@@ -26,11 +26,11 @@ jobs:
           terraform_wrapper: false
           terraform_version: 1.1.7
 
-      # - name: Initialize Terraform
-      #   run: terraform init --retry-once-with-cleanup=true
+      - name: Initialize Terraform
+        run: terraform init
 
       - name: Format Terraform configuration
         run: terraform fmt -diff -check -no-color -recursive
 
       - name: Validate Terraform configuration
-        run: terraform validate
+        run: terraform validate --hook-config=--retry-once-with-cleanup=true 
