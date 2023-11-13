@@ -1,0 +1,33 @@
+#https://artifacthub.io/packages/helm/cloudbees/cloudbees-core/
+#https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/installing-eks-using-helm
+Subdomain: true
+OperationsCenter:
+  JavaOpts: >-
+      -XX:InitialRAMPercentage=70.0
+      -XX:MaxRAMPercentage=70.0
+  Resources:
+    Limits:
+      Memory: "4G"
+      Cpu: 2
+    Requests:
+      Memory: "4G"
+      Cpu: 2
+  HostName: ${hostname}
+  Protocol: https
+  Platform: eks
+  Ingress:
+    Class: alb
+    Annotations:
+      alb.ingress.kubernetes.io/scheme: internet-facing
+      alb.ingress.kubernetes.io/certificate-arn: ${cert_arn}
+  License:
+    Evaluation:
+      Enabled: true
+      FirstName: ${LicFirstName}
+      LastName: ${LicLastName}
+      Email: ${LicEmail}
+      Company: ${LicCompany}    
+Master:
+  JavaOpts: >-
+    -XX:InitialRAMPercentage=70.0
+    -XX:MaxRAMPercentage=70.0
