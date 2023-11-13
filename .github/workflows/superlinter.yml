@@ -1,0 +1,33 @@
+---
+
+name: "Code Quality: Super-Linter"
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+
+jobs:
+  superlinter:
+    name: Super-Linter
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
+        with:
+          fetch-depth: 0
+
+      - name: Lint Code with Super-Linter
+        uses: github/super-linter@454ba4482ce2cd0c505bc592e83c06e1e37ade61 # v4.10.1
+        env:
+          VALIDATE_ALL_CODEBASE: true
+          DEFAULT_BRANCH: "main"
+          DISABLE_ERRORS: false
+          VALIDATE_BASH: true
+          VALIDATE_JSON: true
+          VALIDATE_MD: true
+          VALIDATE_TERRAFORM_TFLINT: true
+          VALIDATE_YAML: true
