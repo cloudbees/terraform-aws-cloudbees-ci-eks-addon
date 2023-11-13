@@ -33,4 +33,4 @@ jobs:
         run: terraform fmt -diff -check -no-color -recursive
 
       - name: Validate Terraform configuration
-        run: terraform validate
+        run: terraform validate --hook-config=--retry-once-with-cleanup=true 
