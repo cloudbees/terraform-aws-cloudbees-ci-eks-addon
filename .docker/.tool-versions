@@ -1,3 +1,4 @@
+kubectl 1.28.3
 awscli 2.11.21
 terraform 1.5.1
 terraform-docs 0.16.0
