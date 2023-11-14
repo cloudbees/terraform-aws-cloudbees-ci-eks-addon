@@ -1,5 +1,8 @@
+# Copyright (c) CloudBees, Inc.
+
 #https://artifacthub.io/packages/helm/cloudbees/cloudbees-core/
 #https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/installing-eks-using-helm
+
 Subdomain: true
 OperationsCenter:
   JavaOpts: >-
