@@ -18,4 +18,4 @@ Run `pre-commit run --all-files`
 
 ## Release Drafter
 
-This repository uses [Release Drafter](https://github.com/release-drafter/release-drafter) thus it is mandatory to label Pull Ruquest and recommended to use [Semantic Commit Messages](https://gist.github.com/joshbuchea/6f47e86d2510bce28f8e7f42ae84c716).
+This repository uses [Release Drafter](https://github.com/release-drafter/release-drafter) thus it is recommended to use [Semantic Commit Messages](https://gist.github.com/joshbuchea/6f47e86d2510bce28f8e7f42ae84c716) to ease labelling your Pull Request accordingly.
