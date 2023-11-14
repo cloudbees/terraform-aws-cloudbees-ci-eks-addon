@@ -21,6 +21,7 @@ permissions:
 
 jobs:
   update_release_draft:
+    name: Update_Release_Draft
     permissions:
       # write permission is required to create a github release
       contents: write
