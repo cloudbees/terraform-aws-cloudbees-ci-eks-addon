@@ -6,10 +6,12 @@ This document provides guidelines for contributing to the module.
 
 Validate your changes inside the blueprint-agent described in [.Dockerfile](.docker/Dockerfile). It can be run `make dBuildAndRun`.
 
-## Linting and Formatting
+## Pre-commits: Linting, Formatting and Secrets Scanning
 
 Many of the files in the repository can be linted or formatted to
 maintain a standard of quality.
+
+Additionally, secret leaks are watched via gitleaks and git-secrets.
 
 When working with the repository for the first time run pre-commit
 
