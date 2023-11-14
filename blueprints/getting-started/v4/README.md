@@ -1,6 +1,6 @@
 # HashiCorp Consul Add-on for AWS EKS
 
-> Get started with this add-on by reviewing the following example.
+> Get started with this add-on by reviewing the following example using [AWS EKS Blueprint v4](https://github.com/aws-ia/terraform-aws-eks-blueprints/tree/v4.32.1).
 
 ## Overview
 
