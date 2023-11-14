@@ -30,10 +30,4 @@ variable "cert_arn" {
 variable "temp_license" {
   description = "Temporary license details"
   type        = map(string)
-  default = {
-    first_name = "User Name Example"
-    last_name  = "User Last Name Example"
-    email      = "example@mail.com"
-    company    = "Example Inc."
-  }
 }

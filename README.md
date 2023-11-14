@@ -15,9 +15,9 @@ If you would like to override any defaults with the chart, you can do so by pass
 |------|-------------|------|---------|:--------:|
 | cert_arn | Certificate ARN from AWS ACM | `string` | n/a | yes |
 | hostname | Route53 Hosted zone name | `string` | n/a | yes |
+| temp_license | Temporary license details | `map(string)` | n/a | yes |
 | helm_config | CloudBees CI Helm chart configuration | `any` | `{}` | no |
 | manage_via_gitops | Determines if the add-on should be managed via GitOps | `bool` | `false` | no |
-| temp_license | Temporary license details | `map(string)` | <pre>{<br>  "company": "Example Inc.",<br>  "email": "example@mail.com",<br>  "first_name": "User Name Example",<br>  "last_name": "User Last Name Example"<br>}</pre> | no |
 
 ### Outputs
 
