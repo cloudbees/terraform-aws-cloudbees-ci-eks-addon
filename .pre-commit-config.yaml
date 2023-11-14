@@ -1,4 +1,4 @@
-# Copyright (c) HashiCorp, Inc.
+# Copyright (c) CloudBees, Inc.
 
 fail_fast: false
 repos:

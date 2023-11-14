@@ -1,3 +1,6 @@
+# Copyright (c) CloudBees, Inc.
+---
+
 name: Release Drafter
 
 on:

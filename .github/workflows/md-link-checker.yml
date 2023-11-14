@@ -1,4 +1,7 @@
-name: MD Links Checker
+# Copyright (c) CloudBees, Inc.
+---
+
+name: "Documentation: MD Links Checker"
 on:
   pull_request:
   push:
