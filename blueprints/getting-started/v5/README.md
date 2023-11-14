@@ -6,10 +6,11 @@
 
 The code in this directory showcases an easy way to get started with the HashiCorp Consul Add-on for AWS EKS.
 
+<!-- UNCOMMENT when root example is ready
 * [main.tf](./main.tf) contains the AWS and Kubernetes resources needed to use this add-on.
 * [outputs.tf](./outputs.tf) defines outputs that make interacting with `kubectl` easier
 * [providers.tf](./providers.tf) defines the required Terraform (core) and Terraform provider versions
-* [variables.tf](./variables.tf) defines the variables needed to use this add-on.
+* [variables.tf](./variables.tf) defines the variables needed to use this add-on. -->
 
 ## Usage
 
