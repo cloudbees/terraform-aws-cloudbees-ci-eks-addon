@@ -1,0 +1,13 @@
+{
+	"ignorePatterns": [
+		{
+			"pattern": "^https://support.cloudbees.com/hc/en-us"
+		},
+		{
+			"pattern": "^https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon"
+		},
+		{
+			"pattern": "^https://university.cloudbees.com/"
+		}
+	]
+}
