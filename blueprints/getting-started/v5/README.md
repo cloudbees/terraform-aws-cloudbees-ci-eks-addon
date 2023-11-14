@@ -70,5 +70,11 @@ Then, the CloudBees CI installation Wizard will be displayed asking for initial 
 Finally, install the suggested plugins and create the first admin user.
 
 <!-- BEGIN_TF_DOCS -->
+### Inputs
 
+No inputs.
+
+### Outputs
+
+No outputs.
 <!-- END_TF_DOCS -->
