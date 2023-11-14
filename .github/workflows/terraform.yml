@@ -1,14 +1,9 @@
 # Copyright (c) CloudBees, Inc.
 ---
-
 name: "Code Quality: Terraform"
 
 on:
   pull_request:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
 
 jobs:
   terraform:
