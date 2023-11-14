@@ -1,4 +1,6 @@
-name: MD Links Checker
+---
+
+name: "Documentation: MD Links Checker"
 on:
   pull_request:
   push:
