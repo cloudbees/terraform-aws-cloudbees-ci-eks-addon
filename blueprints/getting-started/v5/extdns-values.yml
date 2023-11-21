@@ -1,0 +1,6 @@
+#https://artifacthub.io/packages/helm/external-dns/external-dns
+#https://github.com/kubernetes-sigs/external-dns/tree/master/charts/external-dns/Chart.yaml
+provider: "aws"
+domainFilters: [ "${zoneDNS}" ]
+policy: "sync"
+logLevel: "debug"

@@ -8,6 +8,10 @@
 
 If you would like to override any defaults with the chart, you can do so by passing the `helm_config` variable.
 
+## Compatibility
+
+CloudBees CI Add-on uses for its resources definition `helms release` (no ) which makes it compatible [AWS EKS Blueprint v4](https://github.com/aws-ia/terraform-aws-eks-blueprints/tree/v4.32.1) and [AWS EKS Blueprint v5](https://github.com/aws-ia/terraform-aws-eks-blueprints/tree/v5.0.0) (Additional info at [v4 to v5 migration guide](https://aws-ia.github.io/terraform-aws-eks-blueprints/v4-to-v5/motivation/)).
+
 <!-- BEGIN_TF_DOCS -->
 ### Inputs
 
@@ -17,31 +21,19 @@ If you would like to override any defaults with the chart, you can do so by pass
 | hostname | Route53 Hosted zone name | `string` | n/a | yes |
 | temp_license | Temporary license details | `map(string)` | n/a | yes |
 | helm_config | CloudBees CI Helm chart configuration | `any` | `{}` | no |
-| manage_via_gitops | Determines if the add-on should be managed via GitOps | `bool` | `false` | no |
 
 ### Outputs
 
 | Name | Description |
 |------|-------------|
-| argocd_gitops_config | Configuration used for managing the add-on with ArgoCD |
 | merged_helm_config | (merged) Helm Config for CloudBees CI |
 <!-- END_TF_DOCS -->
-
-## Blueprints
-
-### Getting Started
-
-```bash
-ROOT=getting-started/v4 make tfRun
-```
-
-```bash
-ROOT=getting-started/v5 make tfRun
-```
 
 ## References
 
 - [Amazon EKS Blueprints for Terraform](https://aws-ia.github.io/terraform-aws-eks-blueprints/)
 - [Amazon EKS Blueprints Addons](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/)
+- [Bootstrapping clusters with EKS Blueprints | Containers](https://aws.amazon.com/blogs/containers/bootstrapping-clusters-with-eks-blueprints/)
 - [CloudBees CI Docs](https://docs.cloudbees.com/docs/cloudbees-ci/latest/)
 - [CloudBees CI release notes](https://docs.cloudbees.com/docs/release-notes/latest/cloudbees-ci/)
+- [Architecture for CloudBees CI on modern cloud platforms](https://docs.cloudbees.com/docs/cloudbees-ci/latest/architecture/ci-cloud)
