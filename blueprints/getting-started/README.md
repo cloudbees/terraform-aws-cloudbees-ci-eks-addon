@@ -108,6 +108,6 @@ OR
 ROOT=getting-started/v5 make tfDestroy
 ```
 
-<!-- BEGIN_TF_DOCS -->
+## Architecture
 
-<!-- END_TF_DOCS -->
+![Architecture](../diagrams/getting-started.png)
