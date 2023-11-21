@@ -110,4 +110,4 @@ ROOT=getting-started/v5 make tfDestroy
 
 ## Architecture
 
-![Architecture](../diagrams/getting-started.png)
+![Architecture](../diagrams/getting-started.drawio.png)
