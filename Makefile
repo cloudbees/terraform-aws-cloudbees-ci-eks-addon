@@ -4,7 +4,7 @@ MAKEFLAGS       	+= --no-print-directory
 MKFILEDIR 			:= $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 
 define confirmation
-	@echo -n "Are OK with $(1) [yes/No] " && read ans && [ $${ans:-No} = yes ]
+	@echo -n "Asking for your confirmation for $(1) [yes/No] " && read ans && [ $${ans:-No} = yes ]
 endef
 
 #https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#deploy
