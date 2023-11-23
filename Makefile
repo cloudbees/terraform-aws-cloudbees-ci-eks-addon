@@ -41,7 +41,7 @@ define validate
 	@echo "Initial Admin Password: $(shell kubectl exec -n $(2) -ti cjoc-0 -- cat /var/jenkins_home/secrets/initialAdminPassword)"
 endef
 
-define testBlueprint
+define test
 	@echo ">> Testing Blueprint $(1)..."
 	$(call tfDeploy,$(1))
 	$(call validate,$(1),\
@@ -51,7 +51,7 @@ define testBlueprint
 endef
 
 .PHONY: dBuildAndRun
-dBuildAndRun: ## Docker Build and Run locally 
+dBuildAndRun: ## Docker Build and Run locally. Example: make dBuildAndRun 
 dBuildAndRun:
 	docker build . --file .docker/Dockerfile \
 		--tag local.cloudbees/bp-agent:latest
@@ -60,27 +60,32 @@ dBuildAndRun:
 		local.cloudbees/bp-agent:latest
 
 .PHONY: tfDeploy
-tfDeploy: ## Deploy Terraform Blueprint passed as parameter. ROOT=getting-started/v4 make tfRun 
+tfDeploy: ## Deploy Terraform Blueprint passed as parameter. Example: ROOT=getting-started/v4 make tfRun 
 tfDeploy: guard-ROOT
 	$(call tfDeploy,$(ROOT))
 
 .PHONY: tfDestroy
-tfDestroy: ## Destroy Terraform Blueprint passed as parameter. ROOT=getting-started/v4 make tfDestroy 
+tfDestroy: ## Destroy Terraform Blueprint passed as parameter. Example: ROOT=getting-started/v4 make tfDestroy 
 tfDestroy: guard-ROOT
 	$(call tfDestroy,$(ROOT))
 
 .PHONY: validate
-validate: ## Validate CloudBees CI Blueprint deployment passed as parameter. ROOT=getting-started/v4 make validate
+validate: ## Validate CloudBees CI Blueprint deployment passed as parameter. Example: ROOT=getting-started/v4 make validate
 validate: guard-ROOT
 	$(call validate,$(ROOT),\
 		$(shell cd blueprints/$(ROOT) && terraform output -raw eks_blueprints_addon_cbci_namepace),\
 		$(shell cd blueprints/$(ROOT) && terraform output -raw cjoc_url))
 
-.PHONY: tfTestAll
-tfTestAll: ## Test all Terraform Blueprints
-tfTestAll:
-	$(call testBlueprint,getting-started/v4)
-	$(call testBlueprint,getting-started/v5)
+.PHONY: test
+test: ## Test CloudBees CI Blueprint deployment passed as parameter. Example: ROOT=getting-started/v4 make test
+test:
+	$(call test,$(ROOT))
+
+.PHONY: testAll
+testAll: ## Test all Terraform Blueprints. Example: make testAll
+testAll:
+	$(call test,getting-started/v4)
+	$(call test,getting-started/v5)
 
 .PHONY: help
 help: ## Makefile Help Page
