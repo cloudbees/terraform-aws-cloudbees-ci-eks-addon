@@ -37,6 +37,8 @@ Alternatively
 
 ## Deploy
 
+First of all, customize your variables by copying `.auto.tfvars.example` to `.auto.tfvars`.
+
 Initialize the root module and any associated configuration for providers and finally create the resources and deploy CloudBees CI to an EKS Cluster. Please refer to [Getting Started - Amazon EKS Blueprints for Terraform - Deploy](https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#deploy)
 
 In case, it is required to review the resources before applying the changes, remove the flag `-auto-approve` from the commands.
