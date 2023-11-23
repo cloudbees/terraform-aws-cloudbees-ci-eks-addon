@@ -1,30 +1,23 @@
 # CloudBees CI Add-on getting started Blueprint
 
-> Get started with CloudBees CI add-on by reviewing this example which deploys the minimum set of resources to install
-[CloudBees CI on EKS](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/) following its [prerequisites](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/installing-eks-using-helm#_prerequisites):
+Get started with the CloudBees CI add-on by reviewing this example which deploys the minimum set of resources to install [CloudBees CI on EKS](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/) following its [prerequisites](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/installing-eks-using-helm#_prerequisites):
 
 - AWS Certificate Manager
 - [AWS Load Balancer Controller](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/aws-load-balancer-controller/)
 - [External DNS](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/external-dns/)
 
-## Overview
-
-The code in this directory showcases an easy way to get started with the CloudBees CI Add-on for AWS EKS and demonstrates its compatibility with [AWS EKS Blueprint v4](https://github.com/aws-ia/terraform-aws-eks-blueprints/tree/v4.32.1) and [AWS EKS Blueprint v5](https://github.com/aws-ia/terraform-aws-eks-blueprints/tree/v5.0.0) (Additional info at [v4 to v5 migration guide](https://aws-ia.github.io/terraform-aws-eks-blueprints/v4-to-v5/motivation/)).
-
-This parent directory contains the common AWS resources extended by every of the `getting-started` blueprint versions:
+The code in this directory demonstrates its compatibility with [AWS EKS Blueprint v4](https://github.com/aws-ia/terraform-aws-eks-blueprints/tree/v4.32.1) and [AWS EKS Blueprint v5](https://github.com/aws-ia/terraform-aws-eks-blueprints/tree/v5.0.0) (Additional info on [v4 to v5 migration guide](https://aws-ia.github.io/terraform-aws-eks-blueprints/v4-to-v5/motivation/)).
 
 - [v4](v4/README.md)
 - [v5](v5/README.md)
 
 ## Prerequisites
 
-### Tools
+### Tooling
 
-Ensure that you have the following tools installed locally:
+The required tooling as described in the [Getting Started Guide - Prerequisites](https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#prerequisites)
 
-1. [aws cli](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html)
-2. [kubectl](https://Kubernetes.io/docs/tasks/tools/)
-3. [terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli)
+> **_NOTE:_** For contributing there is a dedicated page [CONTRIBUTING.md](../../CONTRIBUTING.md).
 
 ### AWS Authentication
 
@@ -44,19 +37,13 @@ Alternatively
 
 ## Deploy
 
-Initialize the root module and any associated configuration for providers, review the resources that will be created and finally create the resources and deploy CloudBees CI to an EKS Cluster. For more detailed information, see the documentation for the [Terraform Core workflow](https://www.terraform.io/intro/core-workflow).
+Initialize the root module and any associated configuration for providers and finally create the resources and deploy CloudBees CI to an EKS Cluster. Please refer to [Getting Started - Amazon EKS Blueprints for Terraform - Deploy](https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#deploy)
 
-From the root of the project, run the following command:
+In case, it is required to review the resources before applying the changes, remove the flag `-auto-approve` from the commands.
 
-```bash
-ROOT=getting-started/v4 make tfRun
-```
+For more detailed information, see the documentation for the [Terraform Core workflow](https://www.terraform.io/intro/core-workflow).
 
-OR
-
-```bash
-ROOT=getting-started/v5 make tfRun
-```
+> **_NOTE:_** These steps are automated in the [Makefile](../../Makefile) at the root of the project under the target `tfDeploy`.
 
 ## Validate
 
@@ -90,23 +77,23 @@ Then, the CloudBees CI installation Wizard will be displayed asking for the init
 
   ```sh
   kubectl exec -n cloudbees-ci -ti cjoc-0 -- cat /var/jenkins_home/secrets/initialAdminPassword
- ```
+  ```
 
 Finally, install the suggested plugins and create the first admin user.
 
+> **_NOTE:_** These steps are automated in the [Makefile](../../Makefile) at the root of the project under the target `validate`.
+
 ## Destroy
 
-From the root of the project, run the following command:
+As the PVCs are not deleted by default, it is required to delete them manually as you can check on the [CloudBees CI EKS Uninstall](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/eks-uninstall).
 
-```bash
-ROOT=getting-started/v4 make tfDestroy
-```
+  ```sh
+  kubectl delete --all pvc --grace-period=0 --force --namespace cloudbees-ci
+  ```
 
-OR
+To teardown and remove the resources created in the blueprint, the typical steps of execution are as explained in [Getting Started - Amazon EKS Blueprints for Terraform - Destroy](https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#destroy)
 
-```bash
-ROOT=getting-started/v5 make tfDestroy
-```
+> **_NOTE:_** These steps are automated in the [Makefile](../../Makefile) at the root of the project under the target `tfDestroy`.
 
 ## Architecture
 

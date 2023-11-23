@@ -3,20 +3,30 @@ SHELL           	:= /bin/bash
 MAKEFLAGS       	+= --no-print-directory
 MKFILEDIR 			:= $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 
-define tfDeploy
-	@echo ">> Deploying CloudBees CI Blueprint $(1)..."
-	terraform -chdir=blueprints/$(1) init -upgrade
-	terraform -chdir=blueprints/$(1) plan 
-	terraform -chdir=blueprints/$(1) apply
+define confirmation
+	@echo -n "Are OK with $(1) [yes/No] " && read ans && [ $${ans:-No} = yes ]
 endef
 
+#https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#deploy
+define tfDeploy
+	@echo ">> Deploying CloudBees CI Blueprint $(1)..."
+	$(call confirmation,Deploy $(1))
+	terraform -chdir=blueprints/$(1) init -upgrade
+	terraform -chdir=blueprints/$(1) apply -target="module.vpc" -auto-approve
+	terraform -chdir=blueprints/$(1) apply -target="module.eks" -auto-approve
+	terraform -chdir=blueprints/$(1) apply -auto-approve
+endef
+
+#https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#destroy
 define tfDestroy
 	@echo ">> Destroying CloudBees CI Blueprint $(1)..."
-	terraform -chdir=blueprints/$(1) destroy -target=module.eks_blueprints_addon_cbci
-	terraform -chdir=blueprints/$(1) destroy -target=module.eks_blueprints_addons
-	terraform -chdir=blueprints/$(1) destroy -target=module.eks
-	terraform -chdir=blueprints/$(1) destroy -target=module.vpc
-	terraform -chdir=blueprints/$(1) destroy
+	$(call confirmation,Destroy $(1))
+	kubectl delete --all pods --grace-period=0 --force --namespace $(shell cd blueprints/$(1) && terraform output -raw eks_blueprints_addon_cbci_namepace) || echo "There are no pods to delete in $(shell cd blueprints/$(1) && terraform output -raw eks_blueprints_addon_cbci_namepace)" 
+	terraform -chdir=blueprints/$(1) destroy -target=module.eks_blueprints_addon_cbci -auto-approve
+	kubectl delete --all pvc --grace-period=0 --force --namespace $(shell cd blueprints/$(1) && terraform output -raw eks_blueprints_addon_cbci_namepace) || echo "There are no pvc to delete in $(shell cd blueprints/$(1) && terraform output -raw eks_blueprints_addon_cbci_namepace)"
+	terraform -chdir=blueprints/$(1) destroy -target=module.eks_blueprints_addons -auto-approve
+	terraform -chdir=blueprints/$(1) destroy -target=module.eks -auto-approve
+	terraform -chdir=blueprints/$(1) destroy -auto-approve
 endef
 
 define validate
@@ -26,7 +36,7 @@ define validate
 	@echo "OC Pod is Ready"
 	until kubectl get ing -n $(2) cjoc; do sleep 2 && echo "Waiting for Ingress to get ready"; done
 	@echo "Ingress Ready"
-	until curl -s $(3)/login  > /dev/null; do sleep 10 && echo "Waiting for Operation Center at $(1)"; done
+	until curl -s $(3)/whoAmI/api/json  > /dev/null; do sleep 10 && echo "Waiting for Operation Center at $(1)"; done
 	@echo "Operation Center Ready at $(3)"
 	@echo "Initial Admin Password: $(shell kubectl exec -n $(2) -ti cjoc-0 -- cat /var/jenkins_home/secrets/initialAdminPassword)"
 endef

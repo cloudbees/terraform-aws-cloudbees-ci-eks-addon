@@ -1,6 +1,6 @@
 # CloudBees CI Add-on getting started Blueprint v5
 
-> [Getting started](../README.md) for [v5](https://github.com/aws-ia/terraform-aws-eks-blueprints/tree/v5.0.0).
+[Getting started](../README.md) for [v5](https://github.com/aws-ia/terraform-aws-eks-blueprints/tree/v5.0.0).
 
 <!-- BEGIN_TF_DOCS -->
 ### Inputs
