@@ -75,7 +75,7 @@ Once you get access to K8s API from your terminal, validate that:
   terraform output cjoc_url
   ```
 
-Then, the CloudBees CI installation Wizard will be displayed asking for the initial password that can obtained by:
+Now that you’ve installed CloudBees CI and operations center, you’ll want to see your system in action. To do this, follow the steps explained in [CloudBees CI EKS Install Guide - Signing in to your CloudBees CI installation](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/installing-eks-using-helm#log-in).
 
   ```sh
   kubectl exec -n cloudbees-ci -ti cjoc-0 -- cat /var/jenkins_home/secrets/initialAdminPassword
