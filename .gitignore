@@ -37,3 +37,4 @@ terraform.rc
 .terraform.lock.hcl
 
 *.log
+.deployed
