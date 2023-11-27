@@ -83,7 +83,7 @@ endif
 test: ## Test CloudBees CI Blueprint deployment passed as parameter. Example: ROOT=getting-started/v4 make test
 test:
 	@printf "\033[36mRunning Smoke Test for CloudBees CI Blueprint $(1)...\033[0m\n\n"
-	rm $(TF_LOG_PATH)
+	if [[ -f $(TF_LOG_PATH) ]]; then rm $(TF_LOG_PATH); fi
 	$(call tfDeploy,$(ROOT))
 	sleep 3
 ifneq (,$(wildcard blueprints/$(ROOT)/.deployed))
