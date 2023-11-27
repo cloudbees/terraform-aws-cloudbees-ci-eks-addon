@@ -39,13 +39,14 @@ define validate
 	$(shell cd $(MKFILEDIR)/blueprints/$(1) && terraform output --raw configure_kubectl)
 	$(eval CBCI_NAMESPACE := $(shell cd blueprints/$(1) && terraform output -raw eks_blueprints_addon_cbci_namepace))
 	$(eval OC_URL := $(shell cd blueprints/$(1) && terraform output -raw cjoc_url))
+	$(eval ADMIN_PASS := $(shell kubectl exec -n $(CBCI_NAMESPACE) -ti cjoc-0 -- cat /var/jenkins_home/secrets/initialAdminPassword))
 	until kubectl get pod -n $(CBCI_NAMESPACE) cjoc-0; do sleep 2 && echo "Waiting for Pod to get ready"; done
 	@echo "OC Pod is Ready"
 	until kubectl get ing -n $(CBCI_NAMESPACE) cjoc; do sleep 2 && echo "Waiting for Ingress to get ready"; done
 	@echo "Ingress Ready"
 	until curl -sSf $(OC_URL)/whoAmI/api/json > /dev/null; do sleep 10 && echo "Waiting for Operation Center at $(1)"; done
 	@echo "Operation Center Ready at $(OC_URL)"
-	@echo "Initial Admin Password: $(shell kubectl exec -n $(CBCI_NAMESPACE) -ti cjoc-0 -- cat /var/jenkins_home/secrets/initialAdminPassword)"
+	@echo "Initial Admin Password: $(ADMIN_PASS)"
 endef
 
 .PHONY: dBuildAndRun
