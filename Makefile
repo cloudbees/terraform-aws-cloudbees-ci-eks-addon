@@ -15,7 +15,7 @@ define tfDeploy
 	terraform -chdir=$(MKFILEDIR)/blueprints/$(1) apply -target="module.vpc" -auto-approve
 	terraform -chdir=$(MKFILEDIR)/blueprints/$(1) apply -target="module.eks" -auto-approve
 	terraform -chdir=$(MKFILEDIR)/blueprints/$(1) apply -auto-approve
-	touch $(MKFILEDIR)/blueprints/$(1)/.deployed
+	@touch $(MKFILEDIR)/blueprints/$(1)/.deployed
 endef
 
 #https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#destroy
@@ -30,7 +30,7 @@ define tfDestroy
 	terraform -chdir=$(MKFILEDIR)/blueprints/$(1) destroy -target=module.eks_blueprints_addons -auto-approve
 	terraform -chdir=$(MKFILEDIR)/blueprints/$(1) destroy -target=module.eks -auto-approve
 	terraform -chdir=$(MKFILEDIR)/blueprints/$(1) destroy -auto-approve
-	rm -f $(MKFILEDIR)/blueprints/$(1)/.deployed
+	@rm -f $(MKFILEDIR)/blueprints/$(1)/.deployed
 endef
 
 define validate
