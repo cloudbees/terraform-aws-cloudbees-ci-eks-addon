@@ -7,9 +7,9 @@
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| domain_name | An existing domain name maped to a Route 53 Hosted Zone | `string` | n/a | yes |
+| domain_name | Desired domain name (e.g. example.com) used as suffix for CloudBees CI subdomains (e.g. cjoc.example.com). It requires to be mapped within an existing Route 53 Hosted Zone. | `string` | n/a | yes |
+| temp_license | Temporary license details | `map(string)` | n/a | yes |
 | tags | Tags to apply to resources | `map(string)` | `{}` | no |
-| temp_license | Temporary license details | `map(string)` | <pre>{<br>  "company": "Example Inc.",<br>  "email": "example@mail.com",<br>  "first_name": "User Name Example",<br>  "last_name": "User Last Name Example"<br>}</pre> | no |
 
 ### Outputs
 

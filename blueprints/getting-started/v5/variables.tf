@@ -6,7 +6,7 @@ variable "tags" {
 }
 
 variable "domain_name" {
-  description = "An existing domain name maped to a Route 53 Hosted Zone"
+  description = "Desired domain name (e.g. example.com) used as suffix for CloudBees CI subdomains (e.g. cjoc.example.com). It requires to be mapped within an existing Route 53 Hosted Zone."
   type        = string
   validation {
     condition     = trim(var.domain_name, " ") != ""
@@ -17,10 +17,4 @@ variable "domain_name" {
 variable "temp_license" {
   description = "Temporary license details"
   type        = map(string)
-  default = {
-    first_name = "User Name Example"
-    last_name  = "User Last Name Example"
-    email      = "example@mail.com"
-    company    = "Example Inc."
-  }
 }
