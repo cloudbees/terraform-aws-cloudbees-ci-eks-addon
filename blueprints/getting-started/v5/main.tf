@@ -5,7 +5,7 @@ data "aws_route53_zone" "this" {
 data "aws_availability_zones" "available" {}
 
 locals {
-  name   = "cbci-start-v5"
+  name   = "cbci-start-v5-i${random_integer.ramdom_id.result}"
   region = "us-east-1"
 
   vpc_name     = "${local.name}-vpc"
@@ -18,7 +18,8 @@ locals {
 
   route53_zone_id  = data.aws_route53_zone.this.id
   route53_zone_arn = data.aws_route53_zone.this.arn
-  azs              = slice(data.aws_availability_zones.available.names, 0, 3)
+  #Number of AZs per region https://docs.aws.amazon.com/ram/latest/userguide/working-with-az-ids.html
+  azs = slice(data.aws_availability_zones.available.names, 0, 3)
 
   cjoc_url = "https://cjoc.${var.domain_name}"
 
@@ -26,6 +27,11 @@ locals {
     "tf:blueprint"  = local.name
     "tf:repository" = "github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon"
   })
+}
+
+resource "random_integer" "ramdom_id" {
+  min = 1
+  max = 999
 }
 
 ################################################################################

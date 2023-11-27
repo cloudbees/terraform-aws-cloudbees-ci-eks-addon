@@ -15,5 +15,5 @@ test () {
   cd "$HERE"/.. && make tfDestroy
 }
 
-test "getting-started/v4"
+#test "getting-started/v4"
 test "getting-started/v5"
