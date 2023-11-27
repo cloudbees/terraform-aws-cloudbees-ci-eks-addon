@@ -35,6 +35,10 @@ Alternatively
   export AWS_PROFILE=... 
   ```
 
+### Existing AWS Hosted Zone
+
+These blueprints rely on an existing Hosted Zone in AWS Route53. If you don't have one, you can create one by following the [AWS Route53 documentation](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/hosted-zones-working-with.html).
+
 ## Deploy
 
 First of all, customize your variables by copying `.auto.tfvars.example` to `.auto.tfvars`.
