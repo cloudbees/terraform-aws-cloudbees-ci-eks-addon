@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+# This script runs the smoke test for all blueprints thorught its Lifecycle
+# 1. Deploy
+# 2. Validate
+# 3. Destroy
+
 set -e
 
 HERE="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
