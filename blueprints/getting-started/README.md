@@ -55,10 +55,10 @@ For more detailed information, see the documentation for the [Terraform Core wor
 
 ## Validate
 
-Once the resources have been created, start by importing the credentials to the `$home/.kube/config` by running in your terminal the outcome of the following command:
+Once the resources have been created, note that a kubeconfig file has been created inside the respective blueprint folder. Start defining the Environment Variable [KUBECONFIG](https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/#the-kubeconfig-environment-variable) to point to the generated file.
 
   ```sh
-  eval $(terraform output --raw configure_kubectl)
+  eval $(terraform output --raw export_kubeconfig)
   ```
 
 Once you get access to K8s API from your terminal, validate that:

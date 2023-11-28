@@ -7,6 +7,10 @@ define confirmation
 	@echo -n "Asking for your confirmation to $(1) [yes/No] " && read ans && [ $${ans:-No} = yes ]
 endef
 
+define getTFOutput
+	$(shell cd blueprints/$(1) && terraform output -raw $(2))
+endef
+
 #https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#deploy
 define tfDeploy
 	@printf "\033[36mDeploying CloudBees CI Blueprint %s...\033[0m\n\n" "$(1)"
@@ -22,11 +26,11 @@ endef
 define tfDestroy
 	@printf "\033[36mDestroying CloudBees CI Blueprint %s...\033[0m\n\n" "$(1)"
 	$(call confirmation,Destroy $(1))
-	$(shell cd $(MKFILEDIR)/blueprints/$(1) && terraform output --raw configure_kubectl)
-	$(eval CBCI_NAMESPACE := $(shell cd blueprints/$(1) && terraform output -raw eks_blueprints_addon_cbci_namepace))
-	kubectl delete --all pods --grace-period=0 --force --namespace $(CBCI_NAMESPACE) || echo "There are no pods to delete in $(shell cd blueprints/$(1) && terraform output -raw eks_blueprints_addon_cbci_namepace)" 
+	$(eval $(call getTFOutput,$(1),export_kubeconfig))
+	$(eval CBCI_NAMESPACE := $(call getTFOutput,$(1),eks_bp_addon_cbci_namepace))
+	kubectl delete --all pods --grace-period=0 --force --namespace $(CBCI_NAMESPACE) || echo "There are no pods to delete in $(CBCI_NAMESPACE)" 
 	terraform -chdir=$(MKFILEDIR)/blueprints/$(1) destroy -target=module.eks_blueprints_addon_cbci -auto-approve
-	kubectl delete --all pvc --grace-period=0 --force --namespace $(CBCI_NAMESPACE) || echo "There are no pvc to delete in $(shell cd blueprints/$(1) && terraform output -raw eks_blueprints_addon_cbci_namepace)"
+	kubectl delete --all pvc --grace-period=0 --force --namespace $(CBCI_NAMESPACE) || echo "There are no pvc to delete in $(CBCI_NAMESPACE)"
 	terraform -chdir=$(MKFILEDIR)/blueprints/$(1) destroy -target=module.eks_blueprints_addons -auto-approve
 	terraform -chdir=$(MKFILEDIR)/blueprints/$(1) destroy -target=module.eks -auto-approve
 	terraform -chdir=$(MKFILEDIR)/blueprints/$(1) destroy -auto-approve
@@ -36,17 +40,18 @@ endef
 define validate
 	@printf "\033[36mValidating CloudBees CI Operation Center availability for %s...\033[0m\n\n" "$(1)"
 	$(call confirmation,Validate $(1))
-	$(shell cd $(MKFILEDIR)/blueprints/$(1) && terraform output --raw configure_kubectl)
-	$(eval CBCI_NAMESPACE := $(shell cd blueprints/$(1) && terraform output -raw eks_blueprints_addon_cbci_namepace))
-	$(eval OC_URL := $(shell cd blueprints/$(1) && terraform output -raw cjoc_url))
-	$(eval ADMIN_PASS := $(shell kubectl exec -n $(CBCI_NAMESPACE) -ti cjoc-0 -- cat /var/jenkins_home/secrets/initialAdminPassword))
-	until kubectl get pod -n $(CBCI_NAMESPACE) cjoc-0; do sleep 2 && echo "Waiting for Pod to get ready"; done
-	@echo "OC Pod is Ready"
-	until kubectl get ing -n $(CBCI_NAMESPACE) cjoc; do sleep 2 && echo "Waiting for Ingress to get ready"; done
-	@echo "Ingress Ready"
-	until curl -sSf $(OC_URL)/whoAmI/api/json > /dev/null; do sleep 10 && echo "Waiting for Operation Center at $(1)"; done
-	@echo "Operation Center Ready at $(OC_URL)"
-	@echo "Initial Admin Password: $(ADMIN_PASS)"
+	$(eval $(call getTFOutput,$(1),export_kubeconfig))
+	$(eval CBCI_NAMESPACE := $(call getTFOutput,$(1),eks_bp_addon_cbci_namepace))
+	$(eval OC_URL := $(call getTFOutput,$(1),cjoc_url))
+	until $(call getTFOutput,$(1),eks_bp_addon_cbci_oc_pod); do sleep 2 && echo "Waiting for Operation Center Pod to get ready"; done
+	@printf "\033[36m✔\033[0m OC Pod is Ready.\n"
+	until $(call getTFOutput,$(1),eks_bp_addon_cbci_liveness_probe_int); do sleep 10 && echo "Waiting for Operation Center Service to pass Health Check from inside the cluster"; done
+	@printf "\033[36m✔\033[0m Operation Center Service passed Health Check inside the cluster.\n"
+	until $(call getTFOutput,$(1),eks_bp_addon_cbci_oc_ing); do sleep 2 && echo "Waiting for Operation Center Ingress to get ready"; done
+	@printf "\033[36m✔\033[0m Operation Center Ingress Ready.\n"
+	until $(call getTFOutput,$(1),eks_bp_addon_cbci_liveness_probe_ext); do sleep 10 && echo "Waiting for Operation Center Service to pass Health Check from outside the cluster"; done
+	@printf "\033[36m✔\033[0m Operation Center Service passed Health Check outside the cluster. It is available at %s.\n" "$(OC_URL)"
+	@echo "Initial Admin Password: `$(call getTFOutput,$(1),eks_bp_addon_cbci_initial_admin_password)`"
 endef
 
 .PHONY: dBuildAndRun
@@ -64,7 +69,7 @@ tfpreFlightChecks: guard-ROOT
 	@if [ ! -f blueprints/$(ROOT)/.auto.tfvars ]; then echo ERROR: blueprints/$(ROOT)/.auto.tfvars file does not exist and it is required that contains your own values for required variables; exit 1; fi
 	$(eval USER_ID := $(shell aws sts get-caller-identity | grep UserId | cut -d"," -f 1 | xargs ))
 	@if [ "$(USER_ID)" == "" ]; then echo "ERROR: AWS Authention for CLI is not configured" && exit 1; fi
-	@echo "Preflight Checks OK for $(USER_ID)"
+	@printf "\033[36m✔\033[0m Preflight Checks OK for %s\n" "$(USER_ID)"
 
 .PHONY: tfDeploy
 tfDeploy: ## Deploy Terraform Blueprint passed as parameter. Example: ROOT=getting-started/v4 make tfDeploy 
@@ -74,11 +79,10 @@ tfDeploy: guard-ROOT tfpreFlightChecks
 .PHONY: tfDestroy
 tfDestroy: ## Destroy Terraform Blueprint passed as parameter. Example: ROOT=getting-started/v4 make tfDestroy 
 tfDestroy: guard-ROOT tfpreFlightChecks
-ifneq (,$(wildcard blueprints/$(ROOT)/.deployed))
-	$(call tfDestroy,$(ROOT))
-else
-	@echo "ERROR: Blueprint $(ROOT) did not complete the Deployment target"
+ifeq (,$(wildcard blueprints/$(ROOT)/.deployed))
+	@echo "WARN: Blueprint $(ROOT) did not complete the Deployment target"
 endif
+	$(call tfDestroy,$(ROOT))
 
 .PHONY: validate
 validate: ## Validate CloudBees CI Blueprint deployment passed as parameter. Example: ROOT=getting-started/v4 make validate
@@ -86,8 +90,13 @@ validate: guard-ROOT
 ifneq (,$(wildcard blueprints/$(ROOT)/.deployed))
 	$(call validate,$(ROOT))
 else
-	@echo "ERROR: Blueprint $(ROOT) did not complete the Deployment target"
+	@echo "ERROR: Blueprint $(ROOT) did not complete the Deployment target thus it is not Ready to be validated."
 endif
+
+.PHONY: test
+test: ## Runs a smoke test for all blueprints throughout their Terraform Lifecycle. Example: make test
+test:
+	bash $(MKFILEDIR)/blueprints/test-all.sh
 
 .PHONY: help
 help: ## Makefile Help Page

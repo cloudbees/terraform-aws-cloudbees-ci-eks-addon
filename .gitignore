@@ -36,5 +36,7 @@ terraform.rc
 # Ignore lock bacause it is not shared enviroment
 .terraform.lock.hcl
 
+# Assests created via Blueprints
 *.log
 .deployed
+kubeconfig*.yaml
