@@ -35,6 +35,11 @@ CloudBees CI Add-on uses for its resources definition `helms release` (no ) whic
 
 | Name | Description |
 |------|-------------|
+| cloudbees_ci_initial_admin_password | Operation Center Service Initial Admin Password for CloudBees CI Add-on. |
+| cloudbees_ci_liveness_probe | Operation Center Service Internal Liveness Probe for CloudBees CI Add-on. |
+| cloudbees_ci_namespace | Namespace for CloudBees CI Addon. |
+| cloudbees_ci_oc_ing | Operation Center Ingress for CloudBees CI Add-on. |
+| cloudbees_ci_oc_pod | Operation Center Pod for CloudBees CI Add-on. |
 | merged_helm_config | (merged) Helm Config for CloudBees CI |
 <!-- END_TF_DOCS -->
 
