@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# This script runs the smoke test for all blueprints thorught its Lifecycle
+# This script runs the smoke test for all blueprints throughout their Terraform Lifecycle
 # 1. Deploy
 # 2. Validate
 # 3. Destroy
