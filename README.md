@@ -6,15 +6,16 @@
 
 ## Usage
 
-By default, it uses a minimum required configuration described in [values.yml](values.yml)
+By default, it uses a minimum required configuration described in [values.yml](values.yml).
 
 If you would like to override any defaults with the chart, you can do so by passing the `helm_config` variable.
 
 ## Motivation
 
-Ease adoption of CloudBees CI by:
+Easing adoption of CloudBees CI by:
 
-- Using [AWS Terraform EKS Addons](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/) as the single point of truth for the required EKS Addons.
+- Provide just the terraform code to deploy [CloudBees CI in EKS](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/) on top of the [AWS Terraform EKS Addons](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/) maintained by AWS.
+- Using [AWS Terraform EKS Addons](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/) as the single point of truth for the required/recommended EKS Addons.
 - Provide a series of blueprints to deploy [CloudBees CI in EKS](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/).
 
 ## Compatibility
