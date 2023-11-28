@@ -17,9 +17,14 @@
 |------|-------------|
 | acm_certificate_arn | ACM certificate ARN |
 | cjoc_url | URL of the CloudBees CI Operations Center |
-| configure_kubectl | Configure kubectl: make sure you're logged in with the correct AWS profile and run the following command to update your kubeconfig |
-| eks_blueprints_addon_cbci_helm | Helm configuration for CloudBees CI Add-on. It is accesible only via state files. |
-| eks_blueprints_addon_cbci_namepace | Namespace for CloudBees CI Add-on. |
+| eks_bp_addon_cbci_helm | Helm configuration for CloudBees CI Add-on. It is accesible only via state files. |
+| eks_bp_addon_cbci_initial_admin_password | Operation Center Service Initial Admin Password for CloudBees CI Add-on. |
+| eks_bp_addon_cbci_liveness_probe_ext | Operation Center Service External Liveness Probe for CloudBees CI Add-on. |
+| eks_bp_addon_cbci_liveness_probe_int | Operation Center Service Internal Liveness Probe for CloudBees CI Add-on. |
+| eks_bp_addon_cbci_namepace | Namespace for CloudBees CI Add-on. |
+| eks_bp_addon_cbci_oc_ing | Operation Center Ingress for CloudBees CI Add-on. |
+| eks_bp_addon_cbci_oc_pod | Operation Center Pod for CloudBees CI Add-on. |
 | eks_cluster_arn | EKS cluster ARN |
+| export_kubeconfig | Export KUBECONFIG environment variable to access the EKS cluster. |
 | vpc_arn | VPC ID |
 <!-- END_TF_DOCS -->

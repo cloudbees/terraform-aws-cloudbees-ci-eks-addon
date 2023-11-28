@@ -8,8 +8,10 @@ locals {
   name   = "cbci-start-v5-i${random_integer.ramdom_id.result}"
   region = "us-east-1"
 
-  vpc_name     = "${local.name}-vpc"
-  cluster_name = "${local.name}-eks"
+  vpc_name             = "${local.name}-vpc"
+  cluster_name         = "${local.name}-eks"
+  kubeconfig_file      = "kubeconfig_${local.name}.yaml"
+  kubeconfig_file_path = abspath("${path.root}/${local.kubeconfig_file}")
 
   vpc_cidr = "10.0.0.0/16"
 
@@ -170,6 +172,15 @@ module "eks" {
   }
 
   tags = local.tags
+}
+
+resource "null_resource" "create_kubeconfig" {
+
+  depends_on = [module.eks]
+
+  provisioner "local-exec" {
+    command = "aws eks update-kubeconfig --name ${module.eks.cluster_name} --region ${local.region} --kubeconfig ${local.kubeconfig_file}"
+  }
 }
 
 ################################################################################
