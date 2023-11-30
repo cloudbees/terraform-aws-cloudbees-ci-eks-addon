@@ -5,7 +5,7 @@ data "aws_route53_zone" "this" {
 data "aws_availability_zones" "available" {}
 
 locals {
-  name   = "cbci-start-v4-${random_integer.ramdom_int.result}"
+  name   = "cbci-start-v5-i${random_integer.ramdom_id.result}"
   region = "us-east-1"
 
   vpc_name             = "${local.name}-vpc"
@@ -18,7 +18,8 @@ locals {
   #https://docs.cloudbees.com/docs/cloudbees-common/latest/supported-platforms/cloudbees-ci-cloud#_kubernetes
   k8s_version = "1.26"
 
-  route53_zone_id = data.aws_route53_zone.this.id
+  route53_zone_id  = data.aws_route53_zone.this.id
+  route53_zone_arn = data.aws_route53_zone.this.arn
   #Number of AZs per region https://docs.aws.amazon.com/ram/latest/userguide/working-with-az-ids.html
   azs = slice(data.aws_availability_zones.available.names, 0, 3)
 
@@ -30,7 +31,7 @@ locals {
   })
 }
 
-resource "random_integer" "ramdom_int" {
+resource "random_integer" "ramdom_id" {
   min = 1
   max = 999
 }
@@ -52,32 +53,51 @@ module "eks_blueprints_addon_cbci" {
 }
 
 module "eks_blueprints_addons" {
-  #IMPORTANT: DO NOT CHANGE THE REFERENCE TO THE MODULE
-  #Since 4.32.1 to avoid https://github.com/aws-ia/terraform-aws-eks-blueprints/issues/1630#issuecomment-1577525242
-  source = "github.com/aws-ia/terraform-aws-eks-blueprints//modules/kubernetes-addons?ref=v4.32.1"
+  source  = "aws-ia/eks-blueprints-addons/aws"
+  version = "1.9.1"
 
-  eks_cluster_id       = module.eks.cluster_name
-  eks_cluster_endpoint = module.eks.cluster_endpoint
-  eks_oidc_provider    = module.eks.oidc_provider
-  eks_cluster_version  = module.eks.cluster_version
+  cluster_name      = module.eks.cluster_name
+  cluster_endpoint  = module.eks.cluster_endpoint
+  oidc_provider_arn = module.eks.oidc_provider_arn
+  cluster_version   = module.eks.cluster_version
 
-  # Wait on the node group(s) before provisioning addons
-  data_plane_wait_arn = join(",", [for group in module.eks.eks_managed_node_groups : group.node_group_arn])
+  eks_addons = {
+    aws-ebs-csi-driver = {
+      service_account_role_arn = module.ebs_csi_driver_irsa.iam_role_arn
+    }
+    coredns    = {}
+    vpc-cni    = {}
+    kube-proxy = {}
+  }
 
-  #Used by `ExternalDNS` to create DNS records in this Hosted Zone.
-  eks_cluster_domain = var.domain_name
-
-  # Add-ons
-  enable_amazon_eks_aws_ebs_csi_driver = true
-  enable_external_dns                  = true
-  external_dns_helm_config = {
+  enable_external_dns = true
+  external_dns = {
     values = [templatefile("${path.module}/extdns-values.yml", {
-      zoneIdFilter = local.route53_zone_id
+      zoneDNS = var.domain_name
     })]
   }
+  external_dns_route53_zone_arns      = [local.route53_zone_arn]
   enable_aws_load_balancer_controller = true
 
   tags = local.tags
+}
+
+module "ebs_csi_driver_irsa" {
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+  version = "5.29.0"
+
+  role_name_prefix = "${module.eks.cluster_name}-ebs-csi-driv"
+
+  attach_ebs_csi_policy = true
+
+  oidc_providers = {
+    main = {
+      provider_arn               = module.eks.oidc_provider_arn
+      namespace_service_accounts = ["kube-system:ebs-csi-controller-sa"]
+    }
+  }
+
+  tags = var.tags
 }
 
 ################################################################################
@@ -94,18 +114,6 @@ module "eks" {
 
   vpc_id     = module.vpc.vpc_id
   subnet_ids = module.vpc.private_subnets
-
-  cluster_addons = {
-    coredns = {
-      most_recent = true
-    }
-    kube-proxy = {
-      most_recent = true
-    }
-    vpc-cni = {
-      most_recent = true
-    }
-  }
 
   # Security groups based on the best practices doc https://docs.aws.amazon.com/eks/latest/userguide/sec-group-reqs.html.
   #   So, by default the security groups are restrictive. Users needs to enable rules for specific ports required for App requirement or Add-ons

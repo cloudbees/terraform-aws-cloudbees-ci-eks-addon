@@ -4,7 +4,7 @@ This document provides guidelines for contributing to the module.
 
 ## Dependencies
 
-Validate your changes inside the blueprint-agent described in [.Dockerfile](.docker/Dockerfile). It can be run `make dBuildAndRun`.
+Validate your changes inside the blueprint agent described in [.Dockerfile](.docker/Dockerfile). It can be run `make dBuildAndRun`.
 
 ## Pre-commits: Linting, Formatting and Secrets Scanning
 

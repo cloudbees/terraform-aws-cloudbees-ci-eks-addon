@@ -1,7 +1,6 @@
 # Copyright (c) CloudBees, Inc.
 
 resource "helm_release" "cloudbees_ci" {
-  count = var.manage_via_gitops ? 0 : 1
 
   name             = try(var.helm_config.name, "cloudbees-ci")
   namespace        = try(var.helm_config.namespace, "cloudbees-ci")

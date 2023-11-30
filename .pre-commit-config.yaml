@@ -25,7 +25,7 @@ repos:
     - id: terraform_validate
       name: Validate Terraform Configuration
       args:
-        #- --envs=VAULT_ADDR=""  # For local checks
+        - --envs=VAULT_ADDR=""  # For local checks
         - --hook-config=--retry-once-with-cleanup=true
     - id: terraform_tflint
       args:
