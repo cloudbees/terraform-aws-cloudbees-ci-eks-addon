@@ -41,7 +41,7 @@ resource "random_integer" "ramdom_id" {
 ################################################################################
 
 module "eks_blueprints_addon_cbci" {
-  source = "../../.."
+  source = "../../"
 
   hostname     = var.domain_name
   cert_arn     = module.acm.acm_certificate_arn
@@ -54,7 +54,7 @@ module "eks_blueprints_addon_cbci" {
 
 module "eks_blueprints_addons" {
   source  = "aws-ia/eks-blueprints-addons/aws"
-  version = "1.9.1"
+  version = "1.12.0"
 
   cluster_name      = module.eks.cluster_name
   cluster_endpoint  = module.eks.cluster_endpoint

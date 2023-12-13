@@ -7,8 +7,7 @@ temp_license = { # Required. Temporary license details.
   company = "Acme Inc."
 }
 
-# tags = {  # Optional. Tags for the resources created. Default set to empty. Shared among all. 
+# tags = {  # Optional. Tags for the resources created. Default set to empty. Shared among all.
 #   "cb:owner" : "professional-services"
 #   "cb:user" : "crodriguezlopez"
 # }
-

@@ -1,8 +1,0 @@
-#https://artifacthub.io/packages/helm/bitnami/external-dns
-#https://github.com/bitnami/charts/blob/main/bitnami/external-dns/Chart.yaml
-zoneIdFilters:
-  - ${zoneIdFilter}
-policy: "sync"
-aws:
-  zonesCacheDuration: "1m"
-logLevel: "debug"
