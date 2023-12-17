@@ -8,6 +8,7 @@ temp_license = { # Required. Temporary license details.
 }
 
 # tags = {  # Optional. Tags for the resources created. Default set to empty. Shared among all.
-#   "cb:owner" : "professional-services"
-#   "cb:user" : "crodriguezlopez"
+#   "cb-owner" : "professional-services"
+#   "cb-user" : "crodriguezlopez"
+#   "cb-environment" : "demo"
 # }
