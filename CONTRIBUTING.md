@@ -6,7 +6,7 @@ This document provides guidelines for contributing to the module.
 
 Validate your changes inside the blueprint agent described in the [Dockerfile](blueprints/Dockerfile). which is using tooling listed in the [asdf](https://asdf-vm.com/) [tool-versions](blueprints/.tool-versions).
 
-> **_NOTE:_** The agent and dependecies can be automated via [Makefile](../../Makefile) at the root of the project under the target `dRun`.
+> **_NOTE:_** The agent and dependecies can be automated via [Makefile](Makefile) at the root of the project under the target `dRun`.
 
 ## Pre-commits: Linting, Formatting and Secrets Scanning
 
@@ -21,4 +21,4 @@ Run `pre-commit run --all-files`
 
 ## Release Drafter
 
-This repository uses [Release Drafter](https://github.com/release-drafter/release-drafter) thus it is recommended to use [Semantic Commit Messages](https://gist.github.com/joshbuchea/6f47e86d2510bce28f8e7f42ae84c716) to ease labelling your Pull Request accordingly.
+This repository uses [Release Drafter](https://github.com/release-drafter/release-drafter) do not forget to label Pull Request accordingly.

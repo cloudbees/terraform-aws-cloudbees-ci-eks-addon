@@ -3,7 +3,12 @@
 variable "helm_config" {
   description = "CloudBees CI Helm chart configuration"
   type        = any
-  default     = {}
+  default = {
+    values = [
+      <<-EOT
+      EOT
+    ]
+  }
 }
 
 variable "hostname" {

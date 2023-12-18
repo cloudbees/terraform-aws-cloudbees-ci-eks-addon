@@ -14,11 +14,11 @@ If you would like to override any defaults with the chart, you can do so by pass
 
 Easing adoption of CloudBees CI by:
 
-- Provide just the terraform code to deploy [CloudBees CI in EKS](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/) on top of the [AWS Terraform EKS Addons](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/) maintained by AWS.
+- Providing the HCL code to deploy [CloudBees CI in EKS](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/).
 - Using [AWS Terraform EKS Addons](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/) as the single point of truth for the required/recommended EKS Addons.
 - Provide a series of blueprints to deploy [CloudBees CI in EKS](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/).
 
-## License
+## CloudBees License
 
 This module runs with a [Trial License for CloudBees CI](https://docs.cloudbees.com/docs/cloudbees-ci-migration/latest/trial-guide/).
 
@@ -36,7 +36,7 @@ CloudBees CI Add-on uses for its resources definition `helms release` which make
 | cert_arn | Certificate ARN from AWS ACM | `string` | n/a | yes |
 | hostname | Route53 Hosted zone name | `string` | n/a | yes |
 | temp_license | Temporary license details | `map(string)` | n/a | yes |
-| helm_config | CloudBees CI Helm chart configuration | `any` | `{}` | no |
+| helm_config | CloudBees CI Helm chart configuration | `any` | <pre>{<br>  "values": [<br>    ""<br>  ]<br>}</pre> | no |
 
 ### Outputs
 

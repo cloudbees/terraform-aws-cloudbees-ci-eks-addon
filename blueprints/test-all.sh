@@ -12,7 +12,8 @@ HERE="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export TF_LOG=DEBUG
 
 declare -a bluePrints=(
-  "getting-started"
+  #"01-getting-started"
+  "02-at-scale"
 )
 
 test () {
