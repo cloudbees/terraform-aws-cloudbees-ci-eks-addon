@@ -4,12 +4,15 @@ data "aws_route53_zone" "this" {
 
 data "aws_availability_zones" "available" {}
 
+data "aws_caller_identity" "current" {}
+
 locals {
-  name   = "cbci-start-v5-i${random_integer.ramdom_id.result}"
+  name   = "cbci-bp02-i${random_integer.ramdom_id.result}"
   region = "us-east-1"
 
   vpc_name             = "${local.name}-vpc"
   cluster_name         = "${local.name}-eks"
+  efs_name             = "${local.name}-efs"
   kubeconfig_file      = "kubeconfig_${local.name}.yaml"
   kubeconfig_file_path = abspath("${path.root}/${local.kubeconfig_file}")
 
@@ -17,6 +20,15 @@ locals {
 
   #https://docs.cloudbees.com/docs/cloudbees-common/latest/supported-platforms/cloudbees-ci-cloud#_kubernetes
   k8s_version = "1.26"
+
+  k8s_instance_types = {
+    # Not Scalable
+    "k8s-apps" = ["m5.8xlarge"]
+    # Scalable
+    "cb-apps"    = ["m5d.4xlarge"] #https://aws.amazon.com/about-aws/whats-new/2018/06/introducing-amazon-ec2-m5d-instances/
+    "agent"      = ["m5.2xlarge"]
+    "agent-spot" = ["m5.2xlarge"]
+  }
 
   route53_zone_id  = data.aws_route53_zone.this.id
   route53_zone_arn = data.aws_route53_zone.this.arn
@@ -29,6 +41,9 @@ locals {
     "tf:blueprint"  = local.name
     "tf:repository" = "github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon"
   })
+
+  current_account_id  = data.aws_caller_identity.current.account_id
+  current_account_arn = data.aws_caller_identity.current.arn
 }
 
 resource "random_integer" "ramdom_id" {
@@ -46,6 +61,10 @@ module "eks_blueprints_addon_cbci" {
   hostname     = var.domain_name
   cert_arn     = module.acm.acm_certificate_arn
   temp_license = var.temp_license
+
+  helm_config = {
+    values = [file("${path.module}/cbci-values.yml")]
+  }
 
   depends_on = [
     module.eks_blueprints_addons
@@ -69,7 +88,7 @@ module "eks_blueprints_addons" {
     vpc-cni    = {}
     kube-proxy = {}
   }
-
+  #01-getting-started
   enable_external_dns = true
   external_dns = {
     values = [templatefile("${path.module}/extdns-values.yml", {
@@ -78,6 +97,11 @@ module "eks_blueprints_addons" {
   }
   external_dns_route53_zone_arns      = [local.route53_zone_arn]
   enable_aws_load_balancer_controller = true
+  #02-at-scale
+  enable_aws_efs_csi_driver = true
+  enable_metrics_server     = true
+  enable_cluster_autoscaler = true
+  #enable_aws_node_termination_handler = true
 
   tags = local.tags
 }
@@ -114,6 +138,28 @@ module "eks" {
 
   vpc_id     = module.vpc.vpc_id
   subnet_ids = module.vpc.private_subnets
+
+  eks_managed_node_group_defaults = {
+    disk_size = 50
+    iam_role_additional_policies = {
+      # Not required, but used in the example to access the nodes to inspect mounted volumes
+      AmazonSSMManagedInstanceCore = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+    }
+    block_device_mappings = {
+      # Root volume
+      xvda = {
+        device_name = "/dev/xvda"
+        ebs = {
+          volume_size           = 24
+          volume_type           = "gp3"
+          iops                  = 3000
+          encrypted             = true
+          kms_key_id            = module.ebs_kms_key.key_arn
+          delete_on_termination = true
+        }
+      }
+    }
+  }
 
   # Security groups based on the best practices doc https://docs.aws.amazon.com/eks/latest/userguide/sec-group-reqs.html.
   #   So, by default the security groups are restrictive. Users needs to enable rules for specific ports required for App requirement or Add-ons
@@ -161,17 +207,135 @@ module "eks" {
     }
   }
 
+  #Only Node Groups with Taints can use Autoscaling. Pods requires Selector
   eks_managed_node_groups = {
-    mg_start = {
-      node_group_name = "managed-start"
-      instance_types  = ["m5d.4xlarge"]
+    #Managed by Autoscaling
+    mg_k8sApps = {
+      node_group_name = "managed-k8s-apps"
+      instance_types  = local.k8s_instance_types["k8s-apps"]
       capacity_type   = "ON_DEMAND"
-      disk_size       = 25
       desired_size    = 2
+    },
+    #Managed by Autoscaling
+    mg_cbApps = {
+      node_group_name = "managed-cb-apps"
+      instance_types  = local.k8s_instance_types["cb-apps"]
+      capacity_type   = "ON_DEMAND"
+      min_size        = 1
+      max_size        = 6
+      desired_size    = 1
+      taints          = [{ key = "dedicated", value = "cb-apps", effect = "NO_SCHEDULE" }]
+      labels = {
+        ci_type = "cb-apps"
+      }
+    }
+    mg_cbAgents = {
+      node_group_name = "managed-agent"
+      instance_types  = local.k8s_instance_types["agent"]
+      capacity_type   = "ON_DEMAND"
+      min_size        = 1
+      max_size        = 3
+      desired_size    = 1
+      taints          = [{ key = "dedicated", value = "build-linux", effect = "NO_SCHEDULE" }]
+      labels = {
+        ci_type = "build-linux"
+      }
+    },
+    mg_cbAgents_spot = {
+      node_group_name = "managed-agent-spot"
+      instance_types  = local.k8s_instance_types["agent-spot"]
+      capacity_type   = "SPOT"
+      min_size        = 1
+      max_size        = 3
+      desired_size    = 1
+      taints          = [{ key = "dedicated", value = "build-linux-spot", effect = "NO_SCHEDULE" }]
+      labels = {
+        ci_type = "build-linux-spot"
+      }
     }
   }
 
   tags = local.tags
+}
+
+module "ebs_kms_key" {
+  source  = "terraform-aws-modules/kms/aws"
+  version = "1.5.0"
+
+  description = "Customer managed key to encrypt EKS managed node group volumes"
+
+  # Policy
+  key_administrators = [local.current_account_arn]
+  key_service_roles_for_autoscaling = [
+    # required for the ASG to manage encrypted volumes for nodes
+    "arn:aws:iam::${local.current_account_id}:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling",
+    # required for the cluster / persistentvolume-controller to create encrypted PVCs
+    module.eks.cluster_iam_role_arn
+  ]
+
+  # Aliases
+  aliases = ["eks/${local.name}/ebs"]
+
+  tags = var.tags
+}
+
+resource "kubernetes_annotations" "gp2" {
+  api_version = "storage.k8s.io/v1"
+  kind        = "StorageClass"
+  # This is true because the resources was already created by the ebs-csi-driver addon
+  force = "true"
+
+  metadata {
+    name = "gp2"
+  }
+
+  annotations = {
+    # Modify annotations to remove gp2 as default storage class still retain the class
+    "storageclass.kubernetes.io/is-default-class" = "false"
+  }
+}
+
+resource "kubernetes_storage_class_v1" "gp3" {
+  metadata {
+    name = "gp3"
+
+    # IMPORTANT: Prometheus and Velero requires gp3 (Block Storage)
+    annotations = {
+      "storageclass.kubernetes.io/is-default-class" = "true"
+    }
+  }
+
+  storage_provisioner    = "ebs.csi.aws.com"
+  allow_volume_expansion = true
+  reclaim_policy         = "Delete"
+  volume_binding_mode    = "WaitForFirstConsumer"
+
+  parameters = {
+    encrypted = "true"
+    fsType    = "ext4"
+    type      = "gp3"
+  }
+}
+
+resource "kubernetes_storage_class_v1" "efs" {
+
+  metadata {
+    name = "efs"
+    annotations = {
+      "storageclass.kubernetes.io/is-default-class" = "false"
+    }
+  }
+
+  storage_provisioner = "efs.csi.aws.com"
+  parameters = {
+    provisioningMode = "efs-ap" # Dynamic provisioning
+    fileSystemId     = module.efs.id
+    directoryPerms   = "700"
+  }
+
+  mount_options = [
+    "iam"
+  ]
 }
 
 resource "null_resource" "create_kubeconfig" {
@@ -186,6 +350,32 @@ resource "null_resource" "create_kubeconfig" {
 ################################################################################
 # Supported Resources
 ################################################################################
+
+module "efs" {
+  source  = "terraform-aws-modules/efs/aws"
+  version = "1.2.0"
+
+  creation_token = local.efs_name
+  name           = local.efs_name
+
+  mount_targets = {
+    for k, v in zipmap(local.azs, module.vpc.private_subnets) : k => { subnet_id = v }
+  }
+  security_group_description = "${local.efs_name} EFS security group"
+  security_group_vpc_id      = module.vpc.vpc_id
+  #https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/eks-pre-install-requirements-helm#_storage_requirements
+  performance_mode = "generalPurpose"
+  throughput_mode  = "elastic"
+  security_group_rules = {
+    vpc = {
+      # relying on the defaults provdied for EFS/NFS (2049/TCP + ingress)
+      description = "NFS ingress from VPC private subnets"
+      cidr_blocks = module.vpc.private_subnets_cidr_blocks
+    }
+  }
+
+  tags = var.tags
+}
 
 module "acm" {
   source  = "terraform-aws-modules/acm/aws"

@@ -3,7 +3,7 @@
 resource "helm_release" "cloudbees_ci" {
 
   name             = try(var.helm_config.name, "cloudbees-ci")
-  namespace        = try(var.helm_config.namespace, "cloudbees-ci")
+  namespace        = try(var.helm_config.namespace, "cbci")
   create_namespace = try(var.helm_config.create_namespace, true)
   description      = try(var.helm_config.description, null)
   chart            = "cloudbees-core"
@@ -11,7 +11,7 @@ resource "helm_release" "cloudbees_ci" {
   #Chart versions are linked to an app version: https://docs.cloudbees.com/docs/release-notes/latest/cloudbees-ci/
   version    = try(var.helm_config.version, "3.14783.0+d0af0bc462a0")
   repository = try(var.helm_config.repository, "https://public-charts.artifacts.cloudbees.com/repository/public/")
-  values = try(var.helm_config.values, [templatefile("${path.module}/values.yml", {
+  values = concat(var.helm_config.values, [templatefile("${path.module}/values.yml", {
     hostname     = var.hostname
     cert_arn     = var.cert_arn
     LicFirstName = var.temp_license["first_name"]

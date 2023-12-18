@@ -1,0 +1,25 @@
+# Copyright (c) CloudBees, Inc.
+
+#https://artifacthub.io/packages/helm/cloudbees/cloudbees-core/
+#https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/installing-eks-using-helm
+
+OperationsCenter:
+  Ingress:
+    Annotations:
+      alb.ingress.kubernetes.io/target-group-attributes: stickiness.enabled=true
+  NodeSelector:
+    ci_type: cb-apps
+  Tolerations:
+    - key: dedicated
+      operator: Equal
+      value: cb-apps
+      effect: NoSchedule
+Persistence:
+  StorageClass: efs
+Hibernation:
+  Enabled: true
+Agents:
+  SeparateNamespace:
+    Enabled: true
+    Create: true
+    Name: cbci-agents
