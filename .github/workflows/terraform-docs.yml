@@ -27,7 +27,7 @@ jobs:
       - name: Render documentation for `01-getting-started` example and push changes back to branch
         uses: terraform-docs/gh-actions@f6d59f89a280fa0a3febf55ef68f146784b20ba0 # v1.0.0
         with:
-          config-file: "../../../.terraform-docs.yml"
+          config-file: ".terraform-docs.yml"
           output-file: "README.md"
           git-push: true
           working-dir: "./blueprints/01-getting-started"
@@ -35,7 +35,7 @@ jobs:
       - name: Render documentation for `02-at-scale` example and push changes back to branch
         uses: terraform-docs/gh-actions@f6d59f89a280fa0a3febf55ef68f146784b20ba0 # v1.0.0
         with:
-          config-file: "../../../.terraform-docs.yml"
+          config-file: ".terraform-docs.yml"
           output-file: "README.md"
           git-push: true
           working-dir: "./blueprints/02-at-scale"
