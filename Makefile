@@ -2,6 +2,9 @@
 SHELL           	:= /usr/bin/env bash
 MAKEFLAGS       	+= --no-print-directory
 MKFILEDIR 			:= $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
+MSG_INFO 			:= "\033[36m[INFO] %s\033[0m\n"
+MSG_WARN 			:= "\033[0;33m[WARN] %s\033[0m\n"
+MSG_ERROR 			:= "\033[0;31m[ERROR] %s\033[0m\n"
 
 define confirmation
 	@echo -n "Asking for your confirmation to $(1) [yes/No]" && read ans && [ $${ans:-No} = yes ]
@@ -11,21 +14,9 @@ define tfOutput
 	$(shell cd blueprints/$(1) && terraform output -raw $(2))
 endef
 
-define printINFO
-	@printf "\033[36m[INFO]\033[0m %s\n" "$(1)"
-endef
-
-define printWARN
-	@printf "\033[0;33m[WARN]\033[0m %s\n" "$(1)"
-endef
-
-define printERROR
-	@printf "\033[0;31m[ERROR]\033[0m %s\n" "$(1)"
-endef
-
 #https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#deploy
 define tfDeploy
-	$(call printINFO,Deploying CloudBees CI Blueprint $(1) ...)
+	@printf $(MSG_INFO) "Deploying CloudBees CI Blueprint $(1) ..."
 	$(call confirmation,Deploy $(1))
 	terraform -chdir=$(MKFILEDIR)/blueprints/$(1) init -upgrade
 	terraform -chdir=$(MKFILEDIR)/blueprints/$(1) apply -target="module.vpc" -auto-approve
@@ -36,7 +27,7 @@ endef
 
 #https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#destroy
 define tfDestroy
-	$(call printINFO,Destroying CloudBees CI Blueprint $(1) ...)
+	@printf $(MSG_INFO) "Destroying CloudBees CI Blueprint $(1) ..."
 	$(call confirmation,Destroy $(1))
 	$(eval $(call tfOutput,$(1),export_kubeconfig))
 	$(eval CBCI_NAMESPACE := $(call tfOutput,$(1),eks_bp_addon_cbci_namepace))
@@ -50,19 +41,19 @@ define tfDestroy
 endef
 
 define validate
-	$(call printINFO,Validating CloudBees CI Operation Center availability for $(1) ...)
+	@printf $(MSG_INFO) "Validating CloudBees CI Operation Center availability for $(1) ..."
 	$(call confirmation,Validate $(1))
 	$(eval $(call tfOutput,$(1),export_kubeconfig))
 	$(eval CBCI_NAMESPACE := $(call tfOutput,$(1),eks_bp_addon_cbci_namepace))
 	$(eval OC_URL := $(call tfOutput,$(1),cjoc_url))
 	until $(call tfOutput,$(1),eks_bp_addon_cbci_oc_pod); do sleep 2 && echo "Waiting for Operation Center Pod to get ready"; done
-	$(call printINFO,OC Pod is Ready.)
+	@printf $(MSG_INFO) "OC Pod is Ready."
 	until $(call tfOutput,$(1),eks_bp_addon_cbci_liveness_probe_int); do sleep 10 && echo "Waiting for Operation Center Service to pass Health Check from inside the cluster"; done
-	$(call printINFO,Operation Center Service passed Health Check inside the cluster.)
+	@printf $(MSG_INFO) "Operation Center Service passed Health Check inside the cluster."
 	until $(call tfOutput,$(1),eks_bp_addon_cbci_oc_ing); do sleep 2 && echo "Waiting for Operation Center Ingress to get ready"; done
-	$(call printINFO,Operation Center Ingress Ready.)
+	@printf $(MSG_INFO) "Operation Center Ingress Ready."
 	until $(call tfOutput,$(1),eks_bp_addon_cbci_liveness_probe_ext); do sleep 10 && echo "Waiting for Operation Center Service to pass Health Check from outside the cluster"; done
-	$(call printINFO,Operation Center Service passed Health Check outside the cluster. It is available at $(OC_URL))
+	@printf $(MSG_INFO) "Operation Center Service passed Health Check outside the cluster. It is available at $(OC_URL)."
 	@echo "Initial Admin Password: `$(call tfOutput,$(1),eks_bp_addon_cbci_initial_admin_password)`"
 endef
 
@@ -81,10 +72,10 @@ dRun:
 .PHONY: tfpreFlightChecks
 tfpreFlightChecks: ## Run preflight checks for terraform according to getting-started/README.md . Example: ROOT=getting-started/v4 make tfpreFlightChecks
 tfpreFlightChecks: guard-ROOT
-	@if [ ! -f blueprints/$(ROOT)/.auto.tfvars ]; then $(call printERROR, blueprints/$(ROOT)/.auto.tfvars file does not exist and it is required that contains your own values for required variables); exit 1; fi
+	@if [ ! -f blueprints/$(ROOT)/.auto.tfvars ]; then printf $(MSG_ERROR) "blueprints/$(ROOT)/.auto.tfvars file does not exist and it is required that contains your own values for required variables"; exit 1; fi
 	$(eval USER_ID := $(shell aws sts get-caller-identity | grep UserId | cut -d"," -f 1 | xargs ))
-	@if [ "$(USER_ID)" == "" ]; then $(call printERROR,AWS Authention for CLI is not configured) && exit 1; fi
-	$(call printINFO,Preflight Checks OK for $(USER_ID))
+	@if [ "$(USER_ID)" == "" ]; then printf $(MSG_ERROR) "AWS Authention for CLI is not configured" && exit 1; fi
+	@printf $(MSG_INFO) "Preflight Checks OK for $(USER_ID)"
 
 .PHONY: tfDeploy
 tfDeploy: ## Deploy Terraform Blueprint passed as parameter. Example: ROOT=getting-started/v4 make tfDeploy
@@ -97,7 +88,7 @@ tfDestroy: guard-ROOT tfpreFlightChecks
 ifneq ("$(wildcard blueprints/$(ROOT)/.deployed)","")
 	$(call tfDestroy,$(ROOT))
 else
-	$(call printERROR,Blueprint $(ROOT) did not complete the Deployment target. It is not Ready for Destroy target but it is possible to destroy manually https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#destroy)
+	@printf $(MSG_ERROR) "Blueprint $(ROOT) did not complete the Deployment target. It is not Ready for Destroy target but it is possible to destroy manually https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#destroy"
 endif
 
 .PHONY: clean
@@ -119,7 +110,7 @@ validate: guard-ROOT
 ifneq ("$(wildcard blueprints/$(ROOT)/.deployed)","")
 	$(call validate,$(ROOT))
 else
-	$(call printERROR,Blueprint $(ROOT) did not complete the Deployment target thus it is not Ready to be validated.)
+	@printf $(MSG_ERROR) "Blueprint $(ROOT) did not complete the Deployment target thus it is not Ready to be validated."
 endif
 
 .PHONY: test
