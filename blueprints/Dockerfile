@@ -1,5 +1,3 @@
-# Copyright (c) CloudBees, Inc.
-
 FROM debian:bookworm-slim
 SHELL ["/bin/bash", "-c"]
 
@@ -13,11 +11,8 @@ RUN apt-get update -y && \
     git \
     unzip \
     gnupg \
-    gpg-agent \
     parallel \
-    vim \
     wget \
-    less \
     ca-certificates \
     openssh-client \
     curl \
@@ -33,12 +28,13 @@ USER ${USER}
 COPY ${DOCKERFILE_PATH}/.tool-versions .tool-versions
 
 RUN echo "source .bash_profile" >> .bashrc && \
-    cat <<EOF >> .bash_profile
+cat <<EOF >> .bash_profile
 #ASDF Configuration
 PATH=/${USER}/.asdf/shims:/home/$USER/.asdf/bin:${PATH}
 source /${USER}/.asdf/asdf.sh
 # https://github.com/asdf-vm/asdf/issues/1115#issuecomment-995026427
 rm -rf .asdf/shims/* && asdf reshim
+export PS1="\u \W:\$ "
 EOF
 
 RUN git clone --depth 1 https://github.com/asdf-vm/asdf.git --branch ${ASDF_VERSION} .asdf && \
