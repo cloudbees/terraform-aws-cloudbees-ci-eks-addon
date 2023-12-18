@@ -24,18 +24,18 @@ jobs:
           output-method: inject
           git-push: true
 
-      - name: Render documentation for `getting-started/v4` example and push changes back to branch
+      - name: Render documentation for `01-getting-started` example and push changes back to branch
         uses: terraform-docs/gh-actions@f6d59f89a280fa0a3febf55ef68f146784b20ba0 # v1.0.0
         with:
           config-file: "../../../.terraform-docs.yml"
           output-file: "README.md"
           git-push: true
-          working-dir: "./blueprints/getting-started/v4"
+          working-dir: "./blueprints/01-getting-started"
 
-      - name: Render documentation for `getting-started/v5` example and push changes back to branch
+      - name: Render documentation for `02-at-scale` example and push changes back to branch
         uses: terraform-docs/gh-actions@f6d59f89a280fa0a3febf55ef68f146784b20ba0 # v1.0.0
         with:
           config-file: "../../../.terraform-docs.yml"
           output-file: "README.md"
           git-push: true
-          working-dir: "./blueprints/getting-started/v5"
+          working-dir: "./blueprints/02-at-scale"
