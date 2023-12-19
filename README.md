@@ -14,9 +14,9 @@ If you would like to override any defaults with the chart, you can do so by pass
 
 Easing adoption of CloudBees CI by:
 
-- Providing the HCL code to deploy [CloudBees CI in EKS](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/).
-- Using [AWS Terraform EKS Addons](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/) as the single point of truth for the required/recommended EKS Addons.
-- Provide a series of blueprints to deploy [CloudBees CI in EKS](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/).
+- Providing a CloudBees CI Add-on module to encapsulate the deployment of [CloudBees CI in EKS](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/).
+- Provide a series of blueprints using the CloudBees CI Add-on module to deploy CloudBees CI in EKS.
+- Using [AWS Terraform EKS Addons](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/) as the single point of truth for third-party EKS Addons. Note that some of the addons are required and others are optional.
 
 ## CloudBees License
 
@@ -49,6 +49,10 @@ CloudBees CI Add-on uses for its resources definition `helms release` which make
 | cloudbees_ci_oc_pod | Operation Center Pod for CloudBees CI Add-on. |
 | merged_helm_config | (merged) Helm Config for CloudBees CI |
 <!-- END_TF_DOCS -->
+
+## Communications
+
+Cloudbees' slack channel [#cbci-eks-blueprints](https://cloudbees.slack.com/archives/C05NACAEM5H)
 
 ## References
 
