@@ -21,13 +21,12 @@ USER ${USER}
 COPY ${DOCKERFILE_PATH}/.tool-versions .tool-versions
 RUN echo "source .bash_profile" >> .bashrc && \
     cat <<EOF >> .bash_profile
-#ASDF Configuration
 PATH=/${USER}/.asdf/shims:/home/$USER/.asdf/bin:${PATH}
 source /${USER}/.asdf/asdf.sh
 rm -rf .asdf/shims/* && asdf reshim
 export PS1="\u \W:\$ "
-EOF \
-    git clone --depth 1 https://github.com/asdf-vm/asdf.git --branch ${ASDF_VERSION} .asdf && \
+EOF
+RUN git clone --depth 1 https://github.com/asdf-vm/asdf.git --branch ${ASDF_VERSION} .asdf && \
     source .asdf/asdf.sh && \
     cut -d' ' -f1 .tool-versions|xargs -i asdf plugin add {} && \
     asdf install
