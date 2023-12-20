@@ -52,14 +52,14 @@ These blueprints rely on an existing Hosted Zone in AWS Route53. If you don't ha
 | Name | Description |
 |------|-------------|
 | acm_certificate_arn | ACM certificate ARN |
-| cjoc_url | URL of the CloudBees CI Operations Center |
-| eks_bp_addon_cbci_helm | Helm configuration for CloudBees CI Add-on. It is accesible only via state files. |
-| eks_bp_addon_cbci_initial_admin_password | Operation Center Service Initial Admin Password for CloudBees CI Add-on. |
-| eks_bp_addon_cbci_liveness_probe_ext | Operation Center Service External Liveness Probe for CloudBees CI Add-on. |
-| eks_bp_addon_cbci_liveness_probe_int | Operation Center Service Internal Liveness Probe for CloudBees CI Add-on. |
-| eks_bp_addon_cbci_namepace | Namespace for CloudBees CI Add-on. |
-| eks_bp_addon_cbci_oc_ing | Operation Center Ingress for CloudBees CI Add-on. |
-| eks_bp_addon_cbci_oc_pod | Operation Center Pod for CloudBees CI Add-on. |
+| cbci_helm | Helm configuration for CloudBees CI Add-on. It is accesible only via state files. |
+| cbci_initial_admin_password | Operation Center Service Initial Admin Password for CloudBees CI Add-on. |
+| cbci_liveness_probe_ext | Operation Center Service External Liveness Probe for CloudBees CI Add-on. |
+| cbci_liveness_probe_int | Operation Center Service Internal Liveness Probe for CloudBees CI Add-on. |
+| cbci_namespace | Namespace for CloudBees CI Add-on. |
+| cbci_oc_ing | Operation Center Ingress for CloudBees CI Add-on. |
+| cbci_oc_pod | Operation Center Pod for CloudBees CI Add-on. |
+| cjoc_url | URL of the CloudBees CI Operations Center for CloudBees CI Add-on. |
 | eks_cluster_arn | EKS cluster ARN |
 | export_kubeconfig | Export KUBECONFIG environment variable to access the EKS cluster. |
 | vpc_arn | VPC ID |

@@ -30,7 +30,7 @@ define tfDestroy
 	@printf $(MSG_INFO) "Destroying CloudBees CI Blueprint $(1) ..."
 	$(call confirmation,Destroy $(1))
 	$(eval $(call tfOutput,$(1),export_kubeconfig))
-	$(eval CBCI_NAMESPACE := $(call tfOutput,$(1),eks_bp_addon_cbci_namepace))
+	$(eval CBCI_NAMESPACE := $(call tfOutput,$(1),cbci_namespace))
 	kubectl delete --all pods --grace-period=0 --force --namespace $(CBCI_NAMESPACE) || echo "There are no pods to delete in $(CBCI_NAMESPACE)"
 	terraform -chdir=$(MKFILEDIR)/blueprints/$(1) destroy -target=module.eks_blueprints_addon_cbci -auto-approve
 	kubectl delete --all pvc --grace-period=0 --force --namespace $(CBCI_NAMESPACE) || echo "There are no pvc to delete in $(CBCI_NAMESPACE)"
@@ -44,17 +44,17 @@ define validate
 	@printf $(MSG_INFO) "Validating CloudBees CI Operation Center availability for $(1) ..."
 	$(call confirmation,Validate $(1))
 	$(eval $(call tfOutput,$(1),export_kubeconfig))
-	$(eval CBCI_NAMESPACE := $(call tfOutput,$(1),eks_bp_addon_cbci_namepace))
+	$(eval CBCI_NAMESPACE := $(call tfOutput,$(1),cbci_namespace))
 	$(eval OC_URL := $(call tfOutput,$(1),cjoc_url))
-	until $(call tfOutput,$(1),eks_bp_addon_cbci_oc_pod); do sleep 2 && echo "Waiting for Operation Center Pod to get ready"; done
+	until $(call tfOutput,$(1),cbci_oc_pod); do sleep 2 && echo "Waiting for Operation Center Pod to get ready"; done
 	@printf $(MSG_INFO) "OC Pod is Ready."
-	until $(call tfOutput,$(1),eks_bp_addon_cbci_liveness_probe_int); do sleep 10 && echo "Waiting for Operation Center Service to pass Health Check from inside the cluster"; done
+	until $(call tfOutput,$(1),cbci_liveness_probe_int); do sleep 10 && echo "Waiting for Operation Center Service to pass Health Check from inside the cluster"; done
 	@printf $(MSG_INFO) "Operation Center Service passed Health Check inside the cluster."
-	until $(call tfOutput,$(1),eks_bp_addon_cbci_oc_ing); do sleep 2 && echo "Waiting for Operation Center Ingress to get ready"; done
+	until $(call tfOutput,$(1),cbci_oc_ing); do sleep 2 && echo "Waiting for Operation Center Ingress to get ready"; done
 	@printf $(MSG_INFO) "Operation Center Ingress Ready."
-	until $(call tfOutput,$(1),eks_bp_addon_cbci_liveness_probe_ext); do sleep 10 && echo "Waiting for Operation Center Service to pass Health Check from outside the cluster"; done
+	until $(call tfOutput,$(1),cbci_liveness_probe_ext); do sleep 10 && echo "Waiting for Operation Center Service to pass Health Check from outside the cluster"; done
 	@printf $(MSG_INFO) "Operation Center Service passed Health Check outside the cluster. It is available at $(OC_URL)."
-	@echo "Initial Admin Password: `$(call tfOutput,$(1),eks_bp_addon_cbci_initial_admin_password)`"
+	@echo "Initial Admin Password: `$(call tfOutput,$(1),cbci_initial_admin_password)`"
 endef
 
 .PHONY: dRun
