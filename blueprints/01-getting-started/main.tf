@@ -5,18 +5,18 @@ data "aws_route53_zone" "this" {
 data "aws_availability_zones" "available" {}
 
 locals {
-  name   = "cbci-bp01-i${random_integer.ramdom_id.result}"
-  region = "us-east-1"
+  name   = "cbci-bp-${var.name}"
+  region = var.region
 
   vpc_name             = "${local.name}-vpc"
   cluster_name         = "${local.name}-eks"
   kubeconfig_file      = "kubeconfig_${local.name}.yaml"
   kubeconfig_file_path = abspath("${path.root}/${local.kubeconfig_file}")
 
-  vpc_cidr = "10.0.0.0/16"
+  vpc_cidr = var.vpc_cidr
 
   #https://docs.cloudbees.com/docs/cloudbees-common/latest/supported-platforms/cloudbees-ci-cloud#_kubernetes
-  k8s_version = "1.26"
+  k8s_version = var.k8s_version
 
   route53_zone_id  = data.aws_route53_zone.this.id
   route53_zone_arn = data.aws_route53_zone.this.arn
@@ -29,11 +29,6 @@ locals {
     "tf:blueprint"  = local.name
     "tf:repository" = "github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon"
   })
-}
-
-resource "random_integer" "ramdom_id" {
-  min = 1
-  max = 999
 }
 
 ################################################################################
