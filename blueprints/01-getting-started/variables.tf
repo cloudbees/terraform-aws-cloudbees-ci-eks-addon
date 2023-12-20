@@ -41,8 +41,8 @@ variable "k8s_version" {
 
 variable "vpc_cidr" {
   description = "CIDR for the EKS cluster VPC"
-  type = string
-  default = "10.0.0.0/16"
+  type        = string
+  default     = "10.0.0.0/16"
   validation {
     condition     = can(cidrhost(var.vpc_cidr, 0))
     error_message = "Must be valid IPv4 CIDR."
