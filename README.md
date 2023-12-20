@@ -28,6 +28,8 @@ Check out [CloudBees CI License Expiration FAQ](https://docs.cloudbees.com/docs/
 
 CloudBees CI Add-on uses for its resources definition `helms release` which makes it compatible [AWS EKS Blueprint v4](https://github.com/aws-ia/terraform-aws-eks-blueprints/tree/v4.32.1) and [AWS EKS Blueprint v5](https://github.com/aws-ia/terraform-aws-eks-blueprints/tree/v5.0.0) (Additional info at [v4 to v5 migration guide](https://aws-ia.github.io/terraform-aws-eks-blueprints/v4-to-v5/motivation/)).
 
+## Terraform Docs
+
 <!-- BEGIN_TF_DOCS -->
 ### Inputs
 
@@ -42,11 +44,13 @@ CloudBees CI Add-on uses for its resources definition `helms release` which make
 
 | Name | Description |
 |------|-------------|
-| cloudbees_ci_initial_admin_password | Operation Center Service Initial Admin Password for CloudBees CI Add-on. |
-| cloudbees_ci_liveness_probe | Operation Center Service Internal Liveness Probe for CloudBees CI Add-on. |
-| cloudbees_ci_namespace | Namespace for CloudBees CI Addon. |
-| cloudbees_ci_oc_ing | Operation Center Ingress for CloudBees CI Add-on. |
-| cloudbees_ci_oc_pod | Operation Center Pod for CloudBees CI Add-on. |
+| cbci_initial_admin_password | Operation Center Service Initial Admin Password for CloudBees CI Add-on. |
+| cbci_liveness_probe_ext | Operation Center Service External Liveness Probe for CloudBees CI Add-on. |
+| cbci_liveness_probe_int | Operation Center Service Internal Liveness Probe for CloudBees CI Add-on. |
+| cbci_namespace | Namespace for CloudBees CI Addon. |
+| cbci_oc_ing | Operation Center Ingress for CloudBees CI Add-on. |
+| cbci_oc_pod | Operation Center Pod for CloudBees CI Add-on. |
+| cbci_oc_url | Operation Center URL for CloudBees CI Add-on using Subdomain and Certificates. |
 | merged_helm_config | (merged) Helm Config for CloudBees CI |
 <!-- END_TF_DOCS -->
 

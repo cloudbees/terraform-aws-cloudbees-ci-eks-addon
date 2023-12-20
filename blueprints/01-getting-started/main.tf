@@ -23,8 +23,6 @@ locals {
   #Number of AZs per region https://docs.aws.amazon.com/ram/latest/userguide/working-with-az-ids.html
   azs = slice(data.aws_availability_zones.available.names, 0, 3)
 
-  cjoc_url = "https://cjoc.${var.domain_name}"
-
   tags = merge(var.tags, {
     "tf:blueprint"  = local.name
     "tf:repository" = "github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon"
