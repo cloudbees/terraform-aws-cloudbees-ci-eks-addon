@@ -99,7 +99,7 @@ Once you get access to K8s API from your terminal, validate that:
   until kubectl get ing -n cbci cjoc; do sleep 2 && echo "Waiting for Ingress to get ready"; done; echo "Ingress Ready"
   ```
 
-- It is possible to access the CloudBees CI installation Wizard by copying the outcome of the below command in your browser:
+- It is possible to access the CloudBees CI installation Wizard by copying the outcome of the below command in your browser. Please note that this module does not create the record in your Route53 hosted zone. You need to create the relevant record using your preferred method.
 
   ```sh
   terraform output cjoc_url
