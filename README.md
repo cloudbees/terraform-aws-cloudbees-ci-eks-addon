@@ -10,6 +10,8 @@ By default, it uses a minimum required configuration described in [values.yml](v
 
 If you would like to override any defaults with the chart, you can do so by passing the `helm_config` variable.
 
+Follow the [Getting Started](./blueprints/01-getting-started) guide for example on how to use this add-on.
+
 ## Motivation
 
 Easing adoption of CloudBees CI by:
