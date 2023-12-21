@@ -29,7 +29,7 @@ OperationsCenter:
       FirstName: ${LicFirstName}
       LastName: ${LicLastName}
       Email: ${LicEmail}
-      Company: ${LicCompany}    
+      Company: ${LicCompany}
 Master:
   JavaOpts: >-
     -XX:InitialRAMPercentage=70.0
