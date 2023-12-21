@@ -81,6 +81,14 @@ module "eks_blueprints_addons" {
   eks_addons = {
     aws-ebs-csi-driver = {
       service_account_role_arn = module.ebs_csi_driver_irsa.iam_role_arn
+      # ensure any PVC created also includes the custom tags
+      configuration_values = jsonencode(
+        {
+          controller = {
+            extraVolumeTags = local.tags
+          }
+        }
+      )
     }
     coredns    = {}
     vpc-cni    = {}
