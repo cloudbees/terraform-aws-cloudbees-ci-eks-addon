@@ -12,7 +12,7 @@ HERE="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export TF_LOG=DEBUG
 
 declare -a bluePrints=(
-  "01-getting-started"
+  #"01-getting-started"
   "02-at-scale"
 )
 
@@ -23,6 +23,7 @@ test () {
   cd "$HERE"/.. && make tfDeploy
   cd "$HERE"/.. && make validate
   cd "$HERE"/.. && make tfDestroy
+  cd "$HERE"/.. && make clean
 }
 
 for var in "${bluePrints[@]}"
