@@ -19,7 +19,7 @@ locals {
   vpc_cidr = "10.0.0.0/16"
 
   #https://docs.cloudbees.com/docs/cloudbees-common/latest/supported-platforms/cloudbees-ci-cloud#_kubernetes
-  k8s_version = "1.26"
+  k8s_version = "1.27"
 
   k8s_instance_types = {
     # Not Scalable
