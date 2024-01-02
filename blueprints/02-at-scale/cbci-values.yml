@@ -14,6 +14,15 @@ OperationsCenter:
       operator: Equal
       value: cb-apps
       effect: NoSchedule
+  CasC:
+    Enabled: true
+    Retriever:
+      Enabled: true
+      #TODO: Change the organization to CloudBees
+      scmRepo: https://github.com/carlosrodlop/casc-oc-cloudbees-ci-eks-addon
+      scmBranch: main
+      scmBundlePath: bp02
+      scmPollingInterval: PT20M
 Persistence:
   StorageClass: efs
 Hibernation:
