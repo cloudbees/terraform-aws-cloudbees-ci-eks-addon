@@ -17,7 +17,6 @@ declare -a bluePrints=(
 )
 
 test () {
-  printf "\033[36mRunning Smoke Test for CloudBees CI Blueprint %s...\033[0m\n\n" "$1"
   export ROOT=$1
   export TF_LOG_PATH="$HERE/$ROOT/terraform.log"
   cd "$HERE"/.. && make tfDeploy

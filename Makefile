@@ -22,7 +22,7 @@ define tfDeploy
 	terraform -chdir=$(MKFILEDIR)/blueprints/$(1) apply -target="module.vpc" -auto-approve
 	terraform -chdir=$(MKFILEDIR)/blueprints/$(1) apply -target="module.eks" -auto-approve
 	terraform -chdir=$(MKFILEDIR)/blueprints/$(1) apply -auto-approve
-	@touch $(MKFILEDIR)/blueprints/$(1)/.deployed
+	@terraform -chdir=$(MKFILEDIR)/blueprints/$(1) output > $(MKFILEDIR)/blueprints/$(1)/.deployed
 endef
 
 #https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#destroy
@@ -116,6 +116,7 @@ endif
 .PHONY: test
 test: ## Runs a smoke test for all blueprints throughout their Terraform Lifecycle. Example: make test
 test:
+	@printf $(MSG_INFO) "Running Smoke Test for all blueprints ..."
 	bash $(MKFILEDIR)/blueprints/test-all.sh
 
 .PHONY: help
