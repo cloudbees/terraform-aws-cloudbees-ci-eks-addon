@@ -31,10 +31,9 @@ version-resolver:
   default: patch
 template: |
   ## Versions
-
-  * [CloudBees CI Helm Chart version](https://artifacthub.io/packages/helm/cloudbees/cloudbees-core): ![](https://img.shields.io/badge/Version-xxxxx-informational?style=flat-square)
-  * [CloudBees CI Release Notes](https://docs.cloudbees.com/docs/release-notes/latest/cloudbees-ci): ![](https://img.shields.io/badge/Version-xxxxx-informational?style=flat-square)
-  * [Kubernetes version](https://docs.aws.amazon.com/eks/latest/userguide/kubernetes-versions.html): ![](https://img.shields.io/badge/Version-xxxxx-informational?style=flat-square)
+  [![Helm Chart](https://img.shields.io/badge/Chart-xxxxx-informational?style=flat-square)](https://artifacthub.io/packages/helm/cloudbees/cloudbees-core)
+  [![Application](https://img.shields.io/badge/App-xxxxx-informational?style=flat-square)](https://docs.cloudbees.com/docs/release-notes/latest/cloudbees-ci)
+  [![K8s](https://img.shields.io/badge/K8s-xxxxx-informational?style=flat-square)](https://docs.aws.amazon.com/eks/latest/userguide/kubernetes-versions.html)
 
   ## Changes
 
