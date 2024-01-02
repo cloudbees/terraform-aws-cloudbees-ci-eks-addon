@@ -9,7 +9,7 @@ resource "helm_release" "cloudbees_ci" {
   chart            = "cloudbees-core"
   #Chart versions: #https://artifacthub.io/packages/helm/cloudbees/cloudbees-core/
   #Chart versions are linked to an app version: https://docs.cloudbees.com/docs/release-notes/latest/cloudbees-ci/
-  version    = try(var.helm_config.version, "3.14783.0+d0af0bc462a0")
+  version    = try(var.helm_config.version, "3.15666.0+5ea03547ce92")
   repository = try(var.helm_config.repository, "https://public-charts.artifacts.cloudbees.com/repository/public/")
   values = concat(var.helm_config.values, [templatefile("${path.module}/values.yml", {
     hostname     = var.hostname
