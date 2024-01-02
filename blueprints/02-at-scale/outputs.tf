@@ -1,7 +1,12 @@
 
 output "export_kubeconfig" {
-  description = "Export KUBECONFIG environment variable to access the EKS cluster."
+  description = "Export KUBECONFIG environment variable to access the K8s API."
   value       = "export KUBECONFIG=${local.kubeconfig_file_path}"
+}
+
+output "add_kubeconfig" {
+  description = "Add Kubeconfig to local configuration to access the K8s API."
+  value       = "aws eks update-kubeconfig --region ${local.region} --name ${local.cluster_name}"
 }
 
 output "cbci_helm" {

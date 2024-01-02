@@ -52,6 +52,7 @@ These blueprints rely on an existing Hosted Zone in AWS Route53. If you don't ha
 | Name | Description |
 |------|-------------|
 | acm_certificate_arn | ACM certificate ARN |
+| add_kubeconfig | Add Kubeconfig to local configuration to access the K8s API. |
 | cbci_helm | Helm configuration for CloudBees CI Add-on. It is accesible only via state files. |
 | cbci_initial_admin_password | Operation Center Service Initial Admin Password for CloudBees CI Add-on. |
 | cbci_liveness_probe_ext | Operation Center Service External Liveness Probe for CloudBees CI Add-on. |
@@ -61,7 +62,7 @@ These blueprints rely on an existing Hosted Zone in AWS Route53. If you don't ha
 | cbci_oc_pod | Operation Center Pod for CloudBees CI Add-on. |
 | cjoc_url | URL of the CloudBees CI Operations Center for CloudBees CI Add-on. |
 | eks_cluster_arn | EKS cluster ARN |
-| export_kubeconfig | Export KUBECONFIG environment variable to access the EKS cluster. |
+| export_kubeconfig | Export KUBECONFIG environment variable to access to access the K8s API. |
 | vpc_arn | VPC ID |
 <!-- END_TF_DOCS -->
 
