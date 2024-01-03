@@ -18,8 +18,7 @@ OperationsCenter:
     Enabled: true
     Retriever:
       Enabled: true
-      #TODO: Change the organization to CloudBees
-      scmRepo: https://github.com/carlosrodlop/casc-oc-cloudbees-ci-eks-addon
+      scmRepo: https://github.com/cloudbees/casc-oc-cloudbees-ci-eks-addon
       scmBranch: main
       scmBundlePath: bp02
       scmPollingInterval: PT20M
