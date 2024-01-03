@@ -41,8 +41,8 @@ output "cbci_liveness_probe_ext" {
 }
 
 output "cbci_initial_admin_password" {
-  description = "Operation Center Service Initial Admin Password for CloudBees CI Add-on."
-  value       = module.eks_blueprints_addon_cbci.cbci_initial_admin_password
+  description = "Operation Center Service Initial Admin Password for CloudBees CI Add-on. Additionally, there are developer and guest users using the same password."
+  value       = "User: admin\nPassword: <SECRET>"
 }
 
 output "cjoc_url" {

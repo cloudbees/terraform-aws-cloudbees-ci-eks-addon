@@ -42,7 +42,7 @@ output "cbci_liveness_probe_ext" {
 
 output "cbci_initial_admin_password" {
   description = "Operation Center Service Initial Admin Password for CloudBees CI Add-on."
-  value       = module.eks_blueprints_addon_cbci.cbci_initial_admin_password
+  value       = "kubectl exec -n ${module.eks_blueprints_addon_cbci.cbci_namespace} -ti cjoc-0 --container jenkins -- cat /var/jenkins_home/secrets/initialAdminPassword"
 }
 
 output "cjoc_url" {

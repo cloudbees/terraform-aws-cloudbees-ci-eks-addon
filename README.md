@@ -46,7 +46,6 @@ CloudBees CI Add-on uses for its resources definition `helms release` which make
 
 | Name | Description |
 |------|-------------|
-| cbci_initial_admin_password | Operation Center Service Initial Admin Password for CloudBees CI Add-on. |
 | cbci_liveness_probe_ext | Operation Center Service External Liveness Probe for CloudBees CI Add-on. |
 | cbci_liveness_probe_int | Operation Center Service Internal Liveness Probe for CloudBees CI Add-on. |
 | cbci_namespace | Namespace for CloudBees CI Addon. |

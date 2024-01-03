@@ -34,8 +34,3 @@ output "cbci_liveness_probe_ext" {
   description = "Operation Center Service External Liveness Probe for CloudBees CI Add-on."
   value       = "curl -sSf https://cjoc.${var.hostname}/whoAmI/api/json > /dev/null"
 }
-
-output "cbci_initial_admin_password" {
-  description = "Operation Center Service Initial Admin Password for CloudBees CI Add-on."
-  value       = "kubectl exec -n ${helm_release.cloudbees_ci.namespace} -ti cjoc-0 --container jenkins -- cat /var/jenkins_home/secrets/initialAdminPassword &> /dev/null || echo 'N/A. Casc is enabled'"
-}
