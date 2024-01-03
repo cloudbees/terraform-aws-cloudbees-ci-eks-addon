@@ -31,13 +31,13 @@ define tfDestroy
 	$(call confirmation,Destroy $(1))
 	$(eval $(call tfOutput,$(1),export_kubeconfig))
 	$(eval CBCI_NAMESPACE := $(call tfOutput,$(1),cbci_namespace))
-	kubectl delete --all pods --grace-period=0 --force --namespace $(CBCI_NAMESPACE) || echo "There are no pods to delete in $(CBCI_NAMESPACE)"
-	terraform -chdir=$(MKFILEDIR)/blueprints/$(1) destroy -target=module.eks_blueprints_addon_cbci -auto-approve
-	kubectl delete --all pvc --grace-period=0 --force --namespace $(CBCI_NAMESPACE) || echo "There are no pvc to delete in $(CBCI_NAMESPACE)"
-	@#terraform -chdir=$(MKFILEDIR)/blueprints/$(1) destroy -target=module.eks_blueprints_addons -auto-approve
-	@#terraform -chdir=$(MKFILEDIR)/blueprints/$(1) destroy -target=module.eks -auto-approve
-	@#terraform -chdir=$(MKFILEDIR)/blueprints/$(1) destroy -auto-approve
-	@#rm -f $(MKFILEDIR)/blueprints/$(1)/.deployed
+	@kubectl delete --all pods --grace-period=0 --force --namespace $(CBCI_NAMESPACE) || echo "There are no pods to delete in $(CBCI_NAMESPACE)"
+	@terraform -chdir=$(MKFILEDIR)/blueprints/$(1) destroy -target=module.eks_blueprints_addon_cbci -auto-approve
+	@kubectl delete --all pvc --grace-period=0 --force --namespace $(CBCI_NAMESPACE) || echo "There are no pvc to delete in $(CBCI_NAMESPACE)"
+	@terraform -chdir=$(MKFILEDIR)/blueprints/$(1) destroy -target=module.eks_blueprints_addons -auto-approve
+	@terraform -chdir=$(MKFILEDIR)/blueprints/$(1) destroy -target=module.eks -auto-approve
+	@terraform -chdir=$(MKFILEDIR)/blueprints/$(1) destroy -auto-approve
+	@rm -f $(MKFILEDIR)/blueprints/$(1)/.deployed
 endef
 
 define validate
