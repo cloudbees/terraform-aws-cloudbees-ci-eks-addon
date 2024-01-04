@@ -5,7 +5,7 @@ data "aws_route53_zone" "this" {
 data "aws_availability_zones" "available" {}
 
 locals {
-  name   = "cbci-bp01-i${random_integer.ramdom_id.result}"
+  name   = var.suffix == "" ? "cbci-bp01" : "cbci-bp01-${var.suffix}"
   region = "us-east-1"
 
   vpc_name             = "${local.name}-vpc"
@@ -29,11 +29,6 @@ locals {
   })
 }
 
-resource "random_integer" "ramdom_id" {
-  min = 1
-  max = 999
-}
-
 ################################################################################
 # EKS: Add-ons
 ################################################################################
@@ -48,6 +43,24 @@ module "eks_blueprints_addon_cbci" {
   depends_on = [
     module.eks_blueprints_addons
   ]
+}
+
+module "ebs_csi_driver_irsa" {
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+  version = "5.29.0"
+
+  role_name_prefix = "${module.eks.cluster_name}-ebs-csi-driv"
+
+  attach_ebs_csi_policy = true
+
+  oidc_providers = {
+    main = {
+      provider_arn               = module.eks.oidc_provider_arn
+      namespace_service_accounts = ["kube-system:ebs-csi-controller-sa"]
+    }
+  }
+
+  tags = var.tags
 }
 
 module "eks_blueprints_addons" {
@@ -86,24 +99,6 @@ module "eks_blueprints_addons" {
   enable_aws_load_balancer_controller = true
 
   tags = local.tags
-}
-
-module "ebs_csi_driver_irsa" {
-  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "5.29.0"
-
-  role_name_prefix = "${module.eks.cluster_name}-ebs-csi-driv"
-
-  attach_ebs_csi_policy = true
-
-  oidc_providers = {
-    main = {
-      provider_arn               = module.eks.oidc_provider_arn
-      namespace_service_accounts = ["kube-system:ebs-csi-controller-sa"]
-    }
-  }
-
-  tags = var.tags
 }
 
 ################################################################################

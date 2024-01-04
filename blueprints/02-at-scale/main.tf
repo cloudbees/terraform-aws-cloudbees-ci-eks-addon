@@ -7,7 +7,7 @@ data "aws_availability_zones" "available" {}
 data "aws_caller_identity" "current" {}
 
 locals {
-  name   = "cbci-bp02-i${random_integer.ramdom_id.result}"
+  name   = var.suffix == "" ? "cbci-bp02" : "cbci-bp02-${var.suffix}"
   region = "us-east-1"
 
   vpc_name             = "${local.name}-vpc"
@@ -44,11 +44,6 @@ locals {
 
   current_account_id  = data.aws_caller_identity.current.account_id
   current_account_arn = data.aws_caller_identity.current.arn
-}
-
-resource "random_integer" "ramdom_id" {
-  min = 1
-  max = 999
 }
 
 ################################################################################

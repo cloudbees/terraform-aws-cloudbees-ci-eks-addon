@@ -13,16 +13,16 @@ HERE="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export TF_LOG=DEBUG
 
 declare -a bluePrints=(
-  #"01-getting-started"
+  "01-getting-started"
   "02-at-scale"
 )
 
 test () {
   export ROOT=$1
   export TF_LOG_PATH="$HERE/$ROOT/terraform.log"
-  cd "$HERE"/.. && make tfDeploy
+  cd "$HERE"/.. && make deploy
   cd "$HERE"/.. && make validate
-  cd "$HERE"/.. && make tfDestroy
+  cd "$HERE"/.. && make destroy
   cd "$HERE"/.. && make clean
 }
 

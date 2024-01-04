@@ -12,3 +12,5 @@ temp_license = { # Required. Temporary license details.
 #   "cb-user" : "crodriguezlopez"
 #   "cb-environment" : "demo"
 # }
+
+# suffix = my-demo #Optional
