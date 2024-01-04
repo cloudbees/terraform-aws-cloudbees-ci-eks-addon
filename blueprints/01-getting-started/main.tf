@@ -16,7 +16,7 @@ locals {
   vpc_cidr = "10.0.0.0/16"
 
   #https://docs.cloudbees.com/docs/cloudbees-common/latest/supported-platforms/cloudbees-ci-cloud#_kubernetes
-  k8s_version = "1.26"
+  k8s_version = "1.27"
 
   route53_zone_id  = data.aws_route53_zone.this.id
   route53_zone_arn = data.aws_route53_zone.this.arn

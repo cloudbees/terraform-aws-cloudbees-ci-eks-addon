@@ -16,10 +16,12 @@ locals {
   kubeconfig_file      = "kubeconfig_${local.name}.yaml"
   kubeconfig_file_path = abspath("${path.root}/${local.kubeconfig_file}")
 
+  cbci_namespace = "cbci"
+
   vpc_cidr = "10.0.0.0/16"
 
   #https://docs.cloudbees.com/docs/cloudbees-common/latest/supported-platforms/cloudbees-ci-cloud#_kubernetes
-  k8s_version = "1.26"
+  k8s_version = "1.27"
 
   k8s_instance_types = {
     # Not Scalable
@@ -53,6 +55,32 @@ resource "random_integer" "ramdom_id" {
 # EKS: Add-ons
 ################################################################################
 
+# CloudBees CI Add-ons
+
+resource "kubernetes_namespace" "cbci" {
+
+  metadata {
+    name = local.cbci_namespace
+  }
+
+  depends_on = [
+    module.eks_blueprints_addons
+  ]
+
+}
+
+# Secrets to be passed to Casc
+# https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/docs/features/secrets.adoc#kubernetes-secrets
+resource "kubernetes_secret" "oc_secrets" {
+
+  metadata {
+    name      = "oc-secrets"
+    namespace = kubernetes_namespace.cbci.metadata[0].name
+  }
+
+  data = yamldecode(file("${path.module}/secrets-values.yml"))
+}
+
 module "eks_blueprints_addon_cbci" {
   source = "../../"
 
@@ -61,12 +89,33 @@ module "eks_blueprints_addon_cbci" {
   temp_license = var.temp_license
 
   helm_config = {
-    values = [file("${path.module}/cbci-values.yml")]
+    create_namespace = false
+    values           = [file("${path.module}/cbci-values.yml")]
   }
 
   depends_on = [
-    module.eks_blueprints_addons
+    kubernetes_secret.oc_secrets
   ]
+}
+
+# EKS Blueprints Add-ons
+
+module "ebs_csi_driver_irsa" {
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+  version = "5.29.0"
+
+  role_name_prefix = "${module.eks.cluster_name}-ebs-csi-driv"
+
+  attach_ebs_csi_policy = true
+
+  oidc_providers = {
+    main = {
+      provider_arn               = module.eks.oidc_provider_arn
+      namespace_service_accounts = ["kube-system:ebs-csi-controller-sa"]
+    }
+  }
+
+  tags = var.tags
 }
 
 module "eks_blueprints_addons" {
@@ -110,24 +159,6 @@ module "eks_blueprints_addons" {
   #enable_aws_node_termination_handler = true
 
   tags = local.tags
-}
-
-module "ebs_csi_driver_irsa" {
-  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "5.29.0"
-
-  role_name_prefix = "${module.eks.cluster_name}-ebs-csi-driv"
-
-  attach_ebs_csi_policy = true
-
-  oidc_providers = {
-    main = {
-      provider_arn               = module.eks.oidc_provider_arn
-      namespace_service_accounts = ["kube-system:ebs-csi-controller-sa"]
-    }
-  }
-
-  tags = var.tags
 }
 
 ################################################################################

@@ -21,16 +21,17 @@ Refer to the [Getting Started Blueprint - Prerequisites](../01-getting-started/R
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | domain_name | Desired domain name (e.g. example.com) used as suffix for CloudBees CI subdomains (e.g. cjoc.example.com). It requires to be mapped within an existing Route 53 Hosted Zone. | `string` | n/a | yes |
-| temp_license | Temporary license details | `map(string)` | n/a | yes |
-| tags | Tags to apply to resources | `map(string)` | `{}` | no |
+| temp_license | Temporary license details. | `map(string)` | n/a | yes |
+| tags | Tags to apply to resources. | `map(string)` | `{}` | no |
 
 ### Outputs
 
 | Name | Description |
 |------|-------------|
 | acm_certificate_arn | ACM certificate ARN |
+| add_kubeconfig | Add Kubeconfig to local configuration to access the K8s API. |
 | cbci_helm | Helm configuration for CloudBees CI Add-on. It is accesible only via state files. |
-| cbci_initial_admin_password | Operation Center Service Initial Admin Password for CloudBees CI Add-on. |
+| cbci_initial_admin_password | Operation Center Service Initial Admin Password for CloudBees CI Add-on. Additionally, there are developer and guest users using the same password. |
 | cbci_liveness_probe_ext | Operation Center Service External Liveness Probe for CloudBees CI Add-on. |
 | cbci_liveness_probe_int | Operation Center Service Internal Liveness Probe for CloudBees CI Add-on. |
 | cbci_namespace | Namespace for CloudBees CI Add-on. |
@@ -38,13 +39,15 @@ Refer to the [Getting Started Blueprint - Prerequisites](../01-getting-started/R
 | cbci_oc_pod | Operation Center Pod for CloudBees CI Add-on. |
 | cjoc_url | URL of the CloudBees CI Operations Center for CloudBees CI Add-on. |
 | eks_cluster_arn | EKS cluster ARN |
-| export_kubeconfig | Export KUBECONFIG environment variable to access the EKS cluster. |
+| export_kubeconfig | Export KUBECONFIG environment variable to access the K8s API. |
 | vpc_arn | VPC ID |
 <!-- END_TF_DOCS -->
 
 ## Deploy
 
 Refer to the [Getting Started Blueprint - Prerequisites](../01-getting-started/README.md#deploy) section.
+
+Additionally, customize your secrets file by copying `.auto.tfvars.example` to `.auto.tfvars`.
 
 ## Validate
 

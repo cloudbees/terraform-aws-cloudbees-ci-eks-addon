@@ -1,0 +1,6 @@
+[submodule "blueprints/casc/mm"]
+	path = blueprints/casc/mm
+	url = git@github.com:cloudbees/casc-mm-cloudbees-ci-eks-addon.git
+[submodule "blueprints/casc/oc"]
+	path = blueprints/casc/oc
+	url = git@github.com:cloudbees/casc-oc-cloudbees-ci-eks-addon.git
