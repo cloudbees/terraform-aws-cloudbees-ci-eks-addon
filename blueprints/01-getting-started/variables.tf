@@ -18,3 +18,13 @@ variable "temp_license" {
   description = "Temporary license details"
   type        = map(string)
 }
+
+variable "suffix" {
+  description = "Unique suffix to be assigned to all resources"
+  default     = ""
+  type        = string
+  validation {
+    condition     = length(var.suffix) <= 10
+    error_message = "The suffix cannot have more than 10 characters."
+  }
+}

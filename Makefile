@@ -15,7 +15,7 @@ define tfOutput
 endef
 
 #https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#deploy
-define tfDeploy
+define deploy
 	@printf $(MSG_INFO) "Deploying CloudBees CI Blueprint $(1) ..."
 	$(call confirmation,Deploy $(1))
 	@terraform -chdir=$(MKFILEDIR)/blueprints/$(1) init -upgrade
@@ -26,7 +26,7 @@ define tfDeploy
 endef
 
 #https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#destroy
-define tfDestroy
+define destroy
 	@printf $(MSG_INFO) "Destroying CloudBees CI Blueprint $(1) ..."
 	$(call confirmation,Destroy $(1))
 	$(eval $(call tfOutput,$(1),export_kubeconfig))
@@ -72,27 +72,28 @@ dRun:
 .PHONY: tfpreFlightChecks
 tfpreFlightChecks: ## Run preflight checks for terraform according to getting-started/README.md . Example: ROOT=02-at-scale make tfpreFlightChecks
 tfpreFlightChecks: guard-ROOT
-	@if [ ! -f blueprints/$(ROOT)/.auto.tfvars ]; then printf $(MSG_ERROR) "blueprints/$(ROOT)/.auto.tfvars file does not exist and it is required that contains your own values for required variables"; exit 1; fi
+	@if [ ! -f blueprints/$(ROOT)/.auto.tfvars ]; then printf $(MSG_ERROR) "blueprints/$(ROOT)/.auto.tfvars file does not exist and it is required to store your own values"; exit 1; fi
+	@if ([ ! -f blueprints/$(ROOT)/secrets-values.yml ] && [ $(ROOT) == "02-at-scale" ]); then printf $(MSG_ERROR) "blueprints/$(ROOT)/secrets-values.yml file does not exist and it is required to store your secrets"; exit 1; fi
 	$(eval USER_ID := $(shell aws sts get-caller-identity | grep UserId | cut -d"," -f 1 | xargs ))
 	@if [ "$(USER_ID)" == "" ]; then printf $(MSG_ERROR) "AWS Authention for CLI is not configured" && exit 1; fi
 	@printf $(MSG_INFO) "Preflight Checks OK for $(USER_ID)"
 
-.PHONY: tfDeploy
-tfDeploy: ## Deploy Terraform Blueprint passed as parameter. Example: ROOT=02-at-scale make tfDeploy
-tfDeploy: guard-ROOT tfpreFlightChecks
-	$(call tfDeploy,$(ROOT))
+.PHONY: deploy
+deploy: ## Deploy Terraform Blueprint passed as parameter. Example: ROOT=02-at-scale make deploy
+deploy: guard-ROOT tfpreFlightChecks
+	$(call deploy,$(ROOT))
 
-.PHONY: tfDestroy
-tfDestroy: ## Destroy Terraform Blueprint passed as parameter. Example: ROOT=02-at-scale make tfDestroy
-tfDestroy: guard-ROOT tfpreFlightChecks
+.PHONY: destroy
+destroy: ## Destroy Terraform Blueprint passed as parameter. Example: ROOT=02-at-scale make destroy
+destroy: guard-ROOT tfpreFlightChecks
 ifneq ("$(wildcard blueprints/$(ROOT)/.deployed)","")
-	$(call tfDestroy,$(ROOT))
+	$(call destroy,$(ROOT))
 else
 	@printf $(MSG_ERROR) "Blueprint $(ROOT) did not complete the Deployment target. It is not Ready for Destroy target but it is possible to destroy manually https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#destroy"
 endif
 
 .PHONY: clean
-clean: ## Clean Blueprint passed as parameter. Example: ROOT=02-at-scale make tfClean
+clean: ## Clean Blueprint passed as parameter. Example: ROOT=02-at-scale make clean
 clean: guard-ROOT
 	@cd blueprints/$(ROOT) && find -name ".terraform" -type d | xargs rm -rf
 	@cd blueprints/$(ROOT) && find -name ".terraform.lock.hcl" -type f | xargs rm -f

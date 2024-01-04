@@ -16,7 +16,7 @@ Follow the [Getting Started](./blueprints/01-getting-started) guide for example 
 
 Easing adoption of CloudBees CI by:
 
-- Providing a CloudBees CI Add-on module to encapsulate the deployment of [CloudBees CI in EKS](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/).
+- Providing a CloudBees CI Add-on module to encapsulate the deployment of [CloudBees CI in EKS](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/) via Helm.
 - Provide a series of blueprints using the CloudBees CI Add-on module to deploy CloudBees CI in EKS.
 - Using [AWS Terraform EKS Addons](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/) as the single point of truth for third-party EKS Addons. Note that some of the addons are required and others are optional.
 
