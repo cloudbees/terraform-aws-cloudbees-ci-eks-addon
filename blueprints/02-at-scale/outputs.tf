@@ -42,7 +42,7 @@ output "cbci_liveness_probe_ext" {
 
 output "cbci_initial_admin_password" {
   description = "Operation Center Service Initial Admin Password for CloudBees CI Add-on. Additionally, there are developer and guest users using the same password."
-  value       = "User: admin\nPassword: <SECRET>"
+  value       = "echo 'User: admin Password: SECRET'"
 }
 
 output "cjoc_url" {
