@@ -4,6 +4,7 @@
 # 1. Deploy
 # 2. Validate
 # 3. Destroy
+# 4. Clean
 
 set -e
 

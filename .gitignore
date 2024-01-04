@@ -40,3 +40,7 @@ terraform.rc
 *.log
 .deployed
 kubeconfig*.yaml
+
+# Secrets file
+*secrets*
+!secrets*example

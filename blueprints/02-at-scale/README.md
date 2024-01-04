@@ -21,8 +21,8 @@ Refer to the [Getting Started Blueprint - Prerequisites](../01-getting-started/R
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | domain_name | Desired domain name (e.g. example.com) used as suffix for CloudBees CI subdomains (e.g. cjoc.example.com). It requires to be mapped within an existing Route 53 Hosted Zone. | `string` | n/a | yes |
-| temp_license | Temporary license details | `map(string)` | n/a | yes |
-| tags | Tags to apply to resources | `map(string)` | `{}` | no |
+| temp_license | Temporary license details. | `map(string)` | n/a | yes |
+| tags | Tags to apply to resources. | `map(string)` | `{}` | no |
 
 ### Outputs
 
@@ -46,6 +46,8 @@ Refer to the [Getting Started Blueprint - Prerequisites](../01-getting-started/R
 ## Deploy
 
 Refer to the [Getting Started Blueprint - Prerequisites](../01-getting-started/README.md#deploy) section.
+
+Additionally, customize your secrets file by copying `.auto.tfvars.example` to `.auto.tfvars`.
 
 ## Validate
 

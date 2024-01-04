@@ -1,6 +1,6 @@
 
 variable "tags" {
-  description = "Tags to apply to resources"
+  description = "Tags to apply to resources."
   default     = {}
   type        = map(string)
 }
@@ -15,6 +15,6 @@ variable "domain_name" {
 }
 
 variable "temp_license" {
-  description = "Temporary license details"
+  description = "Temporary license details."
   type        = map(string)
 }

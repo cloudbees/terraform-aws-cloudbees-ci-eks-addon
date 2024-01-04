@@ -22,6 +22,17 @@ OperationsCenter:
       scmBranch: main
       scmBundlePath: bp02
       scmPollingInterval: PT20M
+  ContainerEnv:
+    - name: SECRETS
+      value: /var/run/secrets/oc
+  ExtraVolumes:
+    - name: oc-secrets
+      secret:
+        secretName: oc-secrets
+  ExtraVolumeMounts:
+    - name: oc-secrets
+      mountPath: /var/run/secrets/oc
+      readOnly: true
 Persistence:
   StorageClass: efs
 Hibernation:
