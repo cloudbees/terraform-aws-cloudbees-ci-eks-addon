@@ -8,7 +8,7 @@ resource "helm_release" "cloudbees_ci" {
   description      = try(var.helm_config.description, null)
   chart            = "cloudbees-core"
   #Chart versions: #https://artifacthub.io/packages/helm/cloudbees/cloudbees-core/
-  #Chart versions are linked to an app version: https://docs.cloudbees.com/docs/release-notes/latest/cloudbees-ci/
+  #App version: https://docs.cloudbees.com/docs/release-notes/latest/cloudbees-ci/
   version    = try(var.helm_config.version, "3.15666.0+5ea03547ce92")
   repository = try(var.helm_config.repository, "https://public-charts.artifacts.cloudbees.com/repository/public/")
   values = concat(var.helm_config.values, [templatefile("${path.module}/values.yml", {
@@ -40,7 +40,7 @@ resource "helm_release" "cloudbees_ci" {
   skip_crds                  = try(var.helm_config.skip_crds, null)
   render_subchart_notes      = try(var.helm_config.render_subchart_notes, null)
   disable_openapi_validation = try(var.helm_config.disable_openapi_validation, null)
-  wait                       = try(var.helm_config.wait, null)
+  wait                       = try(var.helm_config.wait, true)
   wait_for_jobs              = try(var.helm_config.wait_for_jobs, null)
   dependency_update          = try(var.helm_config.dependency_update, null)
   replace                    = try(var.helm_config.replace, null)
