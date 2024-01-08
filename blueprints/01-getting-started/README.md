@@ -77,7 +77,8 @@ In case, it is required to review the resources before applying the changes, rem
 
 For more detailed information, see the documentation for the [Terraform Core workflow](https://www.terraform.io/intro/core-workflow).
 
-> **_NOTE:_** These steps are automated in the [Makefile](../../Makefile) at the root of the project under the target `tfDeploy`.
+> [!TIP]
+> These steps are automated in the [Makefile](../../Makefile) at the root of the project under the target `tfDeploy`.
 
 ## Validate
 
@@ -115,7 +116,8 @@ Now that you’ve installed CloudBees CI and operations center, you’ll want to
 
 Finally, install the suggested plugins and create the first admin user.
 
-> **_NOTE:_** These steps are automated in the [Makefile](../../Makefile) at the root of the project under the target `validate`.
+> [!TIP]
+> These steps are automated in the [Makefile](../../Makefile) at the root of the project under the target `validate`.
 
 ## Destroy
 
@@ -127,7 +129,8 @@ As the PVCs are not deleted by default, it is required to delete them manually a
 
 To teardown and remove the resources created in the blueprint, the typical steps of execution are as explained in [Getting Started - Amazon EKS Blueprints for Terraform - Destroy](https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#destroy)
 
-> **_NOTE:_** These steps are automated in the [Makefile](../../Makefile) at the root of the project under the target `tfDestroy`.
+> [!TIP]
+> These steps are automated in the [Makefile](../../Makefile) at the root of the project under the target `tfDestroy`.
 
 ## Architecture
 

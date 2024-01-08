@@ -10,15 +10,29 @@ By default, it uses a minimum required configuration described in [values.yml](v
 
 If you would like to override any defaults with the chart, you can do so by passing the `helm_config` variable.
 
-Follow the [Getting Started](./blueprints/01-getting-started) guide for example on how to use this add-on.
+## Data Storage Options
+
+The two main components of CloudBees CI, Operations Center and Managed Controllers, use a file system to persist data. Data is stored in a folder called [Jenkins Home](https://docs.cloudbees.com/docs/cloudbees-ci/latest/backup-restore/jenkins-home) that can be configured to be stored in Amazon EBS or EFS:
+
+- Amazon EBS volumes are scoped to a particular Availability Zone to offer high-speed, low-latency access to the EC2 instances they are connected to. If an Availability Zone fails, an EBS volume becomes inaccessible due to file corruption, or there is a service outage, the data on these volumes will become inaccessible. Operations Center and Managed Controller pods require this persistent data and have no mechanism to replicate the data, so we recommend frequent backups using [Velero](https://docs.cloudbees.com/docs/cloudbees-ci/latest/backup-restore/velero-dr) for Amazon EBS.
+- Amazon EFS file systems are scoped to an AWS Region and can be accessed from any Availability Zone in the Region the file system was created in. Using Amazon EFS as a storage class for the Operations Center and Managed Controller allows pods to be rescheduled successfully onto healthy nodes in the event of an Availability Zone outage. Amazon EFS file systems may increase the cost of the deployment compared to the Amazon EBS option, but provide greater fault tolerance.
+
+> [!IMPORTANT]  
+> CloudBees HA (active-active) requires Amazon EFS. See [CloudBees CI EKS Storage Requirements](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/eks-pre-install-requirements-helm#_storage_requirements).
+
+> [!NOTE]
+> For more information on pricing, see the [Amazon EBS pricing page](https://aws.amazon.com/ebs/pricing/) and the [Amazon EFS pricing page](https://aws.amazon.com/efs/pricing/).
 
 ## Motivation
 
 Easing adoption of CloudBees CI by:
 
-- Providing a CloudBees CI Add-on module to encapsulate the deployment of [CloudBees CI in EKS](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/) via Helm.
-- Provide a series of blueprints using the CloudBees CI Add-on module to deploy CloudBees CI in EKS.
+- Providing a CloudBees CI terraform module to deploy [CloudBees CI in EKS](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/) via Helm.
+- Provide a series of blueprints (examples of implementation) using the CloudBees CI Add-on module.
 - Using [AWS Terraform EKS Addons](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/) as the single point of truth for third-party EKS Addons. Note that some of the addons are required and others are optional.
+
+> [!NOTE]
+> For a better understading of the blueprints' scope, please read the section [Consumption](https://aws-ia.github.io/terraform-aws-eks-blueprints/#consumption) and [Terraform Caveats](https://aws-ia.github.io/terraform-aws-eks-blueprints/#terraform-caveats) in AWS the EKS blueprints documentation.
 
 ## CloudBees License
 
