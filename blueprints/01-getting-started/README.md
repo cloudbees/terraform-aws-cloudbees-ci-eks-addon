@@ -14,7 +14,8 @@ Get started with the CloudBees CI add-on by reviewing this example which deploys
 
 The required tooling as described in the [Getting Started Guide - Prerequisites](https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#prerequisites)
 
-> **_NOTE:_** For contributing there is a dedicated page [CONTRIBUTING.md](../../CONTRIBUTING.md).
+> [!NOTE]
+> For contributing there is a dedicated page [CONTRIBUTING.md](../../CONTRIBUTING.md).
 
 ### AWS Authentication
 
