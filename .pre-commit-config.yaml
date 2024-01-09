@@ -28,9 +28,9 @@ repos:
     - id: terraform_fmt
       name: Format Terraform Configuration
     - id: terraform_validate
-      name: Validate Terraform Configuration
-      args:
-        - --hook-config=--retry-once-with-cleanup=true
+      # name: Validate Terraform Configuration
+      # args:
+      #   - --hook-config=--retry-once-with-cleanup=true
     - id: terraform_tflint
       args:
         - '--args=--only=terraform_deprecated_interpolation'
