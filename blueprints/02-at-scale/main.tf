@@ -4,8 +4,6 @@ data "aws_route53_zone" "this" {
 
 data "aws_availability_zones" "available" {}
 
-data "aws_caller_identity" "current" {}
-
 locals {
   name   = var.suffix == "" ? "cbci-bp02" : "cbci-bp02-${var.suffix}"
   region = "us-east-1"
@@ -42,8 +40,6 @@ locals {
     "tf:repository" = "github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon"
   })
 
-  current_account_id  = data.aws_caller_identity.current.account_id
-  current_account_arn = data.aws_caller_identity.current.arn
 }
 
 ################################################################################
@@ -173,24 +169,6 @@ module "eks" {
 
   eks_managed_node_group_defaults = {
     disk_size = 50
-    iam_role_additional_policies = {
-      # Not required, but used in the example to access the nodes to inspect mounted volumes
-      AmazonSSMManagedInstanceCore = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-    }
-    block_device_mappings = {
-      # Root volume
-      xvda = {
-        device_name = "/dev/xvda"
-        ebs = {
-          volume_size           = 24
-          volume_type           = "gp3"
-          iops                  = 3000
-          encrypted             = true
-          kms_key_id            = module.ebs_kms_key.key_arn
-          delete_on_termination = true
-        }
-      }
-    }
   }
 
   # Security groups based on the best practices doc https://docs.aws.amazon.com/eks/latest/userguide/sec-group-reqs.html.
@@ -288,27 +266,6 @@ module "eks" {
   }
 
   tags = local.tags
-}
-
-module "ebs_kms_key" {
-  source  = "terraform-aws-modules/kms/aws"
-  version = "1.5.0"
-
-  description = "Customer managed key to encrypt EKS managed node group volumes"
-
-  # Policy
-  key_administrators = [local.current_account_arn]
-  key_service_roles_for_autoscaling = [
-    # required for the ASG to manage encrypted volumes for nodes
-    "arn:aws:iam::${local.current_account_id}:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling",
-    # required for the cluster / persistentvolume-controller to create encrypted PVCs
-    module.eks.cluster_iam_role_arn
-  ]
-
-  # Aliases
-  aliases = ["eks/${local.name}/ebs"]
-
-  tags = var.tags
 }
 
 resource "kubernetes_annotations" "gp2" {
