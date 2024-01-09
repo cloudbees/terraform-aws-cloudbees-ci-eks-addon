@@ -8,6 +8,10 @@ Get started with the CloudBees CI add-on by reviewing this example which deploys
   - [External DNS](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/external-dns/)
   - [EBS CSI Driver](https://docs.aws.amazon.com/eks/latest/userguide/ebs-csi.html) to allocate EBS volumes for hosting [$JENKINS_HOME](https://docs.cloudbees.com/docs/cloudbees-ci/latest/backup-restore/jenkins-home).
 
+## Architecture
+
+![Architecture](architecture/getting-started.drawio.svg)
+
 ## Prerequisites
 
 ### Tooling
@@ -70,13 +74,13 @@ These blueprints rely on an existing Hosted Zone in AWS Route53. If you don't ha
 
 ## Deploy
 
-First of all, customize your variables by copying `.auto.tfvars.example` to `.auto.tfvars`.
+First of all, customize your terraform values by copying `.auto.tfvars.example` to `.auto.tfvars`.
 
 Initialize the root module and any associated configuration for providers and finally create the resources and deploy CloudBees CI to an EKS Cluster. Please refer to [Getting Started - Amazon EKS Blueprints for Terraform - Deploy](https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#deploy)
 
-In case, it is required to review the resources before applying the changes, remove the flag `-auto-approve` from the commands.
-
 For more detailed information, see the documentation for the [Terraform Core workflow](https://www.terraform.io/intro/core-workflow).
+
+TODO: Deloyed resources link to AWS Resource Groups
 
 > [!TIP]
 > These steps are automated in the [Makefile](../../Makefile) at the root of the project under the target `tfDeploy`.
@@ -132,7 +136,3 @@ To teardown and remove the resources created in the blueprint, the typical steps
 
 > [!TIP]
 > These steps are automated in the [Makefile](../../Makefile) at the root of the project under the target `tfDestroy`.
-
-## Architecture
-
-![Architecture](../diagrams/getting-started.drawio.png)
