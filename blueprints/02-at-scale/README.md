@@ -7,11 +7,10 @@ Once you have familiarized yourself with the [Getting Started blueprint](../01-g
 - [EFS CSI Driver](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/aws-efs-csi-driver/). It can be used by non-HA/HS (optional) and it is required by HA/HS Controllers.
 - [Metrics Server](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/aws-efs-csi-driver/). It is required by HA/HS Controllers for Horizontal Pod Autoscaling.
 
-Additionally, it uses [CloudBees Configuration as Code](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/casc-intro) for configuring the [Operation Center](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/) and [Controllers](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-controller/) enabling [New Features for Streamlined DevOps](https://www.cloudbees.com/blog/cloudbees-ci-exciting-new-features-for-streamlined-devops)
+> [!IMPORTANT]  
+> [Autoscaling Groups](https://docs.aws.amazon.com/autoscaling/ec2/userguide/auto-scaling-groups.html) design follows the AWS article [Creating Kubernetes Auto Scaling Groups for Multiple Availability Zones](https://aws.amazon.com/blogs/containers/amazon-eks-cluster-multi-zone-auto-scaling-groups/), creating one ASG per AZ for EBS volumne and one single ASG per Multiple AZ for EFS volumes.
 
-- [CloudBees CI High Availability (active/active)](https://www.cloudbees.com/capabilities/continuous-integration/high-availability-horizontal-scalability)
-- [CloudBees CI Workspace Caching](https://www.cloudbees.com/capabilities/continuous-integration/workspace-caching)
-- [CloudBees CI Pipeline Explorer](https://www.cloudbees.com/capabilities/continuous-integration/pipeline-explorer)
+Additionally, it uses [CloudBees Configuration as Code](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/casc-intro) for configuring the [Operation Center](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/) and [Controllers](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-controller/) enabling [New Features for Streamlined DevOps](https://www.cloudbees.com/blog/cloudbees-ci-exciting-new-features-for-streamlined-devops) and [CloudBees CI Hibernation](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#_hibernation_in_managed_masters) for saving Cloud Billing costs.
 
 ## Architecture
 
