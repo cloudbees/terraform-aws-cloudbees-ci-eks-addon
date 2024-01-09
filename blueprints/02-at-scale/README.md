@@ -4,10 +4,18 @@ Once you have familiarized yourself with the [Getting Started blueprint](../01-g
 
 - [Cluster Autoscaler](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/cluster-autoscaler/)
 <!-- - [Node Termination Handler](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/aws-node-termination-handler/) -->
-- [EFS CSI Driver](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/aws-efs-csi-driver/). CloudBees CI HA/HS requirement.
-- [Metrics Server](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/aws-efs-csi-driver/). CloudBees CI HA/HS requirement for Horizontal Pod Autoscaling.
+- [EFS CSI Driver](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/aws-efs-csi-driver/). It can be used by non-HA/HS (optional) and it is required by HA/HS Controllers.
+- [Metrics Server](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/aws-efs-csi-driver/). It is required by HA/HS Controllers for Horizontal Pod Autoscaling.
 
-Additionally, it uses [CloudBees Configuration as Code](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/casc-intro) for configuring the [Operation Center](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/) and [Controllers](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-controller/).
+Additionally, it uses [CloudBees Configuration as Code](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/casc-intro) for configuring the [Operation Center](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/) and [Controllers](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-controller/) enabling [New Features for Streamlined DevOps](https://www.cloudbees.com/blog/cloudbees-ci-exciting-new-features-for-streamlined-devops)
+
+- [CloudBees CI High Availability (active/active)](https://www.cloudbees.com/capabilities/continuous-integration/high-availability-horizontal-scalability)
+- [CloudBees CI Workspace Caching](https://www.cloudbees.com/capabilities/continuous-integration/workspace-caching)
+- [CloudBees CI Pipeline Explorer](https://www.cloudbees.com/capabilities/continuous-integration/pipeline-explorer)
+
+## Architecture
+
+![Architecture](architecture/at-scale.drawio.svg)
 
 ## Prerequisites
 
@@ -57,7 +65,3 @@ Refer to the [Getting Started Blueprint - Prerequisites](../01-getting-started/R
 ## Destroy
 
 Refer to the [Getting Started Blueprint - Prerequisites](../01-getting-started/README.md#destroy) section.
-
-## Architecture
-
-![Architecture]()
