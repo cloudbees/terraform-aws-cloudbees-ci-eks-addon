@@ -7,6 +7,9 @@ data "aws_availability_zones" "available" {}
 locals {
   name   = var.suffix == "" ? "cbci-bp02" : "cbci-bp02-${var.suffix}"
   region = "us-east-1"
+  #Number of AZs per region https://docs.aws.amazon.com/ram/latest/userguide/working-with-az-ids.html
+  azs    = slice(data.aws_availability_zones.available.names, 0, 3)
+  ebs_az = slice(data.aws_availability_zones.available.names, 0, 1)
 
   vpc_name             = "${local.name}-vpc"
   cluster_name         = "${local.name}-eks"
@@ -32,8 +35,6 @@ locals {
 
   route53_zone_id  = data.aws_route53_zone.this.id
   route53_zone_arn = data.aws_route53_zone.this.arn
-  #Number of AZs per region https://docs.aws.amazon.com/ram/latest/userguide/working-with-az-ids.html
-  azs = slice(data.aws_availability_zones.available.names, 0, 3)
 
   tags = merge(var.tags, {
     "tf:blueprint"  = local.name
@@ -217,18 +218,32 @@ module "eks" {
     }
   }
 
-  #Only Node Groups with Taints can use Autoscaling. Pods requires Selector
+  #https://aws.amazon.com/blogs/containers/amazon-eks-cluster-multi-zone-auto-scaling-groups/
   eks_managed_node_groups = {
-    #Managed by Autoscaling
-    mg_k8sApps = {
-      node_group_name = "managed-k8s-apps"
-      instance_types  = local.k8s_instance_types["k8s-apps"]
+    mg_k8sApps_1az = {
+      node_group_name   = "mg-k8s-apps-1az"
+      instance_types    = local.k8s_instance_types["k8s-apps"]
+      capacity_type     = "ON_DEMAND"
+      min_size          = 1
+      max_size          = 3
+      desired_size      = 1
+      availabilityZones = local.ebs_az
+    }
+    mg_cbApps_1az = {
+      node_group_name = "mg-cb-apps-1az"
+      instance_types  = local.k8s_instance_types["cb-apps"]
       capacity_type   = "ON_DEMAND"
-      desired_size    = 2
-    },
-    #Managed by Autoscaling
+      min_size        = 1
+      max_size        = 6
+      desired_size    = 1
+      taints          = [{ key = "dedicated", value = "cb-apps-1az", effect = "NO_SCHEDULE" }]
+      labels = {
+        ci_type = "cb-apps-1az"
+      }
+      availabilityZones = local.ebs_az
+    }
     mg_cbApps = {
-      node_group_name = "managed-cb-apps"
+      node_group_name = "mng-cb-apps"
       instance_types  = local.k8s_instance_types["cb-apps"]
       capacity_type   = "ON_DEMAND"
       min_size        = 1
@@ -240,7 +255,7 @@ module "eks" {
       }
     }
     mg_cbAgents = {
-      node_group_name = "managed-agent"
+      node_group_name = "mng-agent"
       instance_types  = local.k8s_instance_types["agent"]
       capacity_type   = "ON_DEMAND"
       min_size        = 1
@@ -250,9 +265,9 @@ module "eks" {
       labels = {
         ci_type = "build-linux"
       }
-    },
+    }
     mg_cbAgents_spot = {
-      node_group_name = "managed-agent-spot"
+      node_group_name = "mng-agent-spot"
       instance_types  = local.k8s_instance_types["agent-spot"]
       capacity_type   = "SPOT"
       min_size        = 1
