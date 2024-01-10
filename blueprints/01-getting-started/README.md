@@ -126,13 +126,10 @@ Finally, install the suggested plugins and create the first admin user.
 
 ## Destroy
 
-As the PVCs are not deleted by default, it is required to delete them manually as you can check on the [CloudBees CI EKS Uninstall](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/eks-uninstall).
-
-  ```sh
-  kubectl delete --all pvc --grace-period=0 --force --namespace cbci
-  ```
-
 To teardown and remove the resources created in the blueprint, the typical steps of execution are as explained in [Getting Started - Amazon EKS Blueprints for Terraform - Destroy](https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#destroy)
+
+> [!NOTE]
+> Storage Classes have assigned `reclaimPolicy` to `Delete`, and then storage volume is deleted when it is no longer required by the pod. Otherwise, it would require deleting `pvc` manually. See [CloudBees CI EKS Uninstall](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/eks-uninstall)).
 
 > [!TIP]
 > These steps are automated in the [Makefile](../../Makefile) at the root of the project under the target `tfDestroy`.

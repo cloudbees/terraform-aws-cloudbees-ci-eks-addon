@@ -42,7 +42,7 @@ output "cbci_liveness_probe_ext" {
 
 output "cbci_initial_admin_password" {
   description = "Operation Center Service Initial Admin Password for CloudBees CI Add-on. Additionally, there are developer and guest users using the same password."
-  value       = "kubectl get secret oc-secrets -n ${module.eks_blueprints_addon_cbci.cbci_namespace} -o jsonpath='{.data.secJenkinsPass}' | base64 -d"
+  value       = "kubectl get secret cbci-secrets -n ${module.eks_blueprints_addon_cbci.cbci_namespace} -o jsonpath='{.data.secJenkinsPass}' | base64 -d"
 }
 
 output "cjoc_url" {
@@ -63,4 +63,19 @@ output "vpc_arn" {
 output "eks_cluster_arn" {
   description = "EKS cluster ARN"
   value       = module.eks.cluster_arn
+}
+
+output "s3_velero_arn" {
+  description = "Velero s3 Bucket Arn"
+  value       = module.velero_backup_s3_bucket.s3_bucket_arn
+}
+
+output "velero_backup_team_a" {
+  description = "Force to create a velero backup from schedulle for Team A. It can be applicable for rest of schedulle backups."
+  value       = "velero backup create --from-schedule ${local.velero_bk_demo} --wait"
+}
+
+output "velero_restore_team_a" {
+  description = "Restore Team A from backup. It can be applicable for rest of schedulle backups."
+  value       = "kubectl delete all -n ${module.eks_blueprints_addon_cbci.cbci_namespace} -l tenant=team-a; kubectl delete pvc -n ${module.eks_blueprints_addon_cbci.cbci_namespace} -l tenant=team-a; kubectl delete ep -n ${module.eks_blueprints_addon_cbci.cbci_namespace} -l tenant=team-a; velero restore create --from-schedule ${local.velero_bk_demo}"
 }

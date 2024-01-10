@@ -40,6 +40,11 @@ locals {
     "tf:repository" = "github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon"
   })
 
+  velero_s3_backup_location = module.velero_backup_s3_bucket.s3_bucket_arn
+  velero_bk_demo            = "team-a-pvc-bk"
+  velero_bk_freq            = "@every 30m"
+  velero_bk_ttl             = "2h"
+
 }
 
 ################################################################################
@@ -132,8 +137,24 @@ module "eks_blueprints_addons" {
   enable_cluster_autoscaler             = true
   enable_aws_node_termination_handler   = true
   aws_node_termination_handler_asg_arns = data.aws_autoscaling_groups.eks_node_groups.arns
+  enable_velero                         = true
+  velero = {
+    s3_backup_location = local.velero_s3_backup_location
+  }
 
   tags = local.tags
+}
+
+resource "null_resource" "velero_schedules" {
+
+
+  provisioner "local-exec" {
+    command = "velero create schedule ${local.velero_bk_demo} --schedule='${local.velero_bk_freq}' --ttl ${local.velero_bk_ttl} --include-namespaces ${module.eks_blueprints_addon_cbci.cbci_namespace} --exclude-resources pods,events,events.events.k8s.io --selector tenant=team-a"
+    environment = {
+      KUBECONFIG = local.kubeconfig_file
+    }
+  }
+
 }
 
 ################################################################################
@@ -427,4 +448,43 @@ resource "aws_resourcegroups_group" "bp_rg" {
 }
 JSON
   }
+}
+
+module "velero_backup_s3_bucket" {
+  source  = "terraform-aws-modules/s3-bucket/aws"
+  version = "~> 3.0"
+
+  bucket_prefix = "${local.name}-"
+
+  # Allow deletion of non-empty bucket
+  # NOTE: This is enabled for example usage only, you should not enable this for production workloads
+  force_destroy = true
+
+  attach_deny_insecure_transport_policy = true
+  attach_require_latest_tls_policy      = true
+
+  acl = "private"
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+
+  control_object_ownership = true
+  object_ownership         = "BucketOwnerPreferred"
+
+  versioning = {
+    status     = true
+    mfa_delete = false
+  }
+
+  server_side_encryption_configuration = {
+    rule = {
+      apply_server_side_encryption_by_default = {
+        sse_algorithm = "AES256"
+      }
+    }
+  }
+
+  tags = local.tags
 }
