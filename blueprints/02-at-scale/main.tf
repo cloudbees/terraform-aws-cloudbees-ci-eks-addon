@@ -110,6 +110,14 @@ module "ebs_csi_driver_irsa" {
   tags = var.tags
 }
 
+data "aws_autoscaling_groups" "eks_node_groups" {
+  depends_on = [module.eks]
+  filter {
+    name   = "tag-key"
+    values = ["eks:cluster-name"]
+  }
+}
+
 module "eks_blueprints_addons" {
   source  = "aws-ia/eks-blueprints-addons/aws"
   version = "1.12.0"
@@ -145,10 +153,11 @@ module "eks_blueprints_addons" {
   external_dns_route53_zone_arns      = [local.route53_zone_arn]
   enable_aws_load_balancer_controller = true
   #02-at-scale
-  enable_aws_efs_csi_driver = true
-  enable_metrics_server     = true
-  enable_cluster_autoscaler = true
-  #enable_aws_node_termination_handler = true
+  enable_aws_efs_csi_driver             = true
+  enable_metrics_server                 = true
+  enable_cluster_autoscaler             = true
+  enable_aws_node_termination_handler   = true
+  aws_node_termination_handler_asg_arns = data.aws_autoscaling_groups.eks_node_groups.arns
 
   tags = local.tags
 }

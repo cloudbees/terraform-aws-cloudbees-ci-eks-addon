@@ -3,7 +3,7 @@
 Once you have familiarized yourself with the [Getting Started blueprint](../01-getting-started/README.md), this blueprint presents a more scalable architecture by adding the following **optional EKS Addons**:
 
 - [Cluster Autoscaler](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/cluster-autoscaler/)
-<!-- - [Node Termination Handler](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/aws-node-termination-handler/) -->
+- [Node Termination Handler](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/aws-node-termination-handler/)
 - [EFS CSI Driver](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/aws-efs-csi-driver/). It can be used by non-HA/HS (optional) and it is required by HA/HS Controllers.
 - [Metrics Server](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/aws-efs-csi-driver/). It is required by HA/HS Controllers for Horizontal Pod Autoscaling.
 
