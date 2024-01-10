@@ -17,8 +17,6 @@ locals {
   kubeconfig_file      = "kubeconfig_${local.name}.yaml"
   kubeconfig_file_path = abspath("${path.root}/${local.kubeconfig_file}")
 
-  cbci_namespace = "cbci"
-
   vpc_cidr = "10.0.0.0/16"
 
   #https://docs.cloudbees.com/docs/cloudbees-common/latest/supported-platforms/cloudbees-ci-cloud#_kubernetes
@@ -49,30 +47,6 @@ locals {
 
 # CloudBees CI Add-ons
 
-resource "kubernetes_namespace" "cbci" {
-
-  metadata {
-    name = local.cbci_namespace
-  }
-
-  depends_on = [
-    module.eks_blueprints_addons
-  ]
-
-}
-
-# Secrets to be passed to Casc
-# https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/docs/features/secrets.adoc#kubernetes-secrets
-resource "kubernetes_secret" "oc_secrets" {
-
-  metadata {
-    name      = "oc-secrets"
-    namespace = kubernetes_namespace.cbci.metadata[0].name
-  }
-
-  data = yamldecode(file("${path.module}/secrets-values.yml"))
-}
-
 module "eks_blueprints_addon_cbci" {
   source = "../../"
 
@@ -85,9 +59,8 @@ module "eks_blueprints_addon_cbci" {
     values           = [file("${path.module}/cbci-values.yml")]
   }
 
-  depends_on = [
-    kubernetes_secret.oc_secrets
-  ]
+  secrets_file = "${path.module}/secrets-values.yml"
+
 }
 
 # EKS Blueprints Add-ons
@@ -312,7 +285,7 @@ resource "kubernetes_storage_class_v1" "gp3" {
   metadata {
     name = "gp3"
 
-    # IMPORTANT: Prometheus and Velero requires gp3 (Block Storage)
+    # IMPORTANT: Prometheus and Velero requires Block Storage
     annotations = {
       "storageclass.kubernetes.io/is-default-class" = "true"
     }
@@ -334,12 +307,10 @@ resource "kubernetes_storage_class_v1" "efs" {
 
   metadata {
     name = "efs"
-    annotations = {
-      "storageclass.kubernetes.io/is-default-class" = "false"
-    }
   }
 
   storage_provisioner = "efs.csi.aws.com"
+  reclaim_policy      = "Delete"
   parameters = {
     provisioningMode = "efs-ap" # Dynamic provisioning
     fileSystemId     = module.efs.id

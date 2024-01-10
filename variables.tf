@@ -30,3 +30,9 @@ variable "temp_license" {
   description = "Temporary license details"
   type        = map(string)
 }
+
+variable "secrets_file" {
+  description = "Secrets file yml path containing the secrets names:values to create the Kubernetes secret cbci-secrets. It can be mounted for Casc"
+  default     = "secrets-values.yml"
+  type        = string
+}
