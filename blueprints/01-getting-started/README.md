@@ -80,7 +80,7 @@ Initialize the root module and any associated configuration for providers and fi
 
 For more detailed information, see the documentation for the [Terraform Core workflow](https://www.terraform.io/intro/core-workflow).
 
-TODO: Deloyed resources link to AWS Resource Groups
+Once deployed has finished, it is possible to check the generated AWS resources via Resource Groups.
 
 > [!TIP]
 > These steps are automated in the [Makefile](../../Makefile) at the root of the project under the target `tfDeploy`.

@@ -10,6 +10,7 @@ locals {
 
   vpc_name             = "${local.name}-vpc"
   cluster_name         = "${local.name}-eks"
+  resource_group_name  = "${local.name}-rg"
   kubeconfig_file      = "kubeconfig_${local.name}.yaml"
   kubeconfig_file_path = abspath("${path.root}/${local.kubeconfig_file}")
 
@@ -230,4 +231,24 @@ module "vpc" {
 
   tags = local.tags
 
+}
+
+resource "aws_resourcegroups_group" "bp_rg" {
+  name = local.resource_group_name
+
+  resource_query {
+    query = <<JSON
+{
+  "ResourceTypeFilters": [
+    "AWS::AllSupported"
+  ],
+  "TagFilters": [
+    {
+      "Key": "tf:blueprint",
+      "Values": ["${local.name}"]
+    }
+  ]
+}
+JSON
+  }
 }
