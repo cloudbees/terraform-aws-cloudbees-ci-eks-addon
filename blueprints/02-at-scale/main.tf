@@ -358,6 +358,9 @@ module "efs" {
     }
   }
 
+  # Backup policy
+  enable_backup_policy = true
+
   tags = var.tags
 }
 
