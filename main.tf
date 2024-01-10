@@ -1,17 +1,66 @@
 # Copyright (c) CloudBees, Inc.
 
+locals {
+  secret_data   = fileexists(var.secrets_file) ? yamldecode(file(var.secrets_file)) : {}
+  create_secret = length(local.secret_data) > 0
+  oc_secrets_mount = [
+    <<-EOT
+      OperationsCenter:
+        ContainerEnv:
+          - name: SECRETS
+            value: /var/run/secrets/cbci
+        ExtraVolumes:
+          - name: cbci-secrets
+            secret:
+              secretName: cbci-secrets
+        ExtraVolumeMounts:
+          - name: cbci-secrets
+            mountPath: /var/run/secrets/cbci
+            readOnly: true
+      EOT
+  ]
+}
+
+resource "kubernetes_namespace" "cbci" {
+
+  metadata {
+    name = try(var.helm_config.namespace, "cbci")
+  }
+
+}
+
+# Secrets to be passed to Casc
+# https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/docs/features/secrets.adoc#kubernetes-secrets
+resource "kubernetes_secret" "oc_secrets" {
+  count = local.create_secret ? 1 : 0
+
+  metadata {
+    name      = "cbci-secrets"
+    namespace = kubernetes_namespace.cbci.metadata[0].name
+  }
+
+  data = yamldecode(file(var.secrets_file))
+}
+
 resource "helm_release" "cloudbees_ci" {
 
   name             = try(var.helm_config.name, "cloudbees-ci")
   namespace        = try(var.helm_config.namespace, "cbci")
-  create_namespace = try(var.helm_config.create_namespace, true)
+  create_namespace = false
   description      = try(var.helm_config.description, null)
   chart            = "cloudbees-core"
   #Chart versions: #https://artifacthub.io/packages/helm/cloudbees/cloudbees-core/
   #App version: https://docs.cloudbees.com/docs/release-notes/latest/cloudbees-ci/
   version    = try(var.helm_config.version, "3.15666.0+5ea03547ce92")
   repository = try(var.helm_config.repository, "https://public-charts.artifacts.cloudbees.com/repository/public/")
-  values = concat(var.helm_config.values, [templatefile("${path.module}/values.yml", {
+  values = local.create_secret ? concat(var.helm_config.values, local.oc_secrets_mount, [templatefile("${path.module}/values.yml", {
+    hostname     = var.hostname
+    cert_arn     = var.cert_arn
+    LicFirstName = var.temp_license["first_name"]
+    LicLastName  = var.temp_license["last_name"]
+    LicEmail     = var.temp_license["email"]
+    LicCompany   = var.temp_license["company"]
+    })]) : concat(var.helm_config.values, [templatefile("${path.module}/values.yml", {
     hostname     = var.hostname
     cert_arn     = var.cert_arn
     LicFirstName = var.temp_license["first_name"]
@@ -73,4 +122,8 @@ resource "helm_release" "cloudbees_ci" {
       type  = try(set_sensitive.value.type, null)
     }
   }
+
+  depends_on = [
+    kubernetes_namespace.cbci
+  ]
 }
