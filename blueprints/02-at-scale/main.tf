@@ -89,13 +89,14 @@ module "ebs_csi_driver_irsa" {
   tags = var.tags
 }
 
-data "aws_autoscaling_groups" "eks_node_groups" {
-  depends_on = [module.eks]
-  filter {
-    name   = "tag-key"
-    values = ["eks:cluster-name"]
-  }
-}
+#Issue 23
+# data "aws_autoscaling_groups" "eks_node_groups" {
+#   depends_on = [module.eks]
+#   filter {
+#     name   = "tag-key"
+#     values = ["eks:cluster-name"]
+#   }
+# }
 
 module "eks_blueprints_addons" {
   source  = "aws-ia/eks-blueprints-addons/aws"
@@ -132,12 +133,13 @@ module "eks_blueprints_addons" {
   external_dns_route53_zone_arns      = [local.route53_zone_arn]
   enable_aws_load_balancer_controller = true
   #02-at-scale
-  enable_aws_efs_csi_driver             = true
-  enable_metrics_server                 = true
-  enable_cluster_autoscaler             = true
-  enable_aws_node_termination_handler   = true
-  aws_node_termination_handler_asg_arns = data.aws_autoscaling_groups.eks_node_groups.arns
-  enable_velero                         = true
+  enable_aws_efs_csi_driver = true
+  enable_metrics_server     = true
+  enable_cluster_autoscaler = true
+  #Issue 23
+  #enable_aws_node_termination_handler   = false
+  #aws_node_termination_handler_asg_arns = data.aws_autoscaling_groups.eks_node_groups.arns
+  enable_velero = true
   velero = {
     s3_backup_location = local.velero_s3_backup_location
   }
