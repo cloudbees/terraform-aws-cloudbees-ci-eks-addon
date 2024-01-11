@@ -16,7 +16,7 @@ locals {
   efs_name             = "${local.name}-efs"
   resource_group_name  = "${local.name}-rg"
   kubeconfig_file      = "kubeconfig_${local.name}.yaml"
-  kubeconfig_file_path = abspath("${path.root}/${local.kubeconfig_file}")
+  kubeconfig_file_path = abspath("k8s/${local.kubeconfig_file}")
 
   vpc_cidr = "10.0.0.0/16"
 
@@ -62,10 +62,10 @@ module "eks_blueprints_addon_cbci" {
 
   helm_config = {
     create_namespace = false
-    values           = [file("${path.module}/cbci-values.yml")]
+    values           = [file("k8s/cbci-values.yml")]
   }
 
-  secrets_file = "${path.module}/secrets-values.yml"
+  secrets_file = "k8s/secrets-values.yml"
 
 }
 
@@ -126,7 +126,7 @@ module "eks_blueprints_addons" {
   #01-getting-started
   enable_external_dns = true
   external_dns = {
-    values = [templatefile("${path.module}/extdns-values.yml", {
+    values = [templatefile("k8s/extdns-values.yml", {
       zoneDNS = var.domain_name
     })]
   }
@@ -144,11 +144,23 @@ module "eks_blueprints_addons" {
     s3_backup_location = local.velero_s3_backup_location
   }
 
+  enable_kube_prometheus_stack = true
+  kube_prometheus_stack = {
+    values = [
+      file("k8s/kube-prometheus-stack-values.yml"),
+    ]
+    set_sensitive = [
+      {
+        name  = "grafana.adminPassword"
+        value = var.grafana_admin_password
+      }
+    ]
+  }
+
   tags = local.tags
 }
 
 resource "null_resource" "velero_schedules" {
-
 
   provisioner "local-exec" {
     command = "velero create schedule ${local.velero_bk_demo} --schedule='${local.velero_bk_freq}' --ttl ${local.velero_bk_ttl} --include-namespaces ${module.eks_blueprints_addon_cbci.cbci_namespace} --exclude-resources pods,events,events.events.k8s.io --selector tenant=team-a"
@@ -157,6 +169,13 @@ resource "null_resource" "velero_schedules" {
     }
   }
 
+}
+
+resource "kubectl_manifest" "service_monitor_cb_controllers" {
+
+  depends_on = [module.eks_blueprints_addons]
+
+  yaml_body = file("k8s/kube-prometheus-stack-sm.yml")
 }
 
 ################################################################################

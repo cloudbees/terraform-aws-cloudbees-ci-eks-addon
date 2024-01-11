@@ -34,6 +34,7 @@ Refer to the [Getting Started Blueprint - Prerequisites](../01-getting-started/R
 |------|-------------|------|---------|:--------:|
 | domain_name | Desired domain name (e.g. example.com) used as suffix for CloudBees CI subdomains (e.g. cjoc.example.com). It requires to be mapped within an existing Route 53 Hosted Zone. | `string` | n/a | yes |
 | temp_license | Temporary license details. | `map(string)` | n/a | yes |
+| grafana_admin_password | Grafana admin password. | `string` | `"change.me"` | no |
 | suffix | Unique suffix to be assigned to all resources | `string` | `""` | no |
 | tags | Tags to apply to resources. | `map(string)` | `{}` | no |
 
@@ -53,6 +54,8 @@ Refer to the [Getting Started Blueprint - Prerequisites](../01-getting-started/R
 | cjoc_url | URL of the CloudBees CI Operations Center for CloudBees CI Add-on. |
 | eks_cluster_arn | EKS cluster ARN |
 | export_kubeconfig | Export KUBECONFIG environment variable to access the K8s API. |
+| grafana_dashboard | Access to grafana dashbaords. |
+| prometheus_dashboard | Access to prometheus dashbaords. |
 | s3_velero_arn | Velero s3 Bucket Arn |
 | velero_backup_team_a | Force to create a velero backup from schedulle for Team A. It can be applicable for rest of schedulle backups. |
 | velero_restore_team_a | Restore Team A from backup. It can be applicable for rest of schedulle backups. |

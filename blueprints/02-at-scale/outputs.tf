@@ -79,3 +79,13 @@ output "velero_restore_team_a" {
   description = "Restore Team A from backup. It can be applicable for rest of schedulle backups."
   value       = "kubectl delete all -n ${module.eks_blueprints_addon_cbci.cbci_namespace} -l tenant=team-a; kubectl delete pvc -n ${module.eks_blueprints_addon_cbci.cbci_namespace} -l tenant=team-a; kubectl delete ep -n ${module.eks_blueprints_addon_cbci.cbci_namespace} -l tenant=team-a; velero restore create --from-schedule ${local.velero_bk_demo}"
 }
+
+output "prometheus_dashboard" {
+  description = "Access to prometheus dashbaords."
+  value       = "kubectl port-forward svc/kube-prometheus-stack-prometheus 50001:9090 -n kube-prometheus-stack"
+}
+
+output "grafana_dashboard" {
+  description = "Access to grafana dashbaords."
+  value       = "kubectl port-forward svc/grafana 3000 -n kube-prometheus-stack"
+}

@@ -28,3 +28,9 @@ variable "suffix" {
     error_message = "The suffix cannot have more than 10 characters."
   }
 }
+
+variable "grafana_admin_password" {
+  description = "Grafana admin password."
+  default     = "change.me"
+  type        = string
+}

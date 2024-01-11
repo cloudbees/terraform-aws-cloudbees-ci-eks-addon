@@ -1,0 +1,23 @@
+# Copyright (c) CloudBees, Inc.
+
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: servicemonitor-controllers-cbci
+  namespace: kube-prometheus-stack
+  labels:
+    serviceMonitorSelector: controllers
+    release: kube-prometheus-stack
+    app.kubernetes.io/part-of: kube-prometheus-stack
+spec:
+  namespaceSelector:
+    matchNames:
+      - cbci
+  selector:
+    matchLabels:
+      com.cloudbees.cje.type: master
+      operated.prometheus: "true"
+  endpoints:
+    - port: http
+      interval: 30s
+      path: /prometheus/

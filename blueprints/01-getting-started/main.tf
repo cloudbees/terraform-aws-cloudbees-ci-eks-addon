@@ -12,7 +12,7 @@ locals {
   cluster_name         = "${local.name}-eks"
   resource_group_name  = "${local.name}-rg"
   kubeconfig_file      = "kubeconfig_${local.name}.yaml"
-  kubeconfig_file_path = abspath("${path.root}/${local.kubeconfig_file}")
+  kubeconfig_file_path = abspath("k8s/${local.kubeconfig_file}")
 
   vpc_cidr = "10.0.0.0/16"
 
@@ -92,7 +92,7 @@ module "eks_blueprints_addons" {
 
   enable_external_dns = true
   external_dns = {
-    values = [templatefile("${path.module}/extdns-values.yml", {
+    values = [templatefile("k8s/extdns-values.yml", {
       zoneDNS = var.domain_name
     })]
   }
