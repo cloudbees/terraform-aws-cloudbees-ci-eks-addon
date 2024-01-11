@@ -40,7 +40,7 @@ locals {
     "tf:repository" = "github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon"
   })
 
-  velero_s3_backup_location = module.velero_backup_s3_bucket.s3_bucket_arn
+  velero_s3_backup_location = "${module.velero_backup_s3_bucket.s3_bucket_arn}/velero"
   velero_bk_demo            = "team-a-pvc-bk"
   velero_bk_freq            = "@every 30m"
   velero_bk_ttl             = "2h"
@@ -165,7 +165,7 @@ resource "null_resource" "velero_schedules" {
   provisioner "local-exec" {
     command = "velero create schedule ${local.velero_bk_demo} --schedule='${local.velero_bk_freq}' --ttl ${local.velero_bk_ttl} --include-namespaces ${module.eks_blueprints_addon_cbci.cbci_namespace} --exclude-resources pods,events,events.events.k8s.io --selector tenant=team-a"
     environment = {
-      KUBECONFIG = local.kubeconfig_file
+      KUBECONFIG = local.kubeconfig_file_path
     }
   }
 
