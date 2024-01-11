@@ -193,5 +193,5 @@ grafana:
         token: ""
     grafana-dashboards-cloudbees:
       cb-controllers:
-        url: https://raw.githubusercontent.com/carlosrodlop/K8s-lib/main/helm/charts/kube-prometheus-stack-local/dashboards/cloudbees-controllers.json
+        url: https://raw.githubusercontent.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/main/blueprints/02-at-scale/k8s/kube-prometheus-stack-dashboard.json
         token: ""
