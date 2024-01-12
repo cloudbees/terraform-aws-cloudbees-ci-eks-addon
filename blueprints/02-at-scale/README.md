@@ -15,7 +15,11 @@ Additionally, it uses [CloudBees Configuration as Code](https://docs.cloudbees.c
 
 ## Architecture
 
-![Architecture](architecture/at-scale.drawio.svg)
+![Architecture](img/at-scale.architect.drawio.svg)
+
+### Kubernetes Cluster
+
+![Architecture](img/at-scale.k8s.drawio.svg)
 
 ## Prerequisites
 

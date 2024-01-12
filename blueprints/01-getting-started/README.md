@@ -10,7 +10,7 @@ Get started with the [CloudBees CI on Modern in EKS](https://docs.cloudbees.com/
 
 ## Architecture
 
-![Architecture](architecture/getting-started.drawio.svg)
+![Architecture](img/getting-started.architect.drawio.svg)
 
 ## Prerequisites
 
@@ -83,7 +83,7 @@ For more detailed information, see the documentation for the [Terraform Core wor
 Once deployed has finished, it is possible to check the generated AWS resources via Resource Groups.
 
 > [!TIP]
-> These steps are automated in the [Makefile](../../Makefile) at the root of the project under the target `tfDeploy`.
+> These steps are automated in the [Makefile](../../Makefile) at the root of the project under the target `deploy`.
 
 ## Validate
 
@@ -132,4 +132,4 @@ To teardown and remove the resources created in the blueprint, the typical steps
 > Storage Classes have assigned `reclaimPolicy` to `Delete`, and then storage volume is deleted when it is no longer required by the pod. Otherwise, it would require deleting `pvc` manually. See [CloudBees CI EKS Uninstall](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/eks-uninstall)).
 
 > [!TIP]
-> These steps are automated in the [Makefile](../../Makefile) at the root of the project under the target `tfDestroy`.
+> These steps are automated in the [Makefile](../../Makefile) at the root of the project under the target `destroy`.
