@@ -12,6 +12,10 @@ Get started with the [CloudBees CI on Modern in EKS](https://docs.cloudbees.com/
 
 ![Architecture](img/getting-started.architect.drawio.svg)
 
+### Kubernetes Cluster
+
+![Architecture](img/getting-started.k8s.drawio.svg)
+
 ## Prerequisites
 
 ### Tooling
