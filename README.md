@@ -4,6 +4,16 @@
 
 Deploy CloudBees CI to AWS EKS Clusters with this add-on.
 
+## Motivation
+
+Easing adoption of CloudBees CI by:
+
+- Deployment encapsulation of [CloudBees CI in EKS](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/installing-eks-using-helm#_configuring_your_environment) into a Terraform [AWS Partner Addons](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/aws-partner-addons/).
+- Providing a series of Blueprints (examples of implementation) using the mentioned CloudBees CI Addon module on top of the [AWS Terraform EKS Addons](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/).
+
+> [!NOTE]
+> For a better understading of the AWS the EKS blueprints' scope, please read the section [Consumption](https://aws-ia.github.io/terraform-aws-eks-blueprints/#consumption) and [Terraform Caveats](https://aws-ia.github.io/terraform-aws-eks-blueprints/#terraform-caveats) in its documentation.
+
 ## Usage
 
 By default, it uses a minimum required configuration described in [values.yml](values.yml).
