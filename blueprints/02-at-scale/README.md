@@ -89,16 +89,16 @@ Additionally, the following is required:
 
 Refer to the [Getting Started Blueprint - Prerequisites](../01-getting-started/README.md#validate) section. In addition, you can validate the following:
 
-- Velero puntual Backup on time. Note also there is a scheduled backup process.
+- Velero puntual Backup on time for Team A. Note also there is a scheduled backup process.
 
   ```sh
-  velero backup create --from-schedule team-a-pvc-bk --wait
+  eval $(terraform output --raw velero_backup_team_a)
   ```
 
 - Velero Restore process: Make any update on `team-a` (e.g.: adding some jobs), take a backup including the update, remove the latest update (e.g.: removing the jobs) and then restore it from the last backup as follows.
 
   ```sh
-  kubectl delete all -n cbci -l tenant=team-a; kubectl delete pvc -n cbci -l tenant=team-a; kubectl delete ep -n cbci -l tenant=team-a; velero restore create --from-schedule team-a-pvc-bk
+  eval $(terraform output --raw velero_restore_team_a)
   ```
 
 - Check the CloudBees CI Targets are connected to Prometheus.
@@ -107,11 +107,18 @@ Refer to the [Getting Started Blueprint - Prerequisites](../01-getting-started/R
   kubectl exec -n cbci -ti cjoc-0 --container jenkins -- curl -sSf kube-prometheus-stack-prometheus.kube-prometheus-stack.svc.cluster.local:9090/api/v1/targets?state=active | jq '.data.activeTargets[] | select(.labels.container=="jenkins" or .labels.job=="cjoc") | {job: .labels.job, instance: .labels.instance, status: .health}'
   ```
 
-- Access to Grafana and Prometheus dashboards (Check that [jenkins metrics](https://plugins.jenkins.io/metrics/) are available)
+- Access to Kube Prometheus Stack dashboards from your web browser (Check that [jenkins metrics](https://plugins.jenkins.io/metrics/) are available)
+
+  - Prometheus
 
   ```sh
-  kubectl port-forward svc/kube-prometheus-stack-prometheus 50001:9090 -n kube-prometheus-stack
-  kubectl port-forward svc/kube-prometheus-stack-grafana 50002:80 -n kube-prometheus-stack
+  eval $(terraform output --raw prometheus_dashboard)
+  ```  
+
+  - Grafana
+
+  ```sh
+  eval $(terraform output --raw grafana_dashboard)
   ```  
 
 - Once the `Amazon S3 Bucket Access settings` > `S3 Bucket Name` is configured correctly (see [Deploy](#deploy) section), you can validate the Workspace Caching and Artifact Manager are working as expected running the jobs `ws-cache`, `upstream-artifact` and finally `downstream-artifact`. Note that team-b uses hibernation

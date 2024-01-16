@@ -102,25 +102,40 @@ Once you get access to K8s API from your terminal, validate that:
 - The CloudBees Operation Center Pod is running
 
   ```sh
-  until kubectl get pod -n cbci cjoc-0; do sleep 2 && echo "Waiting for Pod to get ready"; done; echo "OC Pod is Ready"
+  eval $(terraform output --raw cbci_oc_pod)
   ```
 
-- The Ingress Controller is ready and has assigned an `ADDRESS`
+- The Ingress Controller is ready and has assigned a valid `ADDRESS`
 
   ```sh
-  until kubectl get ing -n cbci cjoc; do sleep 2 && echo "Waiting for Ingress to get ready"; done; echo "Ingress Ready"
+  eval $(terraform output --raw cbci_oc_ing)
   ```
 
-- It is possible to access the CloudBees CI installation Wizard by copying the outcome of the below command in your browser.
+- Check that the Operation Center Service is running from inside the K8s cluster
+
+  ```sh
+  eval $(terraform output --raw cbci_liveness_probe_int)
+  ```
+
+- Check that the Operation Center Service is running from outside the K8s cluster. DNS propagation can take a few minutes.
+
+  ```sh
+  eval $(terraform output --raw cbci_liveness_probe_ext)
+  ```
+
+> [!NOTE]
+> DNS propagation can take a few minutes
+
+- Once propagation is ready, it is possible to access the CloudBees CI installation Wizard by copying the outcome of the below command in your browser.
 
   ```sh
   terraform output cjoc_url
   ```
 
-Now that you’ve installed CloudBees CI and operations center, you’ll want to see your system in action. To do this, follow the steps explained in [CloudBees CI EKS Install Guide - Signing in to your CloudBees CI installation](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/installing-eks-using-helm#log-in).
+Now that you’ve installed CloudBees CI and operations center, you’ll want to see your system in action. To do this, follow the steps explained in [CloudBees CI EKS Install Guide - Signing in to your CloudBees CI installation](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/installing-eks-using-helm#log-in). You will need the initial admin password to log in as:
 
   ```sh
-  kubectl exec -n cbci -ti cjoc-0 -- cat /var/jenkins_home/secrets/initialAdminPassword
+  eval $(terraform output --raw cbci_initial_admin_password)
   ```
 
 Finally, install the suggested plugins and create the first admin user.
@@ -131,9 +146,6 @@ Finally, install the suggested plugins and create the first admin user.
 ## Destroy
 
 To teardown and remove the resources created in the blueprint, the typical steps of execution are as explained in [Getting Started - Amazon EKS Blueprints for Terraform - Destroy](https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#destroy)
-
-> [!NOTE]
-> Storage Classes have assigned `reclaimPolicy` to `Delete`, and then storage volume is deleted when it is no longer required by the pod. Otherwise, it would require deleting `pvc` manually. See [CloudBees CI EKS Uninstall](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/eks-uninstall)).
 
 > [!TIP]
 > These steps are automated in the [Makefile](../../Makefile) at the root of the project under the target `destroy`.
