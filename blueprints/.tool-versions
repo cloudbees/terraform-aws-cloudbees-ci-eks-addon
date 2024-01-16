@@ -1,3 +1,4 @@
 kubectl 1.29.0
 terraform 1.6.6
 velero 1.12.2
+jq 1.7.1

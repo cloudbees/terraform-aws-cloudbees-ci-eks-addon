@@ -10,14 +10,14 @@ Once you have familiarized yourself with the [Getting Started blueprint](../01-g
 
 Additionally, it uses [CloudBees Configuration as Code](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/casc-intro) for configuring the [Operation Center](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/) and [Controllers](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-controller/) enabling:
 
-- [New Features for Streamlined DevOps](https://www.cloudbees.com/blog/cloudbees-ci-exciting-new-features-for-streamlined-devops): [CloudBees CI HA/HS 🎥](https://www.youtube.com/watch?v=Qkf9HaA2wio) and [CloudBees CI Workspace Cathing in s3 🎥](https://www.youtube.com/watch?v=ESU9oN9JUCw) and [Cloudbees CI Pipeline Explorer 🎥](https://www.youtube.com/watch?v=OMXm6eYd1EQ). The last one also enables the [Artifact s3 Manager 🎥](https://www.youtube.com/watch?v=u6LF-T-daS4) as a dependency and it helps to storage intermediate artifacts out of the Controllers.
+- [New Features for Streamlined DevOps](https://www.cloudbees.com/blog/cloudbees-ci-exciting-new-features-for-streamlined-devops): [CloudBees CI HA/HS 🎥](https://www.youtube.com/watch?v=Qkf9HaA2wio) and [CloudBees CI Workspace Cathing in s3 🎥](https://www.youtube.com/watch?v=ESU9oN9JUCw) and [Cloudbees CI Pipeline Explorer 🎥](https://www.youtube.com/watch?v=OMXm6eYd1EQ). The last one also enables the [Artifact s3 Manager 🎥](https://www.youtube.com/watch?v=u6LF-T-daS4) as a dependency and it helps to store intermediate artifacts out of the Controllers.
 - [CloudBees CI Hibernation](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#_hibernation_in_managed_masters) for saving Cloud Billing costs.
 
 > [!NOTE]
 > For s3 storage permissions for Workspace caching and Artifact Manager is based on [Instance Profile](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2_instance-profiles.html) rather than creating an User with IAM permissions. Then, it is expected that Credentials validation fails from CloudBees CI.
 
 > [!NOTE]
-> To prevent from posible `node affinity conflict` from controllers restarts when using EBS volumens for CloudBees CI, there are two options: make [topology aware volume to the same AZs](https://repost.aws/knowledge-center/eks-topology-aware-volumes), or designing Autoscaling Groups following what is explained in the AWS article [Creating Kubernetes Auto Scaling Groups for Multiple Availability Zones](https://aws.amazon.com/blogs/containers/amazon-eks-cluster-multi-zone-auto-scaling-groups/) (one ASG per AZ for EBS volume and one single ASG per Multiple AZ for EFS volumes). At the moment of publishing this blueprints, `terraform-aws-modules/eks/aws` does not support `availability_zones` atribute for `aws_autoscaling_group` resource, then the first option is used.
+> There are two option to prevent from posible `node affinity conflict` during controllers restarts when using EBS volumens: make [topology aware volume to the same AZs](https://repost.aws/knowledge-center/eks-topology-aware-volumes), or designing Autoscaling Groups following what is explained in the AWS article [Creating Kubernetes Auto Scaling Groups for Multiple Availability Zones](https://aws.amazon.com/blogs/containers/amazon-eks-cluster-multi-zone-auto-scaling-groups/) (one ASG per AZ for EBS volume and one single ASG per Multiple AZ for EFS volumes). At the moment of publishing this blueprints, `terraform-aws-modules/eks/aws` does not support `availability_zones` atribute for `aws_autoscaling_group` resource, then the first option is implemented.
 
 ## Architecture
 
@@ -87,9 +87,38 @@ Additionally, the following is required:
 
 ## Validate
 
-<!-- TODO: COMPLETE with specific validation for Blueprints 2-->
+Refer to the [Getting Started Blueprint - Prerequisites](../01-getting-started/README.md#validate) section. In addition, you can validate the following:
 
-Refer to the [Getting Started Blueprint - Prerequisites](../01-getting-started/README.md#validate) section.
+- Velero puntual Backup on time. Note also there is a scheduled backup process.
+
+  ```sh
+  velero backup create --from-schedule team-a-pvc-bk --wait
+  ```
+
+- Velero Restore process: Make any update on `team-a` (e.g.: adding some jobs), take a backup including the update, remove the latest update (e.g.: removing the jobs) and then restore it from the last backup as follows.
+
+  ```sh
+  kubectl delete all -n cbci -l tenant=team-a; kubectl delete pvc -n cbci -l tenant=team-a; kubectl delete ep -n cbci -l tenant=team-a; velero restore create --from-schedule team-a-pvc-bk
+  ```
+
+- Check the CloudBees CI Targets are connected to Prometheus.
+
+  ```sh
+  kubectl exec -n cbci -ti cjoc-0 --container jenkins -- curl -sSf kube-prometheus-stack-prometheus.kube-prometheus-stack.svc.cluster.local:9090/api/v1/targets?state=active | jq '.data.activeTargets[] | select(.labels.container=="jenkins" or .labels.job=="cjoc") | {job: .labels.job, instance: .labels.instance, status: .health}'
+  ```
+
+- Access to Grafana and Prometheus dashboards (Check that [jenkins metrics](https://plugins.jenkins.io/metrics/) are available)
+
+  ```sh
+  kubectl port-forward svc/kube-prometheus-stack-prometheus 50001:9090 -n kube-prometheus-stack
+  kubectl port-forward svc/kube-prometheus-stack-grafana 50002:80 -n kube-prometheus-stack
+  ```  
+
+- Once the `Amazon S3 Bucket Access settings` > `S3 Bucket Name` is configured correctly (see [Deploy](#deploy) section), you can validate the Workspace Caching and Artifact Manager are working as expected running the jobs `ws-cache`, `upstream-artifact` and finally `downstream-artifact`. Note that team-b uses hibernation
+
+  ```sh
+  curl -i -XPOST -u admin:"$(kubectl get secret cbci-secrets -n cbci -o jsonpath='{.data.secJenkinsPass}' | base64 -d)" "http://$ROUTE_53_DOMAIN/hibernation/queue/team-b/job/ws-cache/build?delay=180sec"
+  ```
 
 ## Destroy
 

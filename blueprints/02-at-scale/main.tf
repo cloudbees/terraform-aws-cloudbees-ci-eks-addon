@@ -163,6 +163,7 @@ module "eks_blueprints_addons" {
 resource "null_resource" "velero_schedules" {
 
   provisioner "local-exec" {
+    #Create a schedule per controller using EBS. In this example, we are creating a schedule for team-a
     command = "velero delete schedule ${local.velero_bk_demo}  --confirm || echo '${local.velero_bk_demo} does not yet exists'; velero create schedule ${local.velero_bk_demo} --schedule='${local.velero_bk_freq}' --ttl ${local.velero_bk_ttl} --include-namespaces ${module.eks_blueprints_addon_cbci.cbci_namespace} --exclude-resources pods,events,events.events.k8s.io --selector tenant=team-a"
     environment = {
       KUBECONFIG = local.kubeconfig_file_path

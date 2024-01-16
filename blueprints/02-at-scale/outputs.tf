@@ -92,5 +92,5 @@ output "prometheus_dashboard" {
 
 output "grafana_dashboard" {
   description = "Access to grafana dashbaords."
-  value       = "kubectl port-forward svc/grafana 50002:3000 -n kube-prometheus-stack"
+  value       = "kubectl port-forward svc/kube-prometheus-stack-grafana 50002:80 -n kube-prometheus-stack"
 }
