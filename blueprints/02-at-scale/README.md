@@ -14,10 +14,8 @@ Additionally, it uses [CloudBees Configuration as Code](https://docs.cloudbees.c
 - [CloudBees CI Hibernation](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#_hibernation_in_managed_masters) for saving Cloud Billing costs.
 
 > [!NOTE]
-> For s3 storage permissions for Workspace caching and Artifact Manager is based on [Instance Profile](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2_instance-profiles.html) rather than creating an User with IAM permissions. Then, it is expected that Credentials validation fails from CloudBees CI.
-
-> [!NOTE]
-> There are two option to prevent from posible `node affinity conflict` during controllers restarts when using EBS volumens: make [topology aware volume to the same AZs](https://repost.aws/knowledge-center/eks-topology-aware-volumes), or designing Autoscaling Groups following what is explained in the AWS article [Creating Kubernetes Auto Scaling Groups for Multiple Availability Zones](https://aws.amazon.com/blogs/containers/amazon-eks-cluster-multi-zone-auto-scaling-groups/) (one ASG per AZ for EBS volume and one single ASG per Multiple AZ for EFS volumes). At the moment of publishing this blueprints, `terraform-aws-modules/eks/aws` does not support `availability_zones` atribute for `aws_autoscaling_group` resource, then the first option is implemented.
+> - For s3 storage permissions for Workspace caching and Artifact Manager is based on [Instance Profile](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2_instance-profiles.html) rather than creating an User with IAM permissions. Then, it is expected that Credentials validation fails from CloudBees CI.
+> - There are two option to prevent from posible `node affinity conflict` during controllers restarts when using EBS volumens: make [topology aware volume to the same AZs](https://repost.aws/knowledge-center/eks-topology-aware-volumes), or designing Autoscaling Groups following what is explained in the AWS article [Creating Kubernetes Auto Scaling Groups for Multiple Availability Zones](https://aws.amazon.com/blogs/containers/amazon-eks-cluster-multi-zone-auto-scaling-groups/) (one ASG per AZ for EBS volume and one single ASG per Multiple AZ for EFS volumes). At the moment of publishing this blueprints, `terraform-aws-modules/eks/aws` does not support `availability_zones` atribute for `aws_autoscaling_group` resource, then the first option is implemented.
 
 ## Architecture
 
