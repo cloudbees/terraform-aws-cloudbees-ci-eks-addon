@@ -1,17 +1,23 @@
 # CloudBees CI Add-on at scale Blueprint
 
-Once you have familiarized yourself with the [Getting Started blueprint](../01-getting-started/README.md), this blueprint explodes additional **[Amazon EKS Addons](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/)** to present a more scalable architecture and configuration.
+Once you have familiarized yourself with the [Getting Started blueprint](../01-getting-started/README.md), this blueprint explodes additional **[Amazon EKS Addons](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/)** to present a more scalable architecture and configuration:
 
-- [Cluster Autoscaler](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/cluster-autoscaler/) to accomplish [CloudBees auto-scaling nodes on EKS](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/eks-auto-scaling-nodes). The [Autoscaling Groups](https://docs.aws.amazon.com/autoscaling/ec2/userguide/auto-scaling-groups.html) design follows the AWS article [Creating Kubernetes Auto Scaling Groups for Multiple Availability Zones](https://aws.amazon.com/blogs/containers/amazon-eks-cluster-multi-zone-auto-scaling-groups/), creating one ASG per AZ for EBS volume and one single ASG per Multiple AZ for EFS volumes.
+- [Cluster Autoscaler](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/cluster-autoscaler/) to accomplish [CloudBees auto-scaling nodes on EKS](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/eks-auto-scaling-nodes).
 - [EFS CSI Driver](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/aws-efs-csi-driver/). It can be used by non-HA/HS (optional) and it is required by HA/HS CBCI Controllers.
 - [Metrics Server](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/metrics-server/). It is required by CBCI HA/HS Controllers for Horizontal Pod Autoscaling.
 - [Velero](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/velero/). It is used for [Backup and Restoring K8s resources and EBS volume snapshots within the CloudBees CI namespace](https://docs.cloudbees.com/docs/cloudbees-ci/latest/backup-restore/velero-dr). EFS Storage uses [AWS Backup](https://aws.amazon.com/backup/).
-- [Kube Prometheus Stack](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/kube-prometheus-stack/) for observability CloudBees CI Add-on by following a similar approach to [How to Monitor Jenkins With Grafana and Prometheus](https://www.youtube.com/watch?v=3H9eNIf9KZs) but relying on the [CloudBees Prometheus Metrics plugin](https://docs.cloudbees.com/docs/cloudbees-ci/latest/monitoring/prometheus-plugin).
+- [Kube Prometheus Stack](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/kube-prometheus-stack/) for observability CloudBees CI Add-on by following a similar approach to [How to Monitor Jenkins With Grafana and Prometheus 🎥](https://www.youtube.com/watch?v=3H9eNIf9KZs) but relying on the [CloudBees Prometheus Metrics plugin](https://docs.cloudbees.com/docs/cloudbees-ci/latest/monitoring/prometheus-plugin).
 
-Additionally, it uses [CloudBees Configuration as Code](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/casc-intro) for configuring the [Operation Center](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/) and [Controllers](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-controller/) enabling [New Features for Streamlined DevOps](https://www.cloudbees.com/blog/cloudbees-ci-exciting-new-features-for-streamlined-devops) and [CloudBees CI Hibernation](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#_hibernation_in_managed_masters) for saving Cloud Billing costs.
+Additionally, it uses [CloudBees Configuration as Code](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/casc-intro) for configuring the [Operation Center](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/) and [Controllers](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-controller/) enabling:
+
+- [New Features for Streamlined DevOps](https://www.cloudbees.com/blog/cloudbees-ci-exciting-new-features-for-streamlined-devops): [CloudBees CI HA/HS 🎥](https://www.youtube.com/watch?v=Qkf9HaA2wio) and [CloudBees CI Workspace Cathing in s3 🎥](https://www.youtube.com/watch?v=ESU9oN9JUCw) and [Cloudbees CI Pipeline Explorer 🎥](https://www.youtube.com/watch?v=OMXm6eYd1EQ). The last one also enables the [Artifact s3 Manager 🎥](https://www.youtube.com/watch?v=u6LF-T-daS4) as a dependency and it helps to storage intermediate artifacts out of the Controllers.
+- [CloudBees CI Hibernation](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#_hibernation_in_managed_masters) for saving Cloud Billing costs.
 
 > [!NOTE]
-> One of the references for the design of this blueprint comes from the [AWS EKS Statefulset pattern](https://github.com/aws-ia/terraform-aws-eks-blueprints/tree/v5.0.0/examples/stateful)
+> For s3 storage permissions for Workspace caching and Artifact Manager is based on [Instance Profile](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2_instance-profiles.html) rather than creating an User with IAM permissions. Then, it is expected that Credentials validation fails from CloudBees CI.
+
+> [!NOTE]
+> To prevent from posible `node affinity conflict` from controllers restarts when using EBS volumens for CloudBees CI, there are two options: make [topology aware volume to the same AZs](https://repost.aws/knowledge-center/eks-topology-aware-volumes), or designing Autoscaling Groups following what is explained in the AWS article [Creating Kubernetes Auto Scaling Groups for Multiple Availability Zones](https://aws.amazon.com/blogs/containers/amazon-eks-cluster-multi-zone-auto-scaling-groups/) (one ASG per AZ for EBS volume and one single ASG per Multiple AZ for EFS volumes). At the moment of publishing this blueprints, `terraform-aws-modules/eks/aws` does not support `availability_zones` atribute for `aws_autoscaling_group` resource, then the first option is used.
 
 ## Architecture
 
@@ -56,7 +62,8 @@ Refer to the [Getting Started Blueprint - Prerequisites](../01-getting-started/R
 | export_kubeconfig | Export KUBECONFIG environment variable to access the K8s API. |
 | grafana_dashboard | Access to grafana dashbaords. |
 | prometheus_dashboard | Access to prometheus dashbaords. |
-| s3_velero_arn | Velero s3 Bucket Arn |
+| s3_cbci_arn | CBCI s3 Bucket Arn |
+| s3_cbci_name | CBCI s3 Bucket Name. It is required by CloudBees CI for Workspace Cacthing and Artifact Manager |
 | velero_backup_team_a | Force to create a velero backup from schedulle for Team A. It can be applicable for rest of schedulle backups. |
 | velero_restore_team_a | Restore Team A from backup. It can be applicable for rest of schedulle backups. |
 | vpc_arn | VPC ID |
@@ -66,9 +73,21 @@ Refer to the [Getting Started Blueprint - Prerequisites](../01-getting-started/R
 
 Refer to the [Getting Started Blueprint - Prerequisites](../01-getting-started/README.md#deploy) section.
 
-Additionally, customize your secrets file by copying `secrets-values.yml.example` to `secrets-values.yml`.
+Additionally, the following is required:
+
+- Customize your secrets file by copying `secrets-values.yml.example` to `secrets-values.yml`.
+- In the case of using the terraform variable `suffix` for this blueprint, the Amazon `S3 Bucket Access settings` > `S3 Bucket Name` requires to be updated:
+  - via UI (temporal update): Go to `Manage Jenkins` in the Controller > `AWS` > `Amazon S3 Bucket Access settings` > `S3 Bucket Name`.
+  - via Casc (permanent update):
+    - Make a fork from [cloudbees/casc-mm-cloudbees-ci-eks-addon](https://github.com/cloudbees/casc-mm-cloudbees-ci-eks-addon) to your organization, and update accordingly `cbci_s3` in `bp02.parent/variables/variables.yaml` file. Save and Push.
+    - Make a fork from [cloudbees/casc-oc-cloudbees-ci-eks-addon](https://github.com/cloudbees/casc-mm-cloudbees-ci-eks-addon) to your organization, and update accordingly `scm_casc_mm_store` in `bp02/variables/variables.yaml` file. Save and Push.
+
+> [!IMPORTANT]
+> The declarative Casc defition overrides anything modified at UI at the next time the Controller is restarted.
 
 ## Validate
+
+<!-- TODO: COMPLETE with specific validation for Blueprints 2-->
 
 Refer to the [Getting Started Blueprint - Prerequisites](../01-getting-started/README.md#validate) section.
 

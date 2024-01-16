@@ -65,9 +65,14 @@ output "eks_cluster_arn" {
   value       = module.eks.cluster_arn
 }
 
-output "s3_velero_arn" {
-  description = "Velero s3 Bucket Arn"
-  value       = module.velero_backup_s3_bucket.s3_bucket_arn
+output "s3_cbci_arn" {
+  description = "CBCI s3 Bucket Arn"
+  value       = module.cbci_s3_bucket.s3_bucket_arn
+}
+
+output "s3_cbci_name" {
+  description = "CBCI s3 Bucket Name. It is required by CloudBees CI for Workspace Cacthing and Artifact Manager"
+  value       = local.bucket_name
 }
 
 output "velero_backup_team_a" {
@@ -87,5 +92,5 @@ output "prometheus_dashboard" {
 
 output "grafana_dashboard" {
   description = "Access to grafana dashbaords."
-  value       = "kubectl port-forward svc/grafana 3000 -n kube-prometheus-stack"
+  value       = "kubectl port-forward svc/grafana 50002:3000 -n kube-prometheus-stack"
 }

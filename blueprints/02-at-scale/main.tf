@@ -2,19 +2,19 @@ data "aws_route53_zone" "this" {
   name = var.domain_name
 }
 
-data "aws_availability_zones" "available" {}
-
 locals {
   name   = var.suffix == "" ? "cbci-bp02" : "cbci-bp02-${var.suffix}"
   region = "us-east-1"
   #Number of AZs per region https://docs.aws.amazon.com/ram/latest/userguide/working-with-az-ids.html
-  azs    = slice(data.aws_availability_zones.available.names, 0, 3)
-  ebs_az = slice(data.aws_availability_zones.available.names, 0, 1)
+  azs = ["${local.region}a", "${local.region}b", "${local.region}c"]
+  #For g3 SC
+  az_a = ["${local.region}a"]
 
   vpc_name             = "${local.name}-vpc"
   cluster_name         = "${local.name}-eks"
   efs_name             = "${local.name}-efs"
   resource_group_name  = "${local.name}-rg"
+  bucket_name          = "${local.name}-s3"
   kubeconfig_file      = "kubeconfig_${local.name}.yaml"
   kubeconfig_file_path = abspath("k8s/${local.kubeconfig_file}")
 
@@ -40,7 +40,7 @@ locals {
     "tf:repository" = "github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon"
   })
 
-  velero_s3_backup_location = "${module.velero_backup_s3_bucket.s3_bucket_arn}/velero"
+  velero_s3_backup_location = "${module.cbci_s3_bucket.s3_bucket_arn}/velero"
   velero_bk_demo            = "team-a-pvc-bk"
   velero_bk_freq            = "@every 30m"
   velero_bk_ttl             = "2h"
@@ -163,7 +163,7 @@ module "eks_blueprints_addons" {
 resource "null_resource" "velero_schedules" {
 
   provisioner "local-exec" {
-    command = "velero create schedule ${local.velero_bk_demo} --schedule='${local.velero_bk_freq}' --ttl ${local.velero_bk_ttl} --include-namespaces ${module.eks_blueprints_addon_cbci.cbci_namespace} --exclude-resources pods,events,events.events.k8s.io --selector tenant=team-a"
+    command = "velero delete schedule ${local.velero_bk_demo}  --confirm || echo '${local.velero_bk_demo} does not yet exists'; velero create schedule ${local.velero_bk_demo} --schedule='${local.velero_bk_freq}' --ttl ${local.velero_bk_ttl} --include-namespaces ${module.eks_blueprints_addon_cbci.cbci_namespace} --exclude-resources pods,events,events.events.k8s.io --selector tenant=team-a"
     environment = {
       KUBECONFIG = local.kubeconfig_file_path
     }
@@ -181,6 +181,8 @@ resource "kubectl_manifest" "service_monitor_cb_controllers" {
 ################################################################################
 # EKS: Infra
 ################################################################################
+
+# EKS Cluster
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
@@ -245,27 +247,13 @@ module "eks" {
 
   #https://aws.amazon.com/blogs/containers/amazon-eks-cluster-multi-zone-auto-scaling-groups/
   eks_managed_node_groups = {
-    mg_k8sApps_1az = {
-      node_group_name   = "mg-k8s-apps-1az"
-      instance_types    = local.k8s_instance_types["k8s-apps"]
-      capacity_type     = "ON_DEMAND"
-      min_size          = 1
-      max_size          = 3
-      desired_size      = 1
-      availabilityZones = local.ebs_az
-    }
-    mg_cbApps_1az = {
-      node_group_name = "mg-cb-apps-1az"
-      instance_types  = local.k8s_instance_types["cb-apps"]
+    mg_k8sApps = {
+      node_group_name = "mg-k8s-apps"
+      instance_types  = local.k8s_instance_types["k8s-apps"]
       capacity_type   = "ON_DEMAND"
       min_size        = 1
-      max_size        = 6
+      max_size        = 3
       desired_size    = 1
-      taints          = [{ key = "dedicated", value = "cb-apps-1az", effect = "NO_SCHEDULE" }]
-      labels = {
-        ci_type = "cb-apps-1az"
-      }
-      availabilityZones = local.ebs_az
     }
     mg_cbApps = {
       node_group_name = "mng-cb-apps"
@@ -278,6 +266,8 @@ module "eks" {
       labels = {
         ci_type = "cb-apps"
       }
+      create_iam_role = false
+      iam_role_arn    = aws_iam_role.managed_ng.arn
     }
     mg_cbAgents = {
       node_group_name = "mng-agent"
@@ -308,6 +298,85 @@ module "eks" {
   tags = local.tags
 }
 
+# AWS Instance Permissions
+
+data "aws_iam_policy_document" "managed_ng_assume_role_policy" {
+  statement {
+    sid = "EKSWorkerAssumeRole"
+
+    actions = [
+      "sts:AssumeRole",
+    ]
+    principals {
+      type        = "Service"
+      identifiers = ["ec2.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role" "managed_ng" {
+  name                  = "${local.name}-iam_role_mn"
+  description           = "EKS Managed Node group IAM Role"
+  assume_role_policy    = data.aws_iam_policy_document.managed_ng_assume_role_policy.json
+  path                  = "/"
+  force_detach_policies = true
+  # Mandatory for EKS Managed Node Group
+  managed_policy_arns = [
+    "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy",
+    "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy",
+    "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly",
+    "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+  ]
+  # Additional Permissions for for EKS Managed Node Group per https://docs.aws.amazon.com/eks/latest/userguide/create-node-role.html
+  inline_policy {
+    name = "${local.name}-iam_inline_policy"
+    policy = jsonencode(
+      {
+        "Version" : "2012-10-17",
+        #https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-cache-step#_s3_configuration
+        "Statement" : [
+          {
+            "Sid" : "cbciS3BucketputGetDelete",
+            "Effect" : "Allow",
+            "Action" : [
+              "s3:PutObject",
+              "s3:GetObject",
+              "s3:DeleteObject"
+            ],
+            "Resource" : "arn:aws:s3:::${module.cbci_s3_bucket.s3_bucket_id}/cbci/*"
+          },
+          {
+            "Sid" : "cbciS3BucketList",
+            "Effect" : "Allow",
+            "Action" : "s3:ListBucket",
+            "Resource" : "arn:aws:s3:::${module.cbci_s3_bucket.s3_bucket_id}"
+            "Condition" : {
+              "StringLike" : {
+                "s3:prefix" : "cbci/*"
+              }
+            }
+          },
+        ]
+      }
+    )
+  }
+  tags = var.tags
+}
+
+resource "aws_iam_instance_profile" "managed_ng" {
+  name = "${local.name}-instance_profile"
+  role = aws_iam_role.managed_ng.name
+  path = "/"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  tags = var.tags
+}
+
+# Storage Classes
+
 resource "kubernetes_annotations" "gp2" {
   api_version = "storage.k8s.io/v1"
   kind        = "StorageClass"
@@ -319,7 +388,6 @@ resource "kubernetes_annotations" "gp2" {
   }
 
   annotations = {
-    # Modify annotations to remove gp2 as default storage class still retain the class
     "storageclass.kubernetes.io/is-default-class" = "false"
   }
 }
@@ -328,7 +396,6 @@ resource "kubernetes_storage_class_v1" "gp3" {
   metadata {
     name = "gp3"
 
-    # IMPORTANT: Prometheus and Velero requires Block Storage
     annotations = {
       "storageclass.kubernetes.io/is-default-class" = "true"
     }
@@ -344,6 +411,14 @@ resource "kubernetes_storage_class_v1" "gp3" {
     fsType    = "ext4"
     type      = "gp3"
   }
+
+  allowed_topologies {
+    match_label_expressions {
+      key    = "topology.ebs.csi.aws.com/zone"
+      values = local.az_a
+    }
+  }
+
 }
 
 resource "kubernetes_storage_class_v1" "efs" {
@@ -365,12 +440,12 @@ resource "kubernetes_storage_class_v1" "efs" {
   ]
 }
 
+# Kubeconfig
+
 resource "null_resource" "create_kubeconfig" {
 
-  depends_on = [module.eks]
-
   provisioner "local-exec" {
-    command = "aws eks update-kubeconfig --name ${module.eks.cluster_name} --region ${local.region} --kubeconfig ${local.kubeconfig_file}"
+    command = "aws eks update-kubeconfig --name ${module.eks.cluster_name} --region ${local.region} --kubeconfig ${local.kubeconfig_file_path}"
   }
 }
 
@@ -471,11 +546,11 @@ JSON
   }
 }
 
-module "velero_backup_s3_bucket" {
+module "cbci_s3_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "~> 3.0"
 
-  bucket_prefix = "${local.name}-"
+  bucket = local.bucket_name
 
   # Allow deletion of non-empty bucket
   # NOTE: This is enabled for example usage only, you should not enable this for production workloads
@@ -493,6 +568,9 @@ module "velero_backup_s3_bucket" {
 
   control_object_ownership = true
   object_ownership         = "BucketOwnerPreferred"
+
+  #SECO-3109
+  object_lock_enabled = false
 
   versioning = {
     status     = true

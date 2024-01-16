@@ -3,7 +3,7 @@
 FROM alpine:3.19.0
 
 ENV ASDF_VERSION=v0.11.3 \
-    USER=asdf \
+    USER=bp-agent \
     DOCKERFILE_PATH=blueprints
 
 RUN apk add --virtual .asdf-deps --no-cache bash \
