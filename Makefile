@@ -1,6 +1,7 @@
 .DEFAULT_GOAL   	:= help
 SHELL           	:= /usr/bin/env bash
 MAKEFLAGS       	+= --no-print-directory
+BP_AGENT_USER		:= bp-agent
 MKFILEDIR 			:= $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 MSG_INFO 			:= "\033[36m[INFO] %s\033[0m\n"
 MSG_WARN 			:= "\033[0;33m[WARN] %s\033[0m\n"
@@ -11,7 +12,7 @@ define confirmation
 endef
 
 define tfOutput
-	$(shell cd blueprints/$(1) && terraform output -raw $(2))
+	$(shell cd blueprints/$(1) && terraform output -raw $(2) 2> /dev/null)
 endef
 
 #https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#deploy
@@ -34,7 +35,7 @@ define destroy
 	@terraform -chdir=$(MKFILEDIR)/blueprints/$(1) destroy -target=module.eks_blueprints_addon_cbci -auto-approve
 	@terraform -chdir=$(MKFILEDIR)/blueprints/$(1) destroy -target=module.eks_blueprints_addons -auto-approve
 	@terraform -chdir=$(MKFILEDIR)/blueprints/$(1) destroy -target=module.eks -auto-approve
-	@#terraform -chdir=$(MKFILEDIR)/blueprints/$(1) destroy -auto-approve
+	@terraform -chdir=$(MKFILEDIR)/blueprints/$(1) destroy -auto-approve
 	@rm -f $(MKFILEDIR)/blueprints/$(1)/.deployed
 endef
 
@@ -52,12 +53,13 @@ define validate
 	@printf $(MSG_INFO) "Operation Center Ingress Ready."
 	@until $(call tfOutput,$(1),cbci_liveness_probe_ext); do sleep 10 && echo "Waiting for Operation Center Service to pass Health Check from outside the cluster"; done
 	@printf $(MSG_INFO) "Operation Center Service passed Health Check outside the cluster. It is available at $(OC_URL)."
-	@echo "Initial Admin Password: `$(call tfOutput,$(1),cbci_initial_admin_password)`"
+	@if [ "$(1)" == "01-getting-started" ]; then \
+		echo "Initial Admin Password: `$(call tfOutput,$(1),cbci_initial_admin_password)`"; fi
 	@if [ "$(1)" == "02-at-scale" ]; then \
+		echo "General Password for all users: `$(call tfOutput,$(1),cbci_general_password)`"; \
 		$(call tfOutput,$(1),velero_backup_team_a) > /tmp/backup.txt && \
 		cat /tmp/backup.txt | grep "Backup completed with status: Completed" && \
-		printf $(MSG_INFO) "Velero backups are working" \
-		; fi
+		printf $(MSG_INFO) "Velero backups are working"; fi
 endef
 
 .PHONY: dRun
@@ -69,12 +71,13 @@ dRun:
 		docker build . --file $(MKFILEDIR)/blueprints/Dockerfile --tag local.cloudbees/bp-agent:latest; \
 		fi
 	docker run --rm -it --name bp-agent \
-		-v $(MKFILEDIR):/asdf/cbci-eks-addon -v $(HOME)/.aws:/asdf/.aws \
+		-v $(MKFILEDIR):/$(BP_AGENT_USER)/cbci-eks-addon -v $(HOME)/.aws:/$(BP_AGENT_USER)/.aws \
 		local.cloudbees/bp-agent:latest
 
 .PHONY: tfpreFlightChecks
 tfpreFlightChecks: ## Run preflight checks for terraform according to getting-started/README.md . Example: ROOT=02-at-scale make tfpreFlightChecks
 tfpreFlightChecks: guard-ROOT
+	@if [ "$(shell whoami)" != "$(BP_AGENT_USER)" ]; then printf $(MSG_ERROR) "These commands have been validated inside the Blueprint Docker Agent. Start by running: make dRun" && exit 1; fi
 	@if [ ! -f blueprints/$(ROOT)/.auto.tfvars ]; then printf $(MSG_ERROR) "blueprints/$(ROOT)/.auto.tfvars file does not exist and it is required to store your own values"; exit 1; fi
 	@if ([ ! -f blueprints/$(ROOT)/k8s/secrets-values.yml ] && [ $(ROOT) == "02-at-scale" ]); then printf $(MSG_ERROR) "blueprints/$(ROOT)/secrets-values.yml file does not exist and it is required to store your secrets"; exit 1; fi
 	$(eval USER_ID := $(shell aws sts get-caller-identity | grep UserId | cut -d"," -f 1 | xargs ))
@@ -97,7 +100,7 @@ endif
 
 .PHONY: clean
 clean: ## Clean Blueprint passed as parameter. Example: ROOT=02-at-scale make clean
-clean: guard-ROOT
+clean: guard-ROOT tfpreFlightChecks
 	@cd blueprints/$(ROOT) && find -name ".terraform" -type d | xargs rm -rf
 	@cd blueprints/$(ROOT) && find -name ".terraform.lock.hcl" -type f | xargs rm -f
 	@cd blueprints/$(ROOT) && find -name "kubeconfig_*.yaml" -type f | xargs rm -f
@@ -110,7 +113,7 @@ tfAction: guard-ROOT guard-ACTION tfpreFlightChecks
 
 .PHONY: validate
 validate: ## Validate CloudBees CI Blueprint deployment passed as parameter. Example: ROOT=02-at-scale make validate
-validate: guard-ROOT
+validate: guard-ROOT tfpreFlightChecks
 ifneq ("$(wildcard blueprints/$(ROOT)/.deployed)","")
 	$(call validate,$(ROOT))
 else
