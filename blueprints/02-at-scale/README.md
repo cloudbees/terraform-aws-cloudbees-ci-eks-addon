@@ -136,8 +136,6 @@ The explanations from [How to Monitor Jenkins With Grafana and Prometheus - Clou
 
 ### CBCI
 
-- [New Features for Streamlined DevOps](https://www.cloudbees.com/blog/cloudbees-ci-exciting-new-features-for-streamlined-devops): [CloudBees CI HA/HS 🎥](https://www.youtube.com/watch?v=Qkf9HaA2wio) and [CloudBees CI Workspace Cathing in s3 🎥](https://www.youtube.com/watch?v=ESU9oN9JUCw) and [Cloudbees CI Pipeline Explorer 🎥](https://www.youtube.com/watch?v=OMXm6eYd1EQ). The last one also enables the [Artifact s3 Manager 🎥](https://www.youtube.com/watch?v=u6LF-T-daS4) as a dependency and it helps to store intermediate artifacts out of the Controllers.
-
 - Configuration as Code (CasC) is enabled for [Operation Center](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/) (`cjoc`) and [Controllers](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-controller/) (`team-b` and `team-c-ha`).
 
 > [!NOTE]
