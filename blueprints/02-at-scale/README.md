@@ -81,7 +81,7 @@ Additionally, the following is required:
 
 ### CBCI
 
-- Start by referring to the [Getting Started Blueprint - Validate](../01-getting-started/README.md#validate) but this time there will be three types of personas/users with a different set of permissions configured via RBAC for Operation Center and Controller using Single Sign-On. The password for all of them is the same:
+- Start by referring to the [Getting Started Blueprint - Validate](../01-getting-started/README.md#validate) but this time there will be three types of personas/users with a different set of permissions configured via [RBAC](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-secure-guide/rbac) for Operation Center and Controller using [Single Sign-On](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-secure-guide/using-sso). The password for all of them is the same:
 
   ```sh
   $(terraform output --raw cbci_general_password)
