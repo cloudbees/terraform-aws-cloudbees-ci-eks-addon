@@ -54,9 +54,9 @@ define validate
 	@until $(call tfOutput,$(1),cbci_liveness_probe_ext); do sleep 10 && echo "Waiting for Operation Center Service to pass Health Check from outside the cluster"; done
 	@printf $(MSG_INFO) "Operation Center Service passed Health Check outside the cluster. It is available at $(OC_URL)."
 	@if [ "$(1)" == "01-getting-started" ]; then \
-		echo "Initial Admin Password: `$(call tfOutput,$(1),cbci_initial_admin_password)`"; fi
+		echo "Initial Admin Password: `$(call tfOutput,$(1),cbci_initial_admin_password)`" ; fi
 	@if [ "$(1)" == "02-at-scale" ]; then \
-		echo "General Password for all users: `$(call tfOutput,$(1),cbci_general_password)`"; \
+		echo "General Password all users: `$(call tfOutput,$(1),cbci_initial_admin_password)`"; \
 		$(call tfOutput,$(1),velero_backup_team_a) > /tmp/backup.txt && \
 		cat /tmp/backup.txt | grep "Backup completed with status: Completed" && \
 		printf $(MSG_INFO) "Velero backups are working"; fi
