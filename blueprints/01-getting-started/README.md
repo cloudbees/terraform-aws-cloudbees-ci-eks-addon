@@ -8,6 +8,9 @@ Get started with the [CloudBees CI on Modern in EKS](https://docs.cloudbees.com/
   - [External DNS](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/external-dns/)
   - [EBS CSI Driver](https://docs.aws.amazon.com/eks/latest/userguide/ebs-csi.html) to allocate EBS volumes for hosting [JENKINS_HOME](https://docs.cloudbees.com/docs/cloudbees-ci/latest/backup-restore/jenkins-home).
 
+> [!TIP]
+> A [Resource Group](https://docs.aws.amazon.com/ARG/latest/userguide/resource-groups.html) is added to get a full list with all resources created by this blueprint.
+
 ## Architecture
 
 ![Architecture](img/getting-started.architect.drawio.svg)
