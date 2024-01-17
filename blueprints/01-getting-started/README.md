@@ -60,9 +60,6 @@ For more detailed information, see the documentation for the [Terraform Core wor
 
 Once deployed has finished, it is possible to check the generated AWS resources via Resource Groups.
 
-> [!TIP]
-> These steps are automated in the [Makefile](../../Makefile) at the root of the project under the target `deploy`.
-
 ## Validate
 
 Once the resources have been created, note that a `kubeconfig` file has been created inside the respective `blueprint/k8s` folder. Start defining the Environment Variable [KUBECONFIG](https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/#the-kubeconfig-environment-variable) to point to the generated file.
@@ -112,14 +109,11 @@ Now that you’ve installed CloudBees CI and operations center, you’ll want to
   eval $(terraform output --raw cbci_initial_admin_password)
   ```
 
-Finally, install the suggested plugins and create the first admin user.
+> [!NOTE]
+> Once you can create the first admin user in the Wizard, this password will not be valid.
 
-> [!TIP]
-> These steps are automated in the [Makefile](../../Makefile) at the root of the project under the target `validate`.
+Finally, install the suggested plugins and create the first admin user.
 
 ## Destroy
 
 To teardown and remove the resources created in the blueprint, the typical steps of execution are as explained in [Getting Started - Amazon EKS Blueprints for Terraform - Destroy](https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#destroy)
-
-> [!TIP]
-> These steps are automated in the [Makefile](../../Makefile) at the root of the project under the target `destroy`.

@@ -43,6 +43,9 @@ By default, it uses a minimum required configuration described in [values.yml](v
 
 If you would like to override any defaults with the chart, you can do so by passing the `helm_config` variable.
 
+> [!TIP]
+> Blueprints lifecycle (`deploy` > `validate` > `destroy`) can be orchestrated via the companion [Makefile](../../Makefile).
+
 ## Prerequisites
 
 ### Tooling
@@ -52,7 +55,7 @@ The [Getting Started blueprint](blueprints/01-getting-started/) requires the min
 The [At Scale blueprint](blueprints/01-getting-started/) requires additional tooling like `jq` and `velero`.
 
 > [!NOTE]
-> There is a companion [Dockerfile](blueprints/Dockerfile) to run the blueprints in a containerized environment ensuring the required tooling is available. It can be built by using the [Makefile](Makefile) target `make dRun`.
+> There is a companion [Dockerfile](blueprints/Dockerfile) to run the blueprints in a containerized Dev environment ensuring dependecies are met. It can be built by using the [Makefile](Makefile) target `make dRun`.
 
 ### AWS Authentication
 
