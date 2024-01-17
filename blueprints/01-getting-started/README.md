@@ -111,13 +111,13 @@ Once you get access to K8s API from your terminal, validate that:
   eval $(terraform output --raw cbci_oc_ing)
   ```
 
-- Check that the Operation Center Service is running from inside the K8s cluster
+- Check that the Operation Center Service is running from inside the K8s cluster. Successful output should be nothing in return.
 
   ```sh
   eval $(terraform output --raw cbci_liveness_probe_int)
   ```
 
-- Check that the Operation Center Service is running from outside the K8s cluster. DNS propagation can take a few minutes.
+- Check that the Operation Center Service is running from outside the K8s cluster. Successful output should be nothing in return.
 
   ```sh
   eval $(terraform output --raw cbci_liveness_probe_ext)
