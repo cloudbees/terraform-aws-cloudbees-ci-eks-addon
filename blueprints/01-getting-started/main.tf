@@ -25,8 +25,8 @@ locals {
   azs = slice(data.aws_availability_zones.available.names, 0, 2)
 
   tags = merge(var.tags, {
-    "tf:blueprint"  = local.name
-    "tf:repository" = "github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon"
+    "tf-blueprint"  = local.name
+    "tf-repository" = "github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon"
   })
 }
 
@@ -244,7 +244,7 @@ resource "aws_resourcegroups_group" "bp_rg" {
   ],
   "TagFilters": [
     {
-      "Key": "tf:blueprint",
+      "Key": "tf-blueprint",
       "Values": ["${local.name}"]
     }
   ]

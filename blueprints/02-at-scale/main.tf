@@ -36,8 +36,8 @@ locals {
   route53_zone_arn = data.aws_route53_zone.this.arn
 
   tags = merge(var.tags, {
-    "tf:blueprint"  = local.name
-    "tf:repository" = "github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon"
+    "tf-blueprint"  = local.name
+    "tf-repository" = "github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon"
   })
 
   velero_s3_backup_location = "${module.cbci_s3_bucket.s3_bucket_arn}/velero"
@@ -538,7 +538,7 @@ resource "aws_resourcegroups_group" "bp_rg" {
   ],
   "TagFilters": [
     {
-      "Key": "tf:blueprint",
+      "Key": "tf-blueprint",
       "Values": ["${local.name}"]
     }
   ]
