@@ -1,6 +1,6 @@
 # CloudBees CI Add-on getting started Blueprint
 
-Get started with the [CloudBees CI on Modern in EKS](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/) by running this blueprint which just installs the product and its [prerequisites](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/installing-eks-using-helm#_prerequisites) to help you to understand what are the minimum requirements.
+Get started with the [CloudBees CI on Modern in EKS](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/) by running this blueprint which just installs the product and its [prerequisites](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/installing-eks-using-helm#_prerequisites) to help you understand the minimum requirements.
 
 - AWS Certificate Manager
 - **[Amazon EKS Addons](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/)**:
@@ -62,7 +62,7 @@ Once deployed has finished, it is possible to check the generated AWS resources 
 
 ## Validate
 
-Once the resources have been created, note that a kubeconfig file has been created inside the respective blueprint folder. Start defining the Environment Variable [KUBECONFIG](https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/#the-kubeconfig-environment-variable) to point to the generated file.
+Once the resources have been created, note that a `kubeconfig` file has been created inside the respective `blueprint/k8s` folder. Start defining the Environment Variable [KUBECONFIG](https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/#the-kubeconfig-environment-variable) to point to the generated file.
 
   ```sh
   eval $(terraform output --raw export_kubeconfig)
