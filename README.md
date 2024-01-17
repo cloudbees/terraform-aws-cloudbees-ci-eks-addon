@@ -56,19 +56,7 @@ The [At Scale blueprint](blueprints/01-getting-started/) requires additional too
 
 ### AWS Authentication
 
-Make sure to export your required [AWS Environment Variables](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html) to your CLI before getting started. For
-
-  ```bash
-  export AWS_ACCESS_KEY_ID=...
-  export AWS_SECRET_ACCESS_KEY=...
-  export AWS_SESSION_TOKEN=...
-  ```
-
-Alternatively
-
-  ```bash
-  export AWS_PROFILE=...
-  ```
+Make sure to export your required [AWS Environment Variables](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html) to your CLI before getting started (eg. `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` or `AWS_PROFILE`).
 
 ### Existing AWS Hosted Zone
 
