@@ -57,6 +57,8 @@ define validate
 		echo "Initial Admin Password: `$(call tfOutput,$(1),cbci_initial_admin_password)`" ; fi
 	@if [ "$(1)" == "02-at-scale" ]; then \
 		echo "General Password all users: `$(call tfOutput,$(1),cbci_general_password)`"; \
+		until $(call tfOutput,$(1),team_c_hpa); do sleep 10 && echo "Waiting for Team C Horizontal Pod Autoscaling"; done; \
+		printf $(MSG_INFO) "Configuration as Code is applied for OC and Controllers and Team C has HA enabled." ; \
 		$(call tfOutput,$(1),velero_backup_team_a) > /tmp/backup.txt && \
 			cat /tmp/backup.txt | grep "Backup completed with status: Completed" && \
 			printf $(MSG_INFO) "Velero backups are working"; \

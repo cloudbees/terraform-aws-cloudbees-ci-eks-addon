@@ -50,6 +50,11 @@ output "cjoc_url" {
   value       = module.eks_blueprints_addon_cbci.cbci_oc_url
 }
 
+output "team_c_hpa" {
+  description = "Team C Horizontal Pod Autoscaling."
+  value       = "kubectl get hpa team-c-ha -n ${module.eks_blueprints_addon_cbci.cbci_namespace}"
+}
+
 output "acm_certificate_arn" {
   description = "ACM certificate ARN"
   value       = module.acm.acm_certificate_arn

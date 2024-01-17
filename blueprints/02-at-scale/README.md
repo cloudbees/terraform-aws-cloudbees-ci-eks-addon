@@ -62,6 +62,7 @@ Once you have familiarized yourself with the [Getting Started blueprint](../01-g
 | prometheus_dashboard | Access to prometheus dashbaords. |
 | s3_cbci_arn | CBCI s3 Bucket Arn |
 | s3_cbci_name | CBCI s3 Bucket Name. It is required by CloudBees CI for Workspace Cacthing and Artifact Manager |
+| team_c_hpa | Team C Horizontal Pod Autoscaling. |
 | velero_backup_team_a | Force to create a velero backup from schedulle for Team A. It can be applicable for rest of schedulle backups. |
 | velero_restore_team_a | Restore Team A from backup. It can be applicable for rest of schedulle backups. |
 | vpc_arn | VPC ID |
@@ -69,7 +70,7 @@ Once you have familiarized yourself with the [Getting Started blueprint](../01-g
 
 ## Deploy
 
-Refer to the [Getting Started Blueprint - Prerequisites](../01-getting-started/README.md#deploy) section.
+Refer to the [Getting Started Blueprint - Deploy](../01-getting-started/README.md#deploy) section.
 
 Additionally, the following is required:
 
@@ -97,7 +98,7 @@ Additionally, the following is required:
 > - Operation Center uses [Bundle Retrival Strategy](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/bundle-retrieval-scm)
 
 > [!IMPORTANT]
-> The declarative Casc defition overrides anything modified at UI at the next time the Controller is restarted.
+> The declarative Casc defition overrides anything modified at UI (in case they overlap) at the next time the Controller is restarted.
 
 - [CloudBees Pipeline Explorer](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-pipeline-explorer-plugin) is enabled for all Controllers using Configuration as Code, where you can follow the steps explained in [Troubleshooting Pipelines With CloudBees Pipeline Explorer - CloudBees TV 🎥](https://www.youtube.com/watch?v=OMXm6eYd1EQ) with the items included in their bundle or by creating your own.
 
@@ -160,4 +161,4 @@ The explanations from [How to Monitor Jenkins With Grafana and Prometheus - Clou
 
 ## Destroy
 
-Refer to the [Getting Started Blueprint - Prerequisites](../01-getting-started/README.md#destroy) section.
+Refer to the [Getting Started Blueprint - Destroy](../01-getting-started/README.md#destroy) section.
