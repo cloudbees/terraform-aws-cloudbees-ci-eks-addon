@@ -44,7 +44,7 @@ By default, it uses a minimum required configuration described in [values.yml](v
 If you would like to override any defaults with the chart, you can do so by passing the `helm_config` variable.
 
 > [!TIP]
-> Blueprints lifecycle (`deploy` > `validate` > `destroy`) can be orchestrated via the companion [Makefile](../../Makefile).
+> Blueprints lifecycle (`deploy` > `validate` > `destroy`) can be orchestrated via the companion [Makefile](Makefile).
 
 ## Prerequisites
 
