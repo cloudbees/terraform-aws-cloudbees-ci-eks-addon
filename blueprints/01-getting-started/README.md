@@ -16,35 +16,6 @@ Get started with the [CloudBees CI on Modern in EKS](https://docs.cloudbees.com/
 
 ![Architecture](img/getting-started.k8s.drawio.svg)
 
-## Prerequisites
-
-### Tooling
-
-The required tooling as described in the [Getting Started Guide - Prerequisites](https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#prerequisites)
-
-> [!NOTE]
-> For contributing there is a dedicated page [CONTRIBUTING.md](../../CONTRIBUTING.md).
-
-### AWS Authentication
-
-Make sure to export your required [AWS Environment Variables](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html) to your CLI before getting started. For
-
-  ```bash
-  export AWS_ACCESS_KEY_ID=...
-  export AWS_SECRET_ACCESS_KEY=...
-  export AWS_SESSION_TOKEN=...
-  ```
-
-Alternatively
-
-  ```bash
-  export AWS_PROFILE=...
-  ```
-
-### Existing AWS Hosted Zone
-
-These blueprints rely on an existing Hosted Zone in AWS Route53. If you don't have one, you can create one by following the [AWS Route53 documentation](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/hosted-zones-working-with.html).
-
 ## Terraform Docs
 
 <!-- BEGIN_TF_DOCS -->

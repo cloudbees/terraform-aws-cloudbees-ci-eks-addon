@@ -22,10 +22,6 @@ Additionally, this blueprint uses [CloudBees Configuration as Code](https://docs
 
 ![Architecture](img/at-scale.k8s.drawio.svg)
 
-## Prerequisites
-
-Refer to the [Getting Started Blueprint - Prerequisites](../01-getting-started/README.md#prerequisites) section.
-
 ## Terraform Docs
 
 <!-- BEGIN_TF_DOCS -->

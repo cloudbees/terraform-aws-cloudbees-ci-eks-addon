@@ -11,17 +11,17 @@
 
 ## Motivation
 
-Easing adoption of CloudBees CI by:
+This [AWS Partner Addon](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/aws-partner-addons/) aims to ease the adoption of CloudBees CI enterprise features by:
 
-- Deployment encapsulation of [CloudBees CI in EKS](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/installing-eks-using-helm#_configuring_your_environment) into a Terraform [AWS Partner Addons](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/aws-partner-addons/).
-- Providing a series of Blueprints (examples of implementation) using the mentioned CloudBees CI Addon module on top of the [AWS Terraform EKS Addons](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/).
+- Encapsulating the Deployment of [CloudBees CI in EKS](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/installing-eks-using-helm#_configuring_your_environment) into a Terraform module for [AWS Partner Addons](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/aws-partner-addons/).
+- Providing a series of Blueprints (examples of implementation) using the mentioned CloudBees CI Addon module on top of [AWS Terraform EKS Addons](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/).
 
 > [!NOTE]
-> For a better understading of the AWS the EKS blueprints' scope, please read the section [Consumption](https://aws-ia.github.io/terraform-aws-eks-blueprints/#consumption) and [Terraform Caveats](https://aws-ia.github.io/terraform-aws-eks-blueprints/#terraform-caveats) in its documentation.
+> - For a better understading of the AWS the EKS blueprints' scope, please read the section [Consumption](https://aws-ia.github.io/terraform-aws-eks-blueprints/#consumption) and [Terraform Caveats](https://aws-ia.github.io/terraform-aws-eks-blueprints/#terraform-caveats) in its documentation.
 
 ## Usage
 
-There are examples included in the blueprint folder but the simplest example of usage is as follows:
+There are examples of implementation included in the [blueprint](blueprints) folder but the simplest example of usage is as follows:
 
 ```terraform
 module "eks_blueprints_addon_cbci" {
@@ -42,6 +42,37 @@ module "eks_blueprints_addon_cbci" {
 By default, it uses a minimum required configuration described in [values.yml](values.yml).
 
 If you would like to override any defaults with the chart, you can do so by passing the `helm_config` variable.
+
+## Prerequisites
+
+### Tooling
+
+The [Getting Started blueprint](blueprints/01-getting-started/) requires the minimum set of tooling described in the [AWS EKS Blueprints - Getting Started Guide - Prerequisites](https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#prerequisites).
+
+The [At Scale blueprint](blueprints/01-getting-started/) requires additional tooling like `jq` and `velero`.
+
+> [!NOTE]
+> There is a companion [Dockerfile](blueprints/Dockerfile) to run the blueprints in a containerized environment ensuring the required tooling is available. It can be built by using the [Makefile](Makefile) target `make dRun`.
+
+### AWS Authentication
+
+Make sure to export your required [AWS Environment Variables](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html) to your CLI before getting started. For
+
+  ```bash
+  export AWS_ACCESS_KEY_ID=...
+  export AWS_SECRET_ACCESS_KEY=...
+  export AWS_SESSION_TOKEN=...
+  ```
+
+Alternatively
+
+  ```bash
+  export AWS_PROFILE=...
+  ```
+
+### Existing AWS Hosted Zone
+
+These blueprints rely on an existing Hosted Zone in AWS Route53. If you don't have one, you can create one by following the [AWS Route53 documentation](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/hosted-zones-working-with.html).
 
 ## Data Storage Options
 
