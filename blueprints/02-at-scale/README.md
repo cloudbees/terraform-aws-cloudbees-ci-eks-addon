@@ -3,19 +3,18 @@
 Once you have familiarized yourself with the [Getting Started blueprint](../01-getting-started/README.md), this blueprint explodes additional **[Amazon EKS Addons](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/)** to present a more scalable architecture and configuration:
 
 - [Cluster Autoscaler](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/cluster-autoscaler/) to accomplish [CloudBees auto-scaling nodes on EKS](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/eks-auto-scaling-nodes).
-- [EFS CSI Driver](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/aws-efs-csi-driver/). It can be used by non-HA/HS (optional) and it is required by HA/HS CBCI Controllers.
-- [Metrics Server](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/metrics-server/). It is required by CBCI HA/HS Controllers for Horizontal Pod Autoscaling.
-- [Velero](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/velero/). It is used for [Backup and Restoring K8s resources and EBS volume snapshots within the CloudBees CI namespace](https://docs.cloudbees.com/docs/cloudbees-ci/latest/backup-restore/velero-dr). EFS Storage uses [AWS Backup](https://aws.amazon.com/backup/).
-- [Kube Prometheus Stack](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/kube-prometheus-stack/) for observability CloudBees CI Add-on by following a similar approach to [How to Monitor Jenkins With Grafana and Prometheus 🎥](https://www.youtube.com/watch?v=3H9eNIf9KZs) but relying on the [CloudBees Prometheus Metrics plugin](https://docs.cloudbees.com/docs/cloudbees-ci/latest/monitoring/prometheus-plugin).
-
-Additionally, it uses [CloudBees Configuration as Code](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/casc-intro) for configuring the [Operation Center](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/) and [Controllers](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-controller/) enabling:
-
-- [New Features for Streamlined DevOps](https://www.cloudbees.com/blog/cloudbees-ci-exciting-new-features-for-streamlined-devops): [CloudBees CI HA/HS 🎥](https://www.youtube.com/watch?v=Qkf9HaA2wio) and [CloudBees CI Workspace Cathing in s3 🎥](https://www.youtube.com/watch?v=ESU9oN9JUCw) and [Cloudbees CI Pipeline Explorer 🎥](https://www.youtube.com/watch?v=OMXm6eYd1EQ). The last one also enables the [Artifact s3 Manager 🎥](https://www.youtube.com/watch?v=u6LF-T-daS4) as a dependency and it helps to store intermediate artifacts out of the Controllers.
-- [CloudBees CI Hibernation](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#_hibernation_in_managed_masters) for saving Cloud Billing costs.
+- [EFS CSI Driver](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/aws-efs-csi-driver/) can be used by non-HA/HS (optional) and it is required by HA/HS CBCI Controllers.
+- The [Metrics Server](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/metrics-server/) is required by CBCI HA/HS Controllers for Horizontal Pod Autoscaling.
+- EBS storage uses [Velero](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/velero/)(https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/velero/) for Backup and Restore.
+- [Kube Prometheus Stack](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/kube-prometheus-stack/) is used for observability.
 
 > [!NOTE]
-> - For s3 storage permissions for Workspace caching and Artifact Manager is based on [Instance Profile](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2_instance-profiles.html) rather than creating an User with IAM permissions. Then, it is expected that Credentials validation fails from CloudBees CI.
-> - There are two option to prevent from posible `node affinity conflict` during controllers restarts when using EBS volumens: make [topology aware volume to the same AZs](https://repost.aws/knowledge-center/eks-topology-aware-volumes), or designing Autoscaling Groups following what is explained in the AWS article [Creating Kubernetes Auto Scaling Groups for Multiple Availability Zones](https://aws.amazon.com/blogs/containers/amazon-eks-cluster-multi-zone-auto-scaling-groups/) (one ASG per AZ for EBS volume and one single ASG per Multiple AZ for EFS volumes). At the moment of publishing this blueprints, `terraform-aws-modules/eks/aws` does not support `availability_zones` atribute for `aws_autoscaling_group` resource, then the first option is implemented.
+> There are two option to prevent from posible `node affinity conflict` during controllers restarts when using EBS volumens: make [topology aware volume to the same AZs](https://repost.aws/knowledge-center/eks-topology-aware-volumes), or designing Autoscaling Groups following what is explained in the AWS article [Creating Kubernetes Auto Scaling Groups for Multiple Availability Zones](https://aws.amazon.com/blogs/containers/amazon-eks-cluster-multi-zone-auto-scaling-groups/) (one ASG per AZ for EBS volume and one single ASG per Multiple AZ for EFS volumes). At the moment of publishing this blueprints, `terraform-aws-modules/eks/aws` does not support `availability_zones` atribute for the embedded `aws_autoscaling_group` resource, then the first option is the only choice for simplicity.
+
+Additionally, this blueprint uses [CloudBees Configuration as Code](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/casc-intro) enabling [New Features for Streamlined DevOps](https://www.cloudbees.com/blog/cloudbees-ci-exciting-new-features-for-streamlined-devops) as well as other enterprise features like [CloudBees CI Hibernation](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#_hibernation_in_managed_masters) for saving Cloud Billing costs.
+
+> [!NOTE]
+> For s3 storage permissions for Workspace caching and Artifact Manager is based on [Instance Profile](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2_instance-profiles.html) rather than creating an User with IAM permissions. Then, it is expected that Credentials validation fails from CloudBees CI.
 
 ## Architecture
 
@@ -48,8 +47,8 @@ Refer to the [Getting Started Blueprint - Prerequisites](../01-getting-started/R
 |------|-------------|
 | acm_certificate_arn | ACM certificate ARN |
 | add_kubeconfig | Add Kubeconfig to local configuration to access the K8s API. |
+| cbci_general_password | Operation Center Service Initial Admin Password for CloudBees CI Add-on. Additionally, there are developer and guest users using the same password. |
 | cbci_helm | Helm configuration for CloudBees CI Add-on. It is accesible only via state files. |
-| cbci_initial_admin_password | Operation Center Service Initial Admin Password for CloudBees CI Add-on. Additionally, there are developer and guest users using the same password. |
 | cbci_liveness_probe_ext | Operation Center Service External Liveness Probe for CloudBees CI Add-on. |
 | cbci_liveness_probe_int | Operation Center Service Internal Liveness Probe for CloudBees CI Add-on. |
 | cbci_namespace | Namespace for CloudBees CI Add-on. |
@@ -85,19 +84,35 @@ Additionally, the following is required:
 
 ## Validate
 
-Refer to the [Getting Started Blueprint - Prerequisites](../01-getting-started/README.md#validate) section. In addition, you can validate the following:
-
-- Velero puntual Backup on time for Team A. Note also there is a scheduled backup process.
+Refer to the [Getting Started Blueprint - Prerequisites](../01-getting-started/README.md#validate) but this time there will be three types of personas/users with a different set of permissions configured via RBAC: `admin`, `team-a` and `team-b`. The password for all of them is the same:
 
   ```sh
-  eval $(terraform output --raw velero_backup_team_a)
+  $(terraform output --raw cbci_general_password)
   ```
 
-- Velero Restore process: Make any update on `team-a` (e.g.: adding some jobs), take a backup including the update, remove the latest update (e.g.: removing the jobs) and then restore it from the last backup as follows.
+### Backups and Restores
 
-  ```sh
-  eval $(terraform output --raw velero_restore_team_a)
-  ```
+- For EBS Storage is based on Velero.
+
+  - Velero Backup on a specific point in time for Team A. Note also there is a scheduled backup process in place.
+
+    ```sh
+    eval $(terraform output --raw velero_backup_team_a)
+    ```
+
+  - Velero Restore process: Make any update on `team-a` (e.g.: adding some jobs), take a backup including the update, remove the latest update (e.g.: removing the jobs) and then restore it from the last backup as follows.
+
+    ```sh
+    eval $(terraform output --raw velero_restore_team_a)
+    ```
+
+- For EFS Storage is based on [AWS Backup](https://aws.amazon.com/backup/).
+
+  - TODO
+
+### Monitoring
+
+The explanations from [How to Monitor Jenkins With Grafana and Prometheus - CloudBees TV 🎥](https://www.youtube.com/watch?v=3H9eNIf9KZs) are valid in this context but this blueprint relies on the [CloudBees Prometheus Metrics plugin](https://docs.cloudbees.com/docs/cloudbees-ci/latest/monitoring/prometheus-plugin) and not the open-source version.
 
 - Check the CloudBees CI Targets are connected to Prometheus.
 
@@ -105,25 +120,43 @@ Refer to the [Getting Started Blueprint - Prerequisites](../01-getting-started/R
   kubectl exec -n cbci -ti cjoc-0 --container jenkins -- curl -sSf kube-prometheus-stack-prometheus.kube-prometheus-stack.svc.cluster.local:9090/api/v1/targets?state=active | jq '.data.activeTargets[] | select(.labels.container=="jenkins" or .labels.job=="cjoc") | {job: .labels.job, instance: .labels.instance, status: .health}'
   ```
 
-- Access to Kube Prometheus Stack dashboards from your web browser (Check that [jenkins metrics](https://plugins.jenkins.io/metrics/) are available)
+- Access to Kube Prometheus Stack dashboards from your web browser (Check that [Jenkins metrics](https://plugins.jenkins.io/metrics/) are available)
 
-  - Prometheus
+  - Prometheus will be available at `http://localhost:50001` after running the following command in your host:
 
   ```sh
   eval $(terraform output --raw prometheus_dashboard)
   ```  
 
-  - Grafana
+  - Grafana will be available at `http://localhost:50002` after running the following command in your host:
 
   ```sh
   eval $(terraform output --raw grafana_dashboard)
   ```  
 
-- Once the `Amazon S3 Bucket Access settings` > `S3 Bucket Name` is configured correctly (see [Deploy](#deploy) section), you can validate the Workspace Caching and Artifact Manager are working as expected running the jobs `ws-cache`, `upstream-artifact` and finally `downstream-artifact`. Note that team-b uses hibernation
+### CBCI
+
+- [New Features for Streamlined DevOps](https://www.cloudbees.com/blog/cloudbees-ci-exciting-new-features-for-streamlined-devops): [CloudBees CI HA/HS 🎥](https://www.youtube.com/watch?v=Qkf9HaA2wio) and [CloudBees CI Workspace Cathing in s3 🎥](https://www.youtube.com/watch?v=ESU9oN9JUCw) and [Cloudbees CI Pipeline Explorer 🎥](https://www.youtube.com/watch?v=OMXm6eYd1EQ). The last one also enables the [Artifact s3 Manager 🎥](https://www.youtube.com/watch?v=u6LF-T-daS4) as a dependency and it helps to store intermediate artifacts out of the Controllers.
+
+- Configuration as Code (CasC) is enabled for [Operation Center](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/) (`cjoc`) and [Controllers](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-controller/) (`team-b` and `team-c-ha`).
+
+> [!NOTE]
+> `team-a` is not using CasC to show the difference between the two approaches.
+
+- [CloudBees Pipeline Explorer](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-pipeline-explorer-plugin) is enabled for all Controllers using Configuration as Code, where you can follow the steps explained in [Troubleshooting Pipelines With CloudBees Pipeline Explorer - CloudBees TV 🎥](https://www.youtube.com/watch?v=OMXm6eYd1EQ) with the items included in their bundle or by creating your own.
+
+- [CloudBees CI HA/HS](https://docs.cloudbees.com/docs/cloudbees-ci/latest/ha-install-guide/) is enabled in `team-c-ha` where you can follow the steps from [Getting Started With CloudBees CI High Availability - CloudBees TV 🎥](https://www.youtube.com/watch?v=Qkf9HaA2wio)
+
+- [CloudBees Workspace Caching](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-cache-step) and [CloudBees CI Hibernation](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#_hibernation_in_managed_masters) features can be seen together in action the `team-b`. Once the `Amazon S3 Bucket Access settings` > `S3 Bucket Name` is configured correctly (see [Deploy](#deploy) section), you can watch how to write (since the first build) and read (since second build) from the `ws-cache` pipeline. To trigger the builds will be using the [POST queue hibernation API endpoints](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#_post_queue_for_hibernation).
 
   ```sh
-  curl -i -XPOST -u admin:"$(kubectl get secret cbci-secrets -n cbci -o jsonpath='{.data.secJenkinsPass}' | base64 -d)" "http://$ROUTE_53_DOMAIN/hibernation/queue/team-b/job/ws-cache/build?delay=180sec"
+  adminSecret=$(terraform output --raw cbci_general_password)
+  curl -i -XPOST -u admin:"$adminSecret" "http://$ROUTE_53_DOMAIN/hibernation/queue/team-b/job/ws-cache/build?delay=180sec"
   ```
+
+> [!NOTE]
+> - More examples for Workspace Caching can be found at [Getting Started With CloudBees Workspace Caching on AWS S3 - CloudBees TV 🎥](https://www.youtube.com/watch?v=ESU9oN9JUCw&list=PLvBBnHmZuNQJcDefZ7G7Qyp3J9MAMaigF&index=7&t=3s)
+> - `team-b` transitions to the hibernation state after the defined time in `unclassified.hibernationConfiguration.gracePeriod` (seconds) of inactivity (idle).
 
 ## Destroy
 
