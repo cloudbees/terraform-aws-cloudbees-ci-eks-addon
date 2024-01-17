@@ -45,8 +45,8 @@ Refer to the [Getting Started Blueprint - Prerequisites](../01-getting-started/R
 |------|-------------|
 | acm_certificate_arn | ACM certificate ARN |
 | add_kubeconfig | Add Kubeconfig to local configuration to access the K8s API. |
-| cbci_general_password | Operation Center Service Initial Admin Password for CloudBees CI Add-on. Additionally, there are developer and guest users using the same password. |
 | cbci_helm | Helm configuration for CloudBees CI Add-on. It is accesible only via state files. |
+| cbci_initial_admin_password | Operation Center Service Initial Admin Password for CloudBees CI Add-on. Additionally, there are developer and guest users using the same password. |
 | cbci_liveness_probe_ext | Operation Center Service External Liveness Probe for CloudBees CI Add-on. |
 | cbci_liveness_probe_int | Operation Center Service Internal Liveness Probe for CloudBees CI Add-on. |
 | cbci_namespace | Namespace for CloudBees CI Add-on. |
