@@ -58,8 +58,11 @@ define validate
 	@if [ "$(1)" == "02-at-scale" ]; then \
 		echo "General Password all users: `$(call tfOutput,$(1),cbci_general_password)`"; \
 		$(call tfOutput,$(1),velero_backup_team_a) > /tmp/backup.txt && \
-		cat /tmp/backup.txt | grep "Backup completed with status: Completed" && \
-		printf $(MSG_INFO) "Velero backups are working"; fi
+			cat /tmp/backup.txt | grep "Backup completed with status: Completed" && \
+			printf $(MSG_INFO) "Velero backups are working"; \
+		$(call tfOutput,$(1),prometheus_active_targets) | jq '.data.activeTargets[] | select(.labels.container=="jenkins" or .labels.job=="cjoc") \
+			| {job: .labels.job, instance: .labels.instance, status: .health}' && \
+			printf $(MSG_INFO) "Prometheus CloudBees CI Targets are OK"; fi
 endef
 
 .PHONY: dRun

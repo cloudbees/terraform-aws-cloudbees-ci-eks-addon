@@ -90,6 +90,11 @@ output "prometheus_dashboard" {
   value       = "kubectl port-forward svc/kube-prometheus-stack-prometheus 50001:9090 -n kube-prometheus-stack"
 }
 
+output "prometheus_active_targets" {
+  description = "Check Active Prometheus Targets from Operation Center."
+  value       = "kubectl exec -n cbci -ti cjoc-0 --container jenkins -- curl -sSf kube-prometheus-stack-prometheus.kube-prometheus-stack.svc.cluster.local:9090/api/v1/targets?state=active"
+}
+
 output "grafana_dashboard" {
   description = "Access to grafana dashbaords."
   value       = "kubectl port-forward svc/kube-prometheus-stack-grafana 50002:80 -n kube-prometheus-stack"

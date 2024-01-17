@@ -52,6 +52,7 @@ Additionally, this blueprint uses [CloudBees Configuration as Code](https://docs
 | eks_cluster_arn | EKS cluster ARN |
 | export_kubeconfig | Export KUBECONFIG environment variable to access the K8s API. |
 | grafana_dashboard | Access to grafana dashbaords. |
+| prometheus_active_targets | Check Active Prometheus Targets from Operation Center. |
 | prometheus_dashboard | Access to prometheus dashbaords. |
 | s3_cbci_arn | CBCI s3 Bucket Arn |
 | s3_cbci_name | CBCI s3 Bucket Name. It is required by CloudBees CI for Workspace Cacthing and Artifact Manager |
@@ -134,7 +135,7 @@ The explanations from [How to Monitor Jenkins With Grafana and Prometheus - Clou
 - Check the CloudBees CI Targets are connected to Prometheus.
 
   ```sh
-  kubectl exec -n cbci -ti cjoc-0 --container jenkins -- curl -sSf kube-prometheus-stack-prometheus.kube-prometheus-stack.svc.cluster.local:9090/api/v1/targets?state=active | jq '.data.activeTargets[] | select(.labels.container=="jenkins" or .labels.job=="cjoc") | {job: .labels.job, instance: .labels.instance, status: .health}'
+  eval $(terraform output --raw prometheus_active_targets) | jq '.data.activeTargets[] | select(.labels.container=="jenkins" or .labels.job=="cjoc") | {job: .labels.job, instance: .labels.instance, status: .health}'
   ```
 
 - Access to Kube Prometheus Stack dashboards from your web browser (Check that [Jenkins metrics](https://plugins.jenkins.io/metrics/) are available)
