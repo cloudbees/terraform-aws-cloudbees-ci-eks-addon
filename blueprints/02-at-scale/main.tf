@@ -160,7 +160,7 @@ module "eks_blueprints_addons" {
   enable_aws_for_fluentbit = true
   aws_for_fluentbit = {
     enable_containerinsights = true
-    values                   = [file("k8s/aws-for-fluent-bit.yml")]
+    values                   = [file("k8s/aws-for-fluent-bit-values.yml")]
   }
 
   tags = local.tags

@@ -1,0 +1,9 @@
+# Copyright (c) CloudBees, Inc.
+
+#https://artifacthub.io/packages/helm/aws/aws-for-fluent-bit
+
+tolerations:
+  - key: dedicated
+    operator: Equal
+    value: cb-apps
+    effect: NoSchedule

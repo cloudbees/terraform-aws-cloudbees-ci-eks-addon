@@ -1,5 +1,0 @@
-tolerations:
-  - key: dedicated
-    operator: Equal
-    value: cb-apps
-    effect: NoSchedule
