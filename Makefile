@@ -30,8 +30,6 @@ endef
 define destroy
 	@printf $(MSG_INFO) "Destroying CloudBees CI Blueprint $(1) ..."
 	$(call confirmation,Destroy $(1))
-	$(eval $(call tfOutput,$(1),export_kubeconfig))
-	$(eval CBCI_NAMESPACE := $(call tfOutput,$(1),cbci_namespace))
 	@terraform -chdir=$(MKFILEDIR)/blueprints/$(1) destroy -target=module.eks_blueprints_addon_cbci -auto-approve
 	@terraform -chdir=$(MKFILEDIR)/blueprints/$(1) destroy -target=module.eks_blueprints_addons -auto-approve
 	@terraform -chdir=$(MKFILEDIR)/blueprints/$(1) destroy -target=module.eks -auto-approve
@@ -42,8 +40,7 @@ endef
 define validate
 	@printf $(MSG_INFO) "Validating CloudBees CI Operation Center availability for $(1) ..."
 	$(call confirmation,Validate $(1))
-	$(eval $(call tfOutput,$(1),export_kubeconfig))
-	$(eval CBCI_NAMESPACE := $(call tfOutput,$(1),cbci_namespace))
+	$(eval $(call tfOutput,$(1),kubeconfig_export))
 	$(eval OC_URL := $(call tfOutput,$(1),cjoc_url))
 	@until $(call tfOutput,$(1),cbci_oc_pod); do sleep 2 && echo "Waiting for Operation Center Pod to get ready"; done
 	@printf $(MSG_INFO) "OC Pod is Ready."

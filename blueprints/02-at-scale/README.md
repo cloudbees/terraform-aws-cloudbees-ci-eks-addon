@@ -48,7 +48,6 @@ Once you have familiarized yourself with the [Getting Started blueprint](../01-g
 | Name | Description |
 |------|-------------|
 | acm_certificate_arn | ACM certificate ARN |
-| add_kubeconfig | Add Kubeconfig to local configuration to access the K8s API. |
 | cbci_general_password | Operation Center Service Initial Admin Password for CloudBees CI Add-on. Additionally, there are developer and guest users using the same password. |
 | cbci_helm | Helm configuration for CloudBees CI Add-on. It is accesible only via state files. |
 | cbci_liveness_probe_ext | Operation Center Service External Liveness Probe for CloudBees CI Add-on. |
@@ -58,8 +57,9 @@ Once you have familiarized yourself with the [Getting Started blueprint](../01-g
 | cbci_oc_pod | Operation Center Pod for CloudBees CI Add-on. |
 | cbci_oc_url | URL of the CloudBees CI Operations Center for CloudBees CI Add-on. |
 | eks_cluster_arn | EKS cluster ARN |
-| export_kubeconfig | Export KUBECONFIG environment variable to access the K8s API. |
 | grafana_dashboard | Access to grafana dashbaords. |
+| kubeconfig_add | Add Kubeconfig to local configuration to access the K8s API. |
+| kubeconfig_export | Export KUBECONFIG environment variable to access the K8s API. |
 | prometheus_active_targets | Check Active Prometheus Targets from Operation Center. |
 | prometheus_dashboard | Access to prometheus dashbaords. |
 | s3_cbci_arn | CBCI s3 Bucket Arn |

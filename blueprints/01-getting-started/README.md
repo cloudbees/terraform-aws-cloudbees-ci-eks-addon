@@ -36,7 +36,6 @@ Get started with the [CloudBees CI on Modern in EKS](https://docs.cloudbees.com/
 | Name | Description |
 |------|-------------|
 | acm_certificate_arn | ACM certificate ARN |
-| add_kubeconfig | Add Kubeconfig to local configuration to access the K8s API. |
 | cbci_helm | Helm configuration for CloudBees CI Add-on. It is accesible only via state files. |
 | cbci_initial_admin_password | Operation Center Service Initial Admin Password for CloudBees CI Add-on. |
 | cbci_liveness_probe_ext | Operation Center Service External Liveness Probe for CloudBees CI Add-on. |
@@ -46,7 +45,8 @@ Get started with the [CloudBees CI on Modern in EKS](https://docs.cloudbees.com/
 | cbci_oc_pod | Operation Center Pod for CloudBees CI Add-on. |
 | cbci_oc_url | URL of the CloudBees CI Operations Center for CloudBees CI Add-on. |
 | eks_cluster_arn | EKS cluster ARN |
-| export_kubeconfig | Export KUBECONFIG environment variable to access to access the K8s API. |
+| kubeconfig_add | Add Kubeconfig to local configuration to access the K8s API. |
+| kubeconfig_export | Export KUBECONFIG environment variable to access to access the K8s API. |
 | vpc_arn | VPC ID |
 <!-- END_TF_DOCS -->
 
@@ -65,7 +65,7 @@ Once deployed has finished, it is possible to check the generated AWS resources 
 Once the resources have been created, note that a `kubeconfig` file has been created inside the respective `blueprint/k8s` folder. Start defining the Environment Variable [KUBECONFIG](https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/#the-kubeconfig-environment-variable) to point to the generated file.
 
   ```sh
-  eval $(terraform output --raw export_kubeconfig)
+  eval $(terraform output --raw kubeconfig_export)
   ```
 
 Once you get access to K8s API from your terminal, validate that:

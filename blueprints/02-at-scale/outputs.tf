@@ -1,10 +1,10 @@
 
-output "export_kubeconfig" {
+output "kubeconfig_export" {
   description = "Export KUBECONFIG environment variable to access the K8s API."
   value       = "export KUBECONFIG=${local.kubeconfig_file_path}"
 }
 
-output "add_kubeconfig" {
+output "kubeconfig_add" {
   description = "Add Kubeconfig to local configuration to access the K8s API."
   value       = "aws eks update-kubeconfig --region ${local.region} --name ${local.cluster_name}"
 }
@@ -18,6 +18,11 @@ output "cbci_helm" {
 output "cbci_namespace" {
   description = "Namespace for CloudBees CI Add-on."
   value       = module.eks_blueprints_addon_cbci.cbci_namespace
+}
+
+output "cbci_oc_pod" {
+  description = "Operation Center Pod for CloudBees CI Add-on."
+  value       = module.eks_blueprints_addon_cbci.cbci_oc_pod
 }
 
 output "cbci_oc_pod" {
