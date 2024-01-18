@@ -48,11 +48,16 @@ Once you have familiarized yourself with the [Getting Started blueprint](../01-g
 | Name | Description |
 |------|-------------|
 | acm_certificate_arn | ACM certificate ARN |
+| cbci_controller_b_hibernation_post_queue_ws_cache | Team B Hibernation Monitor Endpoint to Build Workspace Cache. It expects CBCI_ADMIN_TOKEN as environment variable. |
+| cbci_controller_c_hpa | Team C Horizontal Pod Autoscaling. |
+| cbci_controllers_pods | Operation Center Pod for CloudBees CI Add-on. |
 | cbci_general_password | Operation Center Service Initial Admin Password for CloudBees CI Add-on. Additionally, there are developer and guest users using the same password. |
 | cbci_helm | Helm configuration for CloudBees CI Add-on. It is accesible only via state files. |
 | cbci_liveness_probe_ext | Operation Center Service External Liveness Probe for CloudBees CI Add-on. |
 | cbci_liveness_probe_int | Operation Center Service Internal Liveness Probe for CloudBees CI Add-on. |
 | cbci_namespace | Namespace for CloudBees CI Add-on. |
+| cbci_oc_export_admin_api_token | Export Operation Center Admin API Token to access to the API REST when CSRF is enabled. It expects CBCI_ADMIN_CRUMB as environment variable. |
+| cbci_oc_export_admin_crumb | Export Operation Center Admin Crumb to access to the API REST when CSRF is enabled. |
 | cbci_oc_ing | Operation Center Ingress for CloudBees CI Add-on. |
 | cbci_oc_pod | Operation Center Pod for CloudBees CI Add-on. |
 | cbci_oc_url | URL of the CloudBees CI Operations Center for CloudBees CI Add-on. |
@@ -64,7 +69,6 @@ Once you have familiarized yourself with the [Getting Started blueprint](../01-g
 | prometheus_dashboard | Access to prometheus dashbaords. |
 | s3_cbci_arn | CBCI s3 Bucket Arn |
 | s3_cbci_name | CBCI s3 Bucket Name. It is required by CloudBees CI for Workspace Cacthing and Artifact Manager |
-| team_c_hpa | Team C Horizontal Pod Autoscaling. |
 | velero_backup_team_a | Force to create a velero backup from schedulle for Team A. It can be applicable for rest of schedulle backups. |
 | velero_restore_team_a | Restore Team A from backup. It can be applicable for rest of schedulle backups. |
 | vpc_arn | VPC ID |
@@ -93,11 +97,11 @@ Additionally, the following is required:
   eval $(terraform output --raw cbci_general_password)
   ```
 
-- Configuration as Code (CasC) is enabled for [Operation Center](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/) (`cjoc`) and [Controllers](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-controller/) (`team-b` and `team-c-ha`). `team-a` is not using CasC to show the difference between the two approaches.
+- Configuration as Code (CasC) is enabled for [Operation Center](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/) (`cjoc`) and [Controllers](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-controller/) (`team-b` and `team-c-ha`). `team-a` is not using CasC to show the difference between the two approaches. Note .
 
-TODO: Controllers, using kubectl with labels selector
-TODO: Refactor output cjoc-url and team-c it might contain the preffix cbci
-TODO: Refactor kubeconfgi preffix to be similar
+  ```sh
+  eval $(terraform output --raw cbci_controllers_pods)
+  ```
 
 > [!NOTE]
 > - Controllers use [bundle inheritance](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-controller/advanced#_configuring_bundle_inheritance_with_casc) see `bp02.parent`
@@ -106,22 +110,21 @@ TODO: Refactor kubeconfgi preffix to be similar
 > [!IMPORTANT]
 > The declarative Casc defition overrides anything modified at UI (in case they overlap) at the next time the Controller is restarted.
 
+- From the previous validation you can tell that 2 replicas running for `team-c-ha`. This is because [CloudBees CI HA/HS](https://docs.cloudbees.com/docs/cloudbees-ci/latest/ha-install-guide/) is enabled in this controller, where you can follow the steps from [Getting Started With CloudBees CI High Availability - CloudBees TV 🎥](https://www.youtube.com/watch?v=Qkf9HaA2wio). See Horizontal Pod Autoscaling enabled by:
+
+  ```sh
+  eval $(terraform output --raw cbci_controller_c_hpa)
+  ```
+
 - [CloudBees Pipeline Explorer](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-pipeline-explorer-plugin) is enabled for all Controllers using Configuration as Code, where you can follow the steps explained in [Troubleshooting Pipelines With CloudBees Pipeline Explorer - CloudBees TV 🎥](https://www.youtube.com/watch?v=OMXm6eYd1EQ) with the items included in their bundle or by creating your own.
 
-- [CloudBees CI HA/HS](https://docs.cloudbees.com/docs/cloudbees-ci/latest/ha-install-guide/) is enabled in `team-c-ha` where you can follow the steps from [Getting Started With CloudBees CI High Availability - CloudBees TV 🎥](https://www.youtube.com/watch?v=Qkf9HaA2wio)
+- [CloudBees Workspace Caching](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-cache-step) and [CloudBees CI Hibernation](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#_hibernation_in_managed_masters) features can be seen together in action the `team-b`. Once the `Amazon S3 Bucket Access settings` > `S3 Bucket Name` is configured correctly (see [Deploy](#deploy) section), you can watch how to write (since the first build) and read (since the second build) from the `ws-cache` pipeline. To trigger the builds will be using the [POST queue hibernation API endpoints](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#_post_queue_for_hibernation). But firstly you need to [create an API TOKEN](https://docs.cloudbees.com/docs/cloudbees-ci-kb/latest/client-and-managed-controllers/how-to-generate-change-an-apitoken#_programmatically_creating_a_token) for the `admin` user and then execute:
 
   ```sh
-  eval $(terraform output --raw team_c_hpa)
+  eval $(terraform output --raw cbci_oc_export_admin_crumb) && \
+    eval $(terraform output --raw cbci_oc_export_admin_api_token) && \
+    eval $(terraform output --raw cbci_controller_b_hibernation_post_queue_ws_cache)
   ```
-
-- [CloudBees Workspace Caching](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-cache-step) and [CloudBees CI Hibernation](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#_hibernation_in_managed_masters) features can be seen together in action the `team-b`. Once the `Amazon S3 Bucket Access settings` > `S3 Bucket Name` is configured correctly (see [Deploy](#deploy) section), you can watch how to write (since the first build) and read (since second build) from the `ws-cache` pipeline. To trigger the builds will be using the [POST queue hibernation API endpoints](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#_post_queue_for_hibernation).
-
-  ```sh
-  adminSecret=$(terraform output --raw cbci_general_password)
-  curl -i -XPOST -u admin:"$adminSecret" "http://$ROUTE_53_DOMAIN/hibernation/queue/team-b/job/ws-cache/build?delay=180sec"
-  ```
-
-TODO: check hibernation monitor
 
 > [!NOTE]
 > - More examples for Workspace Caching can be found at [Getting Started With CloudBees Workspace Caching on AWS S3 - CloudBees TV 🎥](https://www.youtube.com/watch?v=ESU9oN9JUCw&list=PLvBBnHmZuNQJcDefZ7G7Qyp3J9MAMaigF&index=7&t=3s)
@@ -137,7 +140,7 @@ TODO: check hibernation monitor
     eval $(terraform output --raw velero_backup_team_a)
     ```
 
-  - Velero Restore process: Make any update on `team-a` (e.g.: adding some jobs), take a backup including the update, remove the latest update (e.g.: removing the jobs) and then restore it from the last backup as follows.
+  - Velero Restore process: Make any update on `team-a` (e.g.: adding some jobs), take a backup including the update, remove the latest update (e.g.: removing the jobs) and then restore it from the last backup as follows
 
     ```sh
     eval $(terraform output --raw velero_restore_team_a)

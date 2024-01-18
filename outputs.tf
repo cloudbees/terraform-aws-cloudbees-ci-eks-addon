@@ -15,6 +15,11 @@ output "cbci_oc_url" {
   value       = "https://cjoc.${var.hostname}"
 }
 
+output "cbci_domain_name" {
+  description = "Route 53 Domain Name to host CloudBees CI Services."
+  value       = var.hostname
+}
+
 output "cbci_oc_pod" {
   description = "Operation Center Pod for CloudBees CI Add-on."
   value       = "kubectl get pod -n ${helm_release.cloudbees_ci.namespace} cjoc-0"

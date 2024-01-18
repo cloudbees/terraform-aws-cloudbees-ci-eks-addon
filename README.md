@@ -105,6 +105,7 @@ CloudBees CI Add-on uses for its resources definition `helms release` which make
 
 | Name | Description |
 |------|-------------|
+| cbci_domain_name | Route 53 Domain Name to host CloudBees CI Services. |
 | cbci_liveness_probe_ext | Operation Center Service External Liveness Probe for CloudBees CI Add-on. |
 | cbci_liveness_probe_int | Operation Center Service Internal Liveness Probe for CloudBees CI Add-on. |
 | cbci_namespace | Namespace for CloudBees CI Addon. |

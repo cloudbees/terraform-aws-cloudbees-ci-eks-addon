@@ -25,11 +25,6 @@ output "cbci_oc_pod" {
   value       = module.eks_blueprints_addon_cbci.cbci_oc_pod
 }
 
-output "cbci_oc_pod" {
-  description = "Operation Center Pod for CloudBees CI Add-on."
-  value       = module.eks_blueprints_addon_cbci.cbci_oc_pod
-}
-
 output "cbci_oc_ing" {
   description = "Operation Center Ingress for CloudBees CI Add-on."
   value       = module.eks_blueprints_addon_cbci.cbci_oc_ing
@@ -55,9 +50,29 @@ output "cbci_oc_url" {
   value       = module.eks_blueprints_addon_cbci.cbci_oc_url
 }
 
-output "team_c_hpa" {
+output "cbci_oc_export_admin_crumb" {
+  description = "Export Operation Center Admin Crumb to access to the API REST when CSRF is enabled."
+  value       = "export CBCI_ADMIN_CRUMB=$(curl -s '${module.eks_blueprints_addon_cbci.cbci_oc_url}/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,%22:%22,//crumb)' --cookie-jar /tmp/cookies.txt --user admin:$(kubectl get secret cbci-secrets -n cbci -o jsonpath='{.data.secJenkinsPass}' | base64 -d))"
+}
+
+output "cbci_oc_export_admin_api_token" {
+  description = "Export Operation Center Admin API Token to access to the API REST when CSRF is enabled. It expects CBCI_ADMIN_CRUMB as environment variable."
+  value       = "export CBCI_ADMIN_TOKEN=$(curl -s '${module.eks_blueprints_addon_cbci.cbci_oc_url}/user/admin/descriptorByName/jenkins.security.ApiTokenProperty/generateNewToken' --user admin:$(kubectl get secret cbci-secrets -n cbci -o jsonpath='{.data.secJenkinsPass}' | base64 -d)  --data 'newTokenName=kb-token' --cookie /tmp/cookies.txt -H $CBCI_ADMIN_CRUMB | . jq -r .data.tokenValue)"
+}
+
+output "cbci_controllers_pods" {
+  description = "Operation Center Pod for CloudBees CI Add-on."
+  value       = "kubectl get pods -n ${module.eks_blueprints_addon_cbci.cbci_namespace} -l com.cloudbees.cje.type=master"
+}
+
+output "cbci_controller_c_hpa" {
   description = "Team C Horizontal Pod Autoscaling."
   value       = "kubectl get hpa team-c-ha -n ${module.eks_blueprints_addon_cbci.cbci_namespace}"
+}
+
+output "cbci_controller_b_hibernation_post_queue_ws_cache" {
+  description = "Team B Hibernation Monitor Endpoint to Build Workspace Cache. It expects CBCI_ADMIN_TOKEN as environment variable."
+  value       = "curl -i -XPOST -u admin:$CBCI_ADMIN_TOKEN ${local.hibernation_monitor_url}/hibernation/queue/team-b/job/ws-cache/build"
 }
 
 output "acm_certificate_arn" {
