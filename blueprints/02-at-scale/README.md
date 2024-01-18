@@ -146,9 +146,10 @@ Additionally, the following is required:
     eval $(terraform output --raw velero_restore_team_a)
     ```
 
-- For EFS Storage is based on [AWS Backup](https://aws.amazon.com/backup/).
+- For EFS Storage is based on [AWS Backup](https://aws.amazon.com/backup/). Refer to [Backing up your Amazon EFS file systems](https://docs.aws.amazon.com/efs/latest/ug/awsbackup.html) and [Restoring an Amazon EFS file system - AWS Backup](https://docs.aws.amazon.com/aws-backup/latest/devguide/restoring-efs.html)
 
-  - TODO
+  - See that the EFS drive is included into a [Backup plan](https://docs.aws.amazon.com/aws-backup/latest/devguide/creating-a-backup-plan.html)
+  - [EFS drives access points](https://docs.aws.amazon.com/efs/latest/ug/efs-access-points.html) matches with PVCs for CloubBees CI Application using this type of Storage Class (e.g `cjoc` and `team-c-ha` controller)
 
 ### Monitoring
 
