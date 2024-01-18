@@ -82,7 +82,7 @@ dRun:
 .PHONY: tfpreFlightChecks
 tfpreFlightChecks: ## Run preflight checks for terraform according to getting-started/README.md . Example: ROOT=02-at-scale make tfpreFlightChecks
 tfpreFlightChecks: guard-ROOT
-	@if [ "$(shell whoami)" != "$(BP_AGENT_USER)" ]; then printf $(MSG_WARN) "It is detected you are not running the $(BP_AGENT_USER) user. Note that blueprints have been validated used the companion Blueprint Docker Agent available via: make dRun"; fi
+	@if [ "$(shell whoami)" != "$(BP_AGENT_USER)" ]; then printf $(MSG_WARN) "$(BP_AGENT_USER) user is not detected. Note that blueprints validations use the companion Blueprint Docker Agent available via: make dRun"; fi
 	@if [ ! -f blueprints/$(ROOT)/.auto.tfvars ]; then printf $(MSG_ERROR) "blueprints/$(ROOT)/.auto.tfvars file does not exist and it is required to store your own values"; exit 1; fi
 	@if ([ ! -f blueprints/$(ROOT)/k8s/secrets-values.yml ] && [ $(ROOT) == "02-at-scale" ]); then printf $(MSG_ERROR) "blueprints/$(ROOT)/secrets-values.yml file does not exist and it is required to store your secrets"; exit 1; fi
 	$(eval USER_ID := $(shell aws sts get-caller-identity | grep UserId | cut -d"," -f 1 | xargs ))
@@ -134,7 +134,7 @@ test:
 .PHONY: help
 help: ## Makefile Help Page
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n\nTargets:\n"} /^[\/\%a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-21s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST) 2>/dev/null
-	@printf "\nDebug mode: Use -d flag with targets. Example: ROOT=02-at-scale make -d validate \n\n"
+	@printf "\nDebug: Use -d flag with targets. Example: ROOT=02-at-scale make -d validate \n\n"
 
 .PHONY: guard-%
 guard-%:
