@@ -45,7 +45,7 @@ output "cbci_general_password" {
   value       = "kubectl get secret cbci-secrets -n ${module.eks_blueprints_addon_cbci.cbci_namespace} -o jsonpath='{.data.secJenkinsPass}' | base64 -d"
 }
 
-output "cjoc_url" {
+output "cbci_oc_url" {
   description = "URL of the CloudBees CI Operations Center for CloudBees CI Add-on."
   value       = module.eks_blueprints_addon_cbci.cbci_oc_url
 }

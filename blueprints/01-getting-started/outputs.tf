@@ -45,7 +45,7 @@ output "cbci_initial_admin_password" {
   value       = "kubectl exec -n ${module.eks_blueprints_addon_cbci.cbci_namespace} -ti cjoc-0 --container jenkins -- cat /var/jenkins_home/secrets/initialAdminPassword"
 }
 
-output "cjoc_url" {
+output "cbci_oc_url" {
   description = "URL of the CloudBees CI Operations Center for CloudBees CI Add-on."
   value       = module.eks_blueprints_addon_cbci.cbci_oc_url
 }

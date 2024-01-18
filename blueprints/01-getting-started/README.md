@@ -44,7 +44,7 @@ Get started with the [CloudBees CI on Modern in EKS](https://docs.cloudbees.com/
 | cbci_namespace | Namespace for CloudBees CI Add-on. |
 | cbci_oc_ing | Operation Center Ingress for CloudBees CI Add-on. |
 | cbci_oc_pod | Operation Center Pod for CloudBees CI Add-on. |
-| cjoc_url | URL of the CloudBees CI Operations Center for CloudBees CI Add-on. |
+| cbci_oc_url | URL of the CloudBees CI Operations Center for CloudBees CI Add-on. |
 | eks_cluster_arn | EKS cluster ARN |
 | export_kubeconfig | Export KUBECONFIG environment variable to access to access the K8s API. |
 | vpc_arn | VPC ID |
@@ -100,7 +100,7 @@ Once you get access to K8s API from your terminal, validate that:
 - Once propagation is ready, it is possible to access the CloudBees CI installation Wizard by copying the outcome of the below command in your browser.
 
   ```sh
-  terraform output cjoc_url
+  terraform output cbci_oc_url
   ```
 
 Now that you’ve installed CloudBees CI and operations center, you’ll want to see your system in action. To do this, follow the steps explained in [CloudBees CI EKS Install Guide - Signing in to your CloudBees CI installation](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/installing-eks-using-helm#log-in). You will need the initial admin password to log in as:
