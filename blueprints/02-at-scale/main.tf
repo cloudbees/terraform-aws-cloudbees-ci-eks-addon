@@ -157,6 +157,12 @@ module "eks_blueprints_addons" {
     ]
   }
 
+  enable_aws_for_fluentbit = true
+  aws_for_fluentbit = {
+    enable_containerinsights = true
+    values                   = [file("k8s/aws-for-fluent-bit.yml")]
+  }
+
   tags = local.tags
 }
 
@@ -295,6 +301,10 @@ module "eks" {
       }
     }
   }
+
+  #https://docs.aws.amazon.com/eks/latest/userguide/control-plane-logs.html
+  create_cloudwatch_log_group = true
+  cluster_enabled_log_types   = ["audit", "api", "authenticator", "controllerManager", "scheduler"]
 
   tags = local.tags
 }
