@@ -7,8 +7,8 @@ locals {
   region = "us-east-1"
   #Number of AZs per region https://docs.aws.amazon.com/ram/latest/userguide/working-with-az-ids.html
   azs = ["${local.region}a", "${local.region}b", "${local.region}c"]
-  #For g3 SC
-  az_a = ["${local.region}a"]
+  #For g3 SC, Issue #51
+  #az_a = ["${local.region}a"]
 
   vpc_name             = "${local.name}-vpc"
   cluster_name         = "${local.name}-eks"
@@ -411,12 +411,13 @@ resource "kubernetes_storage_class_v1" "gp3" {
     type      = "gp3"
   }
 
-  allowed_topologies {
-    match_label_expressions {
-      key    = "topology.ebs.csi.aws.com/zone"
-      values = local.az_a
-    }
-  }
+  #Issue #51
+  # allowed_topologies {
+  #   match_label_expressions {
+  #     key    = "topology.ebs.csi.aws.com/zone"
+  #     values = local.az_a
+  #   }
+  # }
 
 }
 
