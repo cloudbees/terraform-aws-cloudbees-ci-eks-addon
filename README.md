@@ -50,9 +50,9 @@ If you would like to override any defaults with the chart, you can do so by pass
 
 ### Tooling
 
-The [Getting Started blueprint](blueprints/01-getting-started/) requires the minimum set of tooling described in the [AWS EKS Blueprints - Getting Started Guide - Prerequisites](https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#prerequisites).
+Blueprints `deploy` and `destroy` phases use the same tooling requirement per [AWS EKS Blueprints - Getting Started Guide - Prerequisites](https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#prerequisites).
 
-The [At Scale blueprint](blueprints/01-getting-started/) requires additional tooling like `jq` and `velero`.
+Nevertheless, the Blueprints `validate` phase might require additional tooling like `jq` and `velero`.
 
 > [!NOTE]
 > There is a companion [Dockerfile](blueprints/Dockerfile) to run the blueprints in a containerized Dev environment ensuring dependecies are met. It can be built by using the [Makefile](Makefile) target `make dRun`.

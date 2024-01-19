@@ -100,8 +100,13 @@ output "s3_cbci_name" {
   value       = local.bucket_name
 }
 
-output "velero_backup_team_a" {
-  description = "Force to create a velero backup from schedulle for Team A. It can be applicable for rest of schedulle backups."
+output "velero_backup_schedule_team_a" {
+  description = "Create velero backup schedulle for Team A. It can be applied for other controllers using EBS."
+  value       = "velero create schedule ${local.velero_bk_demo} --schedule='@every 30m' --ttl 2h --include-namespaces ${module.eks_blueprints_addon_cbci.cbci_namespace} --exclude-resources pods,events,events.events.k8s.io --selector tenant=team-a"
+}
+
+output "velero_backup_on_demand_team_a" {
+  description = "Take an on-demand velero backup from the schedulle for Team A. "
   value       = "velero backup create --from-schedule ${local.velero_bk_demo} --wait"
 }
 

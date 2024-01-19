@@ -69,7 +69,8 @@ Once you have familiarized yourself with the [Getting Started blueprint](../01-g
 | prometheus_dashboard | Access to prometheus dashbaords. |
 | s3_cbci_arn | CBCI s3 Bucket Arn |
 | s3_cbci_name | CBCI s3 Bucket Name. It is required by CloudBees CI for Workspace Cacthing and Artifact Manager |
-| velero_backup_team_a | Force to create a velero backup from schedulle for Team A. It can be applicable for rest of schedulle backups. |
+| velero_backup_on_demand_team_a | Take an on-demand velero backup from the schedulle for Team A. |
+| velero_backup_schedule_team_a | Create velero backup schedulle for Team A. It can be applied for other controllers using EBS. |
 | velero_restore_team_a | Restore Team A from backup. It can be applicable for rest of schedulle backups. |
 | vpc_arn | VPC ID |
 <!-- END_TF_DOCS -->
@@ -146,10 +147,12 @@ Additionally, the following is required:
     eval $(terraform output --raw velero_restore_team_a)
     ```
 
-- For EFS Storage is based on [AWS Backup](https://aws.amazon.com/backup/). Refer to [Backing up your Amazon EFS file systems](https://docs.aws.amazon.com/efs/latest/ug/awsbackup.html) and [Restoring an Amazon EFS file system - AWS Backup](https://docs.aws.amazon.com/aws-backup/latest/devguide/restoring-efs.html)
+- For EFS Storage is based on [AWS Backup](https://aws.amazon.com/backup/).
 
-  - See that the EFS drive is included into a [Backup plan](https://docs.aws.amazon.com/aws-backup/latest/devguide/creating-a-backup-plan.html)
-  - [EFS drives access points](https://docs.aws.amazon.com/efs/latest/ug/efs-access-points.html) matches with PVCs for CloubBees CI Application using this type of Storage Class (e.g `cjoc` and `team-c-ha` controller)
+  - The EFS Drive is listed in `AWS Backup console` > Protected resources.
+  - Refer to [Backing up your Amazon EFS file systems](https://docs.aws.amazon.com/efs/latest/ug/awsbackup.html) and [Restoring an Amazon EFS file system - AWS Backup](https://docs.aws.amazon.com/aws-backup/latest/devguide/restoring-efs.html)
+  - See that the EFS drive is included in a [Backup plan](https://docs.aws.amazon.com/aws-backup/latest/devguide/creating-a-backup-plan.html)
+  - [EFS drives access points](https://docs.aws.amazon.com/efs/latest/ug/efs-access-points.html) matches with PVCs assigned to CloubBees CI Application Pods using this type of Storage Class (e.g `cjoc` and `team-c-ha` controller)
 
 ### Monitoring
 
