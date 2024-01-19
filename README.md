@@ -13,7 +13,7 @@
 
 This [AWS Partner Addon](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/aws-partner-addons/) aims to ease the adoption of CloudBees CI enterprise features by:
 
-- Encapsulating the Deployment of [CloudBees CI in EKS](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/installing-eks-using-helm#_configuring_your_environment) into a Terraform module for [AWS Partner Addons](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/aws-partner-addons/).
+- Encapsulating the Deployment of [CloudBees CI Modern in AWS EKS](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/installing-eks-using-helm#_configuring_your_environment) into a Terraform module.
 - Providing a series of Blueprints (examples of implementation) using the mentioned CloudBees CI Addon module on top of [AWS Terraform EKS Addons](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/) which are aligned with [EKS Best Practices Guides](https://aws.github.io/aws-eks-best-practices/).
 
 > [!NOTE]
@@ -52,7 +52,7 @@ If you would like to override any defaults with the chart, you can do so by pass
 
 Blueprints `deploy` and `destroy` phases use the same tooling requirement per [AWS EKS Blueprints - Getting Started Guide - Prerequisites](https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#prerequisites).
 
-Nevertheless, the Blueprints `validate` phase might require additional tooling like `jq` and `velero`.
+Nevertheless, the Blueprints `validate` phase might require additional toolings like `jq` and `velero`.
 
 > [!NOTE]
 > There is a companion [Dockerfile](blueprints/Dockerfile) to run the blueprints in a containerized Dev environment ensuring dependecies are met. It can be built by using the [Makefile](Makefile) target `make dRun`.
