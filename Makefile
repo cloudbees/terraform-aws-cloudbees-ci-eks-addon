@@ -40,30 +40,11 @@ endef
 define validate
 	@printf $(MSG_INFO) "Validating CloudBees CI Operation Center availability for $(1) ..."
 	$(call confirmation,Validate $(1))
-	$(eval $(call tfOutput,$(1),kubeconfig_export))
-	$(eval OC_URL := $(call tfOutput,$(1),cbci_oc_url))
-	@until $(call tfOutput,$(1),cbci_oc_pod); do sleep 2 && echo "Waiting for Operation Center Pod to get ready"; done
-	@printf $(MSG_INFO) "OC Pod is Ready."
-	@until $(call tfOutput,$(1),cbci_liveness_probe_int); do sleep 10 && echo "Waiting for Operation Center Service to pass Health Check from inside the cluster"; done
-	@printf $(MSG_INFO) "Operation Center Service passed Health Check inside the cluster."
-	@until $(call tfOutput,$(1),cbci_oc_ing); do sleep 2 && echo "Waiting for Operation Center Ingress to get ready"; done
-	@printf $(MSG_INFO) "Operation Center Ingress Ready."
-	@until $(call tfOutput,$(1),cbci_liveness_probe_ext); do sleep 10 && echo "Waiting for Operation Center Service to pass Health Check from outside the cluster"; done
-	@printf $(MSG_INFO) "Operation Center Service passed Health Check outside the cluster. It is available at $(OC_URL)."
+	source blueprints/helpers.sh && rules-general $(1)
 	@if [ "$(1)" == "01-getting-started" ]; then \
-		echo "Initial Admin Password: `$(call tfOutput,$(1),cbci_initial_admin_password)`" ; fi
+		source blueprints/helpers.sh && rules-bp01 ; fi
 	@if [ "$(1)" == "02-at-scale" ]; then \
-		echo "General Password all users: `$(call tfOutput,$(1),cbci_general_password)`"; \
-		until $(call tfOutput,$(1),team_c_hpa); do sleep 10 && echo "Waiting for Team C Horizontal Pod Autoscaling"; done; \
-		printf $(MSG_INFO) "Configuration as Code is applied for OC and Controllers and Team C has HA enabled." ; \
-		$(call tfOutput,$(1),velero_backup_schedule_team_a) && \
-			printf $(MSG_INFO) "Velero backups schedule configured for Team A"; \
-		$(call tfOutput,$(1),velero_backup_on_demand_team_a) > /tmp/backup.txt && \
-			cat /tmp/backup.txt | grep "Backup completed with status: Completed" && \
-			printf $(MSG_INFO) "Velero on demand backup for Team A was successful"; \
-		$(call tfOutput,$(1),prometheus_active_targets) | jq '.data.activeTargets[] | select(.labels.container=="jenkins" or .labels.job=="cjoc") \
-			| {job: .labels.job, instance: .labels.instance, status: .health}' && \
-			printf $(MSG_INFO) "Prometheus CloudBees CI Targets are OK"; fi
+		source blueprints/helpers.sh && rules-bp02 ; fi
 endef
 
 .PHONY: dRun
@@ -125,10 +106,16 @@ else
 endif
 
 .PHONY: test
-test: ## Runs a smoke test for all blueprints throughout their Terraform Lifecycle. Example: make test
-test:
-	@printf $(MSG_INFO) "Running Smoke Test for all blueprints ..."
-	bash $(MKFILEDIR)/blueprints/test-all.sh
+test: ## Runs a test for blueprint passed as parameters throughout their Terraform Lifecycle. Example: ROOT=02-at-scale make test
+test: guard-ROOT
+	@printf $(MSG_INFO) "Running Test for $(ROOT) blueprint ..."
+	@source $(MKFILEDIR)/blueprints/helpers.sh && test $(ROOT)
+
+.PHONY: test-all
+test-all: ## Runs test for all blueprints throughout their Terraform Lifecycle. Example: make test
+test-all:
+	@printf $(MSG_INFO) "Running Test for all blueprints ..."
+	@source $(MKFILEDIR)/blueprints/helpers.sh && test-all
 
 .PHONY: help
 help: ## Makefile Help Page
