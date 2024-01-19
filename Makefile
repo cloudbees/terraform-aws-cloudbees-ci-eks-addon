@@ -41,7 +41,7 @@ define validate
 	@printf $(MSG_INFO) "Validating CloudBees CI Operation Center availability for $(1) ..."
 	$(call confirmation,Validate $(1))
 	$(eval $(call tfOutput,$(1),kubeconfig_export))
-	$(eval OC_URL := $(call tfOutput,$(1),cjoc_url))
+	$(eval OC_URL := $(call tfOutput,$(1),cbci_oc_url))
 	@until $(call tfOutput,$(1),cbci_oc_pod); do sleep 2 && echo "Waiting for Operation Center Pod to get ready"; done
 	@printf $(MSG_INFO) "OC Pod is Ready."
 	@until $(call tfOutput,$(1),cbci_liveness_probe_int); do sleep 10 && echo "Waiting for Operation Center Service to pass Health Check from inside the cluster"; done
@@ -56,9 +56,11 @@ define validate
 		echo "General Password all users: `$(call tfOutput,$(1),cbci_general_password)`"; \
 		until $(call tfOutput,$(1),team_c_hpa); do sleep 10 && echo "Waiting for Team C Horizontal Pod Autoscaling"; done; \
 		printf $(MSG_INFO) "Configuration as Code is applied for OC and Controllers and Team C has HA enabled." ; \
-		$(call tfOutput,$(1),velero_backup_team_a) > /tmp/backup.txt && \
+		$(call tfOutput,$(1),velero_backup_schedule_team_a) > /tmp/backup.txt && \
+			printf $(MSG_INFO) "Velero backups schedule configured for Team A"; \
+		$(call tfOutput,$(1),velero_backup_on_demand_team_a) > /tmp/backup.txt && \
 			cat /tmp/backup.txt | grep "Backup completed with status: Completed" && \
-			printf $(MSG_INFO) "Velero backups are working"; \
+			printf $(MSG_INFO) "Velero on demand backup for Team A was successful"; \
 		$(call tfOutput,$(1),prometheus_active_targets) | jq '.data.activeTargets[] | select(.labels.container=="jenkins" or .labels.job=="cjoc") \
 			| {job: .labels.job, instance: .labels.instance, status: .health}' && \
 			printf $(MSG_INFO) "Prometheus CloudBees CI Targets are OK"; fi
