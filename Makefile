@@ -11,10 +11,6 @@ define confirmation
 	@echo -n "Asking for your confirmation to $(1) [yes/No]" && read ans && [ $${ans:-No} = yes ]
 endef
 
-define tfOutput
-	$(shell cd blueprints/$(1) && terraform output -raw $(2) 2> /dev/null)
-endef
-
 #https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#deploy
 define deploy
 	@printf $(MSG_INFO) "Deploying CloudBees CI Blueprint $(1) ..."
