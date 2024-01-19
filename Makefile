@@ -56,7 +56,7 @@ define validate
 		echo "General Password all users: `$(call tfOutput,$(1),cbci_general_password)`"; \
 		until $(call tfOutput,$(1),team_c_hpa); do sleep 10 && echo "Waiting for Team C Horizontal Pod Autoscaling"; done; \
 		printf $(MSG_INFO) "Configuration as Code is applied for OC and Controllers and Team C has HA enabled." ; \
-		$(call tfOutput,$(1),velero_backup_schedule_team_a) > /tmp/backup.txt && \
+		$(call tfOutput,$(1),velero_backup_schedule_team_a) && \
 			printf $(MSG_INFO) "Velero backups schedule configured for Team A"; \
 		$(call tfOutput,$(1),velero_backup_on_demand_team_a) > /tmp/backup.txt && \
 			cat /tmp/backup.txt | grep "Backup completed with status: Completed" && \
