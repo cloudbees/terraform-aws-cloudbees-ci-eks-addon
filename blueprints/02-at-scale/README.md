@@ -102,7 +102,7 @@ Additionally, the following is required:
   eval $(terraform output --raw cbci_general_password)
   ```
 
-- Configuration as Code (CasC) is enabled for [Operation Center](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/) (`cjoc`) and [Controllers](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-controller/) (`team-b` and `team-c-ha`). `team-a` is not using CasC to show the difference between the two approaches. Note .
+- Configuration as Code (CasC) is enabled for [Operation Center](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/) (`cjoc`) and [Controllers](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-controller/) (`team-b` and `team-c-ha`). `team-a` is not using CasC to show the difference between the two approaches. Check that all Controllers are in `Running` state
 
   ```sh
   eval $(terraform output --raw cbci_controllers_pods)
@@ -138,6 +138,12 @@ Additionally, the following is required:
 ### Backups and Restores
 
 - For EBS Storage is based on Velero.
+
+  - Create a Velero Backup schedule for Team A to take regular backups. This can be also applied to Team B.
+
+    ```sh
+    eval $(terraform output --raw velero_backup_schedule_team_a)
+    ```
 
   - Velero Backup on a specific point in time for Team A. Note also there is a scheduled backup process in place.
 

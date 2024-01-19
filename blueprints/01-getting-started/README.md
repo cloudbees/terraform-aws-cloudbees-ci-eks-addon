@@ -70,7 +70,7 @@ Once the resources have been created, note that a `kubeconfig` file has been cre
 
 Once you get access to K8s API from your terminal, validate that:
 
-- The CloudBees Operation Center Pod is running
+- The CloudBees Operation Center Pod is in `Running` state
 
   ```sh
   eval $(terraform output --raw cbci_oc_pod)
