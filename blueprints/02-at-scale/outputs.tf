@@ -100,6 +100,26 @@ output "s3_cbci_name" {
   value       = local.bucket_name
 }
 
+output "efs_arn" {
+  description = "EFS ARN."
+  value       = module.efs.arn
+}
+
+output "efs_access_points" {
+  description = "EFS ARN."
+  value       = "aws efs describe-access-points --file-system-id ${module.efs.id} --region ${local.region}"
+}
+
+output "aws_backup_efs_protected_resource" {
+  description = "AWS Backup Protected Resource descriction for EFS Drive."
+  value       = "aws backup describe-protected-resource --resource-arn ${module.efs.arn} --region ${local.region}"
+}
+
+output "aws_fluentbit_logstreams" {
+  description = "AWS CloudWatch Log Streams for FluentBit."
+  value       = "aws logs describe-log-streams --log-group-name /aws/containerinsights/${local.cluster_name}/application --region ${local.region}"
+}
+
 output "velero_backup_schedule_team_a" {
   description = "Create velero backup schedulle for Team A. It can be applied for other controllers using EBS."
   value       = "velero create schedule ${local.velero_bk_demo} --schedule='@every 30m' --ttl 2h --include-namespaces ${module.eks_blueprints_addon_cbci.cbci_namespace} --exclude-resources pods,events,events.events.k8s.io --selector tenant=team-a"

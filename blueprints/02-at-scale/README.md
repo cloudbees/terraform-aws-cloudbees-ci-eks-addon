@@ -48,6 +48,8 @@ Once you have familiarized yourself with the [Getting Started blueprint](../01-g
 | Name | Description |
 |------|-------------|
 | acm_certificate_arn | ACM certificate ARN |
+| aws_backup_efs_protected_resource | AWS Backup Protected Resource descriction for EFS Drive. |
+| aws_fluentbit_logstreams | AWS CloudWatch Log Streams for FluentBit. |
 | cbci_controller_b_hibernation_post_queue_ws_cache | Team B Hibernation Monitor Endpoint to Build Workspace Cache. It expects CBCI_ADMIN_TOKEN as environment variable. |
 | cbci_controller_c_hpa | Team C Horizontal Pod Autoscaling. |
 | cbci_controllers_pods | Operation Center Pod for CloudBees CI Add-on. |
@@ -61,6 +63,8 @@ Once you have familiarized yourself with the [Getting Started blueprint](../01-g
 | cbci_oc_ing | Operation Center Ingress for CloudBees CI Add-on. |
 | cbci_oc_pod | Operation Center Pod for CloudBees CI Add-on. |
 | cbci_oc_url | URL of the CloudBees CI Operations Center for CloudBees CI Add-on. |
+| efs_access_points | EFS ARN. |
+| efs_arn | EFS ARN. |
 | eks_cluster_arn | EKS cluster ARN |
 | grafana_dashboard | Access to grafana dashbaords. |
 | kubeconfig_add | Add Kubeconfig to local configuration to access the K8s API. |
@@ -147,36 +151,49 @@ Additionally, the following is required:
     eval $(terraform output --raw velero_restore_team_a)
     ```
 
-- For EFS Storage is based on [AWS Backup](https://aws.amazon.com/backup/).
+- EFS Storage is protected in [AWS Backup](https://aws.amazon.com/backup/) with a regular Backup Plan. Additional On-Demand Backup can be created. Restore can be performed and item level (particular `pvc`, see EFS access points) or full restore.
 
-  - The EFS Drive is listed in `AWS Backup console` > Protected resources.
-  - Refer to [Backing up your Amazon EFS file systems](https://docs.aws.amazon.com/efs/latest/ug/awsbackup.html) and [Restoring an Amazon EFS file system - AWS Backup](https://docs.aws.amazon.com/aws-backup/latest/devguide/restoring-efs.html)
-  - See that the EFS drive is included in a [Backup plan](https://docs.aws.amazon.com/aws-backup/latest/devguide/creating-a-backup-plan.html)
-  - [EFS drives access points](https://docs.aws.amazon.com/efs/latest/ug/efs-access-points.html) matches with PVCs assigned to CloubBees CI Application Pods using this type of Storage Class (e.g `cjoc` and `team-c-ha` controller)
+  - Protected Resource
 
-### Monitoring
+    ```sh
+    eval $(terraform output --raw aws_backup_efs_protected_resource) | . jq
+    ```
 
-The explanations from [How to Monitor Jenkins With Grafana and Prometheus - CloudBees TV 🎥](https://www.youtube.com/watch?v=3H9eNIf9KZs) are valid in this context but this blueprint relies on the [CloudBees Prometheus Metrics plugin](https://docs.cloudbees.com/docs/cloudbees-ci/latest/monitoring/prometheus-plugin) and not the open-source version.
+  - EFS Access point
 
-- Check the CloudBees CI Targets are connected to Prometheus.
+    ```sh
+    eval $(terraform output --raw efs_access_points) | . jq .AccessPoints[].RootDirectory.Path
+    ```
 
-  ```sh
-  eval $(terraform output --raw prometheus_active_targets) | jq '.data.activeTargets[] | select(.labels.container=="jenkins" or .labels.job=="cjoc") | {job: .labels.job, instance: .labels.instance, status: .health}'
-  ```
+### Observability
 
-- Access to Kube Prometheus Stack dashboards from your web browser (Check that [Jenkins metrics](https://plugins.jenkins.io/metrics/) are available)
+- Metrics: The explanations from [How to Monitor Jenkins With Grafana and Prometheus - CloudBees TV 🎥](https://www.youtube.com/watch?v=3H9eNIf9KZs) are valid in this context but this blueprint relies on the [CloudBees Prometheus Metrics plugin](https://docs.cloudbees.com/docs/cloudbees-ci/latest/monitoring/prometheus-plugin) and not the open-source version.
 
-  - Prometheus will be available at `http://localhost:50001` after running the following command in your host:
+  - Check the CloudBees CI Targets are connected to Prometheus.
 
-  ```sh
-  eval $(terraform output --raw prometheus_dashboard)
-  ```  
+    ```sh
+    eval $(terraform output --raw prometheus_active_targets) | jq '.data.activeTargets[] | select(.labels.container=="jenkins" or .labels.job=="cjoc") | {job: .labels.job, instance: .labels.instance, status: .health}'
+    ```
 
-  - Grafana will be available at `http://localhost:50002` after running the following command in your host:
+  - Access to Kube Prometheus Stack dashboards from your web browser (Check that [Jenkins metrics](https://plugins.jenkins.io/metrics/) are available)
 
-  ```sh
-  eval $(terraform output --raw grafana_dashboard)
-  ```  
+    - Prometheus will be available at `http://localhost:50001` after running the following command in your host:
+
+    ```sh
+    eval $(terraform output --raw prometheus_dashboard)
+    ```  
+
+    - Grafana will be available at `http://localhost:50002` after running the following command in your host:
+
+    ```sh
+    eval $(terraform output --raw grafana_dashboard)
+    ```  
+
+- Logs: Inside CloudWatch Logs Group `/aws/containerinsights/<CLUSTER_NAME>/application` can be found Log streams for all the K8s Services running in the cluster, including CloudBees CI Apps.
+
+    ```sh
+    eval $(terraform output --raw aws_fluentbit_logstreams) | grep logStreamName | grep jenkins
+    ```
 
 ## Destroy
 
