@@ -41,6 +41,7 @@ probes-common () {
 
 probes-bp01 () {
   local ROOT="01-getting-started"
+  eval "$(get-tf-output "$ROOT" kubeconfig_export)"
   INITIAL_PASS=$(eval "$(get-tf-output "$ROOT" cbci_initial_admin_password)"); \
     printf "$MSG_INFO" "Initial Admin Password: $INITIAL_PASS."
 }
