@@ -2,24 +2,30 @@
 SHELL           	:= /usr/bin/env bash
 MAKEFLAGS       	+= --no-print-directory
 BP_AGENT_USER		:= bp-agent
+CI 					?= false
 MKFILEDIR 			:= $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
-MSG_INFO 			:= "\033[36m[INFO] %s\033[0m\n"
+MSG_INFO     		:= "\033[36m[INFO] %s\033[0m\n"
 MSG_WARN 			:= "\033[0;33m[WARN] %s\033[0m\n"
 MSG_ERROR 			:= "\033[0;31m[ERROR] %s\033[0m\n"
 
+#https://developer.hashicorp.com/terraform/internals/debugging
+export TF_LOG=INFO
+export TF_LOG_PATH=$(MKFILEDIR)/blueprints/terraform.log
+
 define confirmation
-	@echo -n "Asking for your confirmation to $(1) [yes/No]" && read ans && [ $${ans:-No} = yes ]
+	@if [ $(CI) == false ]; then \
+		echo -n "Asking for your confirmation to $(1) [yes/No]" && read ans && [ $${ans:-No} = yes ] ; fi
 endef
 
 #https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#deploy
 define deploy
 	@printf $(MSG_INFO) "Deploying CloudBees CI Blueprint $(1) ..."
 	$(call confirmation,Deploy $(1))
-	@terraform -chdir=$(MKFILEDIR)/blueprints/$(1) init -upgrade
+	@terraform -chdir=$(MKFILEDIR)/blueprints/$(1) init
 	@terraform -chdir=$(MKFILEDIR)/blueprints/$(1) apply -target="module.vpc" -auto-approve
 	@terraform -chdir=$(MKFILEDIR)/blueprints/$(1) apply -target="module.eks" -auto-approve
 	@terraform -chdir=$(MKFILEDIR)/blueprints/$(1) apply -auto-approve
-	@terraform -chdir=$(MKFILEDIR)/blueprints/$(1) output > $(MKFILEDIR)/blueprints/$(1)/.deployed
+	@terraform -chdir=$(MKFILEDIR)/blueprints/$(1) output > $(MKFILEDIR)/blueprints/$(1)/terraform.output
 endef
 
 #https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#destroy
@@ -28,19 +34,28 @@ define destroy
 	$(call confirmation,Destroy $(1))
 	@terraform -chdir=$(MKFILEDIR)/blueprints/$(1) destroy -target=module.eks_blueprints_addon_cbci -auto-approve
 	@terraform -chdir=$(MKFILEDIR)/blueprints/$(1) destroy -target=module.eks_blueprints_addons -auto-approve
+	@terraform -chdir=$(MKFILEDIR)/blueprints/$(1) destroy -target=time_static.epoch -auto-approve
 	@terraform -chdir=$(MKFILEDIR)/blueprints/$(1) destroy -target=module.eks -auto-approve
 	@terraform -chdir=$(MKFILEDIR)/blueprints/$(1) destroy -auto-approve
-	@rm -f $(MKFILEDIR)/blueprints/$(1)/.deployed
+	@rm -f $(MKFILEDIR)/blueprints/$(1)/terraform.output
 endef
 
 define validate
 	@printf $(MSG_INFO) "Validating CloudBees CI Operation Center availability for $(1) ..."
 	$(call confirmation,Validate $(1))
-	source blueprints/helpers.sh && rules-general $(1)
+	@source blueprints/helpers.sh && probes-common $(1)
 	@if [ "$(1)" == "01-getting-started" ]; then \
-		source blueprints/helpers.sh && rules-bp01 ; fi
+		source blueprints/helpers.sh && probes-bp01 ; fi
 	@if [ "$(1)" == "02-at-scale" ]; then \
-		source blueprints/helpers.sh && rules-bp02 ; fi
+		source blueprints/helpers.sh && probes-bp02 ; fi
+endef
+
+define clean
+	@cd blueprints/$(ROOT) && find -name ".terraform" -type d | xargs rm -rf
+	@cd blueprints/$(ROOT) && find -name ".terraform.lock.hcl" -type f | xargs rm -f
+	@cd blueprints/$(ROOT) && find -name "kubeconfig_*.yaml" -type f | xargs rm -f
+	@cd blueprints/$(ROOT) && find -name "terraform.output" -type f | xargs rm -f
+	@cd blueprints && find -name terraform.log -type f | xargs rm -f
 endef
 
 .PHONY: dRun
@@ -48,7 +63,7 @@ dRun: ## Build (if not locally present) and Run the Blueprint Agent using Bash a
 dRun:
 	$(eval IMAGE := $(shell docker image ls | grep -c local.cloudbees/bp-agent))
 	@if [ "$(IMAGE)" == "0" ]; then \
-		echo "Building Docker Image local.cloudbees/bp-agent:latest" && \
+		printf $(MSG_INFO) "Building Docker Image local.cloudbees/bp-agent:latest" && \
 		docker build . --file $(MKFILEDIR)/blueprints/Dockerfile --tag local.cloudbees/bp-agent:latest; \
 		fi
 	docker run --rm -it --name bp-agent \
@@ -73,7 +88,7 @@ deploy: guard-ROOT tfpreFlightChecks
 .PHONY: destroy
 destroy: ## Destroy Terraform Blueprint passed as parameter. Example: ROOT=02-at-scale make destroy
 destroy: guard-ROOT tfpreFlightChecks
-ifneq ("$(wildcard blueprints/$(ROOT)/.deployed)","")
+ifneq ("$(wildcard blueprints/$(ROOT)/terraform.output)","")
 	$(call destroy,$(ROOT))
 else
 	@printf $(MSG_ERROR) "Blueprint $(ROOT) did not complete the Deployment target. It is not Ready for Destroy target but it is possible to destroy manually https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#destroy"
@@ -82,10 +97,7 @@ endif
 .PHONY: clean
 clean: ## Clean Blueprint passed as parameter. Example: ROOT=02-at-scale make clean
 clean: guard-ROOT tfpreFlightChecks
-	@cd blueprints/$(ROOT) && find -name ".terraform" -type d | xargs rm -rf
-	@cd blueprints/$(ROOT) && find -name ".terraform.lock.hcl" -type f | xargs rm -f
-	@cd blueprints/$(ROOT) && find -name "kubeconfig_*.yaml" -type f | xargs rm -f
-	@cd blueprints/$(ROOT) && find -name terraform.log -type f | xargs rm -f
+	$(call clean,$(ROOT))
 
 .PHONY: tfAction
 tfAction: ## Any Terraform Action for Blueprint passed as parameters. Usage: ROOT=02-at-scale ACTION="status list" make tf_action
@@ -95,7 +107,7 @@ tfAction: guard-ROOT guard-ACTION tfpreFlightChecks
 .PHONY: validate
 validate: ## Validate CloudBees CI Blueprint deployment passed as parameter. Example: ROOT=02-at-scale make validate
 validate: guard-ROOT tfpreFlightChecks
-ifneq ("$(wildcard blueprints/$(ROOT)/.deployed)","")
+ifneq ("$(wildcard blueprints/$(ROOT)/terraform.output)","")
 	$(call validate,$(ROOT))
 else
 	@printf $(MSG_ERROR) "Blueprint $(ROOT) did not complete the Deployment target thus it is not Ready to be validated."
@@ -103,9 +115,16 @@ endif
 
 .PHONY: test
 test: ## Runs a test for blueprint passed as parameters throughout their Terraform Lifecycle. Example: ROOT=02-at-scale make test
-test: guard-ROOT
 	@printf $(MSG_INFO) "Running Test for $(ROOT) blueprint ..."
-	@source $(MKFILEDIR)/blueprints/helpers.sh && test $(ROOT)
+	$(call deploy,$(ROOT))
+	@sleep 3
+ifneq ("$(wildcard blueprints/$(ROOT)/terraform.output)","")
+	$(call validate,$(ROOT))
+	$(call destroy,$(ROOT))
+	$(call clean,$(ROOT))
+else
+	@printf $(MSG_ERROR) "Blueprint $(ROOT) did not complete the Deployment target thus it is not Ready for the following phases."
+endif
 
 .PHONY: test-all
 test-all: ## Runs test for all blueprints throughout their Terraform Lifecycle. Example: make test
