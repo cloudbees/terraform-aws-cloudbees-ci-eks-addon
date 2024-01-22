@@ -45,6 +45,12 @@ locals {
   velero_s3_backup_location = "${module.cbci_s3_bucket.s3_bucket_arn}/velero"
   velero_bk_demo            = "team-a-pvc-bk"
 
+  epoch_millis = time_static.epoch.unix * 1000
+
+}
+
+resource "time_static" "epoch" {
+  depends_on = [module.eks_blueprints_addons]
 }
 
 ################################################################################
@@ -158,6 +164,7 @@ module "eks_blueprints_addons" {
   }
 
   enable_aws_for_fluentbit = true
+
   aws_for_fluentbit = {
     enable_containerinsights = true
     values                   = [file("k8s/aws-for-fluent-bit-values.yml")]

@@ -196,9 +196,11 @@ Additionally, the following is required:
 
 - Logs: Inside CloudWatch Logs Group `/aws/containerinsights/<CLUSTER_NAME>/application` can be found Log streams for all the K8s Services running in the cluster, including CloudBees CI Apps.
 
-    ```sh
-    eval $(terraform output --raw aws_fluentbit_logstreams) | grep logStreamName | grep jenkins
-    ```
+<!--TODO: Filter by timestamps to select current loggers-->
+
+```sh
+  eval $(terraform output --raw aws_fluentbit_logstreams) | jq '.[].[] | select(.logStreamName | contains("jenkins"))
+```
 
 ## Destroy
 

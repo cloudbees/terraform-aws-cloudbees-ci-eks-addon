@@ -18,6 +18,12 @@ terraform {
       source  = "gavinbunney/kubectl"
       version = ">= 1.14"
     }
+
+    time = {
+      source  = "hashicorp/time"
+      version = ">= 0.7.1"
+    }
+
     null = {
       source  = "hashicorp/null"
       version = ">= 3.1.0"
