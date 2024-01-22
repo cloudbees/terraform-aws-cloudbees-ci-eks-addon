@@ -39,6 +39,7 @@ terraform.rc
 # Assests created via Blueprints
 *.log
 .deployed
+terraform.output
 kubeconfig*.yaml
 
 # Secrets file
