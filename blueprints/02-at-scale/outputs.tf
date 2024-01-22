@@ -117,7 +117,7 @@ output "aws_backup_efs_protected_resource" {
 
 output "aws_fluentbit_logstreams" {
   description = "AWS CloudWatch Log Streams for FluentBit."
-  value       = "aws logs describe-log-streams --log-group-name /aws/containerinsights/${local.cluster_name}/application --region ${local.region}"
+  value       = "aws logs describe-log-streams --log-group-name /aws/containerinsights/${local.cluster_name}/application --order-by LastEventTime --region ${local.region}"
 }
 
 output "velero_backup_schedule_team_a" {
