@@ -19,6 +19,10 @@ test-all () {
   done
 }
 
+dummy () {
+  echo "elo"
+}
+
 get-tf-output () {
   local ROOT=$1
   local OUTPUT=$2
