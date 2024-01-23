@@ -117,7 +117,7 @@ endif
 test: ## Runs a test for blueprint passed as parameters throughout their Terraform Lifecycle. Example: ROOT=02-at-scale make test
 	@printf $(MSG_INFO) "Running Test for $(ROOT) blueprint ..."
 	$(call deploy,$(ROOT))
-	until ls blueprints/$(ROOT)/terraform.output; do sleep 3 && echo "Waiting for output file to proceed..."; done ;
+	until ls blueprints/$(ROOT)/terraform.output; do sleep 3 && echo "Waiting for output file..."; done ;
 ifneq ("$(wildcard blueprints/$(ROOT)/terraform.output)","")
 	$(call validate,$(ROOT))
 	$(call destroy,$(ROOT))
