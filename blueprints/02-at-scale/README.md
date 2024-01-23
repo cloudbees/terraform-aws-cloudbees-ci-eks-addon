@@ -62,7 +62,7 @@ Once you have familiarized yourself with the [Getting Started blueprint](../01-g
 | cbci_oc_ing | Operation Center Ingress for CloudBees CI Add-on. |
 | cbci_oc_pod | Operation Center Pod for CloudBees CI Add-on. |
 | cbci_oc_url | URL of the CloudBees CI Operations Center for CloudBees CI Add-on. |
-| efs_access_points | EFS ARN. |
+| efs_access_points | EFS Access Points. |
 | efs_arn | EFS ARN. |
 | eks_cluster_arn | EKS cluster ARN |
 | grafana_dashboard | Access to grafana dashbaords. |
@@ -73,7 +73,7 @@ Once you have familiarized yourself with the [Getting Started blueprint](../01-g
 | s3_cbci_arn | CBCI s3 Bucket Arn |
 | s3_cbci_name | CBCI s3 Bucket Name. It is required by CloudBees CI for Workspace Cacthing and Artifact Manager |
 | velero_backup_on_demand_team_a | Take an on-demand velero backup from the schedulle for Team A. |
-| velero_backup_schedule_team_a | Create velero backup schedulle for Team A. It can be applied for other controllers using EBS. |
+| velero_backup_schedule_team_a | Create velero backup schedulle for Team A, deleting existing one (if exists). It can be applied for other controllers using EBS. |
 | velero_restore_team_a | Restore Team A from backup. It can be applicable for rest of schedulle backups. |
 | vpc_arn | VPC ID |
 <!-- END_TF_DOCS -->
@@ -147,7 +147,7 @@ Additionally, the following is required:
   - Velero Backup on a specific point in time for Team A. Note also there is a scheduled backup process in place.
 
     ```sh
-    eval $(terraform output --raw velero_backup_team_a)
+    eval $(terraform output --raw velero_backup_on_demand_team_a)
     ```
 
   - Velero Restore process: Make any update on `team-a` (e.g.: adding some jobs), take a backup including the update, remove the latest update (e.g.: removing the jobs) and then restore it from the last backup as follows
@@ -156,7 +156,7 @@ Additionally, the following is required:
     eval $(terraform output --raw velero_restore_team_a)
     ```
 
-- EFS Storage is protected in [AWS Backup](https://aws.amazon.com/backup/) with a regular Backup Plan. Additional On-Demand Backup can be created. Restore can be performed and item level (particular `pvc`, see EFS access points) or full restore.
+- EFS Storage is protected in [AWS Backup](https://aws.amazon.com/backup/) with a regular Backup Plan. Additional On-Demand Backup can be created. Restore can be performed and item level (Access Points) or full restore.
 
   - Protected Resource
 
@@ -164,7 +164,7 @@ Additionally, the following is required:
     eval $(terraform output --raw aws_backup_efs_protected_resource) | . jq
     ```
 
-  - EFS Access point
+  - EFS Access point (they match with CloudBees CI `pvc`)
 
     ```sh
     eval $(terraform output --raw efs_access_points) | . jq .AccessPoints[].RootDirectory.Path
@@ -196,10 +196,8 @@ Additionally, the following is required:
 
 - Logs: Inside CloudWatch Logs Group `/aws/containerinsights/<CLUSTER_NAME>/application` can be found Log streams for all the K8s Services running in the cluster, including CloudBees CI Apps.
 
-<!--TODO: Filter by timestamps to select current loggers-->
-
 ```sh
-  eval $(terraform output --raw aws_fluentbit_logstreams) | jq '.[].[] | select(.logStreamName | contains("jenkins"))
+  eval $(terraform output --raw aws_fluentbit_logstreams) | jq '.[] | select(.logStreamName | contains("jenkins"))'
 ```
 
 ## Destroy

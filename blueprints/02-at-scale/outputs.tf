@@ -106,7 +106,7 @@ output "efs_arn" {
 }
 
 output "efs_access_points" {
-  description = "EFS ARN."
+  description = "EFS Access Points."
   value       = "aws efs describe-access-points --file-system-id ${module.efs.id} --region ${local.region}"
 }
 
@@ -121,7 +121,7 @@ output "aws_fluentbit_logstreams" {
 }
 
 output "velero_backup_schedule_team_a" {
-  description = "Create velero backup schedulle for Team A. It can be applied for other controllers using EBS."
+  description = "Create velero backup schedulle for Team A, deleting existing one (if exists). It can be applied for other controllers using EBS."
   value       = "velero schedule delete ${local.velero_bk_demo} --confirm || true; velero create schedule ${local.velero_bk_demo} --schedule='@every 30m' --ttl 2h --include-namespaces ${module.eks_blueprints_addon_cbci.cbci_namespace} --exclude-resources pods,events,events.events.k8s.io --selector tenant=team-a"
 }
 
