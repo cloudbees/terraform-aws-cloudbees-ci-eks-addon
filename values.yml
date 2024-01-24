@@ -15,7 +15,7 @@ OperationsCenter:
     Requests:
       Memory: "4G"
       Cpu: 2
-  HostName: ${hostname}
+  HostName: ${hosted_zone}
   Protocol: https
   Platform: eks
   Ingress:

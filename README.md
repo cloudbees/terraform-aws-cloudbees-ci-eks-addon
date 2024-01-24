@@ -1,7 +1,7 @@
 # CloudBees CI Add-on for AWS EKS
 
 <p align="center">
-  <a href="https://www.cloudbees.com/capabilities/continuous-integration"><img alt="cloudbees-icon" src="img/cloudbees.png" height="120" /></a>
+  <a href="https://www.cloudbees.com/capabilities/continuous-integration"><img alt="cloudbees-icon" src="https://images.ctfassets.net/vtn4rfaw6n2j/4dkyIw9VG39voD21C18YJz/692394b012c1ad7f2fc192dd484fdd47/image-grid-800x480-page-ci-simplify-your-jenkins-experience.png" height="120px" /></a>
   <p align="center">Deploy CloudBees CI to AWS EKS Clusters with this add-on.</p>
 </p>
 
@@ -93,7 +93,7 @@ CloudBees CI Add-on uses for its resources definition `helms release` which make
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | cert_arn | Certificate ARN from AWS ACM | `string` | n/a | yes |
-| hostname | Route53 Hosted zone name | `string` | n/a | yes |
+| hosted_zone | Route53 Hosted zone name | `string` | n/a | yes |
 | temp_license | Temporary license details | `map(string)` | n/a | yes |
 | helm_config | CloudBees CI Helm chart configuration | `any` | <pre>{<br>  "values": [<br>    ""<br>  ]<br>}</pre> | no |
 | secrets_file | Secrets file yml path containing the secrets names:values to create the Kubernetes secret cbci-secrets. It can be mounted for Casc | `string` | `"secrets-values.yml"` | no |

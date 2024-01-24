@@ -12,12 +12,12 @@ output "cbci_namespace" {
 
 output "cbci_oc_url" {
   description = "Operation Center URL for CloudBees CI Add-on using Subdomain and Certificates."
-  value       = "https://cjoc.${var.hostname}"
+  value       = "https://cjoc.${var.hosted_zone}"
 }
 
 output "cbci_domain_name" {
   description = "Route 53 Domain Name to host CloudBees CI Services."
-  value       = var.hostname
+  value       = var.hosted_zone
 }
 
 output "cbci_oc_pod" {
@@ -37,5 +37,5 @@ output "cbci_liveness_probe_int" {
 
 output "cbci_liveness_probe_ext" {
   description = "Operation Center Service External Liveness Probe for CloudBees CI Add-on."
-  value       = "curl -sSf https://cjoc.${var.hostname}/whoAmI/api/json > /dev/null"
+  value       = "curl -sSf https://cjoc.${var.hosted_zone}/whoAmI/api/json > /dev/null"
 }

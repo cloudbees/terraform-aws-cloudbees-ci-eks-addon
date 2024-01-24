@@ -54,14 +54,14 @@ resource "helm_release" "cloudbees_ci" {
   version    = try(var.helm_config.version, "3.15666.0+5ea03547ce92")
   repository = try(var.helm_config.repository, "https://public-charts.artifacts.cloudbees.com/repository/public/")
   values = local.create_secret ? concat(var.helm_config.values, local.oc_secrets_mount, [templatefile("${path.module}/values.yml", {
-    hostname     = var.hostname
+    hosted_zone  = var.hosted_zone
     cert_arn     = var.cert_arn
     LicFirstName = var.temp_license["first_name"]
     LicLastName  = var.temp_license["last_name"]
     LicEmail     = var.temp_license["email"]
     LicCompany   = var.temp_license["company"]
     })]) : concat(var.helm_config.values, [templatefile("${path.module}/values.yml", {
-    hostname     = var.hostname
+    hosted_zone  = var.hosted_zone
     cert_arn     = var.cert_arn
     LicFirstName = var.temp_license["first_name"]
     LicLastName  = var.temp_license["last_name"]

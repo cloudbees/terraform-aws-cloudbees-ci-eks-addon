@@ -1,4 +1,4 @@
-domain_name = "example.domain.com" # Required. Domain name used by the CloudBees CI instance.
+hosted_zone = "example.domain.com" # Required. Route 53 Hosted Zone to host CloudBees CI subdomains records.
 
 temp_license = { # Required. Temporary license details.
   first_name  = "Foo"
@@ -8,9 +8,9 @@ temp_license = { # Required. Temporary license details.
 }
 
 # tags = {  # Optional. Tags for the resources created. Default set to empty. Shared among all.
-#   "cb-owner" : "professional-services"
-#   "cb-user" : "crodriguezlopez"
-#   "cb-environment" : "demo"
+#   "cb-owner" : "team-services"
+#   "cb-user" : "demo-user"
+#   "cb-environment" : "demo-env"
 # }
 
 # suffix = my-demo #Optional

@@ -1,5 +1,5 @@
 data "aws_route53_zone" "this" {
-  name = var.domain_name
+  name = var.hosted_zone
 }
 
 data "aws_availability_zones" "available" {}
@@ -37,7 +37,7 @@ locals {
 module "eks_blueprints_addon_cbci" {
   source = "../../"
 
-  hostname     = var.domain_name
+  hosted_zone  = var.hosted_zone
   cert_arn     = module.acm.acm_certificate_arn
   temp_license = var.temp_license
 
@@ -93,7 +93,7 @@ module "eks_blueprints_addons" {
   enable_external_dns = true
   external_dns = {
     values = [templatefile("k8s/extdns-values.yml", {
-      zoneDNS = var.domain_name
+      zoneDNS = var.hosted_zone
     })]
   }
   external_dns_route53_zone_arns      = [local.route53_zone_arn]
@@ -196,9 +196,9 @@ module "acm" {
   version = "4.3.2"
 
   #Important: Application Services Hostname must be the same as the domain name or subject_alternative_names
-  domain_name = var.domain_name
+  domain_name = var.hosted_zone
   subject_alternative_names = [
-    "*.${var.domain_name}" # For subdomains example.${var.domain_name}
+    "*.${var.hosted_zone}" # For subdomains example.${var.domain_name}
   ]
 
   #https://docs.aws.amazon.com/acm/latest/userguide/dns-validation.html

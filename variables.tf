@@ -11,9 +11,13 @@ variable "helm_config" {
   }
 }
 
-variable "hostname" {
+variable "hosted_zone" {
   description = "Route53 Hosted zone name"
   type        = string
+  validation {
+    condition     = trim(var.hosted_zone, " ") != ""
+    error_message = "Host name must not be en empty string."
+  }
 }
 
 variable "cert_arn" {

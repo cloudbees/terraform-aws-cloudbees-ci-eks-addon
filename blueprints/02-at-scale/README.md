@@ -36,7 +36,7 @@ Once you have familiarized yourself with the [Getting Started blueprint](../01-g
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| domain_name | Desired domain name (e.g. example.com) used as suffix for CloudBees CI subdomains (e.g. cjoc.example.com). It requires to be mapped within an existing Route 53 Hosted Zone. | `string` | n/a | yes |
+| hosted_zone | Route 53 Hosted Zone. CloudBees CI Apps is configured to use subdomains in this Hosted Zone. | `string` | n/a | yes |
 | temp_license | Temporary license details. | `map(string)` | n/a | yes |
 | grafana_admin_password | Grafana admin password. | `string` | `"change.me"` | no |
 | suffix | Unique suffix to be assigned to all resources | `string` | `""` | no |
