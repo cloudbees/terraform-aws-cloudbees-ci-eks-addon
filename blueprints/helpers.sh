@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -e
+set -euo pipefail
 
 SCRIPTDIR="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -17,10 +17,6 @@ test-all () {
     export ROOT="$bp"
     cd "$SCRIPTDIR"/.. && make test
   done
-}
-
-dummy () {
-  echo "elo"
 }
 
 get-tf-output () {
