@@ -34,7 +34,6 @@ define destroy
 	$(call confirmation,Destroy $(1))
 	@terraform -chdir=$(MKFILEDIR)/blueprints/$(1) destroy -target=module.eks_blueprints_addon_cbci -auto-approve
 	@terraform -chdir=$(MKFILEDIR)/blueprints/$(1) destroy -target=module.eks_blueprints_addons -auto-approve
-	@terraform -chdir=$(MKFILEDIR)/blueprints/$(1) destroy -target=time_static.epoch -auto-approve
 	@terraform -chdir=$(MKFILEDIR)/blueprints/$(1) destroy -target=module.eks -auto-approve
 	@terraform -chdir=$(MKFILEDIR)/blueprints/$(1) destroy -auto-approve
 	@rm -f $(MKFILEDIR)/blueprints/$(1)/terraform.output
