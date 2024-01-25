@@ -7,3 +7,15 @@ tolerations:
     operator: Equal
     value: cb-apps
     effect: NoSchedule
+
+
+cloudWatchLogs:
+  enabled: true
+  region: "${region}"
+  logRetentionDays : ${log_retention_days}
+
+s3:
+  enabled: true
+  region: "${region}"
+  bucket: "${bucketName}"
+  s3KeyFormat: /fluentbit/$TAG/%Y-%m-%d/%H-%M-%S

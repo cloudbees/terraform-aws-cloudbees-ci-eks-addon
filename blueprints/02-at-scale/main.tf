@@ -47,6 +47,8 @@ locals {
 
   epoch_millis = time_static.epoch.unix * 1000
 
+  cloudwatch_logs_expiration_days = 7
+  s3_objects_expiration_days      = 90
 }
 
 resource "time_static" "epoch" {
@@ -165,9 +167,40 @@ module "eks_blueprints_addons" {
 
   enable_aws_for_fluentbit = true
 
+  aws_for_fluentbit_cw_log_group = {
+    create          = true
+    use_name_prefix = true # Set this to true to enable name prefix
+    name_prefix     = "eks-cluster-logs-"
+  }
+
   aws_for_fluentbit = {
-    enable_containerinsights = true
-    values                   = [file("k8s/aws-for-fluent-bit-values.yml")]
+    #Enable Container Insights just for troubleshooting
+    #https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/ContainerInsights.html
+    enable_containerinsights = false
+    values = [templatefile("k8s/aws-for-fluent-bit-values.yml", {
+      region             = local.region
+      bucketName         = module.cbci_s3_bucket.s3_bucket_id
+      log_retention_days = local.cloudwatch_logs_expiration_days
+    })]
+    kubelet_monitoring = true
+    chart_version      = "0.1.28"
+    set = [{
+      name  = "cloudWatchLogs.autoCreateGroup"
+      value = true
+      },
+      {
+        name  = "hostNetwork"
+        value = true
+      },
+      {
+        name  = "dnsPolicy"
+        value = "ClusterFirstWithHostNet"
+      }
+    ]
+    s3_bucket_arns = [
+      module.cbci_s3_bucket.s3_bucket_arn,
+      "${module.cbci_s3_bucket.s3_bucket_arn}/fluentbit/*"
+    ]
   }
 
   tags = local.tags
@@ -298,8 +331,10 @@ module "eks" {
   }
 
   #https://docs.aws.amazon.com/eks/latest/userguide/control-plane-logs.html
-  create_cloudwatch_log_group = true
-  cluster_enabled_log_types   = ["audit", "api", "authenticator", "controllerManager", "scheduler"]
+  #https://aws.amazon.com/blogs/containers/understanding-and-cost-optimizing-amazon-eks-control-plane-logs/
+  create_cloudwatch_log_group            = true
+  cluster_enabled_log_types              = ["audit", "api", "authenticator", "controllerManager", "scheduler"]
+  cloudwatch_log_group_retention_in_days = local.cloudwatch_logs_expiration_days
 
   tags = local.tags
 }
@@ -591,6 +626,31 @@ module "cbci_s3_bucket" {
       }
     }
   }
+
+  #https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lifecycle-mgmt.html
+  #https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_lifecycle_configuration
+  lifecycle_rule = [
+    {
+      #Use multiple rules to apply different transitions and expiration based on filters (prefix, tags, etc)
+      id      = "general"
+      enabled = true
+
+      transition = [
+        {
+          days          = 30
+          storage_class = "ONEZONE_IA"
+          }, {
+          days          = 60
+          storage_class = "GLACIER"
+        }
+      ]
+
+      expiration = {
+        days                         = local.s3_objects_expiration_days
+        expired_object_delete_marker = true
+      }
+    }
+  ]
 
   tags = local.tags
 }

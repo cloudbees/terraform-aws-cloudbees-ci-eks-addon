@@ -48,7 +48,8 @@ Once you have familiarized yourself with the [Getting Started blueprint](../01-g
 |------|-------------|
 | acm_certificate_arn | ACM certificate ARN |
 | aws_backup_efs_protected_resource | AWS Backup Protected Resource descriction for EFS Drive. |
-| aws_fluentbit_logstreams | AWS CloudWatch Log Streams for FluentBit. |
+| aws_logstreams_containerinsights | AWS CloudWatch Log Streams from Container Insights. Use only when eks_blueprints_addons.aws_for_fluentbit.enable_containerinsights is true. |
+| aws_logstreams_fluentbit | AWS CloudWatch Log Streams from FluentBit. |
 | cbci_controller_b_hibernation_post_queue_ws_cache | Team B Hibernation Monitor Endpoint to Build Workspace Cache. It expects CBCI_ADMIN_TOKEN as environment variable. |
 | cbci_controller_c_hpa | Team C Horizontal Pod Autoscaling. |
 | cbci_controllers_pods | Operation Center Pod for CloudBees CI Add-on. |
@@ -114,7 +115,7 @@ Additionally, the following is required:
 > [!IMPORTANT]
 > The declarative Casc defition overrides anything modified at UI (in case they overlap) at the next time the Controller is restarted.
 
-- From the previous validation you can tell that 2 replicas running for `team-c-ha`. This is because [CloudBees CI HA/HS](https://docs.cloudbees.com/docs/cloudbees-ci/latest/ha-install-guide/) is enabled in this controller, where you can follow the steps from [Getting Started With CloudBees CI High Availability - CloudBees TV 🎥](https://www.youtube.com/watch?v=Qkf9HaA2wio). See Horizontal Pod Autoscaling enabled by:
+- From the previous validation, you can tell that 2 replicas running for `team-c-ha`. This is because [CloudBees CI HA/HS](https://docs.cloudbees.com/docs/cloudbees-ci/latest/ha-install-guide/) is enabled in this controller, where you can follow the steps from [Getting Started With CloudBees CI High Availability - CloudBees TV 🎥](https://www.youtube.com/watch?v=Qkf9HaA2wio). See Horizontal Pod Autoscaling enabled by:
 
   ```sh
   eval $(terraform output --raw cbci_controller_c_hpa)
@@ -194,11 +195,22 @@ Additionally, the following is required:
     eval $(terraform output --raw grafana_dashboard)
     ```  
 
-- Logs: Inside CloudWatch Logs Group `/aws/containerinsights/<CLUSTER_NAME>/application` can be found Log streams for all the K8s Services running in the cluster, including CloudBees CI Apps.
+- Logs:
 
-```sh
-  eval $(terraform output --raw aws_fluentbit_logstreams) | jq '.[] | select(.logStreamName | contains("jenkins"))'
-```
+  - Applications logs: Fluent bit acts as a router:
+
+    - Short-term Application logs live in CloudWatch Logs Group `/aws/containerinsights/<CLUSTER_NAME>/application` can be found Log streams for all the K8s Services running in the cluster, including CloudBees CI Apps.
+
+    ```sh
+      eval $(terraform output --raw aws_fluentbit_logstreams) | jq '.[] | select(.logStreamName | contains("jenkins"))'
+    ```
+
+    - Long-term Application logs live in a s3 Bucket
+
+  - Build logs:
+
+    - Short-term lives in CloudBees CI Controller and managed by [Build Discarder | Jenkins plugin](https://plugins.jenkins.io/build-discarder/) - which is installed and configured by CasC.
+    - Long-term logs can be handled by [Artifact Manager on S3 | Jenkins plugin](https://plugins.jenkins.io/artifact-manager-s3/) like any other artifact to be sent to s3 Bucket - which is installed and configured by CasC.
 
 ## Destroy
 
