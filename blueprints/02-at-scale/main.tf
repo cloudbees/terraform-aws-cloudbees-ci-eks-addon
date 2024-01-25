@@ -10,13 +10,15 @@ locals {
   #For g3 SC, Issue #51
   #az_a = ["${local.region}a"]
 
-  vpc_name             = "${local.name}-vpc"
-  cluster_name         = "${local.name}-eks"
-  efs_name             = "${local.name}-efs"
-  resource_group_name  = "${local.name}-rg"
-  bucket_name          = "${local.name}-s3"
-  kubeconfig_file      = "kubeconfig_${local.name}.yaml"
-  kubeconfig_file_path = abspath("k8s/${local.kubeconfig_file}")
+  vpc_name              = "${local.name}-vpc"
+  cluster_name          = "${local.name}-eks"
+  efs_name              = "${local.name}-efs"
+  resource_group_name   = "${local.name}-rg"
+  bucket_name           = "${local.name}-s3"
+  cbci_instance_profile = "${local.name}-instance_profile"
+  cbci_iam_role         = "${local.name}-iam_role_mn"
+  kubeconfig_file       = "kubeconfig_${local.name}.yaml"
+  kubeconfig_file_path  = abspath("k8s/${local.kubeconfig_file}")
 
   hibernation_monitor_url = "https://hibernation-${module.eks_blueprints_addon_cbci.cbci_namespace}.${module.eks_blueprints_addon_cbci.cbci_domain_name}"
 
@@ -42,13 +44,19 @@ locals {
     "tf-repository" = "github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon"
   })
 
-  velero_s3_backup_location = "${module.cbci_s3_bucket.s3_bucket_arn}/velero"
-  velero_bk_demo            = "team-a-pvc-bk"
+  #s3 application prefixes
+  cbci_s3_location      = "${module.cbci_s3_bucket.s3_bucket_arn}/cbci"
+  fluentbit_s3_location = "${module.cbci_s3_bucket.s3_bucket_arn}/fluentbit"
+  velero_s3_location    = "${module.cbci_s3_bucket.s3_bucket_arn}/velero"
+
+  velero_bk_demo = "team-a-pvc-bk"
 
   epoch_millis = time_static.epoch.unix * 1000
 
   cloudwatch_logs_expiration_days = 7
   s3_objects_expiration_days      = 90
+
+
 }
 
 resource "time_static" "epoch" {
@@ -149,7 +157,7 @@ module "eks_blueprints_addons" {
   #aws_node_termination_handler_asg_arns = data.aws_autoscaling_groups.eks_node_groups.arns
   enable_velero = true
   velero = {
-    s3_backup_location = local.velero_s3_backup_location
+    s3_backup_location = local.velero_s3_location
   }
 
   enable_kube_prometheus_stack = true
@@ -199,7 +207,7 @@ module "eks_blueprints_addons" {
     ]
     s3_bucket_arns = [
       module.cbci_s3_bucket.s3_bucket_arn,
-      "${module.cbci_s3_bucket.s3_bucket_arn}/fluentbit/*"
+      "${local.fluentbit_s3_location}/*"
     ]
   }
 
@@ -356,7 +364,7 @@ data "aws_iam_policy_document" "managed_ng_assume_role_policy" {
 }
 
 resource "aws_iam_role" "managed_ng" {
-  name                  = "${local.name}-iam_role_mn"
+  name                  = local.cbci_iam_role
   description           = "EKS Managed Node group IAM Role"
   assume_role_policy    = data.aws_iam_policy_document.managed_ng_assume_role_policy.json
   path                  = "/"
@@ -384,13 +392,13 @@ resource "aws_iam_role" "managed_ng" {
               "s3:GetObject",
               "s3:DeleteObject"
             ],
-            "Resource" : "arn:aws:s3:::${module.cbci_s3_bucket.s3_bucket_id}/cbci/*"
+            "Resource" : "${local.cbci_s3_location}/*"
           },
           {
             "Sid" : "cbciS3BucketList",
             "Effect" : "Allow",
             "Action" : "s3:ListBucket",
-            "Resource" : "arn:aws:s3:::${module.cbci_s3_bucket.s3_bucket_id}"
+            "Resource" : module.cbci_s3_bucket.s3_bucket_arn
             "Condition" : {
               "StringLike" : {
                 "s3:prefix" : "cbci/*"
@@ -405,7 +413,7 @@ resource "aws_iam_role" "managed_ng" {
 }
 
 resource "aws_iam_instance_profile" "managed_ng" {
-  name = "${local.name}-instance_profile"
+  name = local.cbci_instance_profile
   role = aws_iam_role.managed_ng.name
   path = "/"
 
