@@ -10,8 +10,23 @@ on:
 jobs:
   build:
     steps:
-      - name: Say hello
-        uses: docker://golang:1.20.3-alpine3.17
-        shell: sh
-        run: |
-          echo "hello world 2!"
+    - name: Checkout code
+      uses: cloudbees-io/checkout@v1
+
+    - name: Configure AWS Credentials
+      uses: cloudbees-io/configure-aws-credentials@v1
+      with:
+        aws-region: us-east-1
+        aws-access-key-id: ${{ secrets.tfawscb_aws_access_key_id }}
+        aws-secret-access-key: ${{ secrets.tfawscb_aws_secret_access_key }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: cloudbees-io/configure-ecr-credentials@v1
+
+    - name: Build, tag, and push docker image to Amazon ECR
+      uses: cloudbees-io/kaniko@v1
+      with:
+       dockerfile: path/to/Dockerfile
+       context: .
+       destination: public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
