@@ -18,18 +18,3 @@ jobs:
       run: |
        ls -la
 
-    - name: Configure AWS Credentials
-      uses: cloudbees-io/configure-aws-credentials@v1
-      with:
-        aws-region: us-east-1
-        aws-access-key-id: ${{ secrets.ssingh_aws_access_key_id }}
-        aws-secret-access-key: ${{ secrets.ssingh_aws_secret_access_key_id }}
-
-    - name: Login to Amazon ECR
-      id: login-ecr
-      uses: cloudbees-io/configure-ecr-credentials@v1
-
-    - name: Build, tag, and push docker image to Amazon ECR
-      uses: cloudbees-io/kaniko@v1
-      with:
-       destination: 324005994172.dkr.ecr.us-east-1.amazonaws.com/saas-test
