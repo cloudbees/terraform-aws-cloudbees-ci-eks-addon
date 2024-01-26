@@ -19,8 +19,7 @@ jobs:
         aws-region: us-east-1
         aws-access-key-id: ${{ secrets.tfawscb_aws_access_key_id }}
         aws-secret-access-key: ${{ secrets.tfawscb_aws_secret_access_key }}
-        role-to-assume: cloudbees-infra-mgmt-role
-        role-external-id: cloudbees
+        role-to-assume: infra-admin
         role-duration-seconds: "3600"
 
     - name: Blueprints Deploy, Validate, Destroy and Clean
