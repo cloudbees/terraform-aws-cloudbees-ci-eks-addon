@@ -24,6 +24,7 @@ jobs:
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
       run : |
         export CI=true
+        terraform init
         ROOT=02-at-scale make test
 
 
