@@ -12,9 +12,21 @@ jobs:
     steps:
     - name: Checkout code
       uses: cloudbees-io/checkout@v1
-    - name: Maven Build
-      uses: docker://maven:3-openjdk-11
-      shell: sh
-      run: |
-       ls -la
 
+    - name: Configure AWS Credentials
+      uses: cloudbees-io/configure-aws-credentials@v1
+      with:
+        aws-region: us-east-1
+        aws-access-key-id: ${{ secrets.tfawscb_aws_access_key_id }}
+        aws-secret-access-key: ${{ secrets.tfawscb_aws_secret_access_key }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: cloudbees-io/configure-ecr-credentials@v1
+
+    - name: Build, tag, and push docker image to Amazon ECR
+      uses: cloudbees-io/kaniko@v1
+      with:
+       dockerfile: blueprints/Dockerfile
+       context: .
+       destination: public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
