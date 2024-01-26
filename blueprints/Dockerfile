@@ -19,8 +19,8 @@ WORKDIR /${USER}
 USER ${USER}
 
 COPY ${DOCKERFILE_PATH}/.tool-versions .tool-versions
-RUN echo "source .bash_profile" >> .bashrc && \
-    cat <<EOF >> .bash_profile
+RUN echo "source .bp_agent_profile" >> .bashrc && \
+    cat <<EOF >> .bp_agent_profile
 PATH=/${USER}/.asdf/shims:/home/$USER/.asdf/bin:${PATH}
 source /${USER}/.asdf/asdf.sh
 rm -rf .asdf/shims/* && asdf reshim
