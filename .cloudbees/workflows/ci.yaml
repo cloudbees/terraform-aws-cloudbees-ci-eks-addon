@@ -12,7 +12,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: cloudbees-io/checkout@v1
-      path: src
+      with:
+        path: 'src'
 
     - name: Configure AWS Credentials
       uses: cloudbees-io/configure-aws-credentials@v1
