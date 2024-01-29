@@ -54,7 +54,7 @@ define clean
 	@cd blueprints/$(ROOT) && find -name ".terraform.lock.hcl" -type f | xargs rm -f
 	@cd blueprints/$(ROOT) && find -name "kubeconfig_*.yaml" -type f | xargs rm -f
 	@cd blueprints/$(ROOT) && find -name "terraform.output" -type f | xargs rm -f
-	@cd blueprints && find -name terraform.log -type f | xargs rm -f
+	@cd blueprints/$(ROOT) && find -name terraform.log -type f | xargs rm -f
 endef
 
 .PHONY: dRun
@@ -63,7 +63,7 @@ dRun:
 	$(eval IMAGE := $(shell docker image ls | grep -c local.cloudbees/bp-agent))
 	@if [ "$(IMAGE)" == "0" ]; then \
 		printf $(MSG_INFO) "Building Docker Image local.cloudbees/bp-agent:latest" && \
-		docker build . --file $(MKFILEDIR)/blueprints/Dockerfile --tag local.cloudbees/bp-agent:latest; \
+		docker build . --file $(MKFILEDIR)/.docker/Dockerfile --tag local.cloudbees/bp-agent:latest; \
 		fi
 	docker run --rm -it --name bp-agent \
 		-v $(MKFILEDIR):/$(BP_AGENT_USER)/cbci-eks-addon -v $(HOME)/.aws:/$(BP_AGENT_USER)/.aws \
