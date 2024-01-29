@@ -23,7 +23,7 @@ jobs:
         aws-secret-access-key: ${{ secrets.tfawscb_aws_secret_access_key }}
 
     - name: Blueprints Deploy, Validate, Destroy and Clean
-      uses: public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon-v2:latest
+      uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon-v2:latest
       run : |
         ls -laR
         whoami
