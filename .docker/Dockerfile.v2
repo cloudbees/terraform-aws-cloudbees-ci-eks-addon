@@ -20,9 +20,6 @@ RUN curl -sLO https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_$
     mv terraform /usr/bin/terraform && \
     rm terraform_${TF_VERSION}_linux_${ARCH}.zip
 
-ADD  --chmod=655 https://github.com/jqlang/jq/releases/download/${JQ_VERSION}/jq-linux-${ARCH} /usr/bin/jq
-
-
 RUN adduser -s /bin/bash -h /${USER} -D ${USER}
 WORKDIR /${USER}
 USER ${USER}
