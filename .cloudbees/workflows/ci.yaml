@@ -25,7 +25,5 @@ jobs:
     - name: Blueprints Deploy, Validate, Destroy and Clean
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon-v2:latest
       run : |
-        ls -laR
-        whoami
-        pwd
-        echo "Hola"
+        make
+        terraform init
