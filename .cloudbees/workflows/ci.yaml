@@ -24,4 +24,5 @@ jobs:
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
       run : |
         export CI=true
-        make test
+        make
+        ls -laR
