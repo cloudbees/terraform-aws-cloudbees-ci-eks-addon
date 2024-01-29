@@ -9,8 +9,10 @@ MSG_WARN 			:= "\033[0;33m[WARN] %s\033[0m\n"
 MSG_ERROR 			:= "\033[0;31m[ERROR] %s\033[0m\n"
 
 #https://developer.hashicorp.com/terraform/internals/debugging
-export TF_LOG=INFO
-export TF_LOG_PATH=$(MKFILEDIR)/blueprints/terraform.log
+ifeq ($(CI),false)
+	export TF_LOG=INFO
+	export TF_LOG_PATH=$(MKFILEDIR)/blueprints/terraform.log
+endif
 
 define confirmation
 	@if [ $(CI) == false ]; then \
