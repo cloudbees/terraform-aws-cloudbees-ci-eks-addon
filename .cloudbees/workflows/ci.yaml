@@ -24,10 +24,4 @@ jobs:
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
       run : |
         export CI=true
-        ROOT=01-getting-started make test
-
-    - name: Blueprints 02-at-scale
-      uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
-      run : |
-        export CI=true
-        ROOT=02-at-scale make test
+        make test
