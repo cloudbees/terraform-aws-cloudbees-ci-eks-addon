@@ -1,0 +1,32 @@
+apiVersion: automation.cloudbees.io/v1alpha1
+kind: workflow
+name: agent2
+
+on:
+  push:
+    branches:
+      - '**'
+
+jobs:
+  build:
+    steps:
+    - name: Checkout code
+      uses: cloudbees-io/checkout@v1
+
+    - name: Configure AWS Credentials
+      uses: cloudbees-io/configure-aws-credentials@v1
+      with:
+        aws-region: us-east-1
+        aws-access-key-id: ${{ secrets.tfawscb_aws_access_key_id }}
+        aws-secret-access-key: ${{ secrets.tfawscb_aws_secret_access_key }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: cloudbees-io/configure-ecr-credentials@v1
+
+    - name: Build, tag, and push docker image to Amazon ECR
+      uses: cloudbees-io/kaniko@v1
+      with:
+        dockerfile: .docker/Dockerfile.v2
+        context: .
+        destination: public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon-v2:latest
