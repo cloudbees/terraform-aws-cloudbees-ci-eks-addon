@@ -28,10 +28,10 @@ RUN curl -sLO https://storage.googleapis.com/kubernetes-release/release/v${KUBEC
 
 RUN curl -sLO https://github.com/vmware-tanzu/velero/releases/download/v${VELERO_VERSION}/velero-v${VELERO_VERSION}-linux-${ARCH}.tar.gz && \
     tar zxvf velero-v${VELERO_VERSION}-linux-${ARCH}.tar.gz && \
-    mv velero-v${VELERO_VERSION}-linux-${ARCH} /usr/bin/velero && \
+    mv velero-v${VELERO_VERSION}-linux-${ARCH}/velero /usr/bin/velero && \
     chmod +x /usr/bin/velero && \
     rm velero-v${VELERO_VERSION}-linux-${ARCH}.tar.gz
 
-RUN adduser -s /bin/bash -h /${USER} -D ${USER}
-WORKDIR /${USER}
-USER ${USER}
+# RUN adduser -s /bin/bash -h /${USER} -D ${USER}
+# WORKDIR /${USER}
+# USER ${USER}
