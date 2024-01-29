@@ -27,6 +27,6 @@ jobs:
     - name: Build, tag, and push docker image to Amazon ECR
       uses: cloudbees-io/kaniko@v1
       with:
-        dockerfile: .docker/Dockerfile.v2
+        dockerfile: .docker/Dockerfile.v1
         context: .
         destination: public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon-v1:latest
