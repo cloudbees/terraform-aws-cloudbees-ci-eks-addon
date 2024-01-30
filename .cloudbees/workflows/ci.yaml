@@ -19,6 +19,9 @@ jobs:
         aws-region: us-east-1
         aws-access-key-id: ${{ secrets.tfawscb_aws_access_key_id }}
         aws-secret-access-key: ${{ secrets.tfawscb_aws_secret_access_key }}
+        role-to-assume: cloudbees-infra-mgmt-role
+        role-external-id: cloudbees
+        role-duration-seconds: "3600"
 
     - name: Blueprints 01-getting-started
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
