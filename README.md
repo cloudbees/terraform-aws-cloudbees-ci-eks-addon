@@ -52,7 +52,7 @@ Blueprint `deploy` and `destroy` phases use the same tooling requirement per [AW
 Nevertheless, the Blueprint `validate` phase might require additional toolings like `jq` and `velero`.
 
 > [!NOTE]
-> There is a companion [Dockerfile](blueprints/Dockerfile) to run the blueprints in a containerized Dev environment ensuring dependecies are met. It can be built by using the [Makefile](Makefile) target `make dRun`.
+> There is a companion [Dockerfile](.docker/Dockerfile) to run the blueprints in a containerized Dev environment ensuring dependecies are met. It can be built by using the [Makefile](Makefile) target `make dRun`.
 
 ### AWS Authentication
 
