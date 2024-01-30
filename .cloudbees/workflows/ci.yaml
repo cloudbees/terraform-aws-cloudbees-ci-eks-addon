@@ -23,18 +23,20 @@ jobs:
     - name: Blueprints 01-getting-started
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
       run : |
+        export CI=true
+        export ROOT=01-getting-started
         cat <<EOT >> blueprints/greetings.txt
         tags = {
           "cb-owner" : "professional-services"
-          "cb-user" : "crodriguezlopez"
+          "cb-user" : "ci"
           "cb-purpose" : "demo"
         }
         hosted_zone = "bp.core.pscbdemos.com"
         temp_license = {
-          first_name  = "Carlos"
-          last_name  = "Lopez"
-          email = "crodriguezlopez@cloudbees.com"
+          first_name  = "CloudBees.io"
+          last_name  = "CI User"
+          email = "ci.user@cloudbees.com"
           company = "CloudBees Inc."
         }
         EOT
-        cat blueprints/greetings.txt
+        cat "blueprints/$ROOT/greetings.txt"
