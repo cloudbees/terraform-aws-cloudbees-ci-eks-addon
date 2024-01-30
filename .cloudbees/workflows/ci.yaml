@@ -10,8 +10,38 @@ on:
 jobs:
   build:
     steps:
-      - name: Say hello
-        uses: docker://golang:1.20.3-alpine3.17
-        shell: sh
-        run: |
-          echo "hello world 2!"
+    - name: Checkout code
+      uses: cloudbees-io/checkout@v1
+
+    - name: Configure AWS Credentials
+      uses: cloudbees-io/configure-aws-credentials@v1
+      with:
+        aws-region: us-east-1
+        aws-access-key-id: ${{ secrets.tfawscb_aws_access_key_id }}
+        aws-secret-access-key: ${{ secrets.tfawscb_aws_secret_access_key }}
+        role-to-assume: infra-admin-ci
+        role-external-id: cloudbees
+        role-duration-seconds: "3600"
+
+    - name: Blueprints 01-getting-started
+      uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
+      env:
+        ROOT: 01-getting-started
+      run : |
+        cat <<EOT >> blueprints/$ROOT/.auto.tfvars
+        tags = {
+          "cb-owner" : "professional-services"
+          "cb-user" : "ci"
+          "cb-purpose" : "demo"
+        }
+        hosted_zone = "bp.core.pscbdemos.com"
+        temp_license = {
+          first_name  = "CloudBees.io"
+          last_name  = "CI User"
+          email = "ci.user@cloudbees.com"
+          company = "CloudBees Inc."
+        }
+        suffix = "ci"
+        EOT
+        export CI=true
+        make test
