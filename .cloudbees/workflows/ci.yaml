@@ -41,6 +41,7 @@ jobs:
           email = "ci.user@cloudbees.com"
           company = "CloudBees Inc."
         }
+        suffix = "ci"
         EOT
         export CI=true
         make test
