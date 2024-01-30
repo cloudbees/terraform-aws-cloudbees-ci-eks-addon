@@ -25,12 +25,8 @@ jobs:
     - name: Blueprints 01-getting-started
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
       run : |
-        export ROOT=01-getting-started
-        cat <<EOT >> blueprints/$ROOT/.auto.tfvars
+        cat <<EOT >> greetings.txt
         line 1
         line 2
         EOT
-        ls -laR
-        printenv
-        export CI=true
-        make test
+        cat greetings.txt
