@@ -7,6 +7,11 @@ on:
     branches:
       - '**'
 
+env:
+  REGISTRY: public.ecr.aws/r1n1q0e5
+  APP_NAME: cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon
+  APP_VERSION: latest
+
 jobs:
   build:
     steps:
@@ -29,4 +34,4 @@ jobs:
       with:
         dockerfile: .docker/Dockerfile
         context: .
-        destination: public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
+        destination: ${{ env.REGISTRY }}/${{ env.APP_NAME }}:${{ env.APP_VERSION }}

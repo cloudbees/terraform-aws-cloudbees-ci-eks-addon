@@ -26,7 +26,7 @@ jobs:
     - name: Blueprints 01-getting-started
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
       env:
-        CI: true
+        CI: false # Set to true to run
         ROOT: 01-getting-started
       run : |
         cat <<EOT >> blueprints/$ROOT/.auto.tfvars
@@ -43,5 +43,4 @@ jobs:
           company = "CloudBees Inc."
         }
         EOT
-        printenv
-        #make test
+        make test
