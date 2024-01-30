@@ -26,7 +26,17 @@ jobs:
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
       run : |
         cat <<EOT >> greetings.txt
-        line 1
-        line 2
+        tags = {
+          "cb-owner" : "professional-services"
+          "cb-user" : "crodriguezlopez"
+          "cb-purpose" : "demo"
+        }
+        hosted_zone = "bp.core.pscbdemos.com"
+        temp_license = {
+          first_name  = "Carlos"
+          last_name  = "Lopez"
+          email = "crodriguezlopez@cloudbees.com"
+          company = "CloudBees Inc."
+        }
         EOT
         cat greetings.txt
