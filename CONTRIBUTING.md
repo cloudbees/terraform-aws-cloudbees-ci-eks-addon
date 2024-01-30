@@ -4,7 +4,7 @@ This document provides guidelines for contributing to the module.
 
 ## Dependencies
 
-Validate your changes inside the blueprint agent described in the [Dockerfile](blueprints/Dockerfile). which is using tooling listed in the [asdf](https://asdf-vm.com/) [tool-versions](blueprints/.tool-versions).
+Validate your changes inside the blueprint agent described in the [Dockerfile](.docker/Dockerfile).
 
 > **_NOTE:_** The agent and dependecies can be automated via [Makefile](Makefile) at the root of the project under the target `dRun`.
 
@@ -18,6 +18,10 @@ When working with the repository for the first time run pre-commit
 
 Run `pre-commit install`
 Run `pre-commit run --all-files`
+
+## CI Test
+
+* CI Tests are deployed into CloudBees platform inside the PS Organization.
 
 ## Release Drafter
 
