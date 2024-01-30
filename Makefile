@@ -65,7 +65,7 @@ dRun:
 	$(eval IMAGE := $(shell docker image ls | grep -c local.cloudbees/bp-agent))
 	@if [ "$(IMAGE)" == "0" ]; then \
 		printf $(MSG_INFO) "Building Docker Image local.cloudbees/bp-agent:latest" && \
-		docker build . --file $(MKFILEDIR)/.docker/Dockerfile --tag local.cloudbees/bp-agent:latest; \
+		docker build . --file $(MKFILEDIR)/.docker/Dockerfile.rootless --tag local.cloudbees/bp-agent:latest; \
 		fi
 	docker run --rm -it --name bp-agent \
 		-v $(MKFILEDIR):/$(BP_AGENT_USER)/cbci-eks-addon -v $(HOME)/.aws:/$(BP_AGENT_USER)/.aws \

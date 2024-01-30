@@ -32,6 +32,6 @@ RUN curl -sLO https://github.com/vmware-tanzu/velero/releases/download/v${VELERO
     chmod +x /usr/bin/velero && \
     rm velero-v${VELERO_VERSION}-linux-${ARCH}.tar.gz
 
-# RUN adduser -s /bin/bash -h /${USER} -D ${USER}
-# WORKDIR /${USER}
-# USER ${USER}
+RUN adduser -s /bin/bash -h /${USER} -D ${USER}
+WORKDIR /${USER}
+USER ${USER}

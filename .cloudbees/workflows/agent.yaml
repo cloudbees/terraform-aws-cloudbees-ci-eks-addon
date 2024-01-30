@@ -32,6 +32,6 @@ jobs:
     - name: Build, tag, and push docker image to Amazon ECR
       uses: cloudbees-io/kaniko@v1
       with:
-        dockerfile: .docker/Dockerfile
+        dockerfile: .docker/Dockerfile.root
         context: .
         destination: ${{ env.REGISTRY }}/${{ env.APP_NAME }}:${{ env.APP_VERSION }}
