@@ -25,7 +25,7 @@ jobs:
       run : |
         export CI=true
         export ROOT=01-getting-started
-        cat <<EOT >> blueprints/greetings.txt
+        cat <<EOT >> blueprints/$ROOT/greetings.txt
         tags = {
           "cb-owner" : "professional-services"
           "cb-user" : "ci"
