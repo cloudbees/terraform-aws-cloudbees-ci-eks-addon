@@ -30,6 +30,7 @@ jobs:
         line 1
         line 2
         EOT
-        cat blueprints/$ROOT/.auto.tfvars
+        ls -laR
+        printenv
         export CI=true
         make test
