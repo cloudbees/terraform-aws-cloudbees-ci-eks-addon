@@ -6,7 +6,8 @@ This document provides guidelines for contributing to the module.
 
 Validate your changes inside the blueprint agent described in the [Dockerfile](.docker/Dockerfile).
 
-> **_NOTE:_** The agent and dependecies can be automated via [Makefile](Makefile) at the root of the project under the target `dRun`.
+> [!NOTE]
+> The agent and dependecies can be automated via [Makefile](Makefile) at the root of the project under the target `dRun`. It is the same one used in the CI pipeline.
 
 ## Pre-commits: Linting, Formatting and Secrets Scanning
 
@@ -19,9 +20,9 @@ When working with the repository for the first time run pre-commit
 Run `pre-commit install`
 Run `pre-commit run --all-files`
 
-## CI Test
+## CI
 
-* CI Tests are deployed into CloudBees platform inside the PS Organization.
+* Blueprints [CI](.cloudbees/workflows/ci.yaml) are orchestrated into [CloudBees platform](https://www.cloudbees.com/products/saas-platform) inside CloudBees Inc, PS Organization suborganization (Runs [link](https://cloudbees.io/orgs/cloudbees~professional-services/components/94c50dcf-125e-4767-b9c5-58d6d669a1f6/runs))
 
 ## Release Drafter
 
