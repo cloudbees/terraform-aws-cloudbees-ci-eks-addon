@@ -50,7 +50,7 @@ jobs:
           email = "platform.ci@cloudbees.com"
           company = "CloudBees Inc."
         }
-        suffix = "ci"
+        suffix = "ci_v2"
         EOT
         cat <<EOT >> blueprints/${{ env.ROOT }}/backend.tf
         terraform {
@@ -61,6 +61,4 @@ jobs:
           }
         }
         EOT
-        cd blueprints/${{ env.ROOT }}
-        terraform init -reconfigure
-        terraform destroy -auto-approve
+        CI=true make test
