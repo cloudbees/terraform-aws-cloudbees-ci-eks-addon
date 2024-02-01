@@ -2,6 +2,7 @@ apiVersion: automation.cloudbees.io/v1alpha1
 kind: workflow
 name: ci
 
+#TODO: Replace by pull_request when it is supported
 on:
   push:
     branches:
