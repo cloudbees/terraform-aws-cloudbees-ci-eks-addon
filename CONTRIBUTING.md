@@ -22,7 +22,13 @@ Run `pre-commit run --all-files`
 
 ## CI
 
-* Blueprints [CI](.cloudbees/workflows/ci.yaml) are orchestrated into [CloudBees platform](https://www.cloudbees.com/products/saas-platform) inside CloudBees Inc, PS Organization suborganization (Runs [link](https://cloudbees.io/orgs/cloudbees~professional-services/components/94c50dcf-125e-4767-b9c5-58d6d669a1f6/runs))
+Blueprints [CI](.cloudbees/workflows/ci.yaml) are orchestrated into [CloudBees platform](https://www.cloudbees.com/products/saas-platform) inside CloudBees Inc, PS Organization suborganization (Runs [link](https://cloudbees.io/orgs/cloudbees~professional-services/components/94c50dcf-125e-4767-b9c5-58d6d669a1f6/runs))
+
+Pre-requisites:
+
+    - AWS User with permission to create resources in the target account (`AWS_TF_CBCI_EKS_AccessKeyID` and `AWS_TF_CBCI_EKS_SecretAccessKey`).
+    - AWS Role to assume in the target account, including a trust relationship with the user above.
+    - AWS Route 53 Zone Name to create DNS records.
 
 ## Release Drafter
 
