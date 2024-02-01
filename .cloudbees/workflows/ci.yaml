@@ -21,8 +21,8 @@ jobs:
       uses: cloudbees-io/configure-aws-credentials@v1
       with:
         aws-region: ${{ env.AWS_REGION }}
-        aws-access-key-id: ${{ secrets.tfawscb_aws_access_key_id }}
-        aws-secret-access-key: ${{ secrets.tfawscb_aws_secret_access_key }}
+        aws-access-key-id: ${{ secrets.AWS_TF_CBCI_EKS_AccessKeyID }}
+        aws-secret-access-key: ${{ secrets.AWS_TF_CBCI_EKS_SecretAccessKey }}
         role-to-assume: infra-admin-ci
         role-external-id: cloudbees
         role-duration-seconds: "3600"
