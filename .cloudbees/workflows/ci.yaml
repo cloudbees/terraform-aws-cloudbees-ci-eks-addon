@@ -61,5 +61,5 @@ jobs:
           }
         }
         EOT
+        cd blueprints/${{ env.ROOT }} && terraform init -reconfigure
         cd blueprints/${{ env.ROOT }} && terraform destroy -auto-approve
-        #CI=true make destroy
