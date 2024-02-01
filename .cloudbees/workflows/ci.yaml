@@ -12,30 +12,71 @@ on:
 
 env:
   AWS_REGION: us-east-1
-  AWS_ROLE_TO_ASSUME: infra-admin-ci
+  BUCKET_NAME_TF_STATE: ci-tf-state
+  ROUTE_53_HOSTED_ZONE: bp.core.pscbdemos.com
 
 jobs:
   build:
     steps:
-    - name: Checkout code
-      uses: cloudbees-io/checkout@v1
 
     - name: Configure AWS Credentials
       uses: cloudbees-io/configure-aws-credentials@v1
+      env:
+        AWS_ROLE_TO_ASSUME: infra-admin-ci
       with:
         aws-region: ${{ env.AWS_REGION }}
         aws-access-key-id: ${{ secrets.AWS_TF_CBCI_EKS_AccessKeyID }}
         aws-secret-access-key: ${{ secrets.AWS_TF_CBCI_EKS_SecretAccessKey }}
         role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
         role-external-id: cloudbees
-        role-duration-seconds: "3600"
+        role-duration-seconds: "7200"
 
-    - name: Blueprints 01-getting-started
+    - name: Create Terraform Backend Bucket if not exists
+      uses: docker://public.ecr.aws/aws-cli/aws-cli
+      shell: bash
+      run: |
+        aws s3api create-bucket \
+          --bucket ${{ env.BUCKET_NAME_TF_STATE }} \
+          --region ${{ env.AWS_REGION }} || echo "Bucket ${{ env.BUCKET_NAME_TF_STATE }} already exists"
+
+    - name: Checkout code
+      uses: cloudbees-io/checkout@v1
+
+    - name: Test 01-getting-started
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
       env:
         ROOT: 01-getting-started
-        BUCKET_NAME_TF_STATE: crodriguezlopez-tf-state
-        ROUTE_53_HOSTED_ZONE: bp.core.pscbdemos.com
+      run : |
+        cat <<EOT >> blueprints/${{ env.ROOT }}/.auto.tfvars
+        tags = {
+          "cb-owner" : "professional-services"
+          "cb-user" : "cb-platform"
+          "cb-purpose" : "ci"
+        }
+        hosted_zone = "${{ env.ROUTE_53_HOSTED_ZONE }}"
+        temp_license = {
+          first_name  = "CloudBees.io"
+          last_name  = "Platform"
+          email = "platform.ci@cloudbees.com"
+          company = "CloudBees Inc."
+        }
+        suffix = "ci_v2"
+        EOT
+        cat <<EOT >> blueprints/${{ env.ROOT }}/backend.tf
+        terraform {
+          backend "s3" {
+            bucket = "${{ env.BUCKET_NAME_TF_STATE }}"
+            key    = "blueprints/${{ env.ROOT }}/ci.terraform.tfstate"
+            region = "${{ env.AWS_REGION }}"
+          }
+        }
+        EOT
+        CI=true make test
+
+    - name: Test 01-getting-started
+      uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
+      env:
+        ROOT: 02-at-scale
       run : |
         cat <<EOT >> blueprints/${{ env.ROOT }}/.auto.tfvars
         tags = {
