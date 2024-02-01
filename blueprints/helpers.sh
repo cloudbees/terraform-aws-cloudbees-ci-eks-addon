@@ -2,7 +2,7 @@
 
 # Copyright (c) CloudBees, Inc.
 
-set -euox pipefail
+set -euo pipefail
 
 SCRIPTDIR="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
