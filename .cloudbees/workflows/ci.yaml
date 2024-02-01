@@ -28,7 +28,7 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_TF_CBCI_EKS_SecretAccessKey }}
         role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
         role-external-id: cloudbees
-        role-duration-seconds: "7200"
+        role-duration-seconds: "3600"
 
     - name: Create Terraform Backend Bucket if not exists
       uses: docker://public.ecr.aws/aws-cli/aws-cli
