@@ -14,6 +14,7 @@ env:
   AWS_REGION: us-east-1
   BUCKET_NAME_TF_STATE: ci-tf-state
   ROUTE_53_HOSTED_ZONE: bp.core.pscbdemos.com
+  AWS_ROLE_TO_ASSUME: infra-admin-ci
 
 jobs:
   build:
@@ -21,8 +22,6 @@ jobs:
 
     - name: Configure AWS Credentials
       uses: cloudbees-io/configure-aws-credentials@v1
-      env:
-        AWS_ROLE_TO_ASSUME: infra-admin-ci
       with:
         aws-region: ${{ env.AWS_REGION }}
         aws-access-key-id: ${{ secrets.AWS_TF_CBCI_EKS_AccessKeyID }}
