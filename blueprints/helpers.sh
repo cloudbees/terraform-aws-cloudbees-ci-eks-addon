@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# Copyright (c) CloudBees, Inc.
+
 set -euox pipefail
 
 SCRIPTDIR="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
