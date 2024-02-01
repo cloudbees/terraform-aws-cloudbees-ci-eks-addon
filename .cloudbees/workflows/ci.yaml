@@ -12,6 +12,7 @@ on:
 
 env:
   AWS_REGION: us-east-1
+  AWS_ROLE_TO_ASSUME: infra-admin-ci
 
 jobs:
   build:
@@ -25,7 +26,7 @@ jobs:
         aws-region: ${{ env.AWS_REGION }}
         aws-access-key-id: ${{ secrets.AWS_TF_CBCI_EKS_AccessKeyID }}
         aws-secret-access-key: ${{ secrets.AWS_TF_CBCI_EKS_SecretAccessKey }}
-        role-to-assume: infra-admin-ci
+        role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
         role-external-id: cloudbees
         role-duration-seconds: "3600"
 
@@ -53,13 +54,11 @@ jobs:
         EOT
         cat <<EOT >> blueprints/${{ env.ROOT }}/backend.tf
         terraform {
-
           backend "s3" {
             bucket = "${{ env.BUCKET_NAME_TF_STATE }}"
-            key    = "blueprints/${{ env.ROOT }}/terraform.tfstate"
+            key    = "blueprints/${{ env.ROOT }}/ci.terraform.tfstate"
             region = "${{ env.AWS_REGION }}"
           }
         }
         EOT
-        export CI=true
-        make test
+        CI=true make test
