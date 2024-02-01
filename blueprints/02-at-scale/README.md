@@ -157,6 +157,9 @@ Additionally, the following is required:
     eval $(terraform output --raw velero_restore_team_a)
     ```
 
+> [!NOTE]
+> It is possible to use also [CloudBees Backup plugin](https://docs.cloudbees.com/docs/cloudbees-ci/latest/backup-restore/cloudbees-backup-plugin) using [s3 as storage](https://docs.cloudbees.com/docs/cloudbees-ci/latest/backup-restore/cloudbees-backup-plugin#_amazon_s3) but the recommended approach is to use Velero for EBS Storage.
+
 - EFS Storage is protected in [AWS Backup](https://aws.amazon.com/backup/) with a regular Backup Plan. Additional On-Demand Backup can be created. Restore can be performed and item level (Access Points) or full restore.
 
   - Protected Resource
@@ -170,6 +173,9 @@ Additionally, the following is required:
     ```sh
     eval $(terraform output --raw efs_access_points) | . jq .AccessPoints[].RootDirectory.Path
     ```
+
+> [!NOTE]
+> At moment, there is not Best Practice to Restore Dinamically EFS PVCs (see [Issue 39](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/issues/39)). The only way would be using [CloudBees Backup plugin](https://docs.cloudbees.com/docs/cloudbees-ci/latest/backup-restore/cloudbees-backup-plugin) using [s3 as storage](https://docs.cloudbees.com/docs/cloudbees-ci/latest/backup-restore/cloudbees-backup-plugin#_amazon_s3).
 
 ### Observability
 
