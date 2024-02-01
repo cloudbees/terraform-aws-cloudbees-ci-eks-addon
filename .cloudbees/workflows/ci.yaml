@@ -13,8 +13,21 @@ on:
 env:
   AWS_REGION: us-east-1
   BUCKET_NAME_TF_STATE: cbci-eks-addon-bp-tf-state
-  ROUTE_53_HOSTED_ZONE: bp.core.pscbdemos.com
   AWS_ROLE_TO_ASSUME: infra-admin-ci
+  TF_AUTO_VARS_FILE: |
+    tags = {
+      "cb-owner" : "professional-services"
+      "cb-user" : "cb-platform"
+      "cb-purpose" : "ci"
+    }
+    hosted_zone =  bp.core.pscbdemos.com
+    temp_license = {
+      first_name  = "CloudBees.io"
+      last_name  = "Platform"
+      email = "platform.ci@cloudbees.com"
+      company = "CloudBees Inc."
+    }
+    suffix = "ci-v2"
 
 jobs:
   build:
@@ -48,19 +61,7 @@ jobs:
         ROOT: 01-getting-started
       run : |
         cat <<EOT >> blueprints/${{ env.ROOT }}/.auto.tfvars
-        tags = {
-          "cb-owner" : "professional-services"
-          "cb-user" : "cb-platform"
-          "cb-purpose" : "ci"
-        }
-        hosted_zone = "${{ env.ROUTE_53_HOSTED_ZONE }}"
-        temp_license = {
-          first_name  = "CloudBees.io"
-          last_name  = "Platform"
-          email = "platform.ci@cloudbees.com"
-          company = "CloudBees Inc."
-        }
-        suffix = "ci_v2"
+        ${{ env.TF_AUTO_VARS_FILE }}
         EOT
         cat <<EOT >> blueprints/${{ env.ROOT }}/backend.tf
         terraform {
@@ -79,19 +80,7 @@ jobs:
         ROOT: 02-at-scale
       run : |
         cat <<EOT >> blueprints/${{ env.ROOT }}/.auto.tfvars
-        tags = {
-          "cb-owner" : "professional-services"
-          "cb-user" : "cb-platform"
-          "cb-purpose" : "ci"
-        }
-        hosted_zone = "${{ env.ROUTE_53_HOSTED_ZONE }}"
-        temp_license = {
-          first_name  = "CloudBees.io"
-          last_name  = "Platform"
-          email = "platform.ci@cloudbees.com"
-          company = "CloudBees Inc."
-        }
-        suffix = "ci_v2"
+        ${{ env.TF_AUTO_VARS_FILE }}
         EOT
         cat <<EOT >> blueprints/${{ env.ROOT }}/backend.tf
         terraform {
@@ -102,6 +91,4 @@ jobs:
           }
         }
         EOT
-        cd blueprints/${{ env.ROOT }}
-        terraform init -reconfigure
-        terraform destroy -auto-approve
+        CI=true make test
