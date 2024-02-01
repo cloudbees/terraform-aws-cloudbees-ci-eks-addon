@@ -62,5 +62,4 @@ jobs:
         }
         EOT
         export CI=true
-        cat blueprints/${{ env.ROOT }}/.auto.tfvars
-        cat blueprints/${{ env.ROOT }}/backend.tf
+        make test
