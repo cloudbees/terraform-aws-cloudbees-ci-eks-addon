@@ -7,6 +7,9 @@ on:
     branches:
       - '**'
 
+env:
+  AWS_REGION: us-east-1
+
 jobs:
   build:
     steps:
@@ -16,7 +19,7 @@ jobs:
     - name: Configure AWS Credentials
       uses: cloudbees-io/configure-aws-credentials@v1
       with:
-        aws-region: us-east-1
+        aws-region: ${{ env.AWS_REGION }}
         aws-access-key-id: ${{ secrets.tfawscb_aws_access_key_id }}
         aws-secret-access-key: ${{ secrets.tfawscb_aws_secret_access_key }}
         role-to-assume: infra-admin-ci
@@ -28,20 +31,30 @@ jobs:
       env:
         ROOT: 01-getting-started
       run : |
-        cat <<EOT >> blueprints/$ROOT/.auto.tfvars
+        cat <<EOT >> blueprints/${{ env.ROOT }}/.auto.tfvars
         tags = {
           "cb-owner" : "professional-services"
-          "cb-user" : "ci"
-          "cb-purpose" : "demo"
+          "cb-user" : "cb-platform"
+          "cb-purpose" : "ci"
         }
         hosted_zone = "bp.core.pscbdemos.com"
         temp_license = {
           first_name  = "CloudBees.io"
-          last_name  = "CI User"
+          last_name  = "Platform"
           email = "ci.user@cloudbees.com"
           company = "CloudBees Inc."
         }
         suffix = "ci"
         EOT
+        cat <<EOT >> blueprints/${{ env.ROOT }}/backend.tf
+        terraform {
+
+          backend "s3" {
+            bucket = "crodriguezlopez-tf-state"
+            key    = "blueprints/${{ env.ROOT }}/terraform.tfstate"
+            region = "${{ env.AWS_REGION }}"
+          }
+        }
+        EOT
         export CI=true
-        make test
+        ls -laR
