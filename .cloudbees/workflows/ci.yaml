@@ -20,7 +20,7 @@ env:
       "cb-user" : "cb-platform"
       "cb-purpose" : "ci"
     }
-    hosted_zone =  bp.core.pscbdemos.com
+    hosted_zone =  "bp.core.pscbdemos.com"
     temp_license = {
       first_name  = "CloudBees.io"
       last_name  = "Platform"
@@ -79,9 +79,7 @@ jobs:
       env:
         ROOT: 02-at-scale
       run : |
-        cat <<EOT >> blueprints/${{ env.ROOT }}/.auto.tfvars
-        ${{ env.TF_AUTO_VARS_FILE }}
-        EOT
+        echo  ${{ env.TF_AUTO_VARS_FILE }} > blueprints/${{ env.ROOT }}/.auto.tfvars
         cat <<EOT >> blueprints/${{ env.ROOT }}/backend.tf
         terraform {
           backend "s3" {
