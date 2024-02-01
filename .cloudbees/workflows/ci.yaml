@@ -79,7 +79,7 @@ jobs:
       env:
         ROOT: 02-at-scale
       run : |
-        echo  blueprints/${{ env.ROOT }}/.auto.tfvars
+        cat <<EOT >> blueprints/${{ env.ROOT }}/.auto.tfvars
         ${{ env.TF_AUTO_VARS_FILE }}
         EOT
         cat <<EOT >> blueprints/${{ env.ROOT }}/backend.tf
@@ -91,4 +91,5 @@ jobs:
           }
         }
         EOT
+        cat blueprints/${{ env.ROOT }}/.auto.tfvars
         CI=true make test
