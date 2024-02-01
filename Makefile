@@ -52,11 +52,11 @@ define validate
 endef
 
 define clean
-	@cd blueprints/$(ROOT) && find -name ".terraform" -type d | xargs rm -rf
-	@cd blueprints/$(ROOT) && find -name ".terraform.lock.hcl" -type f | xargs rm -f
-	@cd blueprints/$(ROOT) && find -name "kubeconfig_*.yaml" -type f | xargs rm -f
-	@cd blueprints/$(ROOT) && find -name "terraform.output" -type f | xargs rm -f
-	@cd blueprints/$(ROOT) && find -name terraform.log -type f | xargs rm -f
+	@cd $(MKFILEDIR)/blueprints/$(ROOT) && find -name ".terraform" -type d | xargs rm -rf
+	@cd $(MKFILEDIR)/blueprints/$(ROOT) && find -name ".terraform.lock.hcl" -type f | xargs rm -f
+	@cd $(MKFILEDIR)/blueprints/$(ROOT) && find -name "kubeconfig_*.yaml" -type f | xargs rm -f
+	@cd $(MKFILEDIR)/blueprints/$(ROOT) && find -name "terraform.output" -type f | xargs rm -f
+	@cd $(MKFILEDIR)/blueprints/$(ROOT) && find -name terraform.log -type f | xargs rm -f
 endef
 
 .PHONY: dRun
@@ -89,7 +89,7 @@ deploy: guard-ROOT tfpreFlightChecks
 .PHONY: destroy
 destroy: ## Destroy Terraform Blueprint passed as parameter. Example: ROOT=02-at-scale make destroy
 destroy: guard-ROOT tfpreFlightChecks
-ifneq ("$(wildcard blueprints/$(ROOT)/terraform.output)","")
+ifneq ("$(wildcard $(MKFILEDIR)/blueprints/$(ROOT)/terraform.output)","")
 	$(call destroy,$(ROOT))
 else
 	@printf $(MSG_ERROR) "Blueprint $(ROOT) did not complete the Deployment target. It is not Ready for Destroy target but it is possible to destroy manually https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#destroy"
@@ -108,7 +108,7 @@ tfAction: guard-ROOT guard-ACTION tfpreFlightChecks
 .PHONY: validate
 validate: ## Validate CloudBees CI Blueprint deployment passed as parameter. Example: ROOT=02-at-scale make validate
 validate: guard-ROOT tfpreFlightChecks
-ifneq ("$(wildcard blueprints/$(ROOT)/terraform.output)","")
+ifneq ("$(wildcard $(MKFILEDIR)/blueprints/$(ROOT)/terraform.output)","")
 	$(call validate,$(ROOT))
 else
 	@printf $(MSG_ERROR) "Blueprint $(ROOT) did not complete the Deployment target thus it is not Ready to be validated."
@@ -116,16 +116,13 @@ endif
 
 .PHONY: test
 test: ## Runs a test for blueprint passed as parameters throughout their Terraform Lifecycle. Example: ROOT=02-at-scale make test
+test: guard-ROOT
 	@printf $(MSG_INFO) "Running Test for $(ROOT) blueprint ..."
 	$(call deploy,$(ROOT))
-	until ls blueprints/$(ROOT)/terraform.output; do sleep 3 && echo "Waiting for output file..."; done ;
-ifneq ("$(wildcard blueprints/$(ROOT)/terraform.output)","")
+	sleep 5
 	$(call validate,$(ROOT))
 	$(call destroy,$(ROOT))
 	$(call clean,$(ROOT))
-else
-	@printf $(MSG_ERROR) "Blueprint $(ROOT) did not complete the Deployment target thus it is not Ready for the following phases."
-endif
 
 .PHONY: test-all
 test-all: ## Runs test for all blueprints throughout their Terraform Lifecycle. Example: make test
