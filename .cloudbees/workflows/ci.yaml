@@ -12,7 +12,7 @@ on:
 
 env:
   AWS_REGION: us-east-1
-  BUCKET_NAME_TF_STATE: ci-tf-state
+  BUCKET_NAME_TF_STATE: cbci-eks-addon-bp
   ROUTE_53_HOSTED_ZONE: bp.core.pscbdemos.com
   AWS_ROLE_TO_ASSUME: infra-admin-ci
 
@@ -31,9 +31,10 @@ jobs:
         role-duration-seconds: "3600"
 
     - name: Create Terraform Backend Bucket if not exists
-      uses: docker://public.ecr.aws/aws-cli/aws-cli
+      uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
       shell: bash
       run: |
+        set -x
         aws s3api create-bucket \
           --bucket ${{ env.BUCKET_NAME_TF_STATE }} \
           --region ${{ env.AWS_REGION }} || echo "Bucket ${{ env.BUCKET_NAME_TF_STATE }} already exists"
