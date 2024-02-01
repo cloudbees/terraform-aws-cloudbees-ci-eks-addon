@@ -12,7 +12,7 @@ on:
 
 env:
   AWS_REGION: us-east-1
-  BUCKET_NAME_TF_STATE: cbci-eks-addon-bp
+  BUCKET_NAME_TF_STATE: cbci-eks-addon-bp-tf-state
   ROUTE_53_HOSTED_ZONE: bp.core.pscbdemos.com
   AWS_ROLE_TO_ASSUME: infra-admin-ci
 
@@ -66,7 +66,7 @@ jobs:
         terraform {
           backend "s3" {
             bucket = "${{ env.BUCKET_NAME_TF_STATE }}"
-            key    = "blueprints/${{ env.ROOT }}/ci.terraform.tfstate"
+            key    = "${{ env.ROOT }}/ci.terraform.tfstate"
             region = "${{ env.AWS_REGION }}"
           }
         }
@@ -97,7 +97,7 @@ jobs:
         terraform {
           backend "s3" {
             bucket = "${{ env.BUCKET_NAME_TF_STATE }}"
-            key    = "blueprints/${{ env.ROOT }}/ci.terraform.tfstate"
+            key    = "${{ env.ROOT }}/ci.terraform.tfstate"
             region = "${{ env.AWS_REGION }}"
           }
         }
