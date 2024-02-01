@@ -33,6 +33,8 @@ jobs:
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
       env:
         ROOT: 01-getting-started
+        BUCKET_NAME_TF_STATE: crodriguezlopez-tf-state
+        ROUTE_53_HOSTED_ZONE: bp.core.pscbdemos.com
       run : |
         cat <<EOT >> blueprints/${{ env.ROOT }}/.auto.tfvars
         tags = {
@@ -40,11 +42,11 @@ jobs:
           "cb-user" : "cb-platform"
           "cb-purpose" : "ci"
         }
-        hosted_zone = "bp.core.pscbdemos.com"
+        hosted_zone = "${{ env.ROUTE_53_HOSTED_ZONE }}"
         temp_license = {
           first_name  = "CloudBees.io"
           last_name  = "Platform"
-          email = "ci.user@cloudbees.com"
+          email = "platform.ci@cloudbees.com"
           company = "CloudBees Inc."
         }
         suffix = "ci"
@@ -53,13 +55,12 @@ jobs:
         terraform {
 
           backend "s3" {
-            bucket = "crodriguezlopez-tf-state"
+            bucket = "${{ env.BUCKET_NAME_TF_STATE }}"
             key    = "blueprints/${{ env.ROOT }}/terraform.tfstate"
             region = "${{ env.AWS_REGION }}"
           }
         }
         EOT
         export CI=true
-        ls -laR
         cat blueprints/${{ env.ROOT }}/.auto.tfvars
         cat blueprints/${{ env.ROOT }}/backend.tf
