@@ -90,3 +90,4 @@ jobs:
         }
         EOT
         cat blueprints/${{ env.ROOT }}/.auto.tfvars
+        CI=true make test
