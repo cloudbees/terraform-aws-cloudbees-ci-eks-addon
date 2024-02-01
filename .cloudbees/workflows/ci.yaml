@@ -58,3 +58,5 @@ jobs:
         EOT
         export CI=true
         ls -laR
+        cat blueprints/${{ env.ROOT }}/.auto.tfvars
+        cat blueprints/${{ env.ROOT }}/backend.tf
