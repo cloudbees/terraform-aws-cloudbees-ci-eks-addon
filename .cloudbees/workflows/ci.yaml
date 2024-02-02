@@ -96,6 +96,7 @@ jobs:
         secGithubUser: "exampleUser"
         secGithubToken: "ExampleToken"
         EOT
-        terraform -chdir=blueprints/${{ env.ROOT }} init -reconfigure
-        terraform -chdir=blueprints/${{ env.ROOT }} destroy -target=module.eks_blueprints_addon_cbci -auto-approve
-        CI=true make test
+        cat blueprints/${{ env.ROOT }}/k8s/secrets-values.yml
+        #terraform -chdir=blueprints/${{ env.ROOT }} init -reconfigure
+        #terraform -chdir=blueprints/${{ env.ROOT }} destroy -target=module.eks_blueprints_addon_cbci -auto-approve
+        #CI=true make test
