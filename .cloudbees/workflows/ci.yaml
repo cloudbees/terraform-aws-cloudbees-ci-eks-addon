@@ -30,7 +30,7 @@ env:
     suffix = "ci-v2"
 
 jobs:
-#TODO: Create 2 jobs once per blueprint, with 2 different hosted_zone
+#TODO: Create 2 jobs once per blueprint, with 2 different hosted_zone. They depends on a init jobs to create the bucket
   build:
     steps:
 
@@ -92,11 +92,10 @@ jobs:
         }
         EOT
         cat <<EOT >> blueprints/${{ env.ROOT }}/k8s/secrets-values.yml
-        # Secret for Jenkins password. It is valid for all users: admin, developer, and guest.
         secJenkinsPass: "P4ssw0rd"
         secGithubUser: "exampleUser"
         secGithubToken: "ExampleToken"
         EOT
-        cat blueprints/${{ env.ROOT }}/.auto.tfvars
+        terraform -chdir=blueprints/${{ env.ROOT }} init -reconfigure
         terraform -chdir=blueprints/${{ env.ROOT }} destroy -target=module.eks_blueprints_addon_cbci -auto-approve
         CI=true make test
