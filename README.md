@@ -124,3 +124,4 @@ Cloudbees' slack channel [#cbci-eks-blueprints](https://cloudbees.slack.com/arch
 - [Amazon EKS Blueprints Addons](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/)
 - [Amazon EKS Blueprints Patterns](https://aws-ia.github.io/terraform-aws-eks-blueprints/)
 - [Bootstrapping clusters with EKS Blueprints | Containers](https://aws.amazon.com/blogs/containers/bootstrapping-clusters-with-eks-blueprints/)
+- [EKS Workshop | EKS Workshop](https://www.eksworkshop.com/)
