@@ -87,14 +87,14 @@ jobs:
           }
         }
         EOT
-        #CI=true make deploy
+        CI=true make deploy
 
     - name: 01-getting-started - Validate
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
       env:
         ROOT: 01-getting-started
       run : |
-        #CI=true make validate
+        CI=true make validate
 
     - name: Test 01-getting-started
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
@@ -102,7 +102,7 @@ jobs:
         ROOT: 01-getting-started
         TF_VAR_hosted_zone: bp01.aws.ps.beescloud.com
       run : |
-        #CI=true make destroy
+        CI=true make destroy
 
   bp02:
     needs:
