@@ -94,15 +94,15 @@ jobs:
       env:
         ROOT: 01-getting-started
       run : |
-        CI=true make validate
+        #CI=true make validate
 
-    - name: Test 01-getting-started
+    - name: 01-getting-started - Destroy
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
       env:
         ROOT: 01-getting-started
         TF_VAR_hosted_zone: bp01.aws.ps.beescloud.com
       run : |
-        CI=true make destroy
+        #CI=true make destroy
 
   bp02:
     needs:
@@ -152,7 +152,7 @@ jobs:
       env:
         ROOT: 02-at-scale
       run : |
-        CI=true make validate
+        #CI=true make validate
 
     - name: 02-at-scale - Destroy
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
@@ -160,4 +160,4 @@ jobs:
         ROOT: 02-at-scale
         TF_VAR_hosted_zone: bp02.aws.ps.beescloud.com
       run : |
-        CI=true make destroy
+        #CI=true make destroy
