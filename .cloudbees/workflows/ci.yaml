@@ -20,7 +20,6 @@ env:
       "cb-user" : "cb-platform"
       "cb-purpose" : "ci"
     }
-    hosted_zone =  "bp.core.pscbdemos.com"
     temp_license = {
       first_name  = "CloudBees.io"
       last_name  = "Platform"
@@ -31,7 +30,7 @@ env:
 
 jobs:
 #TODO: Create 2 jobs once per blueprint, with 2 different hosted_zone. They depends on a init jobs to create the bucket
-  build:
+  init:
     steps:
 
     - name: Configure AWS Credentials
@@ -52,6 +51,21 @@ jobs:
           --bucket ${{ env.BUCKET_NAME_TF_STATE }} \
           --region ${{ env.AWS_REGION }} || echo "Bucket ${{ env.BUCKET_NAME_TF_STATE }} already exists"
 
+  bp01:
+    needs:
+      - init
+    steps:
+
+    - name: Configure AWS Credentials
+      uses: cloudbees-io/configure-aws-credentials@v1
+      with:
+        aws-region: ${{ env.AWS_REGION }}
+        aws-access-key-id: ${{ secrets.AWS_TF_CBCI_EKS_AccessKeyID }}
+        aws-secret-access-key: ${{ secrets.AWS_TF_CBCI_EKS_SecretAccessKey }}
+        role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
+        role-external-id: cloudbees
+        role-duration-seconds: "3600"
+
     - name: Checkout code
       uses: cloudbees-io/checkout@v1
 
@@ -59,6 +73,7 @@ jobs:
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
       env:
         ROOT: 01-getting-started
+        TF_VAR_hosted_zone: bp01.aws.ps.beescloud.com
       run : |
         cat <<EOT >> blueprints/${{ env.ROOT }}/.auto.tfvars
         ${{ env.TF_AUTO_VARS_FILE }}
@@ -85,13 +100,33 @@ jobs:
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
       env:
         ROOT: 01-getting-started
+        TF_VAR_hosted_zone: bp01.aws.ps.beescloud.com
       run : |
         #CI=true make destroy
+
+  bp02:
+    needs:
+      - init
+    steps:
+
+    - name: Configure AWS Credentials
+      uses: cloudbees-io/configure-aws-credentials@v1
+      with:
+        aws-region: ${{ env.AWS_REGION }}
+        aws-access-key-id: ${{ secrets.AWS_TF_CBCI_EKS_AccessKeyID }}
+        aws-secret-access-key: ${{ secrets.AWS_TF_CBCI_EKS_SecretAccessKey }}
+        role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
+        role-external-id: cloudbees
+        role-duration-seconds: "3600"
+
+    - name: Checkout code
+      uses: cloudbees-io/checkout@v1
 
     - name: 02-at-scale - Deploy
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
       env:
         ROOT: 02-at-scale
+        TF_VAR_hosted_zone: bp02.aws.ps.beescloud.com
       run : |
         cat <<EOT >> blueprints/${{ env.ROOT }}/.auto.tfvars
         ${{ env.TF_AUTO_VARS_FILE }}
@@ -119,9 +154,10 @@ jobs:
       run : |
         CI=true make validate
 
-    - name: 02-at-scale - Validate
+    - name: 02-at-scale - Destroy
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
       env:
         ROOT: 02-at-scale
+        TF_VAR_hosted_zone: bp02.aws.ps.beescloud.com
       run : |
         CI=true make destroy
