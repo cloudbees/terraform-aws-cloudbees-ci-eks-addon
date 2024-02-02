@@ -17,7 +17,8 @@ RUN apk add --update --no-cache \
     git \
     make \
     aws-cli \
-    yq
+    yq \
+    jq
 
 RUN curl -sLO https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_${ARCH}.zip && \
     unzip terraform_${TF_VERSION}_linux_${ARCH}.zip && \
