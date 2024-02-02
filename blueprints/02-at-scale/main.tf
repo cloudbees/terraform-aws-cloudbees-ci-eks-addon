@@ -56,7 +56,6 @@ locals {
   cloudwatch_logs_expiration_days = 7
   s3_objects_expiration_days      = 90
 
-
 }
 
 resource "time_static" "epoch" {
