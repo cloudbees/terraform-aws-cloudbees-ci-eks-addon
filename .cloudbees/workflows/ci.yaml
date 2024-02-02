@@ -96,7 +96,7 @@ jobs:
         secGithubUser: "exampleUser"
         secGithubToken: "ExampleToken"
         EOT
-        terraform -chdir=blueprints/${{ env.ROOT }} init -reconfigure
-        terraform -chdir=blueprints/${{ env.ROOT }} destroy -target=module.eks_blueprints_addon_cbci -auto-approve
+        #terraform -chdir=blueprints/${{ env.ROOT }} init -reconfigure
+        #terraform -chdir=blueprints/${{ env.ROOT }} destroy -target=module.eks_blueprints_addon_cbci -auto-approve
         CI=true make deploy
         cat /cloudbees/workspace/blueprints/02-at-scale/k8s/kubeconfig_cbci-bp02-ci-v2.yaml
