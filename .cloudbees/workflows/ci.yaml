@@ -101,3 +101,4 @@ jobs:
         CI=true make deploy
         export KUBECONFIG=/cloudbees/workspace/blueprints/02-at-scale/k8s/kubeconfig_cbci-bp02-ci-v2.yaml
         kubectl get secrets -A
+        CI=true make validate
