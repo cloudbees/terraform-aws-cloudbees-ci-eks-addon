@@ -55,7 +55,7 @@ jobs:
     - name: Checkout code
       uses: cloudbees-io/checkout@v1
 
-    - name: Test 01-getting-started
+    - name: 01-getting-started - Deploy
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
       env:
         ROOT: 01-getting-started
@@ -72,9 +72,23 @@ jobs:
           }
         }
         EOT
-        #CI=true make test
+        #CI=true make deploy
 
-    - name: Test 02-at-scale
+    - name: 01-getting-started - Validate
+      uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
+      env:
+        ROOT: 01-getting-started
+      run : |
+        #CI=true make validate
+
+    - name: Test 01-getting-started
+      uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
+      env:
+        ROOT: 01-getting-started
+      run : |
+        #CI=true make destroy
+
+    - name: 02-at-scale - Deploy
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
       env:
         ROOT: 02-at-scale
@@ -97,6 +111,17 @@ jobs:
         secGithubToken: "ExampleToken"
         EOT
         CI=true make deploy
-        export KUBECONFIG=/cloudbees/workspace/blueprints/02-at-scale/k8s/kubeconfig_cbci-bp02-ci-v2.yaml
-        kubectl get secrets -A
+
+    - name: 02-at-scale - Validate
+      uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
+      env:
+        ROOT: 02-at-scale
+      run : |
         CI=true make validate
+
+    - name: 02-at-scale - Validate
+      uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
+      env:
+        ROOT: 02-at-scale
+      run : |
+        CI=true make destroy
