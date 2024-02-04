@@ -112,10 +112,6 @@ CloudBees CI Add-on uses for its resources definition `helms release` which make
 | merged_helm_config | (merged) Helm Config for CloudBees CI |
 <!-- END_TF_DOCS -->
 
-## Communications
-
-Cloudbees' slack channel [#cbci-eks-blueprints](https://cloudbees.slack.com/archives/C05NACAEM5H)
-
 ## References
 
 - [CloudBees CI Docs](https://docs.cloudbees.com/docs/cloudbees-ci/latest/)
