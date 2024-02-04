@@ -182,6 +182,10 @@ resource "null_resource" "create_kubeconfig" {
 
   depends_on = [module.eks]
 
+  triggers = {
+    always_run = timestamp()
+  }
+
   provisioner "local-exec" {
     command = "aws eks update-kubeconfig --name ${module.eks.cluster_name} --region ${local.region} --kubeconfig ${local.kubeconfig_file_path}"
   }

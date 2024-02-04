@@ -493,6 +493,7 @@ resource "kubernetes_storage_class_v1" "efs" {
 
 resource "null_resource" "create_kubeconfig" {
 
+  depends_on = [module.eks]
   triggers = {
     always_run = timestamp()
   }
