@@ -29,11 +29,11 @@ locals {
 
   k8s_instance_types = {
     # Not Scalable
-    "k8s-apps" = ["m5.8xlarge"]
+    "k8s-apps" = ["m7g.2xlarge"]
     # Scalable
-    "cb-apps"    = ["m5d.4xlarge"] #https://aws.amazon.com/about-aws/whats-new/2018/06/introducing-amazon-ec2-m5d-instances/
-    "agent"      = ["m5.2xlarge"]
-    "agent-spot" = ["m5.2xlarge"]
+    "cb-apps"    = ["m7g.4xlarge"]
+    "agent"      = ["m7g.2xlarge"]
+    "agent-spot" = ["m7g.2xlarge"]
   }
 
   route53_zone_id  = data.aws_route53_zone.this.id
