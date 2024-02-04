@@ -88,8 +88,8 @@ jobs:
         }
         EOT
         #Debugging
-        #terraform -chdir=blueprints/${{ env.ROOT }} init -reconfigure
-        #terraform -chdir=blueprints/${{ env.ROOT }} destroy -target=module.eks_blueprints_addon_cbci -auto-approve
+        terraform -chdir=blueprints/${{ env.ROOT }} init -reconfigure
+        terraform -chdir=blueprints/${{ env.ROOT }} destroy -target=module.eks_blueprints_addon_cbci -auto-approve
         CI=true make deploy
 
     - name: 01-getting-started - Validate
@@ -149,8 +149,8 @@ jobs:
         secGithubToken: "ExampleToken"
         EOT
         #Debugging
-        #terraform -chdir=blueprints/${{ env.ROOT }} init -reconfigure
-        #terraform -chdir=blueprints/${{ env.ROOT }} destroy -target=module.eks_blueprints_addon_cbci -auto-approve
+        terraform -chdir=blueprints/${{ env.ROOT }} init -reconfigure
+        terraform -chdir=blueprints/${{ env.ROOT }} destroy -target=module.eks_blueprints_addon_cbci -auto-approve
         CI=true make deploy
 
     - name: 02-at-scale - Validate
