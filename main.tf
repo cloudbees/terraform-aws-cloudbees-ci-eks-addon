@@ -51,7 +51,7 @@ resource "helm_release" "cloudbees_ci" {
   chart            = "cloudbees-core"
   #Chart versions: #https://artifacthub.io/packages/helm/cloudbees/cloudbees-core/
   #App version: https://docs.cloudbees.com/docs/release-notes/latest/cloudbees-ci/
-  version    = try(var.helm_config.version, "3.15666.0+5ea03547ce92")
+  version    = try(var.helm_config.version, "3.16155.0+bdcd96dc9444")
   repository = try(var.helm_config.repository, "https://public-charts.artifacts.cloudbees.com/repository/public/")
   values = local.create_secret ? concat(var.helm_config.values, local.oc_secrets_mount, [templatefile("${path.module}/values.yml", {
     hosted_zone  = var.hosted_zone
