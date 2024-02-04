@@ -52,7 +52,7 @@ Blueprint `deploy` and `destroy` phases use the same tooling requirement per [AW
 Nevertheless, the Blueprint `validate` phase might require additional toolings like `jq` and `velero`.
 
 > [!NOTE]
-> There is a companion [Dockerfile](.docker/Dockerfile) to run the blueprints in a containerized Dev environment ensuring dependecies are met. It can be built by using the [Makefile](Makefile) target `make dRun`.
+> There is a companion [Dockerfile](.docker/Dockerfile) to run the blueprints in a containerized Dev environment ensuring dependencies are met. It can be built by using the [Makefile](Makefile) target `make dRun`.
 
 ### AWS Authentication
 
@@ -67,7 +67,7 @@ These blueprints rely on an existing Hosted Zone in AWS Route53. If you don't ha
 The two main components of CloudBees CI, Operations Center and Managed Controllers, use a file system to persist data. Data is stored in a folder called [Jenkins Home](https://docs.cloudbees.com/docs/cloudbees-ci/latest/backup-restore/jenkins-home) that can be configured to be stored in Amazon EBS or EFS:
 
 - Amazon EBS volumes are scoped to a particular Availability Zone to offer high-speed, low-latency access to the EC2 instances they are connected to. If an Availability Zone fails, an EBS volume becomes inaccessible due to file corruption, or there is a service outage, the data on these volumes will become inaccessible. Operations Center and Managed Controller pods require this persistent data and have no mechanism to replicate the data, so we recommend frequent backups for Amazon EBS.
-- Amazon EFS file systems are scoped to an AWS Region and can be accessed from any Availability Zone in the Region the file system was created in. Using Amazon EFS as a storage class for the Operations Center and Managed Controller allows pods to be rescheduled successfully onto healthy nodes in the event of an Availability Zone outage. Amazon EFS file systems may increase the cost of the deployment compared to the Amazon EBS option, but provide greater fault tolerance.
+- Amazon EFS file systems are scoped to an AWS Region and can be accessed from any Availability Zone in the Region the file system was created in. Using Amazon EFS as a storage class for the Operations Center and Managed Controller allows pods to be rescheduled successfully onto healthy nodes in the event of an Availability Zone outage. Amazon EFS is more expensive than the Amazon EBS option, but provides greater fault tolerance.
 
 > [!IMPORTANT]  
 > CloudBees HA (active-active) requires Amazon EFS. See [CloudBees CI EKS Storage Requirements](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/eks-pre-install-requirements-helm#_storage_requirements).
@@ -83,7 +83,7 @@ Check out [CloudBees CI License Expiration FAQ](https://docs.cloudbees.com/docs/
 
 ## Compatibility
 
-CloudBees CI Add-on uses for its resources definition `helms release` which makes it compatible [AWS EKS Blueprint v4](https://github.com/aws-ia/terraform-aws-eks-blueprints/tree/v4.32.1) and [AWS EKS Blueprint v5](https://github.com/aws-ia/terraform-aws-eks-blueprints/tree/v5.0.0) (Additional info at [v4 to v5 migration guide](https://aws-ia.github.io/terraform-aws-eks-blueprints/v4-to-v5/motivation/)).
+CloudBees CI Add-on uses for its resources definition `helm release` which makes it compatible with [AWS EKS Blueprint v4](https://github.com/aws-ia/terraform-aws-eks-blueprints/tree/v4.32.1) and [AWS EKS Blueprint v5](https://github.com/aws-ia/terraform-aws-eks-blueprints/tree/v5.0.0) (Additional info at [v4 to v5 migration guide](https://aws-ia.github.io/terraform-aws-eks-blueprints/v4-to-v5/motivation/)).
 
 ## Terraform Docs
 
