@@ -10,13 +10,13 @@ variable "hosted_zone" {
   type        = string
 }
 
-variable "temp_license" {
-  description = "Temporary license details"
+variable "trial_license" {
+  description = "CloudBees CI Trial license details for evaluation."
   type        = map(string)
 }
 
 variable "suffix" {
-  description = "Unique suffix to be assigned to all resources"
+  description = "Unique suffix to be assigned to all resources."
   default     = ""
   type        = string
   validation {

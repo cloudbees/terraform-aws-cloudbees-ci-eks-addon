@@ -71,9 +71,9 @@ resource "time_static" "epoch" {
 module "eks_blueprints_addon_cbci" {
   source = "../../"
 
-  hosted_zone  = var.hosted_zone
-  cert_arn     = module.acm.acm_certificate_arn
-  temp_license = var.temp_license
+  hosted_zone   = var.hosted_zone
+  cert_arn      = module.acm.acm_certificate_arn
+  trial_license = var.trial_license
 
   helm_config = {
     create_namespace = false

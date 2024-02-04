@@ -56,17 +56,17 @@ resource "helm_release" "cloudbees_ci" {
   values = local.create_secret ? concat(var.helm_config.values, local.oc_secrets_mount, [templatefile("${path.module}/values.yml", {
     hosted_zone  = var.hosted_zone
     cert_arn     = var.cert_arn
-    LicFirstName = var.temp_license["first_name"]
-    LicLastName  = var.temp_license["last_name"]
-    LicEmail     = var.temp_license["email"]
-    LicCompany   = var.temp_license["company"]
+    LicFirstName = var.trial_license["first_name"]
+    LicLastName  = var.trial_license["last_name"]
+    LicEmail     = var.trial_license["email"]
+    LicCompany   = var.trial_license["company"]
     })]) : concat(var.helm_config.values, [templatefile("${path.module}/values.yml", {
     hosted_zone  = var.hosted_zone
     cert_arn     = var.cert_arn
-    LicFirstName = var.temp_license["first_name"]
-    LicLastName  = var.temp_license["last_name"]
-    LicEmail     = var.temp_license["email"]
-    LicCompany   = var.temp_license["company"]
+    LicFirstName = var.trial_license["first_name"]
+    LicLastName  = var.trial_license["last_name"]
+    LicEmail     = var.trial_license["email"]
+    LicCompany   = var.trial_license["company"]
   })])
 
   timeout                    = try(var.helm_config.timeout, 1200)

@@ -27,8 +27,8 @@ Get started with the [CloudBees CI on Modern in EKS](https://docs.cloudbees.com/
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | hosted_zone | Route 53 Hosted Zone. CloudBees CI Apps is configured to use subdomains in this Hosted Zone. | `string` | n/a | yes |
-| temp_license | Temporary license details | `map(string)` | n/a | yes |
-| suffix | Unique suffix to be assigned to all resources | `string` | `""` | no |
+| trial_license | CloudBees CI Trial license details for evaluation. | `map(string)` | n/a | yes |
+| suffix | Unique suffix to be assigned to all resources. | `string` | `""` | no |
 | tags | Tags to apply to resources | `map(string)` | `{}` | no |
 
 ### Outputs

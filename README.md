@@ -94,7 +94,7 @@ CloudBees CI Add-on uses for its resources definition `helms release` which make
 |------|-------------|------|---------|:--------:|
 | cert_arn | Certificate ARN from AWS ACM | `string` | n/a | yes |
 | hosted_zone | Route53 Hosted zone name | `string` | n/a | yes |
-| temp_license | Temporary license details | `map(string)` | n/a | yes |
+| trial_license | CloudBees CI Trial license details for evaluation. | `map(string)` | n/a | yes |
 | helm_config | CloudBees CI Helm chart configuration | `any` | <pre>{<br>  "values": [<br>    ""<br>  ]<br>}</pre> | no |
 | secrets_file | Secrets file yml path containing the secrets names:values to create the Kubernetes secret cbci-secrets. It can be mounted for Casc | `string` | `"secrets-values.yml"` | no |
 

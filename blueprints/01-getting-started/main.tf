@@ -37,9 +37,9 @@ locals {
 module "eks_blueprints_addon_cbci" {
   source = "../../"
 
-  hosted_zone  = var.hosted_zone
-  cert_arn     = module.acm.acm_certificate_arn
-  temp_license = var.temp_license
+  hosted_zone   = var.hosted_zone
+  cert_arn      = module.acm.acm_certificate_arn
+  trial_license = var.trial_license
 
   depends_on = [
     module.eks_blueprints_addons
