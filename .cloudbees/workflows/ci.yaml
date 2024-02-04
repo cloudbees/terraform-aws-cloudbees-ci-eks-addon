@@ -96,7 +96,7 @@ jobs:
       env:
         ROOT: 01-getting-started
       run : |
-        #CI=true make validate
+        CI=true make validate
 
     - name: 01-getting-started - Destroy
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
@@ -156,7 +156,7 @@ jobs:
       env:
         ROOT: 02-at-scale
       run : |
-        #CI=true make validate
+        CI=true make validate
 
     - name: 02-at-scale - Destroy
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
