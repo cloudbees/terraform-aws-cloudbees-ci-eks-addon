@@ -51,13 +51,23 @@ jobs:
           --bucket ${{ env.BUCKET_NAME_TF_STATE }} \
           --region ${{ env.AWS_REGION }} || echo "Bucket ${{ env.BUCKET_NAME_TF_STATE }} already exists"
 
-    - name: Checkout code
-      uses: cloudbees-io/checkout@v1
-
   bp01:
     needs:
       - init
     steps:
+
+    - name: Configure AWS Credentials
+      uses: cloudbees-io/configure-aws-credentials@v1
+      with:
+        aws-region: ${{ env.AWS_REGION }}
+        aws-access-key-id: ${{ secrets.AWS_TF_CBCI_EKS_AccessKeyID }}
+        aws-secret-access-key: ${{ secrets.AWS_TF_CBCI_EKS_SecretAccessKey }}
+        role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
+        role-external-id: cloudbees
+        role-duration-seconds: "3600"
+
+    - name: Checkout code
+      uses: cloudbees-io/checkout@v1
 
     - name: 01-getting-started - Deploy
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
@@ -99,6 +109,19 @@ jobs:
     needs:
       - init
     steps:
+
+    - name: Configure AWS Credentials
+      uses: cloudbees-io/configure-aws-credentials@v1
+      with:
+        aws-region: ${{ env.AWS_REGION }}
+        aws-access-key-id: ${{ secrets.AWS_TF_CBCI_EKS_AccessKeyID }}
+        aws-secret-access-key: ${{ secrets.AWS_TF_CBCI_EKS_SecretAccessKey }}
+        role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
+        role-external-id: cloudbees
+        role-duration-seconds: "3600"
+
+    - name: Checkout code
+      uses: cloudbees-io/checkout@v1
 
     - name: 02-at-scale - Deploy
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
