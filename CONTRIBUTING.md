@@ -4,7 +4,7 @@ This document provides guidelines for contributing to the module.
 
 ## Dependencies
 
-Validate your changes inside the blueprint agent described in the [Dockerfile](.docker/Dockerfile).
+Validate your changes inside the blueprint agent described in the [Dockerfile](.docker).
 
 > [!NOTE]
 > The agent and dependecies can be automated via [Makefile](Makefile) at the root of the project under the target `dRun`. It is the same one used in the CI pipeline.
