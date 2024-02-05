@@ -105,7 +105,9 @@ jobs:
         ROOT: 01-getting-started
         TF_VAR_hosted_zone: bp01.aws.ps.beescloud.com
       run : |
-        CI=true make destroy
+        #Debugging
+        terraform -chdir=blueprints/${{ env.ROOT }} destroy -auto-approve
+        #CI=true make destroy
 
   bp02:
     needs:
@@ -166,4 +168,6 @@ jobs:
         ROOT: 02-at-scale
         TF_VAR_hosted_zone: bp02.aws.ps.beescloud.com
       run : |
+        #Debugging
+        terraform -chdir=blueprints/${{ env.ROOT }} destroy -auto-approve
         CI=true make destroy
