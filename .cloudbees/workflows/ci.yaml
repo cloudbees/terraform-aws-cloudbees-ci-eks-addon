@@ -106,6 +106,9 @@ jobs:
         TF_VAR_hosted_zone: bp01.aws.ps.beescloud.com
       run : |
         #Debugging
+        terraform -chdir=blueprints/${{ env.ROOT }} destroy -target=module.eks_blueprints_addon_cbci -auto-approve
+        terraform -chdir=blueprints/${{ env.ROOT }} destroy -target=module.eks_blueprints_addons -auto-approve
+        terraform -chdir=blueprints/${{ env.ROOT }} destroy -target=module.eks -auto-approve
         terraform -chdir=blueprints/${{ env.ROOT }} destroy -auto-approve
         #CI=true make destroy
 
@@ -169,5 +172,8 @@ jobs:
         TF_VAR_hosted_zone: bp02.aws.ps.beescloud.com
       run : |
         #Debugging
+        terraform -chdir=blueprints/${{ env.ROOT }} destroy -target=module.eks_blueprints_addon_cbci -auto-approve
+        terraform -chdir=blueprints/${{ env.ROOT }} destroy -target=module.eks_blueprints_addons -auto-approve
+        terraform -chdir=blueprints/${{ env.ROOT }} destroy -target=module.eks -auto-approve
         terraform -chdir=blueprints/${{ env.ROOT }} destroy -auto-approve
-        CI=true make destroy
+        #CI=true make destroy
