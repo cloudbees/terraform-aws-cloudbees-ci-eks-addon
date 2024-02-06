@@ -60,6 +60,11 @@ output "cbci_oc_export_admin_api_token" {
   value       = "export CBCI_ADMIN_TOKEN=$(curl -s '${module.eks_blueprints_addon_cbci.cbci_oc_url}/user/admin/descriptorByName/jenkins.security.ApiTokenProperty/generateNewToken' --user admin:$(kubectl get secret cbci-secrets -n cbci -o jsonpath='{.data.secJenkinsPass}' | base64 -d)  --data 'newTokenName=kb-token' --cookie /tmp/cookies.txt -H $CBCI_ADMIN_CRUMB | . jq -r .data.tokenValue)"
 }
 
+output "cbci_oc_take_backups" {
+  description = "OC Cluster Operation Build to take on demand backup. It expects CBCI_ADMIN_TOKEN as environment variable."
+  value       = "curl -i -XPOST -u admin:$CBCI_ADMIN_TOKEN ${module.eks_blueprints_addon_cbci.cbci_oc_url}/job/admin/job/backup-all-controllers/build"
+}
+
 output "cbci_controllers_pods" {
   description = "Operation Center Pod for CloudBees CI Add-on."
   value       = "kubectl get pods -n ${module.eks_blueprints_addon_cbci.cbci_namespace} -l com.cloudbees.cje.type=master"
