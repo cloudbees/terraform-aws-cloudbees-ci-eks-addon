@@ -163,10 +163,11 @@ module "eks" {
     }
   }
 
+  #https://docs.aws.amazon.com/eks/latest/userguide/choosing-instance-type.html
   eks_managed_node_groups = {
     mg_start = {
       node_group_name = "managed-start"
-      instance_types  = ["m7g.2xlarge"]
+      instance_types  = ["m5.2xlarge"]
       capacity_type   = "ON_DEMAND"
       disk_size       = 25
       desired_size    = 2
