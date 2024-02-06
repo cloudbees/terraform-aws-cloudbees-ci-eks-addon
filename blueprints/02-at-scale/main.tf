@@ -27,9 +27,10 @@ locals {
   #https://docs.cloudbees.com/docs/cloudbees-common/latest/supported-platforms/cloudbees-ci-cloud#_kubernetes
   k8s_version = "1.27"
 
+  #https://docs.aws.amazon.com/eks/latest/userguide/choosing-instance-type.html
   k8s_instance_types = {
     # Not Scalable
-    "k8s-apps" = ["m7g.2xlarge"]
+    "k8s-apps" = ["m7g.xlarge"]
     # Scalable
     "cb-apps"    = ["m7g.4xlarge"]
     "agent"      = ["m7g.2xlarge"]
@@ -239,6 +240,7 @@ module "eks" {
 
   eks_managed_node_group_defaults = {
     disk_size = 50
+    ami_type  = "AL2_ARM_64" #For Graviton
   }
 
   # Security groups based on the best practices doc https://docs.aws.amazon.com/eks/latest/userguide/sec-group-reqs.html.
