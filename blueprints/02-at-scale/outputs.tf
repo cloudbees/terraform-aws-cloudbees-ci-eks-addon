@@ -57,7 +57,7 @@ output "cbci_oc_export_admin_crumb" {
 
 output "cbci_oc_export_admin_api_token" {
   description = "Export Operation Center Admin API Token to access to the API REST when CSRF is enabled. It expects CBCI_ADMIN_CRUMB as environment variable."
-  value       = "export CBCI_ADMIN_TOKEN=$(curl -s '${module.eks_blueprints_addon_cbci.cbci_oc_url}/user/admin/descriptorByName/jenkins.security.ApiTokenProperty/generateNewToken' --user admin:$(kubectl get secret cbci-secrets -n cbci -o jsonpath='{.data.secJenkinsPass}' | base64 -d)  --data 'newTokenName=kb-token' --cookie /tmp/cookies.txt -H $CBCI_ADMIN_CRUMB | . jq -r .data.tokenValue)"
+  value       = "export CBCI_ADMIN_TOKEN=$(curl -s '${module.eks_blueprints_addon_cbci.cbci_oc_url}/user/admin/descriptorByName/jenkins.security.ApiTokenProperty/generateNewToken' --user admin:$(kubectl get secret cbci-secrets -n cbci -o jsonpath='{.data.secJenkinsPass}' | base64 -d)  --data 'newTokenName=kb-token' --cookie /tmp/cookies.txt -H $CBCI_ADMIN_CRUMB | jq -r .data.tokenValue)"
 }
 
 output "cbci_oc_take_backups" {
@@ -152,7 +152,7 @@ output "prometheus_dashboard" {
 
 output "prometheus_active_targets" {
   description = "Check Active Prometheus Targets from Operation Center."
-  value       = "kubectl exec -n cbci -ti cjoc-0 --container jenkins -- curl -sSf kube-prometheus-stack-prometheus.kube-prometheus-stack.svc.cluster.local:9090/api/v1/targets?state=active"
+  value       = "kubectl exec -n cbci -ti cjoc-0 --container jenkins -- curl -sSf kube-prometheus-stack-prometheus.kube-prometheus-stack.svc.cluster.local:9090/api/v1/targets"
 }
 
 output "grafana_dashboard" {
