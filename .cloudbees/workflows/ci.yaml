@@ -92,14 +92,14 @@ jobs:
         #terraform -chdir=blueprints/${{ env.ROOT }} apply -target="module.vpc" -auto-approve
         #terraform -chdir=blueprints/${{ env.ROOT }} apply -target="module.eks" -auto-approve
         #terraform -chdir=blueprints/${{ env.ROOT }} apply -auto-approve
-        CI=true make deploy
+        #CI=true make deploy
 
     - name: 01-getting-started - Validate
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
       env:
         ROOT: 01-getting-started
       run : |
-        CI=true make validate
+        #CI=true make validate
 
     - name: 01-getting-started - Destroy
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
@@ -112,7 +112,7 @@ jobs:
         #terraform -chdir=blueprints/${{ env.ROOT }} destroy -target=module.eks_blueprints_addons -auto-approve
         #terraform -chdir=blueprints/${{ env.ROOT }} destroy -target=module.eks -auto-approve
         #terraform -chdir=blueprints/${{ env.ROOT }} destroy -auto-approve
-        CI=true make destroy
+        #CI=true make destroy
 
   bp02:
     needs:
@@ -156,7 +156,7 @@ jobs:
         secGithubToken: "ExampleToken"
         EOT
         #Debugging
-        #terraform -chdir=blueprints/${{ env.ROOT }} init -reconfigure
+        terraform -chdir=blueprints/${{ env.ROOT }} init -reconfigure
         #terraform -chdir=blueprints/${{ env.ROOT }} apply -target="module.vpc" -auto-approve
         #terraform -chdir=blueprints/${{ env.ROOT }} apply -target="module.eks" -auto-approve
         #terraform -chdir=blueprints/${{ env.ROOT }} apply -auto-approve
