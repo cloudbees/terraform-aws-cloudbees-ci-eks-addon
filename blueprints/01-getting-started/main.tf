@@ -24,6 +24,11 @@ locals {
   #Number of AZs per region https://docs.aws.amazon.com/ram/latest/userguide/working-with-az-ids.html
   azs = slice(data.aws_availability_zones.available.names, 0, 2)
 
+  #https://docs.aws.amazon.com/eks/latest/userguide/choosing-instance-type.html
+  k8s_instance_types = {
+    "graviton3" = ["m7g.xlarge"]
+  }
+
   tags = merge(var.tags, {
     "tf-blueprint"  = local.name
     "tf-repository" = "github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon"
@@ -167,7 +172,8 @@ module "eks" {
   eks_managed_node_groups = {
     mg_start = {
       node_group_name = "managed-start"
-      instance_types  = ["m5.2xlarge"]
+      instance_types  = local.k8s_instance_types["graviton3"]
+      ami_type        = "AL2_ARM_64"
       capacity_type   = "ON_DEMAND"
       disk_size       = 25
       desired_size    = 2
