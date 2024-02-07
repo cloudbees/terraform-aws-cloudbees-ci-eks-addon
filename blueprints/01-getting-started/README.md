@@ -15,6 +15,8 @@ Get started with the [CloudBees CI on Modern in EKS](https://docs.cloudbees.com/
 
 ![Architecture](img/getting-started.architect.drawio.svg)
 
+Node Groups use [Graviton Processor](https://aws.amazon.com/ec2/graviton/) to ensure the best balance price and performance for cloud workloads running on Amazon EC2.
+
 ### Kubernetes Cluster
 
 ![Architecture](img/getting-started.k8s.drawio.svg)
@@ -62,11 +64,15 @@ Once deployed has finished, it is possible to check the generated AWS resources 
 
 ## Validate
 
+### Kubeconfig
+
 Once the resources have been created, note that a `kubeconfig` file has been created inside the respective `blueprint/k8s` folder. Start defining the Environment Variable [KUBECONFIG](https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/#the-kubeconfig-environment-variable) to point to the generated file.
 
   ```sh
   eval $(terraform output --raw kubeconfig_export)
   ```
+
+### CloudBees CI
 
 Once you get access to K8s API from your terminal, validate that:
 

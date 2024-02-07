@@ -25,7 +25,7 @@ Once you have familiarized yourself with the [Getting Started blueprint](../01-g
 
 ![Architecture](img/at-scale.architect.drawio.svg)
 
-Node Groups use [Graviton Processor](https://aws.amazon.com/ec2/graviton/).
+Node Groups use [Graviton Processor](https://aws.amazon.com/ec2/graviton/) for Applications Services to ensure the best balance price and performance for cloud workloads running on Amazon EC2. Then, it uses M5 for Agents Tasks.
 
 For s3 storage permissions for Workspace caching and Artifact Manager is based on [Instance Profile](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2_instance-profiles.html) rather than creating a User with IAM permissions. Then, it is expected that Credentials validation fails from CloudBees CI.
 
@@ -91,23 +91,29 @@ Refer to the [Getting Started Blueprint - Deploy](../01-getting-started/README.m
 Additionally, the following is required:
 
 - Customize your secrets file by copying `secrets-values.yml.example` to `secrets-values.yml`. It provides [Docker secrets](https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/docs/features/secrets.adoc#docker-secrets) that can be used from Casc.
-- In the case of using the terraform variable `suffix` for this blueprint the following elements require to be updated:
-  - The Amazon `S3 Bucket Access settings` > `S3 Bucket Name` for CloudBees CI Controllers.
-  - The Amazon `S3 Bucket` for the Backup Controllers Cluster Operations.
-    - via GUI:
-      - On CloudBes CI Controller service once is ready: Go to `Manage Jenkins` in the Controller > `AWS` > `Amazon S3 Bucket Access settings` > `S3 Bucket Name`. Save.
-      - On CloudBes CI Operation Center service once is ready: Login as Admin (backup jobs are restricted to admin only using RBAC). Then, go to `admin` folder > `backup-all-controllers` configure and update `S3 Bucket Name`. Save.
-    - via Casc:
-      - Make a fork from [cloudbees/casc-mm-cloudbees-ci-eks-addon](https://github.com/cloudbees/casc-mm-cloudbees-ci-eks-addon) to your organization, and update accordingly `cbci_s3` in `bp02.parent/variables/variables.yaml` file. Save and Push.
-      - Make a fork from [cloudbees/casc-oc-cloudbees-ci-eks-addon](https://github.com/cloudbees/casc-mm-cloudbees-ci-eks-addon) to your organization, and update accordingly `scm_casc_mm_store` in `bp02/variables/variables.yaml` file and `bp02/items/items-folder-admin.yaml` . Save and Push.
-      - Finally, update the field `OperationsCenter.CasC.Retriever.scmRepo` from the helm file `k8s/cbci-values.yml` from the files in this blueprint. Save and `terraform apply`.
+- In the case of using the terraform variable `suffix` for this blueprint the following elements require to be updated: The Amazon `S3 Bucket Access settings` > `S3 Bucket Name` for CloudBees CI Controllers and The Amazon `S3 Bucket` for the Backup Controllers Cluster Operations. This can be done in two ways:
+  - via Casc (**Before deploying** the blueprint):
+    - Make a fork from [cloudbees/casc-mm-cloudbees-ci-eks-addon](https://github.com/cloudbees/casc-mm-cloudbees-ci-eks-addon) to your organization, and update accordingly `cbci_s3` in `bp02.parent/variables/variables.yaml` file. Save and Push.
+    - Make a fork from [cloudbees/casc-oc-cloudbees-ci-eks-addon](https://github.com/cloudbees/casc-mm-cloudbees-ci-eks-addon) to your organization, and update accordingly `scm_casc_mm_store` in `bp02/variables/variables.yaml` file and `bp02/items/items-folder-admin.yaml` . Save and Push.
+    - Finally, update the field `OperationsCenter.CasC.Retriever.scmRepo` from the helm file `k8s/cbci-values.yml` from the files in this blueprint. Save and `terraform apply`.
+  - via GUI (**After deploying** the blueprint):
+    - On CloudBes CI Controller service once is ready: Go to `Manage Jenkins` in the Controller > `AWS` > `Amazon S3 Bucket Access settings` > `S3 Bucket Name`. Save.
+    - On CloudBes CI Operation Center service once is ready: Login as Admin (backup jobs are restricted to admin only using RBAC). Then, go to `admin` folder > `backup-all-controllers` configure and update `S3 Bucket Name`. Save.
 
 > [!IMPORTANT]
 > The declarative Casc defition overrides configuration updates from the UI (in case they overlap) at the next time the Controller is restarted.
 
 ## Validate
 
-### CBCI
+### Kubeconfig
+
+Once the resources have been created, note that a `kubeconfig` file has been created inside the respective `blueprint/k8s` folder. Start defining the Environment Variable [KUBECONFIG](https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/#the-kubeconfig-environment-variable) to point to the generated file.
+
+  ```sh
+  eval $(terraform output --raw kubeconfig_export)
+  ```
+
+### CloudBees CI
 
 - Start by referring to the [Getting Started Blueprint - Validate](../01-getting-started/README.md#validate) but this time there will be three types of personas/users with a different set of permissions configured via [RBAC](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-secure-guide/rbac) for Operation Center and Controller using [Single Sign-On](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-secure-guide/using-sso). The password for all of them is the same:
 
@@ -141,11 +147,19 @@ Additionally, the following is required:
 
 - [CloudBees Pipeline Explorer](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-pipeline-explorer-plugin) is enabled for all Controllers using Configuration as Code, you can see it in action by triggering any builds of the preconfigured pipelines or following the steps explained in [Troubleshooting Pipelines With CloudBees Pipeline Explorer - CloudBees TV 🎥](https://www.youtube.com/watch?v=OMXm6eYd1EQ).
 
--
-
 ### Backups and Restore
 
-- For Block Storage (EBS) is based on Velero.
+- [CloudBees Backup plugin](https://docs.cloudbees.com/docs/cloudbees-ci/latest/backup-restore/cloudbees-backup-plugin) is enabled for all Controllers and Operation Center using [s3 as storage](https://docs.cloudbees.com/docs/cloudbees-ci/latest/backup-restore/cloudbees-backup-plugin#_amazon_s3). The backup process is scheduled to be taken daily from the Operation Center via [Cluster Operations](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/cluster-operations). It can be used for EFS and EBS Storage.
+
+  - To take an on-demand backup for all controllers:
+
+    ```sh
+    eval $(terraform output --raw cbci_oc_export_admin_crumb) && \
+      eval $(terraform output --raw cbci_oc_export_admin_api_token) && \
+      eval $(terraform output --raw cbci_oc_take_backups)
+    ```
+
+- For Block Storage (EBS) Velero is also enabled and it is the [recommended option](https://aws.github.io/aws-eks-best-practices/upgrades/#backup-the-cluster-before-upgrading). It not only backups the pvc snapshots but also any other defined Kubernetes resources.
 
   - Create a Velero Backup schedule for Team A to take regular backups. This can be also applied to Team B.
 
@@ -165,25 +179,7 @@ Additionally, the following is required:
     eval $(terraform output --raw velero_restore_team_a)
     ```
 
-> [!NOTE]
-> It is possible to use also [CloudBees Backup plugin](https://docs.cloudbees.com/docs/cloudbees-ci/latest/backup-restore/cloudbees-backup-plugin) using [s3 as storage](https://docs.cloudbees.com/docs/cloudbees-ci/latest/backup-restore/cloudbees-backup-plugin#_amazon_s3) but the recommended approach is using Velero for EBS Storage.
-
-- EFS Storage is protected in [AWS Backup](https://aws.amazon.com/backup/) with a regular Backup Plan. Additional On-Demand Backup can be created. Restore can be performed and item level (Access Points) or full restore.
-
-  - Protected Resource
-
-    ```sh
-    eval $(terraform output --raw aws_backup_efs_protected_resource) | . jq
-    ```
-
-  - EFS Access point (they match with CloudBees CI `pvc`)
-
-    ```sh
-    eval $(terraform output --raw efs_access_points) | . jq .AccessPoints[].RootDirectory.Path
-    ```
-
-> [!NOTE]
-> At moment, there is not Best Practice to Restore Dinamically EFS PVCs (see [Issue 39](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/issues/39)). The only way would be using [CloudBees Backup plugin](https://docs.cloudbees.com/docs/cloudbees-ci/latest/backup-restore/cloudbees-backup-plugin) using [s3 as storage](https://docs.cloudbees.com/docs/cloudbees-ci/latest/backup-restore/cloudbees-backup-plugin#_amazon_s3).
+- However, the CloudBees Backup plugin would be the only choice for EFS Storage. At the moment of writing this blueprint, there is no Best Practice to Restore Dynamically EFS PVCs (see [Issue 39](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/issues/39)).
 
 ### Observability
 
@@ -216,7 +212,7 @@ Additionally, the following is required:
     - Short-term Application logs live in CloudWatch Logs Group `/aws/containerinsights/<CLUSTER_NAME>/application` can be found Log streams for all the K8s Services running in the cluster, including CloudBees CI Apps.
 
     ```sh
-      eval $(terraform output --raw aws_fluentbit_logstreams) | jq '.[] | select(.logStreamName | contains("jenkins"))'
+      eval $(terraform output --raw aws_logstreams_fluentbit) | jq '.[] | select(.logStreamName | contains("jenkins"))'
     ```
 
     - Long-term Application logs live in a s3 Bucket
