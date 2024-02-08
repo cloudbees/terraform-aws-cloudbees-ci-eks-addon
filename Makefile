@@ -62,14 +62,14 @@ endef
 .PHONY: dRun
 dRun: ## Build (if not locally present) and Run the Blueprint Agent using Bash as Entrypoint. It is ideal starting point for all targets. Example: make dRun
 dRun:
-	$(eval IMAGE := $(shell docker image ls | grep -c local.cloudbees/$(BP_AGENT_USER)))
+	$(eval IMAGE := $(shell docker image ls | grep -c local.cloudbees/bp-agent))
 	@if [ "$(IMAGE)" == "0" ]; then \
-		printf $(MSG_INFO) "Building Docker Image local.cloudbees/$(BP_AGENT_USER):latest" && \
-		docker build . --file $(MKFILEDIR)/.docker/Dockerfile.root --tag local.cloudbees/$(BP_AGENT_USER):latest; \
+		printf $(MSG_INFO) "Building Docker Image local.cloudbees/bp-agent:latest" && \
+		docker build . --file $(MKFILEDIR)/.docker/Dockerfile.rootless --tag local.cloudbees/bp-agent:latest; \
 		fi
-	docker run --rm -it --name $(BP_AGENT_USER) \
+	docker run --rm -it --name bp-agent \
 		-v $(MKFILEDIR):/$(BP_AGENT_USER)/cbci-eks-addon -v $(HOME)/.aws:/$(BP_AGENT_USER)/.aws \
-		local.cloudbees/$(BP_AGENT_USER):latest
+		local.cloudbees/bp-agent:latest
 
 .PHONY: tfpreFlightChecks
 tfpreFlightChecks: ## Run preflight checks for terraform according to getting-started/README.md . Example: ROOT=02-at-scale make tfpreFlightChecks
@@ -84,7 +84,7 @@ tfpreFlightChecks: guard-ROOT
 .PHONY: deploy
 deploy: ## Deploy Terraform Blueprint passed as parameter. Example: ROOT=02-at-scale make deploy
 deploy: guard-ROOT tfpreFlightChecks
-	$(call deploy_tg,$(ROOT))
+	$(call deploy,$(ROOT))
 
 .PHONY: destroy
 destroy: ## Destroy Terraform Blueprint passed as parameter. Example: ROOT=02-at-scale make destroy
