@@ -75,7 +75,7 @@ The two main components of CloudBees CI, Operations Center and Managed Controlle
 > [!NOTE]
 > For more information on pricing, see the [Amazon EBS pricing page](https://aws.amazon.com/ebs/pricing/) and the [Amazon EFS pricing page](https://aws.amazon.com/efs/pricing/).
 
-## CloudBees License
+## CloudBees Trial License
 
 This module runs with a [Trial License for CloudBees CI](https://docs.cloudbees.com/docs/cloudbees-ci-migration/latest/trial-guide/).
 
