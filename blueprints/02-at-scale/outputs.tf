@@ -120,11 +120,6 @@ output "aws_backup_efs_protected_resource" {
   value       = "aws backup describe-protected-resource --resource-arn ${module.efs.arn} --region ${local.region}"
 }
 
-output "aws_logstreams_containerinsights" {
-  description = "AWS CloudWatch Log Streams from Container Insights. Use only when eks_blueprints_addons.aws_for_fluentbit.enable_containerinsights is true."
-  value       = "aws logs describe-log-streams --log-group-name /aws/containerinsights/${local.cluster_name}/application --order-by LastEventTime --no-descending --query 'logStreams[?creationTime > `${local.epoch_millis}` ]' --region ${local.region}"
-}
-
 output "aws_logstreams_fluentbit" {
   description = "AWS CloudWatch Log Streams from FluentBit."
   value       = "aws logs describe-log-streams --log-group-name /aws/eks/${local.cluster_name}/aws-fluentbit-logs --order-by LastEventTime --no-descending --query 'logStreams[?creationTime > `${local.epoch_millis}` ]' --region ${local.region}"

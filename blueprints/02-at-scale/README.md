@@ -52,7 +52,6 @@ For s3 storage permissions for Workspace caching and Artifact Manager is based o
 |------|-------------|
 | acm_certificate_arn | ACM certificate ARN |
 | aws_backup_efs_protected_resource | AWS Backup Protected Resource descriction for EFS Drive. |
-| aws_logstreams_containerinsights | AWS CloudWatch Log Streams from Container Insights. Use only when eks_blueprints_addons.aws_for_fluentbit.enable_containerinsights is true. |
 | aws_logstreams_fluentbit | AWS CloudWatch Log Streams from FluentBit. |
 | cbci_controller_b_hibernation_post_queue_ws_cache | Team B Hibernation Monitor Endpoint to Build Workspace Cache. It expects CBCI_ADMIN_TOKEN as environment variable. |
 | cbci_controller_c_hpa | Team C Horizontal Pod Autoscaling. |
@@ -212,7 +211,7 @@ Once the resources have been created, note that a `kubeconfig` file has been cre
     - Short-term Application logs live in CloudWatch Logs Group `/aws/containerinsights/<CLUSTER_NAME>/application` can be found Log streams for all the K8s Services running in the cluster, including CloudBees CI Apps.
 
     ```sh
-      eval $(terraform output --raw aws_logstreams_fluentbit) | jq '.[] | select(.logStreamName | contains("jenkins"))'
+      eval $(terraform output --raw aws_logstreams_fluentbit) | jq '.[] '
     ```
 
     - Long-term Application logs live in a s3 Bucket

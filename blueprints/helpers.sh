@@ -65,6 +65,6 @@ probes-bp02 () {
 		INFO "Velero backups are working"
   until eval "$(get-tf-output "$ROOT" prometheus_active_targets)" | jq '.data.activeTargets[] | select(.labels.container=="jenkins" or .labels.job=="cjoc") | {job: .labels.job, instance: .labels.instance, status: .health}'; do sleep $RETRY_SECONDS && echo "Waiting for CloudBees CI Prometheus Targets..."; done ;\
     INFO "CloudBees CI Targets are loaded in Prometheus."
-  until eval "$(get-tf-output "$ROOT" aws_logstreams_fluentbit)" | jq '.[] | select(.logStreamName | contains("jenkins"))'; do sleep $RETRY_SECONDS && echo "Waiting for CloudBees CI Log streams in CloudWatch..."; done ;\
+  until eval "$(get-tf-output "$ROOT" aws_logstreams_fluentbit)" | jq '.[] '; do sleep $RETRY_SECONDS && echo "Waiting for CloudBees CI Log streams in CloudWatch..."; done ;\
     INFO "CloudBees CI Log Streams are already in Cloud Watch."
 }
