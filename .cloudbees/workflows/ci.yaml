@@ -87,10 +87,8 @@ jobs:
           }
         }
         EOT
-        terraform -chdir=blueprints/${{ env.ROOT }} init -reconfigure
-        terraform -chdir=blueprints/${{ env.ROOT }} apply -target="module.vpc" -auto-approve
-        terraform -chdir=blueprints/${{ env.ROOT }} apply -target="module.eks" -auto-approve
-        terraform -chdir=blueprints/${{ env.ROOT }} apply -auto-approve
+        CI=true make deploy
+        sleep 5
 
     - name: 01-getting-started - Validate
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
@@ -105,10 +103,7 @@ jobs:
         ROOT: 01-getting-started
         TF_VAR_hosted_zone: bp01.aws.ps.beescloud.com
       run : |
-        terraform -chdir=blueprints/${{ env.ROOT }} destroy -target=module.eks_blueprints_addon_cbci -auto-approve
-        terraform -chdir=blueprints/${{ env.ROOT }} destroy -target=module.eks_blueprints_addons -auto-approve
-        terraform -chdir=blueprints/${{ env.ROOT }} destroy -target=module.eks -auto-approve
-        terraform -chdir=blueprints/${{ env.ROOT }} destroy -auto-approve
+        CI=true make destroy
 
   bp02:
     needs:
@@ -151,10 +146,8 @@ jobs:
         secGithubUser: "exampleUser"
         secGithubToken: "ExampleToken"
         EOT
-        terraform -chdir=blueprints/${{ env.ROOT }} init -reconfigure
-        terraform -chdir=blueprints/${{ env.ROOT }} apply -target="module.vpc" -auto-approve
-        terraform -chdir=blueprints/${{ env.ROOT }} apply -target="module.eks" -auto-approve
-        terraform -chdir=blueprints/${{ env.ROOT }} apply -auto-approve
+        CI=true make deploy
+        sleep 5
 
     - name: 02-at-scale - Validate
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
@@ -169,7 +162,4 @@ jobs:
         ROOT: 02-at-scale
         TF_VAR_hosted_zone: bp02.aws.ps.beescloud.com
       run : |
-        terraform -chdir=blueprints/${{ env.ROOT }} destroy -target=module.eks_blueprints_addon_cbci -auto-approve
-        terraform -chdir=blueprints/${{ env.ROOT }} destroy -target=module.eks_blueprints_addons -auto-approve
-        terraform -chdir=blueprints/${{ env.ROOT }} destroy -target=module.eks -auto-approve
-        terraform -chdir=blueprints/${{ env.ROOT }} destroy -auto-approve
+        CI=true make destroy
