@@ -5,10 +5,8 @@
 FROM alpine:3.19.0
 
 ENV TF_VERSION=1.6.6 \
-    TG_VERSION=0.55.1 \
     KUBECTL_VERSION=1.29.0 \
     VELERO_VERSION=1.13.0 \
-    USER=bp-agent \
     ARCH=amd64
 
 RUN apk add --update --no-cache \
@@ -25,10 +23,6 @@ RUN curl -sLO https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_$
     unzip terraform_${TF_VERSION}_linux_${ARCH}.zip && \
     mv terraform /usr/bin/terraform && \
     rm terraform_${TF_VERSION}_linux_${ARCH}.zip
-
-RUN curl -sLO https://github.com/gruntwork-io/terragrunt/releases/download/v${TG_VERSION}/terragrunt_linux_${ARCH} && \
-    mv terragrunt_linux_${ARCH} /usr/bin/terragrunt && \
-    chmod u+x /usr/bin/terragrunt
 
 RUN curl -sLO https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/${ARCH}/kubectl && \
     mv kubectl /usr/bin/kubectl && \
