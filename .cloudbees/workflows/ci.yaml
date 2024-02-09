@@ -14,7 +14,7 @@ env:
   AWS_REGION: us-east-1
   BUCKET_NAME_TF_STATE: cbci-eks-addon-bp-tf-state
   AWS_ROLE_TO_ASSUME: infra-admin-ci
-  CLEAN_UP: true
+  CLEAN_UP: "true"
   TF_AUTO_VARS_FILE: |
     tags = {
       "cb-owner" : "professional-services"
@@ -89,7 +89,7 @@ jobs:
           }
         }
         EOT
-        if ${{ env.CLEAN_UP }}; then echo "Clean up mode"; else CI=true make deploy; fi
+        [ "${{ env.CLEAN_UP }}" = "true" ] && echo "Clean up mode" || CI=true make deploy
 
     - name: 01-getting-started - Validate
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
@@ -97,7 +97,7 @@ jobs:
         ROOT: 01-getting-started
       shell: bash
       run : |
-        if ${{ env.CLEAN_UP }}; then echo "Clean up mode"; else CI=true make validate; fi
+        [ "${{ env.CLEAN_UP }}" = "true" ] && echo "Clean up mode" || CI=true make validate
 
     - name: 01-getting-started - Destroy
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
@@ -106,7 +106,7 @@ jobs:
         TF_VAR_hosted_zone: bp01.aws.ps.beescloud.com
       shell: bash
       run : |
-        if ${{ env.CLEAN_UP }}; then terraform init -reconfigure && CI=true make destroy; else CI=true make destroy; fi
+        [ "${{ env.CLEAN_UP }}" = "true" ] && then terraform init -reconfigure; CI=true make destroy || CI=true make destroy
 
   bp02:
     needs:
@@ -150,7 +150,7 @@ jobs:
         secGithubUser: "exampleUser"
         secGithubToken: "ExampleToken"
         EOT
-        if ${{ env.CLEAN_UP }}; then echo "Clean up mode"; else CI=true make deploy; fi
+        [ "${{ env.CLEAN_UP }}" = "true" ] && echo "Clean up mode" || CI=true make deploy
 
     - name: 02-at-scale - Validate
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
@@ -158,7 +158,7 @@ jobs:
         ROOT: 02-at-scale
       shell: bash
       run : |
-        if ${{ env.CLEAN_UP }}; then echo "Clean up mode"; else CI=true make validate; fi
+        [ "${{ env.CLEAN_UP }}" = "true" ] && echo "Clean up mode" || CI=true make validate
 
     - name: 02-at-scale - Destroy
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
@@ -167,4 +167,4 @@ jobs:
         TF_VAR_hosted_zone: bp02.aws.ps.beescloud.com
       shell: bash
       run : |
-        if ${{ env.CLEAN_UP }}; then terraform init -reconfigure && CI=true make destroy; else CI=true make destroy; fi
+        [ "${{ env.CLEAN_UP }}" = "true" ] && then terraform init -reconfigure; CI=true make destroy || CI=true make destroy
