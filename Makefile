@@ -14,25 +14,10 @@ define helpers
 endef
 
 define confirmation
-	if [ $(CI) == false ]; then \
-		echo -n "Asking for your confirmation to $(1) [yes/No]" && read ans && [ $${ans:-No} = yes ] ; fi
-endef
-
-define deploy
-	@$(call helpers,INFO "Deploying CloudBees CI Blueprint $(1) ...")
-	@$(call confirmation,Deploy $(1))
-	@$(call helpers,tf-deploy $(1))
-endef
-
-define destroy
-	@$(call helpers,INFO "Destroying CloudBees CI Blueprint $(1) ...")
-	@$(call confirmation,Destroy $(1))
-	$(call helpers,tf-destroy $(1))
+	echo -n "Asking for your confirmation to $(1) [yes/No]" && read ans && [ $${ans:-No} = yes ]
 endef
 
 define validate
-	@$(call helpers,INFO "Validating CloudBees CI Operation Center availability for $(1) ...")
-	@$(call confirmation,Validate $(1))
 	@$(call helpers,probes-common $(1))
 	@if [ "$(1)" == "01-getting-started" ]; then \
 		$(call helpers,probes-bp01) ; fi
@@ -73,34 +58,41 @@ preFlightChecks: guard-ROOT
 .PHONY: deploy
 deploy: ## Deploy Terraform Blueprint passed as parameter. Example: ROOT=02-at-scale make deploy
 deploy: guard-ROOT preFlightChecks
-	$(call deploy,$(ROOT))
+	@$(call helpers,INFO "Deploying CloudBees CI Blueprint $(ROOT) ...")
+ifeq ($(CI),false)
+	@$(call confirmation,Deploy $(ROOT))
+endif
+	@$(call helpers,tf-deploy $(ROOT))
 
 .PHONY: validate
 validate: ## Validate CloudBees CI Blueprint deployment passed as parameter. Example: ROOT=02-at-scale make validate
 validate: guard-ROOT preFlightChecks
+	@$(call helpers,INFO "Validating CloudBees CI Operation Center availability for $(ROOT) ...")
+ifeq ($(CI),false)
 ifneq ("$(wildcard $(MKFILEDIR)/blueprints/$(ROOT)/terraform.output)","")
-	$(call validate,$(ROOT))
+	@$(call confirmation,Validate $(ROOT))
 else
 	@$(call helpers,ERROR "Blueprint $(ROOT) did not complete the Deployment target thus it is not Ready to be validated.")
 endif
+endif
+	@$(call validate,$(ROOT))
 
 .PHONY: destroy
 destroy: ## Destroy Terraform Blueprint passed as parameter. Example: ROOT=02-at-scale make destroy
 destroy: guard-ROOT preFlightChecks
+	@$(call helpers,INFO "Destroying CloudBees CI Blueprint $(1) ...")
+ifeq ($(CI),false)
 ifneq ("$(wildcard $(MKFILEDIR)/blueprints/$(ROOT)/terraform.output)","")
-	$(call destroy,$(ROOT))
+	@$(call confirmation,Destroy $(ROOT))
 else
 	@$(call helpers,ERROR "Blueprint $(ROOT) did not complete the Deployment target. It is not Ready for Destroy target but it is possible to destroy manually https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#destroy")
 endif
+endif
+	@$(call helpers,tf-destroy $(ROOT))
 
 .PHONY: test
 test: ## Runs a test for blueprint passed as parameters throughout their Terraform Lifecycle. Example: ROOT=02-at-scale make test
-test: guard-ROOT
-	@$(call helpers,INFO "Running Test for $(ROOT) blueprint ...")
-	$(call deploy,$(ROOT))
-	$(call validate,$(ROOT))
-	$(call destroy,$(ROOT))
-	$(call clean,$(ROOT))
+test: guard-ROOT deploy validate destroy clean
 
 .PHONY: test-all
 test-all: ## Runs test for all blueprints throughout their Terraform Lifecycle. Example: make test-all
