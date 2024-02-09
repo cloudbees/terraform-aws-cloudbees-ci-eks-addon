@@ -4,15 +4,14 @@ MAKEFLAGS       	+= --no-print-directory
 BP_AGENT_USER		:= bp-agent
 CI 					?= false
 MKFILEDIR 			:= $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
-MSG_INFO     		:= "\033[36m[INFO] %s\033[0m\n"
-MSG_WARN 			:= "\033[0;33m[WARN] %s\033[0m\n"
-MSG_ERROR 			:= "\033[0;31m[ERROR] %s\033[0m\n"
 
 #https://developer.hashicorp.com/terraform/internals/debugging
-ifeq ($(CI),false)
-	export TF_LOG=INFO
-	export TF_LOG_PATH=$(MKFILEDIR)/blueprints/terraform.log
-endif
+export TF_LOG=INFO
+export TF_LOG_PATH=$(MKFILEDIR)/blueprints/terraform.log
+
+define helpers
+	source blueprints/helpers.sh && $(1)
+endef
 
 define confirmation
 	@if [ $(CI) == false ]; then \
@@ -20,25 +19,25 @@ define confirmation
 endef
 
 define deploy
-	@printf $(MSG_INFO) "Deploying CloudBees CI Blueprint $(1) ..."
+	@$(call helpers,INFO "Deploying CloudBees CI Blueprint $(1) ...")
 	$(call confirmation,Deploy $(1))
-	@source blueprints/helpers.sh && tf-deploy $(1)
+	$(call helpers,tf-deploy $(1))
 endef
 
 define destroy
-	@printf $(MSG_INFO) "Destroying CloudBees CI Blueprint $(1) ..."
+	@$(call helpers,INFO "Destroying CloudBees CI Blueprint $(1) ...")
 	$(call confirmation,Destroy $(1))
-	@source blueprints/helpers.sh && tf-destroy $(1)
+	$(call helpers,tf-destroy $(1))
 endef
 
 define validate
-	@printf $(MSG_INFO) "Validating CloudBees CI Operation Center availability for $(1) ..."
+	@$(call helpers,INFO "Validating CloudBees CI Operation Center availability for $(1) ...")
 	$(call confirmation,Validate $(1))
-	@source blueprints/helpers.sh && probes-common $(1)
+	$(call helpers,probes-common $(1))
 	@if [ "$(1)" == "01-getting-started" ]; then \
-		source blueprints/helpers.sh && probes-bp01 ; fi
+		$(call helpers,probes-bp01) ; fi
 	@if [ "$(1)" == "02-at-scale" ]; then \
-		source blueprints/helpers.sh && probes-bp02 ; fi
+		$(call helpers,probes-bp02) ; fi
 endef
 
 define clean
@@ -54,7 +53,7 @@ dRun: ## Build (if not locally present) and Run the Blueprint Agent using Bash a
 dRun:
 	$(eval IMAGE := $(shell docker image ls | grep -c local.cloudbees/bp-agent))
 	@if [ "$(IMAGE)" == "0" ]; then \
-		printf $(MSG_INFO) "Building Docker Image local.cloudbees/bp-agent:latest" && \
+		$(call helpers,INFO "Building Docker Image local.cloudbees/bp-agent:latest") && \
 		docker build . --file $(MKFILEDIR)/.docker/Dockerfile.rootless --tag local.cloudbees/bp-agent:latest; \
 		fi
 	docker run --rm -it --name bp-agent \
@@ -64,12 +63,12 @@ dRun:
 .PHONY: preFlightChecks
 preFlightChecks: ## Run preflight checks for terraform according to getting-started/README.md . Example: ROOT=02-at-scale make preFlightChecks
 preFlightChecks: guard-ROOT
-	@if [ "$(shell whoami)" != "$(BP_AGENT_USER)" ]; then printf $(MSG_WARN) "$(BP_AGENT_USER) user is not detected. Note that blueprints validations use the companion Blueprint Docker Agent available via: make dRun"; fi
-	@if [ ! -f blueprints/$(ROOT)/.auto.tfvars ]; then printf $(MSG_ERROR) "blueprints/$(ROOT)/.auto.tfvars file does not exist and it is required to store your own values"; exit 1; fi
-	@if ([ ! -f blueprints/$(ROOT)/k8s/secrets-values.yml ] && [ $(ROOT) == "02-at-scale" ]); then printf $(MSG_ERROR) "blueprints/$(ROOT)/secrets-values.yml file does not exist and it is required to store your secrets"; exit 1; fi
+	@if [ "$(shell whoami)" != "$(BP_AGENT_USER)" ]; then $(call helpers,WARN "$(BP_AGENT_USER) user is not detected. Note that blueprints validations use the companion Blueprint Docker Agent available via: make dRun"); fi
+	@if [ ! -f blueprints/$(ROOT)/.auto.tfvars ]; then $(call helpers,ERROR "blueprints/$(ROOT)/.auto.tfvars file does not exist and it is required to store your own values"); fi
+	@if ([ ! -f blueprints/$(ROOT)/k8s/secrets-values.yml ] && [ $(ROOT) == "02-at-scale" ]); then $(call helpers,ERROR "blueprints/$(ROOT)/secrets-values.yml file does not exist and it is required to store your secrets"); fi
 	$(eval USER_ID := $(shell aws sts get-caller-identity | grep UserId | cut -d"," -f 1 | xargs ))
-	@if [ "$(USER_ID)" == "" ]; then printf $(MSG_ERROR) "AWS Authention for CLI is not configured" && exit 1; fi
-	@printf $(MSG_INFO) "Preflight Checks OK for $(USER_ID)"
+	@if [ "$(USER_ID)" == "" ]; then $(call helpers,ERROR "AWS Authention for CLI is not configured"); fi
+	@$(call helpers,INFO "Preflight Checks OK for $(USER_ID)")
 
 .PHONY: deploy
 deploy: ## Deploy Terraform Blueprint passed as parameter. Example: ROOT=02-at-scale make deploy
@@ -82,7 +81,7 @@ validate: guard-ROOT preFlightChecks
 ifneq ("$(wildcard $(MKFILEDIR)/blueprints/$(ROOT)/terraform.output)","")
 	$(call validate,$(ROOT))
 else
-	@printf $(MSG_ERROR) "Blueprint $(ROOT) did not complete the Deployment target thus it is not Ready to be validated."
+	@$(call helpers,ERROR "Blueprint $(ROOT) did not complete the Deployment target thus it is not Ready to be validated.")
 endif
 
 .PHONY: destroy
@@ -91,15 +90,14 @@ destroy: guard-ROOT preFlightChecks
 ifneq ("$(wildcard $(MKFILEDIR)/blueprints/$(ROOT)/terraform.output)","")
 	$(call destroy,$(ROOT))
 else
-	@printf $(MSG_ERROR) "Blueprint $(ROOT) did not complete the Deployment target. It is not Ready for Destroy target but it is possible to destroy manually https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#destroy"
+	@$(call helpers,ERROR "Blueprint $(ROOT) did not complete the Deployment target. It is not Ready for Destroy target but it is possible to destroy manually https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#destroy")
 endif
 
 .PHONY: test
 test: ## Runs a test for blueprint passed as parameters throughout their Terraform Lifecycle. Example: ROOT=02-at-scale make test
 test: guard-ROOT
-	@printf $(MSG_INFO) "Running Test for $(ROOT) blueprint ..."
+	@$(call helpers,INFO "Running Test for $(ROOT) blueprint ...")
 	$(call deploy,$(ROOT))
-	sleep 3
 	$(call validate,$(ROOT))
 	$(call destroy,$(ROOT))
 	$(call clean,$(ROOT))
@@ -107,8 +105,8 @@ test: guard-ROOT
 .PHONY: test-all
 test-all: ## Runs test for all blueprints throughout their Terraform Lifecycle. Example: make test-all
 test-all:
-	@printf $(MSG_INFO) "Running Test for all blueprints ..."
-	@source $(MKFILEDIR)/blueprints/helpers.sh && test-all
+	@$(call helpers,INFO "Running Test for all blueprints ...")
+	$(call helpers,test-all)
 
 .PHONY: clean
 clean: ## Clean Blueprint passed as parameter. Example: ROOT=02-at-scale make clean

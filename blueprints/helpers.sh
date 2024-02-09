@@ -2,7 +2,7 @@
 
 # Copyright (c) CloudBees, Inc.
 
-set -euox pipefail
+set -euo pipefail
 
 SCRIPTDIR="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -12,11 +12,20 @@ INFO () {
   printf "\033[36m[INFO] %s\033[0m\n" "$1"
 }
 
+WARN () {
+  printf "\033[0;33m[WARN] %s\033[0m\n" "$1"
+}
+
+ERROR () {
+  printf "\033[0;31m[ERROR] %s\033[0m\n" "$1"
+  exit 1
+}
+
 retry () {
   local retries="$1"
   local command="$2"
   local options="$-" # Get the current "set" options
-  local wait=3
+  local wait=60
 
   # Disable set -e
   if [[ $options == *e* ]]; then
@@ -35,7 +44,7 @@ retry () {
   # If the exit code is non-zero (i.e. command failed), and we have not
   # reached the maximum number of retries, run the command again
   if [[ $exit_code -ne 0 && $retries -gt 0 ]]; then
-    INFO "$command failed. Retrying in $wait seconds..."
+    WARN "$command failed. Retrying in $wait seconds..."
     sleep $wait
     retry $((retries - 1)) "$command"
   else
@@ -65,7 +74,7 @@ tf-destroy () {
   local root=$1
   retry 2 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.eks_blueprints_addon_cbci -auto-approve"
   retry 2 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.eks_blueprints_addons -auto-approve"
-  retry 2 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.eks -auto-approve"
+  retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.eks -auto-approve"
   retry 2 "terraform -chdir=$SCRIPTDIR/$root destroy -auto-approve"
   rm -f "$SCRIPTDIR/$root/terraform.output"
 }
