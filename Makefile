@@ -19,26 +19,16 @@ define confirmation
 		echo -n "Asking for your confirmation to $(1) [yes/No]" && read ans && [ $${ans:-No} = yes ] ; fi
 endef
 
-#https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#deploy
 define deploy
 	@printf $(MSG_INFO) "Deploying CloudBees CI Blueprint $(1) ..."
 	$(call confirmation,Deploy $(1))
-	@terraform -chdir=$(MKFILEDIR)/blueprints/$(1) init
-	@terraform -chdir=$(MKFILEDIR)/blueprints/$(1) apply -target="module.vpc" -auto-approve
-	@terraform -chdir=$(MKFILEDIR)/blueprints/$(1) apply -target="module.eks" -auto-approve
-	@terraform -chdir=$(MKFILEDIR)/blueprints/$(1) apply -auto-approve
-	@terraform -chdir=$(MKFILEDIR)/blueprints/$(1) output > $(MKFILEDIR)/blueprints/$(1)/terraform.output
+	@source blueprints/helpers.sh && tf-deploy $(1)
 endef
 
-#https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#destroy
 define destroy
 	@printf $(MSG_INFO) "Destroying CloudBees CI Blueprint $(1) ..."
 	$(call confirmation,Destroy $(1))
-	@terraform -chdir=$(MKFILEDIR)/blueprints/$(1) destroy -target=module.eks_blueprints_addon_cbci -auto-approve
-	@terraform -chdir=$(MKFILEDIR)/blueprints/$(1) destroy -target=module.eks_blueprints_addons -auto-approve
-	@terraform -chdir=$(MKFILEDIR)/blueprints/$(1) destroy -target=module.eks -auto-approve
-	@terraform -chdir=$(MKFILEDIR)/blueprints/$(1) destroy -auto-approve
-	@rm -f $(MKFILEDIR)/blueprints/$(1)/terraform.output
+	@source blueprints/helpers.sh && tf-destroy $(1)
 endef
 
 define validate
@@ -71,9 +61,9 @@ dRun:
 		-v $(MKFILEDIR):/$(BP_AGENT_USER)/cbci-eks-addon -v $(HOME)/.aws:/$(BP_AGENT_USER)/.aws \
 		local.cloudbees/bp-agent:latest
 
-.PHONY: tfpreFlightChecks
-tfpreFlightChecks: ## Run preflight checks for terraform according to getting-started/README.md . Example: ROOT=02-at-scale make tfpreFlightChecks
-tfpreFlightChecks: guard-ROOT
+.PHONY: preFlightChecks
+preFlightChecks: ## Run preflight checks for terraform according to getting-started/README.md . Example: ROOT=02-at-scale make preFlightChecks
+preFlightChecks: guard-ROOT
 	@if [ "$(shell whoami)" != "$(BP_AGENT_USER)" ]; then printf $(MSG_WARN) "$(BP_AGENT_USER) user is not detected. Note that blueprints validations use the companion Blueprint Docker Agent available via: make dRun"; fi
 	@if [ ! -f blueprints/$(ROOT)/.auto.tfvars ]; then printf $(MSG_ERROR) "blueprints/$(ROOT)/.auto.tfvars file does not exist and it is required to store your own values"; exit 1; fi
 	@if ([ ! -f blueprints/$(ROOT)/k8s/secrets-values.yml ] && [ $(ROOT) == "02-at-scale" ]); then printf $(MSG_ERROR) "blueprints/$(ROOT)/secrets-values.yml file does not exist and it is required to store your secrets"; exit 1; fi
@@ -83,35 +73,27 @@ tfpreFlightChecks: guard-ROOT
 
 .PHONY: deploy
 deploy: ## Deploy Terraform Blueprint passed as parameter. Example: ROOT=02-at-scale make deploy
-deploy: guard-ROOT tfpreFlightChecks
-	$(call deploy,$(ROOT))
-
-.PHONY: destroy
-destroy: ## Destroy Terraform Blueprint passed as parameter. Example: ROOT=02-at-scale make destroy
-destroy: guard-ROOT tfpreFlightChecks
-ifneq ("$(wildcard $(MKFILEDIR)/blueprints/$(ROOT)/terraform.output)","")
-	$(call destroy,$(ROOT))
-else
-	@printf $(MSG_ERROR) "Blueprint $(ROOT) did not complete the Deployment target. It is not Ready for Destroy target but it is possible to destroy manually https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#destroy"
-endif
-
-.PHONY: clean
-clean: ## Clean Blueprint passed as parameter. Example: ROOT=02-at-scale make clean
-clean: guard-ROOT tfpreFlightChecks
-	$(call clean,$(ROOT))
-
-.PHONY: tfAction
-tfAction: ## Any Terraform Action for Blueprint passed as parameters. Usage: ROOT=02-at-scale ACTION="status list" make tf_action
-tfAction: guard-ROOT guard-ACTION tfpreFlightChecks
-	terraform -chdir=blueprints/$(ROOT) $(ACTION)
+deploy: guard-ROOT preFlightChecks
+	@printf $(MSG_INFO) "Deploying CloudBees CI Blueprint $(1) ..."
+	$(call confirmation,Deploy $(1))
+	@source blueprints/helpers.sh && tf-deploy $(1)
 
 .PHONY: validate
 validate: ## Validate CloudBees CI Blueprint deployment passed as parameter. Example: ROOT=02-at-scale make validate
-validate: guard-ROOT tfpreFlightChecks
+validate: guard-ROOT preFlightChecks
 ifneq ("$(wildcard $(MKFILEDIR)/blueprints/$(ROOT)/terraform.output)","")
 	$(call validate,$(ROOT))
 else
 	@printf $(MSG_ERROR) "Blueprint $(ROOT) did not complete the Deployment target thus it is not Ready to be validated."
+endif
+
+.PHONY: destroy
+destroy: ## Destroy Terraform Blueprint passed as parameter. Example: ROOT=02-at-scale make destroy
+destroy: guard-ROOT preFlightChecks
+ifneq ("$(wildcard $(MKFILEDIR)/blueprints/$(ROOT)/terraform.output)","")
+	$(call destroy,$(ROOT))
+else
+	@printf $(MSG_ERROR) "Blueprint $(ROOT) did not complete the Deployment target. It is not Ready for Destroy target but it is possible to destroy manually https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#destroy"
 endif
 
 .PHONY: test
@@ -125,15 +107,19 @@ test: guard-ROOT
 	$(call clean,$(ROOT))
 
 .PHONY: test-all
-test-all: ## Runs test for all blueprints throughout their Terraform Lifecycle. Example: make test
+test-all: ## Runs test for all blueprints throughout their Terraform Lifecycle. Example: make test-all
 test-all:
 	@printf $(MSG_INFO) "Running Test for all blueprints ..."
 	@source $(MKFILEDIR)/blueprints/helpers.sh && test-all
 
+.PHONY: clean
+clean: ## Clean Blueprint passed as parameter. Example: ROOT=02-at-scale make clean
+clean: guard-ROOT preFlightChecks
+	$(call clean,$(ROOT))
+
 .PHONY: help
 help: ## Makefile Help Page
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n\nTargets:\n"} /^[\/\%a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-21s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST) 2>/dev/null
-	@printf "\nDebug: Use -d flag with targets. Example: ROOT=02-at-scale make -d validate \n\n"
 
 .PHONY: guard-%
 guard-%:
