@@ -106,7 +106,7 @@ jobs:
         TF_VAR_hosted_zone: bp01.aws.ps.beescloud.com
       shell: bash
       run : |
-        [ "${{ env.CLEAN_UP }}" = "true" ] && then terraform init -reconfigure; CI=true make destroy || CI=true make destroy
+        [ "${{ env.CLEAN_UP }}" = "true" ] && terraform init -reconfigure; CI=true make destroy || CI=true make destroy
 
   bp02:
     needs:
@@ -167,4 +167,4 @@ jobs:
         TF_VAR_hosted_zone: bp02.aws.ps.beescloud.com
       shell: bash
       run : |
-        [ "${{ env.CLEAN_UP }}" = "true" ] && then terraform init -reconfigure; CI=true make destroy || CI=true make destroy
+        [ "${{ env.CLEAN_UP }}" = "true" ] && terraform init -reconfigure; CI=true make destroy || CI=true make destroy
