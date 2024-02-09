@@ -88,14 +88,14 @@ jobs:
           }
         }
         EOT
-        [ ! ${{ env.CLEAN_UP }} ] && CI=true make deploy  || echo "Skipping deploying for cleaning up..."
+        [ ${{ env.CLEAN_UP }} = false ] && CI=true make deploy  || echo "Skipping deploying for cleaning up..."
 
     - name: 01-getting-started - Validate
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
       env:
         ROOT: 01-getting-started
       run : |
-        [ ! ${{ env.CLEAN_UP }} ] && CI=true make validate || echo "Skipping validation for cleaning up..."
+        [ ${{ env.CLEAN_UP }} = false ] && CI=true make validate || echo "Skipping validation for cleaning up..."
 
     - name: 01-getting-started - Destroy
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
@@ -103,7 +103,7 @@ jobs:
         ROOT: 01-getting-started
         TF_VAR_hosted_zone: bp01.aws.ps.beescloud.com
       run : |
-        [ ! ${{ env.CLEAN_UP }} ] && CI=true make destroy || { terraform init -reconfigure; CI=true make destroy }
+        [ ${{ env.CLEAN_UP }} = false ] && CI=true make destroy || { terraform init -reconfigure; CI=true make destroy }
 
   bp02:
     needs:
@@ -146,14 +146,14 @@ jobs:
         secGithubUser: "exampleUser"
         secGithubToken: "ExampleToken"
         EOT
-        [ ! ${{ env.CLEAN_UP }} ] && CI=true make deploy  || echo "Skipping deploying for cleaning up..."
+        [ ${{ env.CLEAN_UP }} = false ] && CI=true make deploy  || echo "Skipping deploying for cleaning up..."
 
     - name: 02-at-scale - Validate
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
       env:
         ROOT: 02-at-scale
       run : |
-        [ ! ${{ env.CLEAN_UP }} ] && CI=true make validate || echo "Skipping validation for cleaning up..."
+        [ ${{ env.CLEAN_UP }} = false ] && CI=true make validate || echo "Skipping validation for cleaning up..."
 
     - name: 02-at-scale - Destroy
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
@@ -161,4 +161,4 @@ jobs:
         ROOT: 02-at-scale
         TF_VAR_hosted_zone: bp02.aws.ps.beescloud.com
       run : |
-        [ ! ${{ env.CLEAN_UP }} ] && CI=true make destroy || { terraform init -reconfigure; CI=true make destroy }
+        [ ${{ env.CLEAN_UP }} = false ] && CI=true make destroy || { terraform init -reconfigure; CI=true make destroy }
