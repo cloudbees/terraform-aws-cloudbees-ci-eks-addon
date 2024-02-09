@@ -74,9 +74,7 @@ preFlightChecks: guard-ROOT
 .PHONY: deploy
 deploy: ## Deploy Terraform Blueprint passed as parameter. Example: ROOT=02-at-scale make deploy
 deploy: guard-ROOT preFlightChecks
-	@printf $(MSG_INFO) "Deploying CloudBees CI Blueprint $(1) ..."
-	$(call confirmation,Deploy $(1))
-	@source blueprints/helpers.sh && tf-deploy $(1)
+	$(call deploy,$(ROOT))
 
 .PHONY: validate
 validate: ## Validate CloudBees CI Blueprint deployment passed as parameter. Example: ROOT=02-at-scale make validate
@@ -101,7 +99,7 @@ test: ## Runs a test for blueprint passed as parameters throughout their Terrafo
 test: guard-ROOT
 	@printf $(MSG_INFO) "Running Test for $(ROOT) blueprint ..."
 	$(call deploy,$(ROOT))
-	sleep 5
+	sleep 3
 	$(call validate,$(ROOT))
 	$(call destroy,$(ROOT))
 	$(call clean,$(ROOT))
