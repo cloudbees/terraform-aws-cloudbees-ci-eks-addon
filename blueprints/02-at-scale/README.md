@@ -43,7 +43,7 @@ For s3 storage permissions for Workspace caching and Artifact Manager is based o
 | hosted_zone | Route 53 Hosted Zone. CloudBees CI Apps is configured to use subdomains in this Hosted Zone. | `string` | n/a | yes |
 | trial_license | CloudBees CI Trial license details for evaluation. | `map(string)` | n/a | yes |
 | grafana_admin_password | Grafana admin password. | `string` | `"change.me"` | no |
-| suffix | Unique suffix to be assigned to all resources | `string` | `""` | no |
+| suffix | Unique suffix to be assigned to all resources. When adding suffix, it requires chnages in CloudBees CI for the validation phase. | `string` | `""` | no |
 | tags | Tags to apply to resources. | `map(string)` | `{}` | no |
 
 ### Outputs
