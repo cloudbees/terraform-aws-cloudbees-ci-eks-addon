@@ -35,7 +35,7 @@ retry () {
   # If the exit code is non-zero (i.e. command failed), and we have not
   # reached the maximum number of retries, run the command again
   if [[ $exit_code -ne 0 && $retries -gt 0 ]]; then
-    INFO "Command failed. Retrying in $wait seconds..."
+    INFO "$command failed. Retrying in $wait seconds..."
     sleep $wait
     retry $((retries - 1)) "$command"
   else
