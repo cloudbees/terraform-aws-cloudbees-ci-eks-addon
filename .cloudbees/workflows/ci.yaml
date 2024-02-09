@@ -14,6 +14,7 @@ env:
   AWS_REGION: us-east-1
   BUCKET_NAME_TF_STATE: cbci-eks-addon-bp-tf-state
   AWS_ROLE_TO_ASSUME: infra-admin-ci
+  CLEAN_UP: true
   TF_AUTO_VARS_FILE: |
     tags = {
       "cb-owner" : "professional-services"
@@ -27,7 +28,6 @@ env:
       company = "CloudBees Inc."
     }
     suffix = "ci-v2"
-  CLEAN_UP: true
 
 jobs:
 #TODO: Create 2 jobs once per blueprint, with 2 different hosted_zone. They depends on a init jobs to create the bucket
