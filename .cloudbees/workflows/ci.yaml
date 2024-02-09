@@ -75,6 +75,7 @@ jobs:
       env:
         ROOT: 01-getting-started
         TF_VAR_hosted_zone: bp01.aws.ps.beescloud.com
+      shell: bash
       run : |
         cat <<EOT >> blueprints/${{ env.ROOT }}/.auto.tfvars
         ${{ env.TF_AUTO_VARS_FILE }}
@@ -88,12 +89,13 @@ jobs:
           }
         }
         EOT
-        [ ${{ env.CLEAN_UP }} = false ] && CI=true make deploy  || echo "Skipping deploying for cleaning up..."
+        [ ${{ env.CLEAN_UP }} = false ] && CI=true make deploy || echo "Skipping deploying for cleaning up..."
 
     - name: 01-getting-started - Validate
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
       env:
         ROOT: 01-getting-started
+      shell: bash
       run : |
         [ ${{ env.CLEAN_UP }} = false ] && CI=true make validate || echo "Skipping validation for cleaning up..."
 
@@ -102,6 +104,7 @@ jobs:
       env:
         ROOT: 01-getting-started
         TF_VAR_hosted_zone: bp01.aws.ps.beescloud.com
+      shell: bash
       run : |
         [ ${{ env.CLEAN_UP }} = false ] && CI=true make destroy || { terraform init -reconfigure; CI=true make destroy }
 
@@ -128,6 +131,7 @@ jobs:
       env:
         ROOT: 02-at-scale
         TF_VAR_hosted_zone: bp02.aws.ps.beescloud.com
+      shell: bash
       run : |
         cat <<EOT >> blueprints/${{ env.ROOT }}/.auto.tfvars
         ${{ env.TF_AUTO_VARS_FILE }}
@@ -152,6 +156,7 @@ jobs:
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
       env:
         ROOT: 02-at-scale
+      shell: bash
       run : |
         [ ${{ env.CLEAN_UP }} = false ] && CI=true make validate || echo "Skipping validation for cleaning up..."
 
@@ -160,5 +165,6 @@ jobs:
       env:
         ROOT: 02-at-scale
         TF_VAR_hosted_zone: bp02.aws.ps.beescloud.com
+      shell: bash
       run : |
         [ ${{ env.CLEAN_UP }} = false ] && CI=true make destroy || { terraform init -reconfigure; CI=true make destroy }
