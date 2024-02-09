@@ -29,11 +29,9 @@ locals {
 
   #https://docs.aws.amazon.com/eks/latest/userguide/choosing-instance-type.html
   k8s_instance_types = {
-    # Not Scalable (by design)
-    "k8s-apps" = ["m7g.xlarge"]
-    # Scalable (by design)
-    "cb-apps" = ["m7g.4xlarge"]
-    "agent"   = ["m5.2xlarge"]
+    "common-apps" = ["m7g.large"]
+    "cb-apps"     = ["m7g.xlarge"]
+    "agents"      = ["m7g.4xlarge"]
   }
 
   route53_zone_id  = data.aws_route53_zone.this.id
@@ -291,7 +289,7 @@ module "eks" {
   eks_managed_node_groups = {
     mg_k8sApps = {
       node_group_name = "mg-k8s-apps"
-      instance_types  = local.k8s_instance_types["k8s-apps"]
+      instance_types  = local.k8s_instance_types["common-apps"]
       capacity_type   = "ON_DEMAND"
       min_size        = 1
       max_size        = 3
@@ -315,7 +313,7 @@ module "eks" {
     }
     mg_cbAgents = {
       node_group_name = "mng-agent"
-      instance_types  = local.k8s_instance_types["agent"]
+      instance_types  = local.k8s_instance_types["agents"]
       capacity_type   = "ON_DEMAND"
       min_size        = 1
       max_size        = 3
@@ -327,7 +325,7 @@ module "eks" {
     }
     mg_cbAgents_spot = {
       node_group_name = "mng-agent-spot"
-      instance_types  = local.k8s_instance_types["agent"]
+      instance_types  = local.k8s_instance_types["agents"]
       capacity_type   = "SPOT"
       min_size        = 1
       max_size        = 3

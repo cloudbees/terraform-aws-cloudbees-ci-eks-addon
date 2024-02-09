@@ -25,7 +25,7 @@ Once you have familiarized yourself with the [Getting Started blueprint](../01-g
 
 ![Architecture](img/at-scale.architect.drawio.svg)
 
-Node Groups use [Graviton Processor](https://aws.amazon.com/ec2/graviton/) for Applications Services to ensure the best balance price and performance for cloud workloads running on Amazon EC2. Then, it uses M5 for Agents Tasks.
+Node Groups use [Graviton Processor](https://aws.amazon.com/ec2/graviton/) to ensure the best balance price and performance for cloud workloads running on Amazon EC2.
 
 For s3 storage permissions for Workspace caching and Artifact Manager is based on [Instance Profile](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2_instance-profiles.html) rather than creating a User with IAM permissions. Then, it is expected that Credentials validation fails from CloudBees CI.
 
