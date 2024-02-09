@@ -14,26 +14,26 @@ define helpers
 endef
 
 define confirmation
-	@if [ $(CI) == false ]; then \
+	if [ $(CI) == false ]; then \
 		echo -n "Asking for your confirmation to $(1) [yes/No]" && read ans && [ $${ans:-No} = yes ] ; fi
 endef
 
 define deploy
 	@$(call helpers,INFO "Deploying CloudBees CI Blueprint $(1) ...")
-	$(call confirmation,Deploy $(1))
-	$(call helpers,tf-deploy $(1))
+	@$(call confirmation,Deploy $(1))
+	@$(call helpers,tf-deploy $(1))
 endef
 
 define destroy
 	@$(call helpers,INFO "Destroying CloudBees CI Blueprint $(1) ...")
-	$(call confirmation,Destroy $(1))
+	@$(call confirmation,Destroy $(1))
 	$(call helpers,tf-destroy $(1))
 endef
 
 define validate
 	@$(call helpers,INFO "Validating CloudBees CI Operation Center availability for $(1) ...")
-	$(call confirmation,Validate $(1))
-	$(call helpers,probes-common $(1))
+	@$(call confirmation,Validate $(1))
+	@$(call helpers,probes-common $(1))
 	@if [ "$(1)" == "01-getting-started" ]; then \
 		$(call helpers,probes-bp01) ; fi
 	@if [ "$(1)" == "02-at-scale" ]; then \
