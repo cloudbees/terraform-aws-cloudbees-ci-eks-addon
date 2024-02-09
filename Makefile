@@ -25,14 +25,6 @@ define validate
 		$(call helpers,probes-bp02) ; fi
 endef
 
-define clean
-	@cd $(MKFILEDIR)/blueprints/$(ROOT) && find -name ".terraform" -type d | xargs rm -rf
-	@cd $(MKFILEDIR)/blueprints/$(ROOT) && find -name ".terraform.lock.hcl" -type f | xargs rm -f
-	@cd $(MKFILEDIR)/blueprints/$(ROOT) && find -name "kubeconfig_*.yaml" -type f | xargs rm -f
-	@cd $(MKFILEDIR)/blueprints/$(ROOT) && find -name "terraform.output" -type f | xargs rm -f
-	@cd $(MKFILEDIR)/blueprints/$(ROOT) && find -name terraform.log -type f | xargs rm -f
-endef
-
 .PHONY: dRun
 dRun: ## Build (if not locally present) and Run the Blueprint Agent using Bash as Entrypoint. It is ideal starting point for all targets. Example: make dRun
 dRun:
@@ -103,7 +95,11 @@ test-all:
 .PHONY: clean
 clean: ## Clean Blueprint passed as parameter. Example: ROOT=02-at-scale make clean
 clean: guard-ROOT preFlightChecks
-	$(call clean,$(ROOT))
+	@cd $(MKFILEDIR)/blueprints/$(ROOT) && find -name ".terraform" -type d | xargs rm -rf
+	@cd $(MKFILEDIR)/blueprints/$(ROOT) && find -name ".terraform.lock.hcl" -type f | xargs rm -f
+	@cd $(MKFILEDIR)/blueprints/$(ROOT) && find -name "kubeconfig_*.yaml" -type f | xargs rm -f
+	@cd $(MKFILEDIR)/blueprints/$(ROOT) && find -name "terraform.output" -type f | xargs rm -f
+	@cd $(MKFILEDIR)/blueprints/$(ROOT) && find -name terraform.log -type f | xargs rm -f
 
 .PHONY: help
 help: ## Makefile Help Page
