@@ -72,10 +72,10 @@ tf-deploy () {
 #https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#destroy
 tf-destroy () {
   local root=$1
-  retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.eks_blueprints_addon_cbci -auto-approve"
-  retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.eks_blueprints_addons -auto-approve"
-  retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.eks -auto-approve"
-  retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -auto-approve"
+  retry 2 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.eks_blueprints_addon_cbci -auto-approve"
+  retry 2 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.eks_blueprints_addons -auto-approve"
+  retry 2 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.eks -auto-approve"
+  retry 2 "terraform -chdir=$SCRIPTDIR/$root destroy -auto-approve"
   rm -f "$SCRIPTDIR/$root/terraform.output"
 }
 
