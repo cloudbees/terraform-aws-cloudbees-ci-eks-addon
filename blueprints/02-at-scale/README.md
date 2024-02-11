@@ -126,25 +126,35 @@ Once the resources have been created, note that a `kubeconfig` file has been cre
   eval $(terraform output --raw cbci_controllers_pods)
   ```
 
-- From the previous validation, it can be seen that 2 replicas are running for `team-c-ha`. This is because [CloudBees CI HA/HS](https://docs.cloudbees.com/docs/cloudbees-ci/latest/ha-install-guide/) is enabled in this controller, where you can follow the steps from [Getting Started With CloudBees CI High Availability - CloudBees TV 🎥](https://www.youtube.com/watch?v=Qkf9HaA2wio). See Horizontal Pod Autoscaling enabled by:
+- From the previous validation, it can be seen that 2 replicas are running for `team-c-ha`. This is because [CloudBees CI HA/HS](https://docs.cloudbees.com/docs/cloudbees-ci/latest/ha-install-guide/) is enabled in this controller. See Horizontal Pod Autoscaling enabled by:
 
   ```sh
   eval $(terraform output --raw cbci_controller_c_hpa)
   ```
 
-- [CloudBees Workspace Caching](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-cache-step) and [CloudBees CI Hibernation](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#_hibernation_in_managed_masters) features can be seen together in action the `team-b`. Once the `Amazon S3 Bucket Access settings` > `S3 Bucket Name` is configured correctly (see [Deploy](#deploy) section), you can watch how to write (since the first build) and read (since the second build) from the `ws-cache` pipeline. To trigger the builds will be using the [POST queue hibernation API endpoints](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#_post_queue_for_hibernation). But firstly you need to [create an API TOKEN](https://docs.cloudbees.com/docs/cloudbees-ci-kb/latest/client-and-managed-controllers/how-to-generate-change-an-apitoken#_programmatically_creating_a_token) for the `admin` user:
+- The consecutive validations for CloudBees CI operate remotely with CloudBees CI by triggering pipeline builds (The same results could be obtained by scheduling builds manually from the GUI). Firstly, let's set the `admin` user `API Token` as an environment variable to be used in the next steps:
 
   ```sh
   eval $(terraform output --raw cbci_oc_export_admin_crumb) && \
     eval $(terraform output --raw cbci_oc_export_admin_api_token) && \
-    eval $(terraform output --raw cbci_controller_b_hibernation_post_queue_ws_cache)
+    printenv | grep CBCI_ADMIN_TOKEN
   ```
 
 > [!NOTE]
-> - More examples for Workspace Caching can be found at [Getting Started With CloudBees Workspace Caching on AWS S3 - CloudBees TV 🎥](https://www.youtube.com/watch?v=ESU9oN9JUCw&list=PLvBBnHmZuNQJcDefZ7G7Qyp3J9MAMaigF&index=7&t=3s).
-> - Transitions to the hibernation state happens after reaching the defined [Grace Period time](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#_configuring_hibernation) of inactivity (idle).
+> If it fails, validate the DNS propgation is completed by `eval $(terraform output --raw cbci_liveness_probe_ext)`.
 
-- [CloudBees Pipeline Explorer](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-pipeline-explorer-plugin) is enabled for all Controllers using Configuration as Code, you can see it in action by triggering any builds of the preconfigured pipelines or following the steps explained in [Troubleshooting Pipelines With CloudBees Pipeline Explorer - CloudBees TV 🎥](https://www.youtube.com/watch?v=OMXm6eYd1EQ).
+- [CloudBees Workspace Caching](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-cache-step), [CloudBees CI Hibernation](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#_hibernation_in_managed_masters) and [CloudBees Pipeline Explorer](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-pipeline-explorer-plugin) features can be seen together in action in the pipeline `ws-cache` from `team-b`. To trigger these builds will be using the [POST queue hibernation API endpoints](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#_post_queue_for_hibernation).
+
+  ```sh
+    eval $(terraform output --raw cbci_controller_b_hibernation_post_queue_ws_cache)
+  ```
+
+The build is triggered successfully getting `HTTP/2 201` as the response from the API REST call. Now, log in `team-b` and check its build output of `ws-cache` pipeline using the capabilities CloudBees Pipeline Explorer (enabled for all Controllers using Configuration as Code).
+
+> [!NOTE]
+>
+> - If build logs contains `Failed to upload cache`, likely it is related that a `suffix` is included into the your terraform vars but considerations from [Deploy](#deploy) section were not followed.
+> - Transitions to the hibernation state happens after reaching the defined [Grace Period time](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#_configuring_hibernation) of inactivity (idle).
 
 ### Backups and Restore
 
@@ -153,8 +163,6 @@ Once the resources have been created, note that a `kubeconfig` file has been cre
   - To take an on-demand backup for all controllers:
 
     ```sh
-    eval $(terraform output --raw cbci_oc_export_admin_crumb) && \
-      eval $(terraform output --raw cbci_oc_export_admin_api_token) && \
       eval $(terraform output --raw cbci_oc_take_backups)
     ```
 
@@ -224,3 +232,12 @@ Once the resources have been created, note that a `kubeconfig` file has been cre
 ## Destroy
 
 Refer to the [Getting Started Blueprint - Destroy](../01-getting-started/README.md#destroy) section.
+
+### References
+
+The following videos extend the capabilities presented in this blueprint:
+
+- [Getting Started With CloudBees CI High Availability - CloudBees TV 🎥](https://www.youtube.com/watch?v=Qkf9HaA2wio)
+- [Troubleshooting Pipelines With CloudBees Pipeline Explorer - CloudBees TV 🎥](https://www.youtube.com/watch?v=OMXm6eYd1EQ)
+- [Getting Started With CloudBees Workspace Caching on AWS S3 - CloudBees TV 🎥](https://www.youtube.com/watch?v=ESU9oN9JUCw&)
+- [How to Monitor Jenkins With Grafana and Prometheus - CloudBees TV 🎥](https://www.youtube.com/watch?v=3H9eNIf9KZs)
