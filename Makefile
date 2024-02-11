@@ -58,7 +58,7 @@ else
 	@$(call helpers,ERROR "Blueprint $(ROOT) did not complete the Deployment target thus it is not Ready to be validated.")
 endif
 endif
-	@$(call helpers,probes $(1))
+	@$(call helpers,probes $(ROOT))
 
 .PHONY: destroy
 destroy: ## Destroy Terraform Blueprint passed as parameter. Example: ROOT=02-at-scale make destroy
