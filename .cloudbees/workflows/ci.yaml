@@ -106,8 +106,8 @@ jobs:
         TF_VAR_hosted_zone: bp01.aws.ps.beescloud.com
       shell: bash
       run : |
-        [ "${{ env.CLEAN_UP }}" = "true" ] && cd blueprints/${{ env.ROOT }} && terraform init -reconfigure \
-          || echo "Adios"
+        [ "${{ env.CLEAN_UP }}" = "true" ] && cd blueprints/${{ env.ROOT }} && terraform init -reconfigure && CI=true make destroy \
+          || CI=true make destroy
 
   bp02:
     needs:
@@ -168,5 +168,5 @@ jobs:
         TF_VAR_hosted_zone: bp02.aws.ps.beescloud.com
       shell: bash
       run : |
-        [ "${{ env.CLEAN_UP }}" = "true" ] && cd blueprints/${{ env.ROOT }} && terraform init -reconfigure \
-          || echo "Adios"
+        [ "${{ env.CLEAN_UP }}" = "true" ] && cd blueprints/${{ env.ROOT }} && terraform init -reconfigure && CI=true make destroy \
+          || CI=true make destroy
