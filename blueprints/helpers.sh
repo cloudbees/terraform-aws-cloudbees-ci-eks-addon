@@ -25,7 +25,7 @@ retry () {
   local retries="$1"
   local command="$2"
   local options="$-" # Get the current "set" options
-  local wait=60
+  local wait=150
 
   # Disable set -e
   if [[ $options == *e* ]]; then
