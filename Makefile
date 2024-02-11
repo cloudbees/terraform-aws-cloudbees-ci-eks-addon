@@ -7,7 +7,6 @@ MKFILEDIR 			:= $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 
 #https://developer.hashicorp.com/terraform/internals/debugging
 export TF_LOG=INFO
-export TF_LOG_PATH=$(MKFILEDIR)/blueprints/terraform.log
 
 define helpers
 	source blueprints/helpers.sh && $(1)
@@ -15,14 +14,6 @@ endef
 
 define confirmation
 	echo -n "Asking for your confirmation to $(1) [yes/No]" && read ans && [ $${ans:-No} = yes ]
-endef
-
-define validate
-	@$(call helpers,probes-common $(1))
-	@if [ "$(1)" == "01-getting-started" ]; then \
-		$(call helpers,probes-bp01) ; fi
-	@if [ "$(1)" == "02-at-scale" ]; then \
-		$(call helpers,probes-bp02) ; fi
 endef
 
 .PHONY: dRun
@@ -67,7 +58,11 @@ else
 	@$(call helpers,ERROR "Blueprint $(ROOT) did not complete the Deployment target thus it is not Ready to be validated.")
 endif
 endif
-	@$(call validate,$(ROOT))
+	@$(call helpers,probes-common $(1))
+	@if [ "$(1)" == "01-getting-started" ]; then \
+		$(call helpers,probes-bp01) ; fi
+	@if [ "$(1)" == "02-at-scale" ]; then \
+		$(call helpers,probes-bp02) ; fi
 
 .PHONY: destroy
 destroy: ## Destroy Terraform Blueprint passed as parameter. Example: ROOT=02-at-scale make destroy
