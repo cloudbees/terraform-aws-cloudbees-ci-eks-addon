@@ -151,7 +151,7 @@ jobs:
         secGithubUser: "exampleUser"
         secGithubToken: "ExampleToken"
         EOT
-        [ "${{ env.CLEAN_UP }}" = "true" ] && cho "Skipping step... Clean up mode enabled" || CI=true make deploy
+        [ "${{ env.CLEAN_UP }}" = "true" ] && echo "Clean up mode" || CI=true make deploy
 
     - name: 02-at-scale - Validate
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
@@ -159,7 +159,7 @@ jobs:
         ROOT: 02-at-scale
       shell: bash
       run : |
-        [ "${{ env.CLEAN_UP }}" = "true" ] && echo "Skipping step... Clean up mode enabled" || CI=true make validate
+        [ "${{ env.CLEAN_UP }}" = "true" ] && echo "Clean up mode" || CI=true make deploy
 
     - name: 02-at-scale - Destroy
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
