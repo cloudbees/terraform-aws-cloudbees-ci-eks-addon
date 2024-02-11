@@ -158,13 +158,7 @@ The build is triggered successfully getting `HTTP/2 201` as the response from th
 
 ### Backups and Restore
 
-- [CloudBees Backup plugin](https://docs.cloudbees.com/docs/cloudbees-ci/latest/backup-restore/cloudbees-backup-plugin) is enabled for all Controllers and Operation Center using [s3 as storage](https://docs.cloudbees.com/docs/cloudbees-ci/latest/backup-restore/cloudbees-backup-plugin#_amazon_s3). The backup process is scheduled to be taken daily from the Operation Center via [Cluster Operations](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/cluster-operations). It can be used for EFS and EBS Storage.
-
-  - To take an on-demand backup for all controllers:
-
-    ```sh
-      eval $(terraform output --raw cbci_oc_take_backups)
-    ```
+- [CloudBees Backup plugin](https://docs.cloudbees.com/docs/cloudbees-ci/latest/backup-restore/cloudbees-backup-plugin) is enabled for all Controllers and Operation Center using [s3 as storage](https://docs.cloudbees.com/docs/cloudbees-ci/latest/backup-restore/cloudbees-backup-plugin#_amazon_s3). The backup process is scheduled to be taken daily from the Operation Center via [Cluster Operations](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/cluster-operations) inside the Admin folder which is restricted to Admin persona (accessible in the `All` view in the Operation Center Dashboard). It can be used for EFS and EBS Storage.
 
 - For Block Storage (EBS) Velero is also enabled and it is the [recommended option](https://aws.github.io/aws-eks-best-practices/upgrades/#backup-the-cluster-before-upgrading). It not only backups the pvc snapshots but also any other defined Kubernetes resources.
 
@@ -190,7 +184,7 @@ The build is triggered successfully getting `HTTP/2 201` as the response from th
 
 ### Observability
 
-- Metrics: The explanations from [How to Monitor Jenkins With Grafana and Prometheus - CloudBees TV 🎥](https://www.youtube.com/watch?v=3H9eNIf9KZs) are valid in this context but this blueprint relies on the [CloudBees Prometheus Metrics plugin](https://docs.cloudbees.com/docs/cloudbees-ci/latest/monitoring/prometheus-plugin) and not the open-source version.
+- Metrics: [CloudBees Prometheus Metrics plugin](https://docs.cloudbees.com/docs/cloudbees-ci/latest/monitoring/prometheus-plugin) exposes [Jenkins Metrics](https://plugins.jenkins.io/metrics/) for Prometheus.
 
   - Check the CloudBees CI Targets are connected to Prometheus.
 
@@ -216,7 +210,7 @@ The build is triggered successfully getting `HTTP/2 201` as the response from th
 
   - Applications logs: Fluent bit acts as a router:
 
-    - Short-term Application logs live in CloudWatch Logs Group `/aws/containerinsights/<CLUSTER_NAME>/application` can be found Log streams for all the K8s Services running in the cluster, including CloudBees CI Apps.
+    - Short-term Application logs live in CloudWatch Logs Group `/aws/eks/<CLUSTER_NAME>/aws-fluentbit-logs` can be found Log streams for all the K8s Services running in the cluster, including CloudBees CI Apps.
 
     ```sh
       eval $(terraform output --raw aws_logstreams_fluentbit) | jq '.[] '
