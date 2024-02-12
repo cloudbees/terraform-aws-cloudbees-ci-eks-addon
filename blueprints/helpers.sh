@@ -6,7 +6,7 @@ set -euo pipefail
 
 SCRIPTDIR="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-RETRY_SECONDS=10
+RETRY_SECONDS=5
 
 INFO () {
   printf "\033[36m[INFO] %s\033[0m\n" "$1"
@@ -109,6 +109,8 @@ probes () {
     eval "$(tf-output "$root" cbci_controller_b_hibernation_post_queue_ws_cache)" > /tmp/ws-cache-build-trigger && \
       grep "HTTP/2 201" /tmp/ws-cache-build-trigger && \
       INFO "Hibernation Post Queue WS Cache is working."
+    until eval "$(tf-output "$root" cbci_agents_pods)"; do sleep $RETRY_SECONDS && echo "Waiting for Agent Pods to Provision the build..."; done ;\
+      INFO "Kubernetes Plugins provisioned an agent correctly."
     eval "$(tf-output "$root" velero_backup_schedule_team_a)" && eval "$(tf-output "$root" velero_backup_on_demand_team_a)" > "/tmp/backup.txt" && \
       grep "Backup completed with status: Completed" "/tmp/backup.txt" && \
       INFO "Velero backups are working"
