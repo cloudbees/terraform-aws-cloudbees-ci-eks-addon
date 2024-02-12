@@ -80,6 +80,11 @@ output "cbci_controller_b_hibernation_post_queue_ws_cache" {
   value       = "curl -i -XPOST -u admin:$CBCI_ADMIN_TOKEN ${local.hibernation_monitor_url}/hibernation/queue/team-b/job/ws-cache/build"
 }
 
+output "cbci_agents_pods" {
+  description = "Get a list of pods running the cbci-agents namespace."
+  value       = "kubectl get pods -n cbci-agents"
+}
+
 output "acm_certificate_arn" {
   description = "ACM certificate ARN"
   value       = module.acm.acm_certificate_arn
