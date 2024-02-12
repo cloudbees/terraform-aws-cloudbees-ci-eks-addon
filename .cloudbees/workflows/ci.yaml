@@ -159,7 +159,7 @@ jobs:
         ROOT: 02-at-scale
       shell: bash
       run : |
-        [ "${{ env.CLEAN_UP }}" = "true" ] && echo "Skipping... Clean up mode." || CI=true make deploy
+        [ "${{ env.CLEAN_UP }}" = "true" ] && echo "Skipping... Clean up mode." || CI=true make validate
 
     - name: 02-at-scale - Destroy
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
