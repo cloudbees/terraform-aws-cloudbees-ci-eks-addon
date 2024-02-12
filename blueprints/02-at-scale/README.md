@@ -93,7 +93,7 @@ Additionally, the following is required:
 - Customize your secrets file by copying `secrets-values.yml.example` to `secrets-values.yml`. It provides [Docker secrets](https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/docs/features/secrets.adoc#docker-secrets) that can be comsumed by Casc.
 - In the case of using the terraform variable `suffix` for this blueprint the following elements require to be updated: The Amazon `S3 Bucket Access settings` > `S3 Bucket Name` for CloudBees CI Controllers and The Amazon `S3 Bucket` for the Backup Controllers Cluster Operations. This can be done in two ways:
   - via Casc (**Before deploying** the blueprint):
-    - Make a fork from [cloudbees/casc-mm-cloudbees-ci-eks-addon](https://github.com/cloudbees/casc-mm-cloudbees-ci-eks-addon) to your organization, and update accordingly `cbci_s3` in `bp02.parent/variables/variables.yaml` file. Save and Push.
+    - Make a fork from [cloudbees/casc-mc-cloudbees-ci-eks-addon](https://github.com/cloudbees/casc-mc-cloudbees-ci-eks-addon) to your organization, and update accordingly `cbci_s3` in `bp02.parent/variables/variables.yaml` file. Save and Push.
     - Make a fork from [cloudbees/casc-oc-cloudbees-ci-eks-addon](https://github.com/cloudbees/casc-mm-cloudbees-ci-eks-addon) to your organization, and update accordingly `scm_casc_mm_store` in `bp02/variables/variables.yaml` file and `bp02/items/items-folder-admin.yaml` . Save and Push.
     - Finally, update the field `OperationsCenter.CasC.Retriever.scmRepo` from the helm file `k8s/cbci-values.yml` from the files in this blueprint. Save and `terraform apply`.
   - via GUI (**After deploying** the blueprint):
