@@ -36,7 +36,7 @@ variable "trial_license" {
 }
 
 variable "secrets_file" {
-  description = "Secrets file yml path containing the secrets names:values to create the Kubernetes secret cbci-secrets. It can be mounted for Casc"
+  description = "Secrets file yml path containing the secrets names:values to create the Kubernetes secret cbci-secrets. It can be consumed by Casc as Docker secrets."
   default     = "secrets-values.yml"
   type        = string
 }

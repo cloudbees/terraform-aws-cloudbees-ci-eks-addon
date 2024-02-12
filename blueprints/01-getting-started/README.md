@@ -1,6 +1,6 @@
 # CloudBees CI Add-on getting started Blueprint
 
-Get started with the [CloudBees CI on Modern in EKS](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/) by running this blueprint which just installs the product and its [prerequisites](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/installing-eks-using-helm#_prerequisites) to help you understand the minimum requirements.
+Get started with the [CloudBees CI on Modern in EKS](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/) by running this blueprint which just installs the product and its [prerequisites](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/installing-eks-using-helm#_prerequisites) to help you understand the minimum setup.
 
 - AWS Certificate Manager
 - **[Amazon EKS Addons](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/)**:
@@ -59,8 +59,6 @@ First of all, customize your terraform values by copying `.auto.tfvars.example` 
 Initialize the root module and any associated configuration for providers and finally create the resources and deploy CloudBees CI to an EKS Cluster. Please refer to [Getting Started - Amazon EKS Blueprints for Terraform - Deploy](https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#deploy)
 
 For more detailed information, see the documentation for the [Terraform Core workflow](https://www.terraform.io/intro/core-workflow).
-
-Once deployed has finished, it is possible to check the generated AWS resources via Resource Groups.
 
 ## Validate
 
