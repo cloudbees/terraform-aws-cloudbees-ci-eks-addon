@@ -81,8 +81,8 @@ output "cbci_controller_b_hibernation_post_queue_ws_cache" {
 }
 
 output "cbci_agents_pods" {
-  description = "Get a list of pods running the cbci-agents namespace."
-  value       = "kubectl get pods -n cbci-agents"
+  description = "Get a list of agents pods running the cbci-agents namespace."
+  value       = "kubectl get pods -n cbci-agents -l jenkins=slave"
 }
 
 output "acm_certificate_arn" {

@@ -53,7 +53,7 @@ For s3 storage permissions for Workspace caching and Artifact Manager is based o
 | acm_certificate_arn | ACM certificate ARN |
 | aws_backup_efs_protected_resource | AWS Backup Protected Resource descriction for EFS Drive. |
 | aws_logstreams_fluentbit | AWS CloudWatch Log Streams from FluentBit. |
-| cbci_agents_pods | Get a list of pods running the cbci-agents namespace. |
+| cbci_agents_pods | Get a list of agents pods running the cbci-agents namespace. |
 | cbci_controller_b_hibernation_post_queue_ws_cache | Team B Hibernation Monitor Endpoint to Build Workspace Cache. It expects CBCI_ADMIN_TOKEN as environment variable. |
 | cbci_controller_c_hpa | Team C Horizontal Pod Autoscaling. |
 | cbci_controllers_pods | Operation Center Pod for CloudBees CI Add-on. |
@@ -234,9 +234,9 @@ Log in `team-b` and check its build output of `ws-cache` pipeline using the Clou
 
 Refer to the [Getting Started Blueprint - Destroy](../01-getting-started/README.md#destroy) section.
 
-### References
+## References
 
-The following videos extend the capabilities presented in this blueprint:
+The following videos provide more insights regarding the capabilities presented in this blueprint:
 
 - [Getting Started With CloudBees CI High Availability - CloudBees TV 🎥](https://www.youtube.com/watch?v=Qkf9HaA2wio)
 - [Troubleshooting Pipelines With CloudBees Pipeline Explorer - CloudBees TV 🎥](https://www.youtube.com/watch?v=OMXm6eYd1EQ)

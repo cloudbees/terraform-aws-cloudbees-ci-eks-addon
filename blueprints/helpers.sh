@@ -101,7 +101,7 @@ probes () {
     GENERAL_PASS=$(eval "$(tf-output "$root" cbci_general_password)"); \
     INFO "General Password all users: $GENERAL_PASS."
     until [ "$(eval "$(tf-output "$root" cbci_controllers_pods)" | awk '{ print $3 }' | grep -v STATUS | grep -v -c Running)" == 0 ]; do sleep $RETRY_SECONDS && echo "Waiting for Controllers Pod to get into Ready State..."; done ;\
-      eval "$(tf-output "$root" cbci_controllers_pods)" && INFO "All Controllers Pods are Ready..."
+      eval "$(tf-output "$root" cbci_controllers_pods)" && INFO "All Controllers Pods are Ready."
     until eval "$(tf-output "$root" cbci_controller_c_hpa)"; do sleep $RETRY_SECONDS && echo "Waiting for Team C HPA to get Ready..."; done ;\
       INFO "Team C HPA is Ready."
     eval "$(tf-output "$root" cbci_oc_export_admin_crumb)" && eval "$(tf-output "$root" cbci_oc_export_admin_api_token)" && \
@@ -109,8 +109,8 @@ probes () {
     eval "$(tf-output "$root" cbci_controller_b_hibernation_post_queue_ws_cache)" > /tmp/ws-cache-build-trigger && \
       grep "HTTP/2 201" /tmp/ws-cache-build-trigger && \
       INFO "Hibernation Post Queue WS Cache is working."
-    until eval "$(tf-output "$root" cbci_agents_pods)"; do sleep $RETRY_SECONDS && echo "Waiting for Agent Pods to Provision the build..."; done ;\
-      INFO "Kubernetes Plugins provisioned an agent correctly."
+    until [ "$(eval "$(tf-output "$root" cbci_agents_pods)" | awk '{ print $3 }' | grep -v STATUS | grep -c Running)" == 1 ]; do echo "Waiting for Agents Pod to get into Ready State..."; done ;\
+      eval "$(tf-output "$root" cbci_agents_pods)" && INFO "Agent Pods are Ready."
     eval "$(tf-output "$root" velero_backup_schedule_team_a)" && eval "$(tf-output "$root" velero_backup_on_demand_team_a)" > "/tmp/backup.txt" && \
       grep "Backup completed with status: Completed" "/tmp/backup.txt" && \
       INFO "Velero backups are working"
