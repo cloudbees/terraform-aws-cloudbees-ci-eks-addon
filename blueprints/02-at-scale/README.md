@@ -165,9 +165,9 @@ Log in `team-b` and check its build output of `ws-cache` pipeline using the Clou
 
 ### Backups and Restore
 
-- [CloudBees Backup plugin](https://docs.cloudbees.com/docs/cloudbees-ci/latest/backup-restore/cloudbees-backup-plugin) is enabled for all Controllers and Operation Center using [s3 as storage](https://docs.cloudbees.com/docs/cloudbees-ci/latest/backup-restore/cloudbees-backup-plugin#_amazon_s3). The backup process is scheduled to be taken daily from the Operation Center via [Cluster Operations](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/cluster-operations) inside the Admin folder which is restricted to Admin persona (accessible in the `All` view in the Operation Center Dashboard). It can be used for EFS and EBS Storage.
+- [CloudBees Backup plugin](https://docs.cloudbees.com/docs/cloudbees-ci/latest/backup-restore/cloudbees-backup-plugin) is enabled for all Controllers and Operation Center using [s3 as storage](https://docs.cloudbees.com/docs/cloudbees-ci/latest/backup-restore/cloudbees-backup-plugin#_amazon_s3). The Controller's backup job is scheduled daily from the Operation Center via [Cluster Operations](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/cluster-operations) inside the Admin folder which is restricted to the Admin persona only (accessible in the `All` view in the Operation Center Dashboard). It can be used for EFS and EBS Storage.
 
-- For Block Storage (EBS) Velero is also enabled and it is the [recommended option](https://aws.github.io/aws-eks-best-practices/upgrades/#backup-the-cluster-before-upgrading). It not only backups the pvc snapshots but also any other defined Kubernetes resources.
+- For services using EBS as storage, they can use Velero as an alternative. It not only can take a backup of the pvc snapshots but also any other defined Kubernetes resources.
 
   - Create a Velero Backup schedule for Team A to take regular backups. This can be also applied to Team B.
 
@@ -187,7 +187,7 @@ Log in `team-b` and check its build output of `ws-cache` pipeline using the Clou
     eval $(terraform output --raw velero_restore_team_a)
     ```
 
-- However, the CloudBees Backup plugin would be the only choice for EFS Storage. At the moment of writing this blueprint, there is no Best Practice to Restore Dynamically EFS PVCs (see [Issue 39](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/issues/39)).
+- However, there is no alternative for service using EFS Storage. At the moment of writing this blueprint, there is no Best Practice to Restore Dynamically EFS PVCs (see [Issue 39](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/issues/39)).
 
 ### Observability
 
