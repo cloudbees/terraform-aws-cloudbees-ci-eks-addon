@@ -210,7 +210,7 @@ Then, let's examine the build logs by logging in `team-b`, browsing to `ws-cache
     eval $(terraform output --raw prometheus_dashboard)
     ```  
 
-    - Grafana will be available at `http://localhost:50002` after running the following command in your host:
+    - Grafana will be available at the following URL. Use login `admin` and password set on `grafana_admin_password` terraform variable:
 
     ```sh
     eval $(terraform output --raw grafana_dashboard)
