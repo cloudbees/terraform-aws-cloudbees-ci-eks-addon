@@ -161,7 +161,7 @@ module "eks_blueprints_addons" {
 
   enable_kube_prometheus_stack = true
   kube_prometheus_stack = {
-    values = [templatefile("k8s/kube-prometheus-stack-values.yml", {
+    values = [templatefile("k8s/kube-prom-stack-values.yml", {
       grafana_hostname = local.grafana_hostname
       cert_arn         = module.acm.acm_certificate_arn
     })]
@@ -218,7 +218,7 @@ resource "kubectl_manifest" "service_monitor_cb_controllers" {
 
   depends_on = [module.eks_blueprints_addons]
 
-  yaml_body = file("k8s/kube-prometheus-stack-sm.yml")
+  yaml_body = file("k8s/kube-prom-stack-sm.yml")
 }
 
 ################################################################################
