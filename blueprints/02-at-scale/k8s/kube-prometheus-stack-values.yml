@@ -1,7 +1,7 @@
 # Copyright (c) CloudBees, Inc.
 
 #https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack
-#https://observability.thomasriley.co.uk/prometheus/configuring-prometheus/using-service-monitors/
+
 prometheus:
   prometheusSpec:
     additionalScrapeConfigs:
