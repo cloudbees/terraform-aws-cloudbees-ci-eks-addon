@@ -65,11 +65,7 @@ destroy: ## Destroy Terraform Blueprint passed as parameter. Example: ROOT=02-at
 destroy: guard-ROOT preFlightChecks
 	@$(call helpers,INFO "Destroying CloudBees CI Blueprint $(1) ...")
 ifeq ($(CI),false)
-ifneq ("$(wildcard $(MKFILEDIR)/blueprints/$(ROOT)/terraform.output)","")
 	@$(call confirmation,Destroy $(ROOT))
-else
-	@$(call helpers,ERROR "Blueprint $(ROOT) did not complete the Deployment target. It is not Ready for Destroy target but it is possible to destroy manually https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#destroy")
-endif
 endif
 	@$(call helpers,tf-destroy $(ROOT))
 
