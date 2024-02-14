@@ -15,8 +15,7 @@ spec:
       - cbci
   selector:
     matchLabels:
-      com.cloudbees.cje.type: master
-      operated.prometheus: "true"
+      "cloudbees.prometheus": "true"
   endpoints:
     - port: http
       interval: 30s

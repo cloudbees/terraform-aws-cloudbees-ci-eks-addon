@@ -104,7 +104,7 @@ module "ebs_csi_driver_irsa" {
   tags = var.tags
 }
 
-#Issue 23
+#Issue #23
 # data "aws_autoscaling_groups" "eks_node_groups" {
 #   depends_on = [module.eks]
 #   filter {
@@ -151,7 +151,7 @@ module "eks_blueprints_addons" {
   enable_aws_efs_csi_driver = true
   enable_metrics_server     = true
   enable_cluster_autoscaler = true
-  #Issue 23
+  #Issue #23
   #enable_aws_node_termination_handler   = false
   #aws_node_termination_handler_asg_arns = data.aws_autoscaling_groups.eks_node_groups.arns
   enable_velero = true
@@ -219,6 +219,25 @@ resource "kubectl_manifest" "service_monitor_cb_controllers" {
   depends_on = [module.eks_blueprints_addons]
 
   yaml_body = file("k8s/kube-prom-stack-sm.yml")
+}
+
+resource "kubernetes_labels" "oc_sm_label" {
+
+  depends_on = [module.eks_blueprints_addon_cbci]
+
+  api_version = "v1"
+  kind        = "Service"
+  # This is true because the resources was already created by the
+  force = "true"
+
+  metadata {
+    name      = "cjoc"
+    namespace = module.eks_blueprints_addon_cbci.cbci_namespace
+  }
+
+  labels = {
+    "cloudbees.prometheus" = "true"
+  }
 }
 
 ################################################################################
@@ -496,9 +515,11 @@ resource "kubernetes_storage_class_v1" "efs" {
 resource "null_resource" "create_kubeconfig" {
 
   depends_on = [module.eks]
-  triggers = {
-    always_run = timestamp()
-  }
+
+  # Remove comment block to force the update of the kubeconfig file
+  # triggers = {
+  #   always_run = timestamp()
+  # }
   provisioner "local-exec" {
     command = "aws eks update-kubeconfig --name ${module.eks.cluster_name} --region ${local.region} --kubeconfig ${local.kubeconfig_file_path}"
   }

@@ -14,10 +14,19 @@ prometheus:
       matchLabels:
         release: kube-prometheus-stack
 additionalPrometheusRulesMap:
-  #https://joostvdg.github.io/blogs/monitor-jenkins-on-k8s/alerts/
   rule-name:
     groups:
-      - name: Jenkins Jobs
+      - name: Controllers
+        rules:
+          - alert: JenkinsTooManyPluginsNeedUpate
+            expr: sum(jenkins_plugins_withUpdate) by (pod) > 3
+            for: 1m
+            labels:
+              severity: notify
+            annotations:
+              summary: " {{ $labels.pod }} too many plugins updates"
+              description: " {{ $labels.pod }} has {{ $value }} plugins that require an update"
+      - name: Builds
         rules:
           - alert: JenkinsTooManyJobsQueued
             expr: sum(jenkins_queue_size_value) > 5
@@ -25,135 +34,8 @@ additionalPrometheusRulesMap:
             labels:
               severity: notify
             annotations:
-              summary: " {{ $labels.app_kubernetes_io_instance }} too many jobs queued"
-              description: "{{ $labels.app_kubernetes_io_instance }} has {{ $value }} jobs stuck in the queue"
-          - alert: JenkinsTooManyJobsStuckInQueue
-            expr: sum(jenkins_queue_stuck_value) by (app_kubernetes_io_instance) > 5
-            for: 1m
-            labels:
-              severity: notify
-            annotations:
-              summary: " {{ $labels.app_kubernetes_io_instance }} too many jobs queued"
-              description: " {{ $labels.app_kubernetes_io_instance }} has {{ $value }} jobs in queue"
-          - alert: JenkinsWaitingTooMuchOnJobStart
-            expr: sum (jenkins_job_waiting_duration) by (app_kubernetes_io_instance) > 0.05
-            for: 1m
-            labels:
-              severity: notify
-            annotations:
-              summary: "{{ $labels.app_kubernetes_io_instance }} waits too long for jobs"
-              description: "{{ $labels.app_kubernetes_io_instance }} is waiting on average {{ $value }} seconds to start a job"
-          - alert: JenkinsTooLowJobSuccessRate
-            expr: sum(jenkins_runs_success_total) by (app_kubernetes_io_instance) / sum(jenkins_runs_total_total) by (app_kubernetes_io_instance) < 0.60
-            for: 1m
-            labels:
-              severity: notify
-            annotations:
-              summary: " {{ $labels.app_kubernetes_io_instance }} has a too low job success rate"
-              description: " {{ $labels.app_kubernetes_io_instance }} instance has {{ $value }}% of jobs being successful"
-      - name: Jenkins Uptime
-        rules:
-          - alert: JenkinsNewOrRestarted
-            expr: sum(vm_uptime_milliseconds) by (app_kubernetes_io_instance) / 3600000 < 2
-            for: 3m
-            labels:
-              severity: notify
-            annotations:
-              summary: " {{ $labels.app_kubernetes_io_instance }} has low uptime"
-              description: " {{ $labels.app_kubernetes_io_instance }} has low uptime and was either restarted or is a new instance (uptime: {{ $value }} hours)"
-      - name: Jenkins Plugins
-        rules:
-          - alert: JenkinsTooManyPluginsNeedUpate
-            expr: sum(jenkins_plugins_withUpdate) by (app_kubernetes_io_instance) > 3
-            for: 1m
-            labels:
-              severity: notify
-            annotations:
-              summary: " {{ $labels.app_kubernetes_io_instance }} too many plugins updates"
-              description: " {{ $labels.app_kubernetes_io_instance }} has {{ $value }} plugins that require an update"
-      - name: Jenkins jvm
-        rules:
-          - alert: JenkinsToManyOpenFiles
-            expr: sum(vm_file_descriptor_ratio) by (app_kubernetes_io_instance) > 0.040
-            for: 5m
-            labels:
-              severity: notify
-            annotations:
-              summary: " {{ $labels.app_kubernetes_io_instance }} has a to many open files"
-              description: " {{ $labels.app_kubernetes_io_instance }} instance has used {{ $value }} of available open files"
-          - alert: JenkinsVMMemoryRationTooHigh
-            expr: sum(vm_memory_heap_usage) by (app_kubernetes_io_instance) > 0.70
-            for: 3m
-            labels:
-              severity: notify
-            annotations:
-              summary: "{{$labels.app_kubernetes_io_instance}} too high memory ration"
-              description: "{{$labels.app_kubernetes_io_instance}} has a too high VM memory ration"
-          - alert: JenkinsVMGCToolow
-            expr: 1 - sum(vm_gc_G1_Young_Generation_time)by (app_kubernetes_io_instance)  /  sum (vm_uptime_milliseconds) by (app_kubernetes_io_instance) < 0.99
-            for: 30m
-            labels:
-              severity: notify
-            annotations:
-              summary: "{{ $labels.instance }} too low GC throughput"
-              description: "{{ $labels.instance }} has too low Garbage Collection throughput"
-      - name: web
-        rules:
-          - alert: JenkinsTooSlow
-            expr: sum(http_requests{quantile="0.99"} ) by (app_kubernetes_io_instance) > 1
-            for: 3m
-            labels:
-              severity: notify
-            annotations:
-              summary: "{{ $labels.app_kubernetes_io_instance }} is too slow"
-              description: "{{ $labels.app_kubernetes_io_instance }}  More then 1% of requests are slower than 1s (request time: {{ $value }})"
-          - alert: AppTooSlow
-            expr: sum(rate(nginx_ingress_controller_request_duration_seconds_bucket{le="0.25"}[5m])) by (ingress) / sum(rate(nginx_ingress_controller_request_duration_seconds_count[5m])) by (ingress) < 0.95
-            for: 5m
-            labels:
-              severity: notify
-            annotations:
-              summary: "Application - {{ $labels.ingress }} - is too slow"
-              description: " {{ $labels.ingress }} - More then 5% of requests are slower than 0.25s"
-      - name: Jenkins healthcheck
-        rules:
-          - alert: JenkinsHealthScoreToLow
-            expr: sum(jenkins_health_check_score) by (app_kubernetes_io_instance) < 1
-            for: 5m
-            labels:
-              severity: notify
-            annotations:
-              summary: " {{ $labels.app_kubernetes_io_instance }} has a to low health score"
-              description: " {{ $labels.app_kubernetes_io_instance }} a health score lower than 100%"
-          - alert: JenkinsTooSlowHealthCheck
-            expr: sum(jenkins_health_check_duration{quantile="0.999"})
-              by (app_kubernetes_io_instance) > 0.001
-            for: 1m
-            labels:
-              severity: notify
-            annotations:
-              summary: " {{ $labels.app_kubernetes_io_instance }} responds too slow to health check"
-              description: " {{ $labels.app_kubernetes_io_instance }} is responding too slow to the regular health check"
-      - name: Jenkins Nodes
-        rules:
-          - alert: JenkinsTooManyOfflineNodes
-            expr: sum(jenkins_node_offline_value) by (app_kubernetes_io_instance) > 3
-            for: 1m
-            labels:
-              severity: notify
-            annotations:
-              summary: "{{ $labels.app_kubernetes_io_instance }} has a too many offline nodes"
-              description: "{{ $labels.app_kubernetes_io_instance }} has {{ $value }} nodes that are offline for some time (5 minutes)"
-      - name: Kubernetes Nodes
-        rules:
-          - alert: NodeHighCpuLoad
-            expr: avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[1m]) * 100) < 30
-            for: 1m
-            labels:
-              severity: warning
-            annotations:
-              summary: "High usage on {{ $labels.instance }}"
-              description: "{{ $labels.instance }} has a average CPU idle (current value: {{ $value }}s)"
+              summary: " {{ $labels.pod }} too many jobs queued"
+              description: "{{ $labels.pod}} has {{ $value }} jobs stuck in the queue"
 grafana:
   ingress:
     enabled: true
