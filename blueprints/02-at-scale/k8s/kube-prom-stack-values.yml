@@ -4,11 +4,12 @@
 
 prometheus:
   prometheusSpec:
-    additionalScrapeConfigs:
-      - job_name: "cjoc"
-        metrics_path: "/prometheus/"
-        static_configs:
-          - targets: ["cjoc.cbci.svc.cluster.local:80"]
+    # Not Used since OC uses ServiceMonitor
+    # additionalScrapeConfigs:
+    #   - job_name: "cjoc"
+    #     metrics_path: "/prometheus/"
+    #     static_configs:
+    #       - targets: ["cjoc.cbci.svc.cluster.local:80"]
     serviceMonitorSelector:
       # Note: For all Service Monitors, use a common label
       matchLabels:
@@ -16,26 +17,76 @@ prometheus:
 additionalPrometheusRulesMap:
   rule-name:
     groups:
-      - name: Controllers
+      - name: CloudBees CI Performance
         rules:
-          - alert: JenkinsTooManyPluginsNeedUpate
+          - alert: JenkinsHealthScoreToLow
+            expr: sum(jenkins_health_check_score) by (pod) < 1
+            for: 1m
+            labels:
+              severity: critical
+            annotations:
+              summary: "{{ $labels.pod }} has a health score lower than 100%"
+              description: "{{ $labels.pod }} has a to low health score {{ $value }}"
+          - alert: JenkinsVMMemoryRationTooHigh
+            expr: sum(vm_memory_heap_usage) by (pod) > 0.85
+            for: 3m
+            labels:
+              severity: critical
+            annotations:
+              summary: "{{$labels.pod}} too high memory ration (above 85%)"
+              description: "{{$labels.pod}} has a VM memory ratio of {{ $value }}"
+          - alert: JenkinsNewOrRestarted
+            expr: sum(vm_uptime_milliseconds) by (pod) / 3600000 < 1
+            for: 3m
+            labels:
+              severity: warning
+            annotations:
+              summary: "{{ $labels.pod }} has uptime less than 1 hour"
+              description: "{{ $labels.pod }} has low uptime and was either restarted or is a new instance (uptime: {{ $value }} hours)"
+      - name: CloudBees CI Plugins
+        rules:
+          - alert: JenkinsTooManyPluginsNeedUpdate
             expr: sum(jenkins_plugins_withUpdate) by (pod) > 3
-            for: 1m
+            for: 5m
             labels:
-              severity: notify
+              severity: warning
             annotations:
-              summary: " {{ $labels.pod }} too many plugins updates"
-              description: " {{ $labels.pod }} has {{ $value }} plugins that require an update"
-      - name: Builds
+              summary: "{{ $labels.pod }} too many plugins updates"
+              description: "{{ $labels.pod }} has {{ $value }} plugins that require an update"
+          - alert: JenkinsPluginsFailedToInstall
+            expr: sum(jenkins_plugins_failed) by (pod) > 1
+            for: 5m
+            labels:
+              severity: critical
+            annotations:
+              summary: "{{ $labels.pod }} failed to install plugins"
+              description: "{{ $labels.pod }} has {{ $value }} plugins that failed to install"
+      - name: CloudBees CI  Builds
         rules:
-          - alert: JenkinsTooManyJobsQueued
-            expr: sum(jenkins_queue_size_value) > 5
-            for: 1m
+          - alert: JenkinsTooLowJobSuccessRate
+            expr: (sum(jenkins_runs_success_total) by (pod) * 100 / sum(jenkins_runs_total_total) by (pod)) < 50
+            for: 5m
             labels:
-              severity: notify
+              severity: warning
             annotations:
-              summary: " {{ $labels.pod }} too many jobs queued"
-              description: "{{ $labels.pod}} has {{ $value }} jobs stuck in the queue"
+              summary: "{{$labels.pod}} has low job success rate under 50%"
+              description: "{{$labels.pod}} instance has less than 50% of jobs being successful"
+          - alert: JenkinsTooManyJobsQueued
+            expr: sum(jenkins_queue_size_value) by (pod) > 10
+            for: 10m
+            labels:
+              severity: warning
+            annotations:
+              summary: "{{ $labels.pod }} too many jobs queued"
+              description: "{{ $labels.pod}} has {{ $value }} jobs in the queue"
+          - alert: JenkinsTooManyJobsStuckInQueue
+            expr: sum(jenkins_queue_stuck_value) by (pod) > 5
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: "{{ $labels.pod }} too many jobs queued"
+              description: "{{ $labels.pod }} has {{ $value }} jobs stuck in queue"
 grafana:
   ingress:
     enabled: true

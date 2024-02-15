@@ -3,10 +3,9 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: servicemonitor-controllers-cbci
+  name: servicemonitor-cbci
   namespace: kube-prometheus-stack
   labels:
-    serviceMonitorSelector: controllers
     release: kube-prometheus-stack
     app.kubernetes.io/part-of: kube-prometheus-stack
 spec:

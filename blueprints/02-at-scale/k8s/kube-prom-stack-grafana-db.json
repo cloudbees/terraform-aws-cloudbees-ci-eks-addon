@@ -20,6 +20,7 @@
   "fiscalYearStartMonth": 0,
   "gnetId": 9964,
   "graphTooltip": 0,
+  "id": 30,
   "links": [
     {
       "asDropdown": false,
@@ -44,9 +45,9 @@
         "x": 0,
         "y": 0
       },
-      "id": 24,
+      "id": 32,
       "panels": [],
-      "title": "Controller",
+      "title": "Performance",
       "type": "row"
     },
     {
@@ -56,39 +57,21 @@
       },
       "fieldConfig": {
         "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "decimals": 1,
-          "mappings": [
-            {
-              "options": {
-                "match": "null",
-                "result": {
-                  "text": "N/A"
-                }
-              },
-              "type": "special"
-            }
-          ],
+          "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "rgba(245, 54, 54, 0.9)",
+                "color": "green",
                 "value": null
               },
               {
-                "color": "rgba(237, 129, 40, 0.89)",
-                "value": 30
-              },
-              {
-                "color": "rgba(50, 172, 45, 0.97)",
-                "value": 10
+                "color": "red",
+                "value": 80
               }
             ]
           },
-          "unit": "decgbytes"
+          "unit": "percentunit"
         },
         "overrides": []
       },
@@ -98,14 +81,14 @@
         "x": 0,
         "y": 1
       },
-      "id": 7,
+      "id": 8,
       "links": [],
       "maxDataPoints": 100,
       "options": {
-        "colorMode": "value",
-        "graphMode": "area",
+        "colorMode": "background",
+        "graphMode": "none",
         "justifyMode": "auto",
-        "orientation": "horizontal",
+        "orientation": "auto",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -123,7 +106,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "vm_memory_total_used{pod=\"$pod\"}",
+          "expr": "sum(jenkins_health_check_score{pod=\"$pod\"}) by (pod)",
           "format": "time_series",
           "intervalFactor": 1,
           "range": true,
@@ -131,7 +114,7 @@
           "textEditor": false
         }
       ],
-      "title": "JVM free memory",
+      "title": "Jenkins health",
       "type": "stat"
     },
     {
@@ -144,36 +127,20 @@
           "color": {
             "mode": "thresholds"
           },
-          "decimals": 0,
-          "mappings": [
-            {
-              "options": {
-                "match": "null",
-                "result": {
-                  "text": "N/A"
-                }
-              },
-              "type": "special"
-            }
-          ],
+          "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "#299c46",
+                "color": "green",
                 "value": null
               },
               {
-                "color": "rgba(237, 129, 40, 0.89)",
-                "value": 0
-              },
-              {
-                "color": "#1F60C4",
-                "value": 0
+                "color": "red",
+                "value": 80
               }
             ]
-          },
-          "unit": "decbytes"
+          }
         },
         "overrides": []
       },
@@ -183,14 +150,75 @@
         "x": 4,
         "y": 1
       },
-      "id": 15,
-      "links": [],
-      "maxDataPoints": 100,
+      "id": 35,
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "pluginVersion": "10.0.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "vm_uptime_milliseconds{pod=~\"$pod\"} / 3600000",
+          "instant": false,
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "VM Uptime (Hours)",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 8,
+        "y": 1
+      },
+      "id": 39,
       "options": {
         "colorMode": "value",
         "graphMode": "area",
         "justifyMode": "auto",
-        "orientation": "horizontal",
+        "orientation": "auto",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -208,14 +236,13 @@
             "uid": "prometheus"
           },
           "editorMode": "builder",
-          "expr": "vm_memory_total_used{pod=\"$pod\"}",
-          "format": "time_series",
-          "intervalFactor": 1,
+          "expr": "vm_deadlock_count{pod=\"$pod\"}",
+          "instant": false,
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Memory Usage",
+      "title": "Number of Deadlocks",
       "type": "stat"
     },
     {
@@ -228,42 +255,98 @@
           "color": {
             "mode": "thresholds"
           },
-          "mappings": [
-            {
-              "options": {
-                "match": "null",
-                "result": {
-                  "text": "N/A"
-                }
-              },
-              "type": "special"
-            }
-          ],
+          "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "#299c46",
+                "color": "green",
                 "value": null
               },
               {
-                "color": "rgba(237, 129, 40, 0.89)",
-                "value": 50
-              },
-              {
-                "color": "#C4162A",
-                "value": 80
+                "color": "red",
+                "value": 0.7997
               }
             ]
           },
-          "unit": "percent"
+          "unit": "percentunit"
         },
         "overrides": []
       },
       "gridPos": {
         "h": 4,
         "w": 4,
-        "x": 8,
+        "x": 12,
+        "y": 1
+      },
+      "id": 40,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "10.0.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "vm_file_descriptor_ratio{pod=\"$pod\"}",
+          "instant": false,
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "File Descriptor Ratio",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 70
+              },
+              {
+                "color": "red",
+                "value": 85
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 16,
         "y": 1
       },
       "id": 5,
@@ -273,7 +356,7 @@
         "colorMode": "value",
         "graphMode": "area",
         "justifyMode": "auto",
-        "orientation": "horizontal",
+        "orientation": "auto",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -298,7 +381,7 @@
           "refId": "A"
         }
       ],
-      "title": "CPU Usage",
+      "title": "CPU Core Usage",
       "type": "stat"
     },
     {
@@ -308,58 +391,535 @@
       },
       "fieldConfig": {
         "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "decimals": 1,
-          "mappings": [
-            {
-              "options": {
-                "*": {
-                  "text": "Check :/"
-                },
-                "1.0": {
-                  "text": "Good!"
-                }
-              },
-              "type": "value"
-            }
-          ],
+          "mappings": [],
           "thresholds": {
-            "mode": "absolute",
+            "mode": "percentage",
             "steps": [
               {
-                "color": "rgba(245, 54, 54, 0.9)",
+                "color": "green",
                 "value": null
               },
               {
-                "color": "rgba(237, 129, 40, 0.89)",
-                "value": 1
+                "color": "orange",
+                "value": 70
               },
               {
-                "color": "rgba(50, 172, 45, 0.97)",
-                "value": 1
+                "color": "red",
+                "value": 85
               }
             ]
           },
-          "unit": "none"
+          "unit": "percentunit"
         },
         "overrides": []
       },
       "gridPos": {
         "h": 4,
         "w": 4,
-        "x": 12,
+        "x": 20,
         "y": 1
       },
-      "id": 8,
+      "id": 15,
       "links": [],
       "maxDataPoints": 100,
       "options": {
-        "colorMode": "value",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "pluginVersion": "10.0.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "vm_memory_heap_usage{pod=\"$pod\"}",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Memory  Heap Usage",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "description": "The 99% percentile of HTTP Requests handled by Jenkins masters.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 8,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 5
+      },
+      "id": 36,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "sum(http_requests{pod=~\"$pod\",quantile=\"0.99\"} ) by (pod)",
+          "instant": false,
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "HTTP Request Duration (99%)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "description": "The ratio of ok (200) request out of all requests.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 13,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 5
+      },
+      "id": 41,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "sum(http_responseCodes_ok_total{pod=~\"$pod\"}) \nby (pod) / \nsum(http_requests_count{pod=~\"$pod\"}) \nby (pod)",
+          "instant": false,
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Good HTTP Request Ratio",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "description": "Http Server Errors (500)",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 5
+      },
+      "id": 37,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "10.0.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "rate(http_responseCodes_serverError_total{pod=~\"$pod\"}[1m])",
+          "instant": false,
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "HTTP Server Errors",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 13
+      },
+      "id": 24,
+      "panels": [],
+      "title": "Plugins",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 200
+              },
+              {
+                "color": "#EAB839",
+                "value": 300
+              },
+              {
+                "color": "red",
+                "value": 500
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 0,
+        "y": 14
+      },
+      "id": 28,
+      "options": {
+        "colorMode": "background",
         "graphMode": "none",
         "justifyMode": "auto",
-        "orientation": "horizontal",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "10.0.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "builder",
+          "expr": "jenkins_plugins_active{pod=\"$pod\"}",
+          "instant": false,
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Plugins Active",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 3,
+        "y": 14
+      },
+      "id": 29,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "10.0.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "builder",
+          "expr": "jenkins_plugins_withUpdate{pod=\"$pod\"}",
+          "instant": false,
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Plugins Update Available",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 6,
+        "y": 14
+      },
+      "id": 33,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -377,16 +937,94 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "jenkins_health_check_score{pod=\"$pod\"}",
-          "format": "time_series",
-          "intervalFactor": 1,
+          "expr": "jenkins_plugins_failed{pod=\"$pod\"}",
+          "instant": false,
           "range": true,
-          "refId": "A",
-          "textEditor": false
+          "refId": "A"
         }
       ],
-      "title": "Jenkins health",
+      "title": "Plugins Failed",
       "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 20
+              },
+              {
+                "color": "red",
+                "value": 30
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 9,
+        "y": 14
+      },
+      "id": 34,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "10.0.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "jenkins_plugins_inactive{pod=\"$pod\"}",
+          "instant": false,
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Plugins inactive",
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 18
+      },
+      "id": 23,
+      "panels": [],
+      "title": "Builds",
+      "type": "row"
     },
     {
       "datasource": {
@@ -419,7 +1057,7 @@
         "h": 4,
         "w": 4,
         "x": 0,
-        "y": 5
+        "y": 19
       },
       "id": 25,
       "options": {
@@ -460,23 +1098,25 @@
       },
       "fieldConfig": {
         "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
           "mappings": [],
           "thresholds": {
-            "mode": "absolute",
+            "mode": "percentage",
             "steps": [
               {
-                "color": "green",
+                "color": "red",
                 "value": null
               },
               {
-                "color": "red",
-                "value": 300
+                "color": "orange",
+                "value": 50
+              },
+              {
+                "color": "green",
+                "value": 75
               }
             ]
-          }
+          },
+          "unit": "percent"
         },
         "overrides": []
       },
@@ -484,173 +1124,13 @@
         "h": 4,
         "w": 4,
         "x": 4,
-        "y": 5
-      },
-      "id": 28,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "auto"
-      },
-      "pluginVersion": "10.0.2",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "editorMode": "builder",
-          "expr": "jenkins_plugins_active{pod=\"$pod\"}",
-          "instant": false,
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "Plugin Count",
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 5
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 4,
-        "w": 4,
-        "x": 8,
-        "y": 5
-      },
-      "id": 29,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "auto"
-      },
-      "pluginVersion": "10.0.2",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "editorMode": "builder",
-          "expr": "jenkins_plugins_withUpdate{pod=\"$pod\"}",
-          "instant": false,
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "Plugins Updates Available",
-      "type": "stat"
-    },
-    {
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 9
-      },
-      "id": 23,
-      "panels": [],
-      "title": "Builds",
-      "type": "row"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [
-            {
-              "options": {
-                "0": {
-                  "text": "None!"
-                }
-              },
-              "type": "value"
-            }
-          ],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "rgba(245, 54, 54, 0.9)",
-                "value": null
-              },
-              {
-                "color": "rgba(237, 129, 40, 0.89)",
-                "value": 0
-              },
-              {
-                "color": "rgba(50, 172, 45, 0.97)",
-                "value": 0
-              }
-            ]
-          },
-          "unit": "none"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 4,
-        "w": 4,
-        "x": 0,
-        "y": 10
+        "y": 19
       },
       "id": 9,
       "links": [],
       "maxDataPoints": 100,
       "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "horizontal",
+        "orientation": "auto",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -658,7 +1138,8 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
       },
       "pluginVersion": "10.0.2",
       "targets": [
@@ -667,8 +1148,8 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "editorMode": "builder",
-          "expr": "jenkins_runs_success_total{pod=\"$pod\"}",
+          "editorMode": "code",
+          "expr": "(sum(jenkins_runs_success_total{pod=\"$pod\"})\nby (pod) * 100) /\nsum(jenkins_runs_total_total{pod=\"$pod\"})\nby (pod)",
           "format": "time_series",
           "intervalFactor": 1,
           "range": true,
@@ -677,7 +1158,7 @@
         }
       ],
       "title": "Successful Builds",
-      "type": "stat"
+      "type": "gauge"
     },
     {
       "datasource": {
@@ -686,160 +1167,9 @@
       },
       "fieldConfig": {
         "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
           "mappings": [],
           "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 10
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 4,
-        "w": 4,
-        "x": 4,
-        "y": 10
-      },
-      "id": 26,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "auto"
-      },
-      "pluginVersion": "10.0.2",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "editorMode": "code",
-          "expr": "jenkins_runs_aborted_total{pod=\"$pod\"}",
-          "instant": false,
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "Aborted Builds",
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [
-            {
-              "options": {
-                "0": {
-                  "text": "None!"
-                }
-              },
-              "type": "value"
-            }
-          ],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "rgba(50, 172, 45, 0.97)",
-                "value": null
-              },
-              {
-                "color": "#37872D",
-                "value": 0
-              },
-              {
-                "color": "rgba(245, 54, 54, 0.9)",
-                "value": 5
-              }
-            ]
-          },
-          "unit": "none"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 4,
-        "w": 4,
-        "x": 8,
-        "y": 10
-      },
-      "id": 17,
-      "links": [],
-      "maxDataPoints": 100,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "horizontal",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "auto"
-      },
-      "pluginVersion": "10.0.2",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "editorMode": "builder",
-          "expr": "jenkins_runs_failure_total{pod=\"$pod\"}",
-          "format": "time_series",
-          "intervalFactor": 1,
-          "range": true,
-          "refId": "A",
-          "textEditor": false
-        }
-      ],
-      "title": "Failed Jobs",
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
+            "mode": "percentage",
             "steps": [
               {
                 "color": "green",
@@ -847,24 +1177,26 @@
               },
               {
                 "color": "orange",
-                "value": 1
+                "value": 25
+              },
+              {
+                "color": "red",
+                "value": 50
               }
             ]
-          }
+          },
+          "unit": "percent"
         },
         "overrides": []
       },
       "gridPos": {
         "h": 4,
-        "w": 4,
-        "x": 12,
-        "y": 10
+        "w": 12,
+        "x": 8,
+        "y": 19
       },
-      "id": 27,
+      "id": 31,
       "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
           "calcs": [
@@ -873,7 +1205,9 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "text": {}
       },
       "pluginVersion": "10.0.2",
       "targets": [
@@ -883,14 +1217,43 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "jenkins_runs_unstable_total{pod=\"$pod\"}",
+          "exemplar": false,
+          "expr": "(sum(jenkins_runs_failure_total{pod=~\"$pod\"})\nby (pod) * 100) /\nsum(jenkins_runs_total_total{pod=~\"$pod\"})\nby (pod)",
           "instant": false,
+          "interval": "",
+          "legendFormat": "Failed",
           "range": true,
           "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "(sum(jenkins_runs_aborted_total{pod=~\"$pod\"})\nby (pod) * 100) /\nsum(jenkins_runs_total_total{pod=~\"$pod\"})\nby (pod)",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "Aborted",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "(sum(jenkins_runs_unstable_total{pod=~\"$pod\"})\nby (pod) * 100) /\nsum(jenkins_runs_total_total{pod=~\"$pod\"})\nby (pod)",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "Unstable",
+          "range": true,
+          "refId": "C"
         }
       ],
-      "title": "Unstable Builds",
-      "type": "stat"
+      "title": "Unsuccessful Builds",
+      "type": "gauge"
     },
     {
       "datasource": {
@@ -938,7 +1301,7 @@
         "h": 4,
         "w": 4,
         "x": 20,
-        "y": 10
+        "y": 19
       },
       "id": 11,
       "links": [],
@@ -1023,7 +1386,7 @@
         "h": 7,
         "w": 4,
         "x": 0,
-        "y": 14
+        "y": 23
       },
       "id": 12,
       "links": [],
@@ -1120,7 +1483,7 @@
         "h": 7,
         "w": 16,
         "x": 4,
-        "y": 14
+        "y": 23
       },
       "id": 4,
       "links": [],
@@ -1197,7 +1560,7 @@
         "h": 7,
         "w": 4,
         "x": 20,
-        "y": 14
+        "y": 23
       },
       "id": 13,
       "links": [],
@@ -1237,17 +1600,17 @@
   "schemaVersion": 38,
   "style": "dark",
   "tags": [
-    "ci",
+    "jenkins",
     "cloudbees",
-    "jenkins"
+    "ci"
   ],
   "templating": {
     "list": [
       {
         "current": {
           "selected": true,
-          "text": "team-b-0",
-          "value": "team-b-0"
+          "text": "cjoc-0",
+          "value": "cjoc-0"
         },
         "datasource": {
           "type": "prometheus",
@@ -1302,8 +1665,8 @@
     ]
   },
   "timezone": "browser",
-  "title": "CloudBees CI",
-  "uid": "haryan-jenkins",
-  "version": 1,
+  "title": "CloudBees CI v2",
+  "uid": "f22bb554-2024-45e2-9795-af2ca85aea82",
+  "version": 3,
   "weekStart": ""
 }
