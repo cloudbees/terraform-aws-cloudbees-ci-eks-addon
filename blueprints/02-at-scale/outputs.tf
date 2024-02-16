@@ -157,5 +157,5 @@ output "prometheus_active_targets" {
 
 output "grafana_dashboard" {
   description = "Access to grafana dashbaords."
-  value       = "https://${local.grafana_hostname}"
+  value       = "kubectl port-forward svc/kube-prometheus-stack-grafana 50002:80 -n kube-prometheus-stack"
 }
