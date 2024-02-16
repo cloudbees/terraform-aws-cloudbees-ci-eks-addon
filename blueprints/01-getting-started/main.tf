@@ -39,6 +39,8 @@ locals {
 # EKS: Add-ons
 ################################################################################
 
+# CloudBees CI Add-ons
+
 module "eks_blueprints_addon_cbci" {
   source = "../../"
 
@@ -50,6 +52,8 @@ module "eks_blueprints_addon_cbci" {
     module.eks_blueprints_addons
   ]
 }
+
+# EKS Blueprints Add-ons
 
 module "ebs_csi_driver_irsa" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
@@ -71,7 +75,7 @@ module "ebs_csi_driver_irsa" {
 
 module "eks_blueprints_addons" {
   source  = "aws-ia/eks-blueprints-addons/aws"
-  version = "1.12.0"
+  version = "1.15.1"
 
   cluster_name      = module.eks.cluster_name
   cluster_endpoint  = module.eks.cluster_endpoint
@@ -113,7 +117,7 @@ module "eks_blueprints_addons" {
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "19.15.3"
+  version = "19.17.1"
 
   cluster_name                   = local.cluster_name
   cluster_version                = local.k8s_version
@@ -205,7 +209,7 @@ resource "null_resource" "create_kubeconfig" {
 
 module "acm" {
   source  = "terraform-aws-modules/acm/aws"
-  version = "4.3.2"
+  version = "5.0.0"
 
   #Important: Application Services Hostname must be the same as the domain name or subject_alternative_names
   domain_name = var.hosted_zone
@@ -214,14 +218,15 @@ module "acm" {
   ]
 
   #https://docs.aws.amazon.com/acm/latest/userguide/dns-validation.html
-  zone_id = local.route53_zone_id
+  zone_id           = local.route53_zone_id
+  validation_method = "DNS"
 
   tags = local.tags
 }
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "5.0.0"
+  version = "5.5.2"
 
   name = local.vpc_name
   cidr = local.vpc_cidr
