@@ -7,8 +7,6 @@ locals {
   region = "us-east-1"
   #Number of AZs per region https://docs.aws.amazon.com/ram/latest/userguide/working-with-az-ids.html
   azs = ["${local.region}a", "${local.region}b", "${local.region}c"]
-  #For g3 SC, Issue #51
-  #az_a = ["${local.region}a"]
 
   vpc_name              = "${local.name}-vpc"
   cluster_name          = "${local.name}-eks"
@@ -54,8 +52,6 @@ locals {
   cloudwatch_logs_expiration_days = 7
   s3_objects_expiration_days      = 90
 
-  grafana_hostname = "grafana.${var.hosted_zone}"
-
 }
 
 resource "time_static" "epoch" {
@@ -84,6 +80,32 @@ module "eks_blueprints_addon_cbci" {
 
 }
 
+resource "kubectl_manifest" "service_monitor_cb_controllers" {
+
+  depends_on = [module.eks_blueprints_addon_cbci]
+
+  yaml_body = file("k8s/kube-prom-stack-sm.yml")
+}
+
+resource "kubernetes_labels" "oc_sm_label" {
+
+  depends_on = [module.eks_blueprints_addon_cbci]
+
+  api_version = "v1"
+  kind        = "Service"
+  # This is true because the resources was already created by the
+  force = "true"
+
+  metadata {
+    name      = "cjoc"
+    namespace = module.eks_blueprints_addon_cbci.cbci_namespace
+  }
+
+  labels = {
+    "cloudbees.prometheus" = "true"
+  }
+}
+
 # EKS Blueprints Add-ons
 
 module "ebs_csi_driver_irsa" {
@@ -104,18 +126,9 @@ module "ebs_csi_driver_irsa" {
   tags = var.tags
 }
 
-#Issue #23
-# data "aws_autoscaling_groups" "eks_node_groups" {
-#   depends_on = [module.eks]
-#   filter {
-#     name   = "tag-key"
-#     values = ["eks:cluster-name"]
-#   }
-# }
-
 module "eks_blueprints_addons" {
   source  = "aws-ia/eks-blueprints-addons/aws"
-  version = "1.12.0"
+  version = "1.15.1"
 
   cluster_name      = module.eks.cluster_name
   cluster_endpoint  = module.eks.cluster_endpoint
@@ -151,20 +164,13 @@ module "eks_blueprints_addons" {
   enable_aws_efs_csi_driver = true
   enable_metrics_server     = true
   enable_cluster_autoscaler = true
-  #Issue #23
-  #enable_aws_node_termination_handler   = false
-  #aws_node_termination_handler_asg_arns = data.aws_autoscaling_groups.eks_node_groups.arns
-  enable_velero = true
+  enable_velero             = true
   velero = {
     s3_backup_location = local.velero_s3_location
   }
-
   enable_kube_prometheus_stack = true
   kube_prometheus_stack = {
-    values = [templatefile("k8s/kube-prom-stack-values.yml", {
-      grafana_hostname = local.grafana_hostname
-      cert_arn         = module.acm.acm_certificate_arn
-    })]
+    values = [file("k8s/kube-prom-stack-values.yml")]
     set_sensitive = [
       {
         name  = "grafana.adminPassword"
@@ -172,15 +178,12 @@ module "eks_blueprints_addons" {
       }
     ]
   }
-
   enable_aws_for_fluentbit = true
-
   aws_for_fluentbit_cw_log_group = {
     create          = true
     use_name_prefix = true # Set this to true to enable name prefix
     name_prefix     = "eks-cluster-logs-"
   }
-
   aws_for_fluentbit = {
     #Enable Container Insights just for troubleshooting
     #https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/ContainerInsights.html
@@ -210,34 +213,7 @@ module "eks_blueprints_addons" {
       "${local.fluentbit_s3_location}/*"
     ]
   }
-
   tags = local.tags
-}
-
-resource "kubectl_manifest" "service_monitor_cb_controllers" {
-
-  depends_on = [module.eks_blueprints_addons]
-
-  yaml_body = file("k8s/kube-prom-stack-sm.yml")
-}
-
-resource "kubernetes_labels" "oc_sm_label" {
-
-  depends_on = [module.eks_blueprints_addon_cbci]
-
-  api_version = "v1"
-  kind        = "Service"
-  # This is true because the resources was already created by the
-  force = "true"
-
-  metadata {
-    name      = "cjoc"
-    namespace = module.eks_blueprints_addon_cbci.cbci_namespace
-  }
-
-  labels = {
-    "cloudbees.prometheus" = "true"
-  }
 }
 
 ################################################################################
@@ -248,7 +224,7 @@ resource "kubernetes_labels" "oc_sm_label" {
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "19.15.3"
+  version = "19.17.1"
 
   cluster_name                   = local.cluster_name
   cluster_version                = local.k8s_version
@@ -481,14 +457,6 @@ resource "kubernetes_storage_class_v1" "gp3" {
     type      = "gp3"
   }
 
-  #Issue #51
-  # allowed_topologies {
-  #   match_label_expressions {
-  #     key    = "topology.ebs.csi.aws.com/zone"
-  #     values = local.az_a
-  #   }
-  # }
-
 }
 
 resource "kubernetes_storage_class_v1" "efs" {
@@ -531,7 +499,7 @@ resource "null_resource" "create_kubeconfig" {
 
 module "efs" {
   source  = "terraform-aws-modules/efs/aws"
-  version = "1.2.0"
+  version = "1.6.0"
 
   creation_token = local.efs_name
   name           = local.efs_name
@@ -560,7 +528,7 @@ module "efs" {
 
 module "acm" {
   source  = "terraform-aws-modules/acm/aws"
-  version = "4.3.2"
+  version = "5.0.0"
 
   #Important: Application Services Hostname must be the same as the domain name or subject_alternative_names
   domain_name = var.hosted_zone
@@ -569,14 +537,15 @@ module "acm" {
   ]
 
   #https://docs.aws.amazon.com/acm/latest/userguide/dns-validation.html
-  zone_id = local.route53_zone_id
+  zone_id           = local.route53_zone_id
+  validation_method = "DNS"
 
   tags = local.tags
 }
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "5.0.0"
+  version = "5.5.2"
 
   name = local.vpc_name
   cidr = local.vpc_cidr
@@ -624,7 +593,7 @@ JSON
 
 module "cbci_s3_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "~> 3.0"
+  version = "4.0.1"
 
   bucket = local.bucket_name
 
@@ -637,6 +606,7 @@ module "cbci_s3_bucket" {
 
   acl = "private"
 
+  # S3 bucket-level Public Access Block configuration (by default now AWS has made this default as true for S3 bucket-level block public access)
   block_public_acls       = true
   block_public_policy     = true
   ignore_public_acls      = true
