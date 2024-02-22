@@ -19,9 +19,17 @@ additionalPrometheusRulesMap:
     groups:
       - name: CloudBees CI Performance
         rules:
+          - alert: JenkinsTargetsAreDown
+            expr: up{container="jenkins"} == 0
+            for: 3m
+            labels:
+              severity: critical
+            annotations:
+              summary: "{{ $labels.pod }} target is down"
+              description: "{{ $labels.pod }} target is down"
           - alert: JenkinsHealthScoreToLow
             expr: sum(jenkins_health_check_score) by (pod) < 1
-            for: 1m
+            for: 3m
             labels:
               severity: critical
             annotations:
