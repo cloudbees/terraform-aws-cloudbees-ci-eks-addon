@@ -8,7 +8,7 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
 - [Amazon CloudWatch Logs](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/WhatIsCloudWatchLogs.html) to explode control plane logs and Fluent Bit logs.
 - The following [Amazon EKS blueprints add-ons](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/):
 
-  | Amazon EKS blueprint add-ons                                                                                             | Description                                                                                                                                                                                  |
+  | Amazon EKS blueprints add-ons                                                                                            | Description                                                                                                                                                                                  |
   |--------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
   | [AWS EFS CSI Driver](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/aws-efs-csi-driver/)       | Connects the Amazon Elastic File System (Amazon EFS) drive to the Amazon EKS cluster.                                                                                                        |
   | [AWS for Fluent Bit](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/aws-for-fluentbit/)        | Acts as an applications log router for log observability in CloudWatch.                                                                                                                      |
@@ -93,7 +93,7 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
 When preparing to deploy, you must [customize the secrets file](#customize-secrets-file) and [update Amazon S3 bucket settings](#update-amazon-s3-bucket-settings).
 
 > [!TIP]
-> To understand the minimum required settings, refer to [Getting started - Deploy](../01-getting-started/README.md#deploy).
+> To understand the minimum required settings, refer to [Get started - Deploy](../01-getting-started/README.md#deploy).
 
 ### Customize secrets file
 
@@ -108,7 +108,7 @@ Since the Terraform variable `suffix` is used for this blueprint, you must updat
 
 #### Option 1: Update Amazon S3 bucket name using CasC
 
->[!NOTE]
+>[!IMPORTANT]
 > This option can only be used before the blueprint has been deployed.
 
 1. Create a fork from the [cloudbees/casc-mc-cloudbees-ci-eks-addon](https://github.com/cloudbees/casc-mc-cloudbees-ci-eks-addon) GitHub repo to your GitHub organization and make any necessary edits to the controller CasC bundle (for example, add `cbci_s3` to the [bp02.parent/variables/variables.yaml](https://github.com/cloudbees/casc-mc-cloudbees-ci-eks-addon/blob/main/bp02.parent/variables/variables.yaml) file). 
@@ -120,20 +120,20 @@ Since the Terraform variable `suffix` is used for this blueprint, you must updat
 
 #### Option 2: Update Amazon S3 bucket name using the CloudBees CI UI
 
->[!NOTE]
-> This option can only be used after the blueprint is deployed.
+> [!IMPORTANT]
+> - This option can only be used after the blueprint is deployed.
+> - If using CasC, the declarative definition overrides any configuration updates that are made in the UI the next time the controller is restarted.
 
-1. Sign in to the CloudBees CI controller.
+1. Sign in to the CloudBees CI controller UI.
 2. Navigate to **Manage Jenkins > AWS > Amazon S3 Bucket Access settings**, update the **S3 Bucket Name**, and select **Save**.
-3. Sign in to the CloudBees CI operations center as a user with **Administer** privileges.
-   > [!TIP] Back up jobs are restricted to only admin users via role-based access control (RBAC).
+3. Sign in to the CloudBees CI operations center UI as a user with **Administer** privileges.
+   > [!TIP]
+   > Back up jobs are restricted to only admin users via role-based access control (RBAC).
 4. From the operations center dashboard, select **All** to view all folders on the operations center.  
 5. Navigate to the **admin** folder, and then select the **backup-all-controllers** Cluster Operations job.
 6. From the left pane, select **Configure**.
 7. Update the **S3 Bucket Name**, and then select **Save**.
 
-   > [!IMPORTANT] 
-   > If using CasC, the declarative definition overrides any configuration updates that are made in the UI the next time the controller is restarted.
 
 ## Validate
 
@@ -151,7 +151,7 @@ Once the resources have been created, a `kubeconfig` file is created in the [/k8
 
 1. Complete the steps to [validate CloudBees CI](../01-getting-started/README.md#cloudbees-ci), if you have not done so already.
 
-2. Authentication in this blueprint uses three types of personas, each with a different authorization level. Each persona uses a different user ID, but has the same password. The authorization level defines a set of permissions configured using [RBAC](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-secure-guide/rbac). Additionally, the operations center and controller use [single sign-on (SS0)](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-secure-guide/using-sso). Issue the following command to retrieve the password:
+2. Authentication in this blueprint uses three types of personas, each with a different authorization level. Each persona uses a different username, but has the same password. The authorization level defines a set of permissions configured using [RBAC](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-secure-guide/rbac). Additionally, the operations center and controller use [single sign-on (SS0)](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-secure-guide/using-sso). Issue the following command to retrieve the password:
 
     ```sh
     eval $(terraform output --raw cbci_general_password)
@@ -221,13 +221,14 @@ The [CloudBees Backup plugin](https://docs.cloudbees.com/docs/cloudbees-ci/lates
 To view the **backup-all-controllers** job:
 
 1. Sign in to the CloudBees CI operations center UI.
+
    > [!TIP]
    > Back up jobs are restricted to only admin users via RBAC.
 2. From the operations center dashboard, select **All** to view all folders on the operations center.
 3. Navigate to the **admin** folder, and then select the **backup-all-controllers** Cluster Operations job.
 
-> [!NOTE]
-> If a build fails, it is likely related to a `suffix` that is included in your Terraform variables, and the recommendations from the [Deploy](#deploy) section were not followed.
+   > [!NOTE]
+   > If a build fails, it is likely related to a `suffix` that is included in your Terraform variables, and the recommendations from the [Deploy](#deploy) section were not followed.
 
 #### Create a Velero backup
 
@@ -279,7 +280,7 @@ The [CloudBees Prometheus Metrics plugin](https://docs.cloudbees.com/docs/cloudb
       If successful, the Grafana dashboard should be available at `http://localhost:50002`.
 
 
-### Logss
+### Logs
 
 For application logs, Fluent Bit acts as a router.
 - Short-term application logs live in the [Amazon CloudWatch Logs](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/WhatIsCloudWatchLogs.html) group, under `/aws/eks/<CLUSTER_NAME>/aws-fluentbit-logs` and contains log streams for all the Kubernetes services running in the cluster, including CloudBees CI applications.

@@ -18,7 +18,7 @@ Get started with the [CloudBees CI on modern platforms in Amazon Elastic Kuberne
 
 ![Architecture](img/getting-started.architect.drawio.svg)
 
-### Kubernetes Cluster
+### Kubernetes cluster
 
 ![Architecture](img/getting-started.k8s.drawio.svg)
 
