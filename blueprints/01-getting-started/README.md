@@ -1,27 +1,27 @@
-# CloudBees CI Add-on getting started Blueprint
+# CloudBees CI blueprint add-on: Get started
 
-Get started with the [CloudBees CI on Modern in EKS](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/) by running this blueprint which just installs the product and its [prerequisites](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/installing-eks-using-helm#_prerequisites) to help you understand the minimum setup.
+Get started with the [CloudBees CI on modern platforms in Amazon Elastic Kubernetes Service (Amazon EKS)](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/) by running this blueprint, which only installs the product and its [prerequisites](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/installing-eks-using-helm#_prerequisites), to help you understand the minimum setup:
 
-- AWS Certificate Manager
-- **[Amazon EKS Addons](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/)**:
+- Amazon Web Services (AWS) certificate manager
+- [Amazon EKS Blueprints Addons](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/):
   - [AWS Load Balancer Controller](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/aws-load-balancer-controller/)
-  - [External DNS](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/external-dns/)
-  - [EBS CSI Driver](https://docs.aws.amazon.com/eks/latest/userguide/ebs-csi.html) to allocate EBS volumes for hosting [JENKINS_HOME](https://docs.cloudbees.com/docs/cloudbees-ci/latest/backup-restore/jenkins-home).
+  - [ExternalDNS](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/external-dns/)
+  - [Amazon Elastic Block Store (Amazon EBS) Container Storage Interface (CSI) driver](https://docs.aws.amazon.com/eks/latest/userguide/ebs-csi.html), to allocate Amazon EBS volumes for hosting [$JENKINS_HOME](https://docs.cloudbees.com/docs/cloudbees-ci/latest/backup-restore/jenkins-home).
 
 > [!TIP]
-> A [Resource Group](https://docs.aws.amazon.com/ARG/latest/userguide/resource-groups.html) is added to get a full list with all resources created by this blueprint.
+> A [resource group](https://docs.aws.amazon.com/ARG/latest/userguide/resource-groups.html) is added, to get a full list with all resources created by this blueprint.
 
 ## Architecture
 
-![Architecture](img/getting-started.architect.drawio.svg)
+> [!NOTE] Node groups use an [AWS Graviton Processor](https://aws.amazon.com/ec2/graviton/) to ensure the best balance between price and performance for cloud workloads running on Amazon Elastic Compute Cloud (Amazon EC2).
 
-Node Groups use [Graviton Processor](https://aws.amazon.com/ec2/graviton/) to ensure the best balance price and performance for cloud workloads running on Amazon EC2.
+![Architecture](img/getting-started.architect.drawio.svg)
 
 ### Kubernetes Cluster
 
 ![Architecture](img/getting-started.k8s.drawio.svg)
 
-## Terraform Docs
+## Terraform documentation
 
 <!-- BEGIN_TF_DOCS -->
 ### Inputs
@@ -54,17 +54,19 @@ Node Groups use [Graviton Processor](https://aws.amazon.com/ec2/graviton/) to en
 
 ## Deploy
 
-First of all, customize your terraform values by copying `.auto.tfvars.example` to `.auto.tfvars`.
+1. Customize your Terraform values by copying `.auto.tfvars.example` to `.auto.tfvars`.
+2. Initialize the root module and any associated configuration for providers.
+3. Create the resources and deploy CloudBees CI to an EKS cluster. Refer to [Amazon EKS Blueprints for Terraform - Deploy](https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#deploy).
 
-Initialize the root module and any associated configuration for providers and finally create the resources and deploy CloudBees CI to an EKS Cluster. Please refer to [Getting Started - Amazon EKS Blueprints for Terraform - Deploy](https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#deploy)
-
-For more detailed information, see the documentation for the [Terraform Core workflow](https://www.terraform.io/intro/core-workflow).
+For more information, refer to [The Core Terraform Workflow](https://www.terraform.io/intro/core-workflow) documentation.
 
 ## Validate
 
+Once the blueprint has been deployed, you can validate it.
+
 ### Kubeconfig
 
-Once the resources have been created, note that a `kubeconfig` file has been created inside the respective `blueprint/k8s` folder. Start defining the Environment Variable [KUBECONFIG](https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/#the-kubeconfig-environment-variable) to point to the generated file.
+Once the resources have been created, a `kubeconfig` file is created in the [/k8s](k8s) folder. Issue the following command to define the [KUBECONFIG](https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/#the-kubeconfig-environment-variable) environment variable to point to the newly generated file:
 
   ```sh
   eval $(terraform output --raw kubeconfig_export)
@@ -72,52 +74,53 @@ Once the resources have been created, note that a `kubeconfig` file has been cre
 
 ### CloudBees CI
 
-Once you get access to K8s API from your terminal, validate that:
+Once you can access the Kubernetes API from your terminal, complete the following steps.
 
-- The CloudBees Operation Center Pod is in `Running` state
+1. Verify that the CloudBees CI operations center pod is in a `Running` state:
 
-  ```sh
-  eval $(terraform output --raw cbci_oc_pod)
-  ```
+    ```sh
+    eval $(terraform output --raw cbci_oc_pod)
+    ```
+   
+2. Verify that the Ingress is ready and has assigned a valid `ADDRESS`:
 
-- The Ingress Controller is ready and has assigned a valid `ADDRESS`
+    ```sh
+    eval $(terraform output --raw cbci_oc_ing)
+    ```
 
-  ```sh
-  eval $(terraform output --raw cbci_oc_ing)
-  ```
+3. Verify that the operations center service is running from inside the Kubernetes cluster:
 
-- Check that the Operation Center Service is running from inside the K8s cluster. Successful output should be nothing in return.
+    ```sh
+    eval $(terraform output --raw cbci_liveness_probe_int)
+    ```
+   If the command is successful, no output is returned.
 
-  ```sh
-  eval $(terraform output --raw cbci_liveness_probe_int)
-  ```
+4. Verify that the operations center service is running from outside the Kubernetes cluster:
 
-- Check that the Operation Center Service is running from outside the K8s cluster. Successful output should be nothing in return.
+    ```sh
+    eval $(terraform output --raw cbci_liveness_probe_ext)
+    ```
+   If the command is successful, no output is returned.
 
-  ```sh
-  eval $(terraform output --raw cbci_liveness_probe_ext)
-  ```
+5. DNS propagation may take a several minutes. Once propagation is complete, issue the following command and copy the output:
 
-> [!NOTE]
-> DNS propagation can take a few minutes
+    ```sh
+    terraform output cbci_oc_url
+    ```
+6. Paste the output of the previous command into your browser to access the CloudBees CI setup wizard to install CloudBees CI and the operations center.
 
-- Once propagation is ready, it is possible to access the CloudBees CI installation Wizard by copying the outcome of the below command in your browser.
+7. Once you have installed CloudBees CI and the operations center, type the following command to retrieve your administrative user password:
 
-  ```sh
-  terraform output cbci_oc_url
-  ```
+    ```sh
+    eval $(terraform output --raw cbci_initial_admin_password)
+    ```
 
-Now that you’ve installed CloudBees CI and operations center, you’ll want to see your system in action. To do this, follow the steps explained in [CloudBees CI EKS Install Guide - Signing in to your CloudBees CI installation](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/installing-eks-using-helm#log-in). You will need the initial admin password to log in as:
+8. Open a browser and navigate to http://cloudbees-core.example.com/cjoc/.
 
-  ```sh
-  eval $(terraform output --raw cbci_initial_admin_password)
-  ```
+9. Sign in with the username `admin` and the password you retrieved.
 
-> [!NOTE]
-> Once you can create the first admin user in the Wizard, this password will not be valid.
-
-Finally, install the suggested plugins and create the first admin user.
+10. Install the suggested plugins.
 
 ## Destroy
 
-To teardown and remove the resources created in the blueprint, the typical steps of execution are as explained in [Getting Started - Amazon EKS Blueprints for Terraform - Destroy](https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#destroy)
+To tear down and remove the resources created in the blueprint, complete the steps for [Amazon EKS Blueprints for Terraform - Destroy](https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#destroy).
