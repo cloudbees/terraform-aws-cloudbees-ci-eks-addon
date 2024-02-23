@@ -6,7 +6,7 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
 - An [Amazon Simple Storage Service (Amazon S3) bucket](https://aws.amazon.com/s3/) to store assets from applications like CloudBees CI, Velero, and Fluent Bit.
 - [Amazon Elastic Kubernetes Service (Amazon EKS) managed node groups](https://docs.aws.amazon.com/eks/latest/userguide/managed-node-groups.html) for different workloads: CI applications, CI on-demand agents, CI spot agents, and Kubernetes applications.
 - [Amazon CloudWatch Logs](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/WhatIsCloudWatchLogs.html) to explode control plane logs and Fluent Bit logs.
-- The following [Amazon EKS add-ons](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/):
+- The following [Amazon EKS blueprints add-ons](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/):
 
   | Amazon EKS blueprint add-ons                                                                                             | Description                                                                                                                                                                                  |
   |--------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -92,7 +92,8 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
 
 When preparing to deploy, you must [customize the secrets file](#customize-secrets-file) and [update Amazon S3 bucket settings](#update-amazon-s3-bucket-settings).
 
-[!TIP] To understand the minimum required settings, refer to [Getting started - Deploy](../01-getting-started/README.md#deploy).
+> [!TIP]
+> To understand the minimum required settings, refer to [Getting started - Deploy](../01-getting-started/README.md#deploy).
 
 ### Customize secrets file
 
@@ -107,7 +108,8 @@ Since the Terraform variable `suffix` is used for this blueprint, you must updat
 
 #### Option 1: Update Amazon S3 bucket name using CasC
 
->[!NOTE] This option can only be used before the blueprint has been deployed.
+>[!NOTE]
+> This option can only be used before the blueprint has been deployed.
 
 1. Create a fork from the [cloudbees/casc-mc-cloudbees-ci-eks-addon](https://github.com/cloudbees/casc-mc-cloudbees-ci-eks-addon) GitHub repo to your GitHub organization and make any necessary edits to the controller CasC bundle (for example, add `cbci_s3` to the [bp02.parent/variables/variables.yaml](https://github.com/cloudbees/casc-mc-cloudbees-ci-eks-addon/blob/main/bp02.parent/variables/variables.yaml) file). 
 2. Commit and push your changes to the forked repo in your organization.
@@ -118,7 +120,8 @@ Since the Terraform variable `suffix` is used for this blueprint, you must updat
 
 #### Option 2: Update Amazon S3 bucket name using the CloudBees CI UI
 
->[!NOTE] This option can only be used after the blueprint is deployed.
+>[!NOTE]
+> This option can only be used after the blueprint is deployed.
 
 1. Sign in to the CloudBees CI controller.
 2. Navigate to **Manage Jenkins > AWS > Amazon S3 Bucket Access settings**, update the **S3 Bucket Name**, and select **Save**.
@@ -208,7 +211,8 @@ For backup and restore operations, you can use the [preconfigured CloudBees CI C
 
 [Velero](#create-a-velero-backup) is an alternative for services that use Amazon EBS as storage. Velero not only takes a backup of the PVC snapshots, but also takes a backup of any other defined Kubernetes resources.
 
-> [!NOTE] There is no alternative for services using Amazon EFS storage. Although [AWS Backup](https://aws.amazon.com/backup/) includes this Amazon EFS drive as a protected resource, there is not currently a best practice to dynamically restore Amazon EFS PVCs. For more information, refer to [Issue 39](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/issues/39).
+> [!NOTE]
+> There is no alternative for services using Amazon EFS storage. Although [AWS Backup](https://aws.amazon.com/backup/) includes this Amazon EFS drive as a protected resource, there is not currently a best practice to dynamically restore Amazon EFS PVCs. For more information, refer to [Issue 39](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/issues/39).
 
 #### Create daily backups using a CloudBeees CI Cluster Operations job
 
@@ -217,7 +221,8 @@ The [CloudBees Backup plugin](https://docs.cloudbees.com/docs/cloudbees-ci/lates
 To view the **backup-all-controllers** job:
 
 1. Sign in to the CloudBees CI operations center UI.
-   > [!TIP] Back up jobs are restricted to only admin users via RBAC.
+   > [!TIP]
+   > Back up jobs are restricted to only admin users via RBAC.
 2. From the operations center dashboard, select **All** to view all folders on the operations center.
 3. Navigate to the **admin** folder, and then select the **backup-all-controllers** Cluster Operations job.
 

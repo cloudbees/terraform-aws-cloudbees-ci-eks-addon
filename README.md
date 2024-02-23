@@ -2,7 +2,7 @@
 
 <p align="center">
   <a href="https://www.cloudbees.com/capabilities/continuous-integration"><img alt="Continuous Integration for Jenkins in the Enterprise" src="https://images.ctfassets.net/vtn4rfaw6n2j/4dkyIw9VG39voD21C18YJz/692394b012c1ad7f2fc192dd484fdd47/image-grid-800x480-page-ci-simplify-your-jenkins-experience.png" height="120px" /></a>
-  <p align="center">>Deploy CloudBees CI to Amazon Web Services (AWS) Elastic Kubernetes Service (EKS) clusters</p>
+  <p align="center">Deploy CloudBees CI to Amazon Web Services (AWS) Elastic Kubernetes Service (EKS) clusters</p>
 
 ---
 

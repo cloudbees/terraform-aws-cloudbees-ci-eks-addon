@@ -3,7 +3,7 @@
 Get started with the [CloudBees CI on modern platforms in Amazon Elastic Kubernetes Service (Amazon EKS)](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/) by running this blueprint, which only installs the product and its [prerequisites](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/installing-eks-using-helm#_prerequisites), to help you understand the minimum setup:
 
 - Amazon Web Services (AWS) certificate manager
-- [Amazon EKS Blueprints Addons](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/):
+- The following [Amazon EKS blueprints add-ons](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/):
   - [AWS Load Balancer Controller](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/aws-load-balancer-controller/)
   - [ExternalDNS](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/external-dns/)
   - [Amazon Elastic Block Store (Amazon EBS) Container Storage Interface (CSI) driver](https://docs.aws.amazon.com/eks/latest/userguide/ebs-csi.html), to allocate Amazon EBS volumes for hosting [$JENKINS_HOME](https://docs.cloudbees.com/docs/cloudbees-ci/latest/backup-restore/jenkins-home).
@@ -13,7 +13,8 @@ Get started with the [CloudBees CI on modern platforms in Amazon Elastic Kuberne
 
 ## Architecture
 
-> [!NOTE] Node groups use an [AWS Graviton Processor](https://aws.amazon.com/ec2/graviton/) to ensure the best balance between price and performance for cloud workloads running on Amazon Elastic Compute Cloud (Amazon EC2).
+> [!NOTE] 
+> Node groups use an [AWS Graviton Processor](https://aws.amazon.com/ec2/graviton/) to ensure the best balance between price and performance for cloud workloads running on Amazon Elastic Compute Cloud (Amazon EC2).
 
 ![Architecture](img/getting-started.architect.drawio.svg)
 
@@ -53,6 +54,8 @@ Get started with the [CloudBees CI on modern platforms in Amazon Elastic Kuberne
 <!-- END_TF_DOCS -->
 
 ## Deploy
+
+When preparing to deploy, you must complete the following steps:
 
 1. Customize your Terraform values by copying `.auto.tfvars.example` to `.auto.tfvars`.
 2. Initialize the root module and any associated configuration for providers.
