@@ -105,7 +105,7 @@ Once you can access the Kubernetes API from your terminal, complete the followin
     ```
    If the command is successful, no output is returned.
 
-5. DNS propagation may take a several minutes. Once propagation is complete, issue the following command and copy the output:
+5. DNS propagation may take a several minutes. Once propagation is complete, issue the following command and copy the output in your web browser.
 
     ```sh
     terraform output cbci_oc_url
