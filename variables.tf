@@ -26,7 +26,7 @@ variable "cert_arn" {
 
   validation {
     condition     = can(regex("^arn", var.cert_arn))
-    error_message = "cert_arn should start with ARN."
+    error_message = "The cert_arn should start with ARN."
   }
 }
 

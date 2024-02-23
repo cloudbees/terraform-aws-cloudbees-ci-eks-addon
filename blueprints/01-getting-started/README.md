@@ -115,7 +115,7 @@ Once you can access the Kubernetes API from your terminal, complete the followin
     eval $(terraform output --raw cbci_initial_admin_password)
     ```
 
-8. Open a browser and navigate to http://cloudbees-core.example.com/cjoc/.
+8. Open a browser and navigate to `http://cloudbees-core.example.com/cjoc/`.
 
 9. Sign in with the username `admin` and the password you retrieved.
 
