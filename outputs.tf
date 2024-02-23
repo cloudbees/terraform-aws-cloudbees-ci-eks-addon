@@ -11,7 +11,7 @@ output "cbci_namespace" {
 }
 
 output "cbci_oc_url" {
-  description = "Operations center URL for the CloudBees CI Add-on using a subdomain and certificates."
+  description = "Operations center URL for the CloudBees CI add-on using a subdomain and certificates."
   value       = "https://cjoc.${var.hosted_zone}"
 }
 
@@ -21,21 +21,21 @@ output "cbci_domain_name" {
 }
 
 output "cbci_oc_pod" {
-  description = "Operations center pod for the CloudBees CI Add-on."
+  description = "Operations center pod for the CloudBees CI add-on."
   value       = "kubectl get pod -n ${helm_release.cloudbees_ci.namespace} cjoc-0"
 }
 
 output "cbci_oc_ing" {
-  description = "Operations center Ingress for the CloudBees CI Add-on."
+  description = "Operations center Ingress for the CloudBees CI add-on."
   value       = "kubectl get ing -n ${helm_release.cloudbees_ci.namespace} cjoc"
 }
 
 output "cbci_liveness_probe_int" {
-  description = "Operations center service internal liveness probe for the CloudBees CI Add-on."
+  description = "Operations center service internal liveness probe for the CloudBees CI add-on."
   value       = "kubectl exec -n ${helm_release.cloudbees_ci.namespace} -ti cjoc-0 --container jenkins -- curl -sSf localhost:8080/whoAmI/api/json > /dev/null"
 }
 
 output "cbci_liveness_probe_ext" {
-  description = "Operations center service external liveness probe for the CloudBees CI Add-on."
+  description = "Operations center service external liveness probe for the CloudBees CI add-on."
   value       = "curl -sSf https://cjoc.${var.hosted_zone}/whoAmI/api/json > /dev/null"
 }

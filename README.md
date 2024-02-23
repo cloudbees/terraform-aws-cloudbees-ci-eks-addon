@@ -1,7 +1,7 @@
-# CloudBees CI Add-on for Amazon EKS blueprints
+# CloudBees CI add-on for Amazon EKS blueprints
 
 <p style="text-align:center">
-  <a href="https://www.cloudbees.com/capabilities/continuous-integration"><img alt="cloudbees-icon" src="https://images.ctfassets.net/vtn4rfaw6n2j/4dkyIw9VG39voD21C18YJz/692394b012c1ad7f2fc192dd484fdd47/image-grid-800x480-page-ci-simplify-your-jenkins-experience.png" height="120px" /></a>
+  <a href="https://www.cloudbees.com/capabilities/continuous-integration"><img alt="Continuous Integration for Jenkins in the Enterprise" src="https://images.ctfassets.net/vtn4rfaw6n2j/4dkyIw9VG39voD21C18YJz/692394b012c1ad7f2fc192dd484fdd47/image-grid-800x480-page-ci-simplify-your-jenkins-experience.png" height="120px" /></a>
   <p style="text-align:center">Deploy CloudBees CI to Amazon Web Services (AWS) Elastic Kubernetes Service (EKS) clusters</p>
 
 ---
@@ -17,10 +17,10 @@
 
 ## Motivation
 
-The CloudBees CI [AWS Partner Add-on](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/aws-partner-addons/) streamlines the adoption and experimentation of CloudBees CI enterprise features by:
+The CloudBees CI [AWS partner add-on](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/aws-partner-addons/) streamlines the adoption and experimentation of CloudBees CI enterprise features by:
 
 - Encapsulating the deployment of [CloudBees CI on modern platforms in AWS EKS](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/installing-eks-using-helm#_configuring_your_environment) into a Terraform module.
-- Providing a series of [blueprints](blueprints) that implement the CloudBees CI Add-on module for use with [Amazon EKS blueprints for Terraform](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/), which are aligned with the [EKS Best Practices Guides](https://aws.github.io/aws-eks-best-practices/).
+- Providing a series of [blueprints](blueprints) that implement the CloudBees CI add-on module for use with [Amazon EKS blueprints for Terraform](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/), which are aligned with the [EKS Best Practices Guides](https://aws.github.io/aws-eks-best-practices/).
 
 ## Usage
 
@@ -84,7 +84,7 @@ Once the trial has expired, refer to [CloudBees CI license expiration FAQ](https
 
 ## Compatibility
 
-The CloudBees CI Add-on uses `helms release` for its resources definition, making it compatible with [AWS EKS Blueprint v4](https://github.com/aws-ia/terraform-aws-eks-blueprints/tree/v4.32.1) and [AWS EKS Blueprint v5](https://github.com/aws-ia/terraform-aws-eks-blueprints/tree/v5.0.0). For more information, refer to [Amazon EKS Blueprints for Terraform: v4 to v5 migration](https://aws-ia.github.io/terraform-aws-eks-blueprints/v4-to-v5/motivation/).
+The CloudBees CI add-on uses `helms release` for its resources definition, making it compatible with [AWS EKS Blueprint v4](https://github.com/aws-ia/terraform-aws-eks-blueprints/tree/v4.32.1) and [AWS EKS Blueprint v5](https://github.com/aws-ia/terraform-aws-eks-blueprints/tree/v5.0.0). For more information, refer to [Amazon EKS Blueprints for Terraform: v4 to v5 migration](https://aws-ia.github.io/terraform-aws-eks-blueprints/v4-to-v5/motivation/).
 
 ## Terraform documentation
 
@@ -118,7 +118,7 @@ The CloudBees CI Add-on uses `helms release` for its resources definition, makin
 - [CloudBees CI documentation](https://docs.cloudbees.com/docs/cloudbees-ci/latest/)
 - [CloudBees CI release notes](https://docs.cloudbees.com/docs/release-notes/latest/cloudbees-ci/)
 - [Architecture for CloudBees CI on modern cloud platforms](https://docs.cloudbees.com/docs/cloudbees-ci/latest/architecture/ci-cloud)
-- [Amazon EKS Blueprints Add-ons](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/)
+- [Amazon EKS Blueprints Addons](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/)
 - [Amazon EKS Blueprints for Terraform](https://aws-ia.github.io/terraform-aws-eks-blueprints/)
 - [Containers: Bootstrapping clusters with EKS Blueprints](https://aws.amazon.com/blogs/containers/bootstrapping-clusters-with-eks-blueprints/)
 - [EKS Workshop](https://www.eksworkshop.com/)

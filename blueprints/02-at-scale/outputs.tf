@@ -10,43 +10,43 @@ output "kubeconfig_add" {
 }
 
 output "cbci_helm" {
-  description = "Helm configuration for the CloudBees CI Add-on. It is accessible only via state files."
+  description = "Helm configuration for the CloudBees CI add-on. It is accessible only via state files."
   value       = module.eks_blueprints_addon_cbci.merged_helm_config
   sensitive   = true
 }
 
 output "cbci_namespace" {
-  description = "Namespace for the CloudBees CI Add-on."
+  description = "Namespace for the CloudBees CI add-on."
   value       = module.eks_blueprints_addon_cbci.cbci_namespace
 }
 
 output "cbci_oc_pod" {
-  description = "Operations center pod for the CloudBees CI Add-on."
+  description = "Operations center pod for the CloudBees CI add-on."
   value       = module.eks_blueprints_addon_cbci.cbci_oc_pod
 }
 
 output "cbci_oc_ing" {
-  description = "Operations center Ingress for the CloudBees CI Add-on."
+  description = "Operations center Ingress for the CloudBees CI add-on."
   value       = module.eks_blueprints_addon_cbci.cbci_oc_ing
 }
 
 output "cbci_liveness_probe_int" {
-  description = "Operations center service internal liveness probe for the CloudBees CI Add-on."
+  description = "Operations center service internal liveness probe for the CloudBees CI add-on."
   value       = module.eks_blueprints_addon_cbci.cbci_liveness_probe_int
 }
 
 output "cbci_liveness_probe_ext" {
-  description = "Operations center service external liveness probe for the CloudBees CI Add-on."
+  description = "Operations center service external liveness probe for the CloudBees CI add-on."
   value       = module.eks_blueprints_addon_cbci.cbci_liveness_probe_ext
 }
 
 output "cbci_general_password" {
-  description = "Operations center service initial admin password for the CloudBees CI Add-on. Additionally, there are developer and guest users using the same password."
+  description = "Operations center service initial admin password for the CloudBees CI add-on. Additionally, there are developer and guest users using the same password."
   value       = "kubectl get secret cbci-secrets -n ${module.eks_blueprints_addon_cbci.cbci_namespace} -o jsonpath='{.data.secJenkinsPass}' | base64 -d"
 }
 
 output "cbci_oc_url" {
-  description = "Operations center URL for the CloudBees CI Add-on."
+  description = "Operations center URL for the CloudBees CI add-on."
   value       = module.eks_blueprints_addon_cbci.cbci_oc_url
 }
 
@@ -66,7 +66,7 @@ output "cbci_oc_take_backups" {
 }
 
 output "cbci_controllers_pods" {
-  description = "Operations center pod for the CloudBees CI Add-on."
+  description = "Operations center pod for the CloudBees CI add-on."
   value       = "kubectl get pods -n ${module.eks_blueprints_addon_cbci.cbci_namespace} -l com.cloudbees.cje.type=master"
 }
 
