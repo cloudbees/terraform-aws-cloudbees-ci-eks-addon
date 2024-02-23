@@ -127,8 +127,8 @@ Since the Terraform variable `suffix` is used for this blueprint, you must updat
 1. Sign in to the CloudBees CI controller UI.
 2. Navigate to **Manage Jenkins > AWS > Amazon S3 Bucket Access settings**, update the **S3 Bucket Name**, and select **Save**.
 3. Sign in to the CloudBees CI operations center UI as a user with **Administer** privileges.
-   > [!TIP]
-   > Back up jobs are restricted to only admin users via role-based access control (RBAC).
+    > [!TIP]
+    > Back up jobs are restricted to only admin users via role-based access control (RBAC).
 4. From the operations center dashboard, select **All** to view all folders on the operations center.  
 5. Navigate to the **admin** folder, and then select the **backup-all-controllers** Cluster Operations job.
 6. From the left pane, select **Configure**.
