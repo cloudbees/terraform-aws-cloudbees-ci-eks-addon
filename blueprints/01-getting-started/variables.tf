@@ -1,26 +1,26 @@
 
 variable "tags" {
-  description = "Tags to apply to resources"
+  description = "Tags to apply to resources."
   default     = {}
   type        = map(string)
 }
 
 variable "hosted_zone" {
-  description = "Route 53 Hosted Zone. CloudBees CI Apps is configured to use subdomains in this Hosted Zone."
+  description = "Amazon Route 53 hosted zone. CloudBees CI applications are configured to use subdomains in this hosted zone."
   type        = string
 }
 
 variable "trial_license" {
-  description = "CloudBees CI Trial license details for evaluation."
+  description = "CloudBees CI trial license details for evaluation."
   type        = map(string)
 }
 
 variable "suffix" {
-  description = "Unique suffix to be assigned to all resources."
+  description = "Unique suffix to assign to all resources."
   default     = ""
   type        = string
   validation {
     condition     = length(var.suffix) <= 10
-    error_message = "The suffix cannot have more than 10 characters."
+    error_message = "The suffix cannot contain more than 10 characters."
   }
 }

@@ -1,24 +1,30 @@
-# CloudBees CI Add-on for AWS EKS
+# CloudBees CI add-on for Amazon EKS blueprints
 
 <p align="center">
-  <a href="https://www.cloudbees.com/capabilities/continuous-integration"><img alt="cloudbees-icon" src="https://images.ctfassets.net/vtn4rfaw6n2j/4dkyIw9VG39voD21C18YJz/692394b012c1ad7f2fc192dd484fdd47/image-grid-800x480-page-ci-simplify-your-jenkins-experience.png" height="120px" /></a>
-  <p align="center">Deploy CloudBees CI to AWS EKS Clusters with this add-on.</p>
-</p>
+  <a href="https://www.cloudbees.com/capabilities/continuous-integration"><img alt="Continuous Integration for Jenkins in the Enterprise" src="https://images.ctfassets.net/vtn4rfaw6n2j/4dkyIw9VG39voD21C18YJz/692394b012c1ad7f2fc192dd484fdd47/image-grid-800x480-page-ci-simplify-your-jenkins-experience.png" height="120px" /></a>
+  <p align="center">Deploy CloudBees CI to Amazon Web Services (AWS) Elastic Kubernetes Service (EKS) clusters</p>
 
 ---
 
-![GitHub Latest Release)](https://img.shields.io/github/v/release/cloudbees/terraform-aws-cloudbees-ci-eks-addon?logo=github) ![GitHub Issues](https://img.shields.io/github/issues/cloudbees/terraform-aws-cloudbees-ci-eks-addon?logo=github) [![Code Quality: Terraform](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/actions/workflows/terraform.yml/badge.svg?event=pull_request)](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/actions/workflows/terraform.yml) [![Code Quality: Super-Linter](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/actions/workflows/superlinter.yml/badge.svg?event=pull_request)](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/actions/workflows/superlinter.yml) [![Documentation: MD Links Checker](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/actions/workflows/md-link-checker.yml/badge.svg?event=pull_request)](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/actions/workflows/md-link-checker.yml) [![Documentation: terraform-docs](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/actions/workflows/terraform-docs.yml/badge.svg?event=pull_request)](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/actions/workflows/terraform-docs.yml) [![gitleaks badge](https://img.shields.io/badge/protected%20by-gitleaks-blue)](https://github.com/zricethezav/gitleaks#pre-commit) [![gitsecrets](https://img.shields.io/badge/protected%20by-gitsecrets-blue)](https://github.com/awslabs/git-secrets)
+[![GitHub Latest Release)](https://img.shields.io/github/v/release/cloudbees/terraform-aws-cloudbees-ci-eks-addon?logo=github)](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/releases) 
+[![GitHub Issues](https://img.shields.io/github/issues/cloudbees/terraform-aws-cloudbees-ci-eks-addon?logo=github)](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/issues)
+[![Code Quality: Terraform](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/actions/workflows/terraform.yml/badge.svg?event=pull_request)](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/actions/workflows/terraform.yml) 
+[![Code Quality: Super-Linter](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/actions/workflows/superlinter.yml/badge.svg?event=pull_request)](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/actions/workflows/superlinter.yml) 
+[![Documentation: MD Links Checker](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/actions/workflows/md-link-checker.yml/badge.svg?event=pull_request)](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/actions/workflows/md-link-checker.yml) 
+[![Documentation: terraform-docs](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/actions/workflows/terraform-docs.yml/badge.svg?event=pull_request)](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/actions/workflows/terraform-docs.yml) 
+[![gitleaks badge](https://img.shields.io/badge/protected%20by-gitleaks-blue)](https://github.com/zricethezav/gitleaks#pre-commit) 
+[![gitsecrets](https://img.shields.io/badge/protected%20by-gitsecrets-blue)](https://github.com/awslabs/git-secrets)
 
 ## Motivation
 
-This [AWS Partner Addon](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/aws-partner-addons/) aims to ease the adoption and experimentation of CloudBees CI enterprise features by:
+The CloudBees CI [AWS partner add-on](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/aws-partner-addons/) streamlines the adoption and experimentation of CloudBees CI enterprise features by:
 
-- Encapsulating the Deployment of [CloudBees CI Modern in AWS EKS](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/installing-eks-using-helm#_configuring_your_environment) into a Terraform module.
-- Providing a series of [Blueprints](blueprints) implementing the mentioned CloudBees CI Addon module on top of [AWS Terraform EKS Addons](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/) which are aligned with [EKS Best Practices Guides](https://aws.github.io/aws-eks-best-practices/).
+- Encapsulating the deployment of [CloudBees CI on modern platforms in AWS EKS](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/installing-eks-using-helm#_configuring_your_environment) into a Terraform module.
+- Providing a series of [blueprints](blueprints) that implement the CloudBees CI add-on module for use with [Amazon EKS blueprints for Terraform](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/), which are aligned with the [EKS Best Practices Guides](https://aws.github.io/aws-eks-best-practices/).
 
 ## Usage
 
-There are examples of implementation included in the [blueprint](blueprints) folder but the simplest example of usage is as follows:
+Implementation examples are included in the [blueprints](blueprints) folder, however this is the simplest example of usage:
 
 ```terraform
 module "eks_blueprints_addon_cbci" {
@@ -36,56 +42,49 @@ module "eks_blueprints_addon_cbci" {
 }
 ```
 
-By default, it uses a minimum required configuration described in [values.yml](values.yml).
-
-If you would like to override any defaults with the chart, you can do so by passing the `helm_config` variable.
+By default, it uses a minimum required configuration described in the Helm chart [values.yaml](values.yml) file. If you need to override any default settings with the chart, you can do so by passing the `helm_config` variable.
 
 > [!TIP]
-> Blueprints lifecycle (`deploy` > `validate` > `destroy`) can be orchestrated via the companion [Makefile](Makefile).
+> The blueprints lifecycle (`deploy` > `validate` > `destroy`) can be orchestrated via the companion [Makefile](Makefile).
 
 ## Prerequisites
 
-### Tooling
+### Tools
 
-Blueprint `deploy` and `destroy` phases use the same tooling requirement per [AWS EKS Blueprints - Getting Started Guide - Prerequisites](https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#prerequisites).
-
-Nevertheless, the Blueprint `validate` phase might require additional toolings like `jq` and `velero`.
+The blueprint `deploy` and `destroy` phases use the same requirements provided in the [AWS EKS Blueprints for Terraform - Prerequisites](https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#prerequisites). However, the blueprint `validate` phase may require additional tooling, such as `jq` and `velero`.
 
 > [!NOTE]
-> There is a companion [Dockerfile](.docker) to run the blueprints in a containerized Dev environment ensuring dependencies are met. It can be built by using the [Makefile](Makefile) target `make dRun`.
+> There is a companion [Dockerfile](.docker) to run the blueprints in a containerized development environment, ensuring all dependencies are met. It can be built using the [Makefile](Makefile) target `make dRun`.
 
-### AWS Authentication
+### AWS authentication
 
-Make sure to export your required [AWS Environment Variables](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html) to your CLI before getting started (eg. `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` or `AWS_PROFILE`).
+Before getting started, you must export your required [AWS environment variables](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html) to your CLI (for example, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, and `AWS_PROFILE`).
 
-### Existing AWS Hosted Zone
+### Existing AWS hosted zone
 
-These blueprints rely on an existing Hosted Zone in AWS Route53. If you don't have one, you can create one by following the [AWS Route53 documentation](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/hosted-zones-working-with.html).
+These blueprints rely on an existing hosted zone in AWS Route 53. If you do not have a hosted zone, you can create one by following the [AWS Route 53 documentation](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/hosted-zones-working-with.html).
 
 ## Data Storage Options
 
-The two main components of CloudBees CI, Operations Center and Managed Controllers, use a file system to persist data. Data is stored in a folder called [Jenkins Home](https://docs.cloudbees.com/docs/cloudbees-ci/latest/backup-restore/jenkins-home) that can be configured to be stored in Amazon EBS or EFS:
+The two main components of CloudBees CI - the operations center and managed controllers - use a file system to persist data. By default, data is stored in the [$JENKINS_HOME](https://docs.cloudbees.com/docs/cloudbees-ci/latest/backup-restore/jenkins-home) folder, but can be configured to be stored in Amazon Elastic Block Store (Amazon EBS) or Amazon Elastic File System (Amazon EFS):
 
-- Amazon EBS volumes are scoped to a particular Availability Zone to offer high-speed, low-latency access to the EC2 instances they are connected to. If an Availability Zone fails, an EBS volume becomes inaccessible due to file corruption, or there is a service outage, the data on these volumes will become inaccessible. Operations Center and Managed Controller pods require this persistent data and have no mechanism to replicate the data, so we recommend frequent backups for Amazon EBS.
-- Amazon EFS file systems are scoped to an AWS Region and can be accessed from any Availability Zone in the Region the file system was created in. Using Amazon EFS as a storage class for the Operations Center and Managed Controller allows pods to be rescheduled successfully onto healthy nodes in the event of an Availability Zone outage. Amazon EFS is more expensive than the Amazon EBS option, but provides greater fault tolerance.
+- Amazon EBS volumes are scoped to a particular availability zone to offer high-speed, low-latency access to the Amazon Elastic Compute Cloud (Amazon EC2) instances they are connected to. If an availability zone fails, an Amazon EBS volume becomes inaccessible due to file corruption, or there is a service outage, the data on these volumes becomes inaccessible. The operations center and managed controller pods require this persistent data and have no mechanism to replicate the data, so CloudBees recommends frequent backups for Amazon EBS.
+- Amazon EFS file systems are scoped to an AWS region and can be accessed from any availability zone in the region that the file system was created in. Using Amazon EFS as a storage class for the operations center and managed controllers allows pods to be rescheduled successfully onto healthy nodes in the event of an availability zone outage. Amazon EFS is more expensive than Amazon EBS, but provides greater fault tolerance.
 
 > [!IMPORTANT]  
-> CloudBees HA (active-active) requires Amazon EFS. See [CloudBees CI EKS Storage Requirements](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/eks-pre-install-requirements-helm#_storage_requirements).
+> - CloudBees CI High Availability (HA) (active-active) requires Amazon EFS. For more information, refer to [CloudBees CI EKS storage requirements](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/eks-pre-install-requirements-helm#_storage_requirements).
+> - For more information on pricing, refer to [Amazon EBS pricing](https://aws.amazon.com/ebs/pricing/) and [Amazon EFS pricing](https://aws.amazon.com/efs/pricing/).
 
-> [!NOTE]
-> For more information on pricing, see the [Amazon EBS pricing page](https://aws.amazon.com/ebs/pricing/) and the [Amazon EFS pricing page](https://aws.amazon.com/efs/pricing/).
+## CloudBees CI trial license
 
-## CloudBees Trial License
-
-This module runs with a [Trial License for CloudBees CI](https://docs.cloudbees.com/docs/cloudbees-ci-migration/latest/trial-guide/).
-
-Check out [CloudBees CI License Expiration FAQ](https://docs.cloudbees.com/docs/general-kb/latest/faqs/jenkins-enterprise-license-expiration-faq) once the trial has expired to define our next steps.
+This module runs with a [trial license for CloudBees CI](https://docs.cloudbees.com/docs/cloudbees-ci-migration/latest/trial-guide/). 
+Once the trial has expired, refer to [CloudBees CI license expiration FAQ](https://docs.cloudbees.com/docs/general-kb/latest/faqs/jenkins-enterprise-license-expiration-faq) to determine your next steps.
 
 ## Compatibility
 
-CloudBees CI Add-on uses for its resources definition `helm release` which makes it compatible with [AWS EKS Blueprint v4](https://github.com/aws-ia/terraform-aws-eks-blueprints/tree/v4.32.1) and [AWS EKS Blueprint v5](https://github.com/aws-ia/terraform-aws-eks-blueprints/tree/v5.0.0) (Additional info at [v4 to v5 migration guide](https://aws-ia.github.io/terraform-aws-eks-blueprints/v4-to-v5/motivation/)).
+The CloudBees CI add-on uses `helms release` for its resources definition, making it compatible with [AWS EKS Blueprint v4](https://github.com/aws-ia/terraform-aws-eks-blueprints/tree/v4.32.1) and [AWS EKS Blueprint v5](https://github.com/aws-ia/terraform-aws-eks-blueprints/tree/v5.0.0). For more information, refer to [Amazon EKS Blueprints for Terraform: v4 to v5 migration](https://aws-ia.github.io/terraform-aws-eks-blueprints/v4-to-v5/motivation/).
 
-## Terraform Docs
+## Terraform documentation
 
 <!-- BEGIN_TF_DOCS -->
 ### Inputs
@@ -112,12 +111,12 @@ CloudBees CI Add-on uses for its resources definition `helm release` which makes
 | merged_helm_config | (merged) Helm Config for CloudBees CI |
 <!-- END_TF_DOCS -->
 
-## References
+## Additional resources
 
-- [CloudBees CI Docs](https://docs.cloudbees.com/docs/cloudbees-ci/latest/)
+- [CloudBees CI documentation](https://docs.cloudbees.com/docs/cloudbees-ci/latest/)
 - [CloudBees CI release notes](https://docs.cloudbees.com/docs/release-notes/latest/cloudbees-ci/)
 - [Architecture for CloudBees CI on modern cloud platforms](https://docs.cloudbees.com/docs/cloudbees-ci/latest/architecture/ci-cloud)
 - [Amazon EKS Blueprints Addons](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/)
-- [Amazon EKS Blueprints Patterns](https://aws-ia.github.io/terraform-aws-eks-blueprints/)
-- [Bootstrapping clusters with EKS Blueprints | Containers](https://aws.amazon.com/blogs/containers/bootstrapping-clusters-with-eks-blueprints/)
-- [EKS Workshop | EKS Workshop](https://www.eksworkshop.com/)
+- [Amazon EKS Blueprints for Terraform](https://aws-ia.github.io/terraform-aws-eks-blueprints/)
+- [Containers: Bootstrapping clusters with EKS Blueprints](https://aws.amazon.com/blogs/containers/bootstrapping-clusters-with-eks-blueprints/)
+- [EKS Workshop](https://www.eksworkshop.com/)
