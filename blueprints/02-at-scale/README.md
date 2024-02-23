@@ -127,13 +127,11 @@ Since the Terraform variable `suffix` is used for this blueprint, you must updat
 1. Sign in to the CloudBees CI controller UI.
 2. Navigate to **Manage Jenkins > AWS > Amazon S3 Bucket Access settings**, update the **S3 Bucket Name**, and select **Save**.
 3. Sign in to the CloudBees CI operations center UI as a user with **Administer** privileges.
-    > [!TIP]
-    > Back up jobs are restricted to only admin users via role-based access control (RBAC).
+   Note that access to back up jobs is restricted to admin users via role-based access control (RBAC).
 4. From the operations center dashboard, select **All** to view all folders on the operations center.  
 5. Navigate to the **admin** folder, and then select the **backup-all-controllers** Cluster Operations job.
 6. From the left pane, select **Configure**.
 7. Update the **S3 Bucket Name**, and then select **Save**.
-
 
 ## Validate
 
@@ -200,10 +198,10 @@ Once the resources have been created, a `kubeconfig` file is created in the [/k8
 9. Navigate to the `ws-cache` Pipeline and select the first build, indicated by the `#1` build number.
 10. Select [CloudBees Pipeline Explorer](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-pipeline-explorer-plugin) and examine the build logs.
 
-    > [!NOTE]
-    > - This Pipeline uses [CloudBees Workspace Caching](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-cache-step). Once the second build is complete, you can find the read cache operation at the beginning of the build logs and the write cache operation at the end of the build logs.
-    > - If build logs contains `Failed to upload cache`, it is likely related to a `suffix` in your Terraform variables, and the recommendations from the [Deploy](#deploy) section were not followed.
-    > - Transitions to the hibernation state may happen if the defined [grace period](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#_configuring_hibernation) of inactivity (idle) has been reached.
+> [!NOTE]
+> - This Pipeline uses [CloudBees Workspace Caching](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-cache-step). Once the second build is complete, you can find the read cache operation at the beginning of the build logs and the write cache operation at the end of the build logs.
+> - If build logs contains `Failed to upload cache`, it is likely related to a `suffix` in your Terraform variables, and the recommendations from the [Deploy](#deploy) section were not followed.
+> - Transitions to the hibernation state may happen if the defined [grace period](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#_configuring_hibernation) of inactivity (idle) has been reached.
 
 ### Back up and restore
 
@@ -220,15 +218,12 @@ The [CloudBees Backup plugin](https://docs.cloudbees.com/docs/cloudbees-ci/lates
 
 To view the **backup-all-controllers** job:
 
-1. Sign in to the CloudBees CI operations center UI.
-
-   > [!TIP]
-   > Back up jobs are restricted to only admin users via RBAC.
+1. Sign in to the CloudBees CI operations center UI. Note that access to back up jobs is restricted to admin users via RBAC.
 2. From the operations center dashboard, select **All** to view all folders on the operations center.
 3. Navigate to the **admin** folder, and then select the **backup-all-controllers** Cluster Operations job.
 
-   > [!NOTE]
-   > If a build fails, it is likely related to a `suffix` that is included in your Terraform variables, and the recommendations from the [Deploy](#deploy) section were not followed.
+> [!NOTE]
+> If a build fails, it is likely related to a `suffix` that is included in your Terraform variables, and the recommendations from the [Deploy](#deploy) section were not followed.
 
 #### Create a Velero backup
 
