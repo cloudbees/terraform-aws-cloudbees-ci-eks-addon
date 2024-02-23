@@ -79,26 +79,26 @@ Once the resources have been created, a `kubeconfig` file is created in the [/k8
 
 Once you can access the Kubernetes API from your terminal, complete the following steps.
 
-1. Verify that the CloudBees CI operations center pod is in a `Running` state:
+1. Issue the following command to verify that the CloudBees CI operations center pod is in a `Running` state:
 
     ```sh
     eval $(terraform output --raw cbci_oc_pod)
     ```
    
-2. Verify that the Ingress is ready and has assigned a valid `ADDRESS`:
+2. Issue the following command to verify that the Ingress is ready and has assigned a valid `ADDRESS`:
 
     ```sh
     eval $(terraform output --raw cbci_oc_ing)
     ```
 
-3. Verify that the operations center service is running from inside the Kubernetes cluster:
+3. Issue the following command to verify that the operations center service is running from inside the Kubernetes cluster:
 
     ```sh
     eval $(terraform output --raw cbci_liveness_probe_int)
     ```
    If the command is successful, no output is returned.
 
-4. Verify that the operations center service is running from outside the Kubernetes cluster:
+4. Issue the following command to verify that the operations center service is running from outside the Kubernetes cluster:
 
     ```sh
     eval $(terraform output --raw cbci_liveness_probe_ext)
@@ -112,7 +112,7 @@ Once you can access the Kubernetes API from your terminal, complete the followin
     ```
 6. Paste the output of the previous command into your browser to access the CloudBees CI setup wizard to install CloudBees CI and the operations center.
 
-7. Once you have installed CloudBees CI and the operations center, type the following command to retrieve your administrative user password:
+7. Once you have installed CloudBees CI and the operations center, issue the following command to retrieve your administrative user password:
 
     ```sh
     eval $(terraform output --raw cbci_initial_admin_password)
