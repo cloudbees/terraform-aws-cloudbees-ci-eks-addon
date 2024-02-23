@@ -27,7 +27,7 @@ locals {
 
   #https://docs.aws.amazon.com/eks/latest/userguide/choosing-instance-type.html
   k8s_instance_types = {
-    "common-apps" = ["m7g.large"]
+    "common-apps" = ["m5.8xlarge"]
     "cb-apps"     = ["m7g.xlarge"]
     "agents"      = ["m7g.4xlarge"]
   }
@@ -166,6 +166,7 @@ module "eks_blueprints_addons" {
   enable_cluster_autoscaler = true
   enable_velero             = true
   velero = {
+    values             = [file("k8s/velero-values.yml")]
     s3_backup_location = local.velero_s3_location
   }
   enable_kube_prometheus_stack = true
@@ -235,7 +236,6 @@ module "eks" {
 
   eks_managed_node_group_defaults = {
     disk_size = 50
-    ami_type  = "AL2_ARM_64" #For Graviton
   }
 
   # Security groups based on the best practices doc https://docs.aws.amazon.com/eks/latest/userguide/sec-group-reqs.html.
@@ -307,6 +307,7 @@ module "eks" {
       }
       create_iam_role = false
       iam_role_arn    = aws_iam_role.managed_ng.arn
+      ami_type        = "AL2_ARM_64" #For Graviton
     }
     mg_cbAgents = {
       node_group_name = "mng-agent"
@@ -319,6 +320,7 @@ module "eks" {
       labels = {
         ci_type = "build-linux"
       }
+      ami_type = "AL2_ARM_64" #For Graviton
     }
     mg_cbAgents_spot = {
       node_group_name = "mng-agent-spot"
@@ -331,6 +333,7 @@ module "eks" {
       labels = {
         ci_type = "build-linux-spot"
       }
+      ami_type = "AL2_ARM_64" #For Graviton
     }
   }
 
