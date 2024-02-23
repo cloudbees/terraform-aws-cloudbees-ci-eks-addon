@@ -24,7 +24,7 @@ The CloudBees CI [AWS partner add-on](https://aws-ia.github.io/terraform-aws-eks
 
 ## Usage
 
-Implementation examples are included in the [blueprints](blueprints) folder, however the simplest example of usage is as follows:
+Implementation examples are included in the [blueprints](blueprints) folder, however this is the simplest example of usage:
 
 ```terraform
 module "eks_blueprints_addon_cbci" {
@@ -51,14 +51,14 @@ By default, it uses a minimum required configuration described in the Helm chart
 
 ### Tools
 
-The blueprint `deploy` and `destroy` phases use the same requirements provided in the [AWS EKS Blueprints for Terraform - Prerequisites](https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#prerequisites). Nevertheless, the blueprint `validate` phase may require additional tooling, such as `jq` and `velero`.
+The blueprint `deploy` and `destroy` phases use the same requirements provided in the [AWS EKS Blueprints for Terraform - Prerequisites](https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#prerequisites). However, the blueprint `validate` phase may require additional tooling, such as `jq` and `velero`.
 
 > [!NOTE]
 > There is a companion [Dockerfile](.docker) to run the blueprints in a containerized development environment, ensuring all dependencies are met. It can be built using the [Makefile](Makefile) target `make dRun`.
 
 ### AWS authentication
 
-Before getting started, you must export your required [AWS environment variables](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html) to your CLI (for example, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, or `AWS_PROFILE`).
+Before getting started, you must export your required [AWS environment variables](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html) to your CLI (for example, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, and `AWS_PROFILE`).
 
 ### Existing AWS hosted zone
 
@@ -69,13 +69,11 @@ These blueprints rely on an existing hosted zone in AWS Route 53. If you do not 
 The two main components of CloudBees CI - the operations center and managed controllers - use a file system to persist data. By default, data is stored in the [$JENKINS_HOME](https://docs.cloudbees.com/docs/cloudbees-ci/latest/backup-restore/jenkins-home) folder, but can be configured to be stored in Amazon Elastic Block Store (Amazon EBS) or Amazon Elastic File System (Amazon EFS):
 
 - Amazon EBS volumes are scoped to a particular availability zone to offer high-speed, low-latency access to the Amazon Elastic Compute Cloud (Amazon EC2) instances they are connected to. If an availability zone fails, an Amazon EBS volume becomes inaccessible due to file corruption, or there is a service outage, the data on these volumes becomes inaccessible. The operations center and managed controller pods require this persistent data and have no mechanism to replicate the data, so CloudBees recommends frequent backups for Amazon EBS.
-- Amazon EFS file systems are scoped to an AWS region and can be accessed from any availability zone in the region that the file system was created in. Using Amazon EFS as a storage class for the operations center and managed controller allows pods to be rescheduled successfully onto healthy nodes in the event of an availability zone outage. Amazon EFS is more expensive than the Amazon EBS option, but provides greater fault tolerance.
+- Amazon EFS file systems are scoped to an AWS region and can be accessed from any availability zone in the region that the file system was created in. Using Amazon EFS as a storage class for the operations center and managed controllers allows pods to be rescheduled successfully onto healthy nodes in the event of an availability zone outage. Amazon EFS is more expensive than Amazon EBS, but provides greater fault tolerance.
 
 > [!IMPORTANT]  
-> CloudBees CI High Availability (HA) (active-active) requires Amazon EFS. For more information, refer to [CloudBees CI EKS storage requirements](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/eks-pre-install-requirements-helm#_storage_requirements).
-
-> [!NOTE]
-> For more information on pricing, refer to [Amazon EBS pricing](https://aws.amazon.com/ebs/pricing/) and [Amazon EFS pricing](https://aws.amazon.com/efs/pricing/).
+> - CloudBees CI High Availability (HA) (active-active) requires Amazon EFS. For more information, refer to [CloudBees CI EKS storage requirements](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/eks-pre-install-requirements-helm#_storage_requirements).
+> - For more information on pricing, refer to [Amazon EBS pricing](https://aws.amazon.com/ebs/pricing/) and [Amazon EFS pricing](https://aws.amazon.com/efs/pricing/).
 
 ## CloudBees CI trial license
 
