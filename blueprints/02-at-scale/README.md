@@ -265,15 +265,20 @@ The [CloudBees Prometheus Metrics plugin](https://docs.cloudbees.com/docs/cloudb
      ```sh
    eval $(terraform output --raw prometheus_dashboard)
    ```  
-      If successful, the Prometheus dashboard should be available at `http://localhost:50001`.
+
+   If successful, the Prometheus dashboard should be available at `http://localhost:50001`.
+
+   See the configured Alerts for CloudBees CI.
 
 3. Issue the following command to access Grafana dashboards at `localhost:50002`. For the username, use `admin` and set the password using the `grafana_admin_password` terraform variable:
 
    ```sh
     eval $(terraform output --raw grafana_dashboard)
-    ```  
-      If successful, the Grafana dashboard should be available at `http://localhost:50002`.
+   ```
 
+   If successful, the Grafana dashboard should be available at `http://localhost:50002`.
+
+   See configured Dashboards for CloudBees CI.
 
 ### Logs
 
