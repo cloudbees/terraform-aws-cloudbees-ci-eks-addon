@@ -35,8 +35,20 @@ variable "trial_license" {
   type        = map(string)
 }
 
-variable "secrets_file" {
-  description = "Secrets file .yml path containing the secrets names:values to create the Kubernetes secret, cbci-secrets. It can be consumed by CasC as Docker secrets."
+variable "create_k8s_secrets" {
+  description = "Create the Kubernetes secret cbci-secrets. It can be consumed by CasC."
+  default     = false
+  type        = bool
+}
+
+variable "k8s_secrets_file" {
+  description = "Secrets file .yml path containing the secrets names:values for cbci-secrets."
   default     = "secrets-values.yml"
   type        = string
+}
+
+variable "prometheus_target" {
+  description = "Create resources to be uses CloudBees CI as Prometheus Target."
+  default     = false
+  type        = bool
 }

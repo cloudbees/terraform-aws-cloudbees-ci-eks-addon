@@ -1,4 +1,4 @@
-# CloudBees CI blueprint add-on: At scale 
+# CloudBees CI blueprint add-on: At scale
 
 Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get started](../01-getting-started/README.md), this blueprint presents a scalable architecture and configuration by adding:
 
@@ -44,48 +44,48 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| hosted_zone | Route 53 Hosted Zone. CloudBees CI Apps is configured to use subdomains in this Hosted Zone. | `string` | n/a | yes |
-| trial_license | CloudBees CI Trial license details for evaluation. | `map(string)` | n/a | yes |
+| hosted_zone | Amazon Route 53 hosted zone. CloudBees CI applications are configured to use subdomains in this hosted zone. | `string` | n/a | yes |
+| trial_license | CloudBees CI trial license details for evaluation. | `map(string)` | n/a | yes |
 | grafana_admin_password | Grafana admin password. | `string` | `"change.me"` | no |
-| suffix | Unique suffix to be assigned to all resources. When adding suffix, it requires chnages in CloudBees CI for the validation phase. | `string` | `""` | no |
+| suffix | Unique suffix to assign to all resources. When adding the suffix, it requires changes in CloudBees CI for the validation phase. | `string` | `""` | no |
 | tags | Tags to apply to resources. | `map(string)` | `{}` | no |
 
 ### Outputs
 
 | Name | Description |
 |------|-------------|
-| acm_certificate_arn | ACM certificate ARN |
-| aws_backup_efs_protected_resource | AWS Backup Protected Resource descriction for EFS Drive. |
-| aws_logstreams_fluentbit | AWS CloudWatch Log Streams from FluentBit. |
-| cbci_agents_pods | Get a list of agents pods running the cbci-agents namespace. |
-| cbci_controller_b_hibernation_post_queue_ws_cache | Team B Hibernation Monitor Endpoint to Build Workspace Cache. It expects CBCI_ADMIN_TOKEN as environment variable. |
-| cbci_controller_c_hpa | Team C Horizontal Pod Autoscaling. |
-| cbci_controllers_pods | Operation Center Pod for CloudBees CI Add-on. |
-| cbci_general_password | Operation Center Service Initial Admin Password for CloudBees CI Add-on. Additionally, there are developer and guest users using the same password. |
-| cbci_helm | Helm configuration for CloudBees CI Add-on. It is accesible only via state files. |
-| cbci_liveness_probe_ext | Operation Center Service External Liveness Probe for CloudBees CI Add-on. |
-| cbci_liveness_probe_int | Operation Center Service Internal Liveness Probe for CloudBees CI Add-on. |
-| cbci_namespace | Namespace for CloudBees CI Add-on. |
-| cbci_oc_export_admin_api_token | Export Operation Center Admin API Token to access to the API REST when CSRF is enabled. It expects CBCI_ADMIN_CRUMB as environment variable. |
-| cbci_oc_export_admin_crumb | Export Operation Center Admin Crumb to access to the API REST when CSRF is enabled. |
-| cbci_oc_ing | Operation Center Ingress for CloudBees CI Add-on. |
-| cbci_oc_pod | Operation Center Pod for CloudBees CI Add-on. |
-| cbci_oc_take_backups | OC Cluster Operation Build to take on demand backup. It expects CBCI_ADMIN_TOKEN as environment variable. |
-| cbci_oc_url | URL of the CloudBees CI Operations Center for CloudBees CI Add-on. |
-| efs_access_points | EFS Access Points. |
-| efs_arn | EFS ARN. |
-| eks_cluster_arn | EKS cluster ARN |
-| grafana_dashboard | Access to grafana dashbaords. |
-| kubeconfig_add | Add Kubeconfig to local configuration to access the K8s API. |
-| kubeconfig_export | Export KUBECONFIG environment variable to access the K8s API. |
-| prometheus_active_targets | Check Active Prometheus Targets from Operation Center. |
-| prometheus_dashboard | Access to prometheus dashbaords. |
-| s3_cbci_arn | CBCI s3 Bucket Arn |
-| s3_cbci_name | CBCI s3 Bucket Name. It is required by CloudBees CI for Workspace Cacthing and Artifact Manager |
-| velero_backup_on_demand_team_a | Take an on-demand velero backup from the schedulle for Team A. |
-| velero_backup_schedule_team_a | Create velero backup schedulle for Team A, deleting existing one (if exists). It can be applied for other controllers using EBS. |
-| velero_restore_team_a | Restore Team A from backup. It can be applicable for rest of schedulle backups. |
-| vpc_arn | VPC ID |
+| acm_certificate_arn | AWS Certificate Manager (ACM) certificate for Amazon Resource Names (ARN). |
+| aws_backup_efs_protected_resource | AWS description for the Amazon EFS drive used to back up protected resources. |
+| aws_logstreams_fluentbit | AWS CloudWatch log streams from Fluent Bit. |
+| cbci_agents_pods | Retrieves a list of agent pods running in the cbci-agents namespace. |
+| cbci_controller_b_hibernation_post_queue_ws_cache | team-b hibernation monitor endpoint to the build workspace cache. It expects CBCI_ADMIN_TOKEN as the environment variable. |
+| cbci_controller_c_hpa | team-c horizontal pod autoscaling. |
+| cbci_controllers_pods | Operations center pod for the CloudBees CI add-on. |
+| cbci_general_password | Operations center service initial admin password for the CloudBees CI add-on. Additionally, there are developer and guest users using the same password. |
+| cbci_helm | Helm configuration for the CloudBees CI add-on. It is accessible only via state files. |
+| cbci_liveness_probe_ext | Operations center service external liveness probe for the CloudBees CI add-on. |
+| cbci_liveness_probe_int | Operations center service internal liveness probe for the CloudBees CI add-on. |
+| cbci_namespace | Namespace for the CloudBees CI add-on. |
+| cbci_oc_export_admin_api_token | Exports the operations center admin API token to access the REST API when CSRF is enabled. It expects CBCI_ADMIN_CRUMB as the environment variable. |
+| cbci_oc_export_admin_crumb | Exports the operations center admin crumb, to access the REST API when CSRF is enabled. |
+| cbci_oc_ing | Operations center Ingress for the CloudBees CI add-on. |
+| cbci_oc_pod | Operations center pod for the CloudBees CI add-on. |
+| cbci_oc_take_backups | Operations center cluster operations build for the on-demand back up. It expects CBCI_ADMIN_TOKEN as the environment variable. |
+| cbci_oc_url | Operations center URL for the CloudBees CI add-on. |
+| efs_access_points | Amazon EFS access points. |
+| efs_arn | Amazon EFS ARN. |
+| eks_cluster_arn | Amazon EKS cluster ARN. |
+| grafana_dashboard | Provides access to Grafana dashboards. |
+| kubeconfig_add | Add kubeconfig to the local configuration to access the Kubernetes API. |
+| kubeconfig_export | Export the KUBECONFIG environment variable to access the Kubernetes API. |
+| prometheus_active_targets | Checks active Prometheus targets from the operations center. |
+| prometheus_dashboard | Provides access to Prometheus dashboards. |
+| s3_cbci_arn | CloudBees CI Amazon S3 bucket ARN. |
+| s3_cbci_name | CloudBees CI Amazon S3 bucket name. It is required by CloudBees CI for workspace caching and artifact management. |
+| velero_backup_on_demand_team_a | Takes an on-demand Velero backup from the schedule for team-a. |
+| velero_backup_schedule_team_a | Creates a Velero backup schedule for team-a and deletes the existing backup, if it exists. It can be applied for other controllers using Amazon EBS. |
+| velero_restore_team_a | Restores team-a from backup. It is also applicable for the rest of the scheduled backups. |
+| vpc_arn | VPC ID. |
 <!-- END_TF_DOCS -->
 
 ## Deploy
@@ -111,11 +111,11 @@ Since the Terraform variable `suffix` is used for this blueprint, you must updat
 >[!IMPORTANT]
 > This option can only be used before the blueprint has been deployed.
 
-1. Create a fork from the [cloudbees/casc-mc-cloudbees-ci-eks-addon](https://github.com/cloudbees/casc-mc-cloudbees-ci-eks-addon) GitHub repo to your GitHub organization and make any necessary edits to the controller CasC bundle (for example, add `cbci_s3` to the [bp02.parent/variables/variables.yaml](https://github.com/cloudbees/casc-mc-cloudbees-ci-eks-addon/blob/main/bp02.parent/variables/variables.yaml) file). 
+1. Create a fork from the [cloudbees/casc-mc-cloudbees-ci-eks-addon](https://github.com/cloudbees/casc-mc-cloudbees-ci-eks-addon) GitHub repo to your GitHub organization and make any necessary edits to the controller CasC bundle (for example, add `cbci_s3` to the [bp02.parent/variables/variables.yaml](https://github.com/cloudbees/casc-mc-cloudbees-ci-eks-addon/blob/main/bp02.parent/variables/variables.yaml) file).
 2. Commit and push your changes to the forked repo in your organization.
-3. Create a fork from the [cloudbees/casc-oc-cloudbees-ci-eks-addon](https://github.com/cloudbees/casc-oc-cloudbees-ci-eks-addon) GitHub repo to your GitHub organization and make any necessary edits to the operations center CasC bundle (for example, add `scm_casc_mc_store` to the [bp02/variables/variables.yaml](https://github.com/cloudbees/casc-oc-cloudbees-ci-eks-addon/blob/main/bp02/variables/variables.yaml) and [bp02/items/items-folder-admin.yaml](https://github.com/cloudbees/casc-oc-cloudbees-ci-eks-addon/blob/main/bp02/items/items-folder-admin.yaml) files). 
+3. Create a fork from the [cloudbees/casc-oc-cloudbees-ci-eks-addon](https://github.com/cloudbees/casc-oc-cloudbees-ci-eks-addon) GitHub repo to your GitHub organization and make any necessary edits to the operations center CasC bundle (for example, add `scm_casc_mc_store` to the [bp02/variables/variables.yaml](https://github.com/cloudbees/casc-oc-cloudbees-ci-eks-addon/blob/main/bp02/variables/variables.yaml) and [bp02/items/items-folder-admin.yaml](https://github.com/cloudbees/casc-oc-cloudbees-ci-eks-addon/blob/main/bp02/items/items-folder-admin.yaml) files).
 4. Commit and push your changes to the forked repo in your organization.
-5. In the [k8s/cbci-values.yml](k8s/cbci-values.yml) Helm file, update the `OperationsCenter.CasC.Retriever.scmRepo` field based on the files in this blueprint. 
+5. In the [k8s/cbci-values.yml](k8s/cbci-values.yml) Helm file, update the `OperationsCenter.CasC.Retriever.scmRepo` field based on the files in this blueprint.
 6. Save the file and issue the `terraform apply` command.
 
 #### Option 2: Update Amazon S3 bucket name using the CloudBees CI UI
@@ -177,7 +177,7 @@ Once the resources have been created, a `kubeconfig` file is created in the [/k8
    ```
 
    If the command is not successful, issue the following command to validate that DNS propagation has completed:
-   
+
    ```sh
    eval $(terraform output --raw cbci_liveness_probe_ext)
    ```
@@ -205,7 +205,7 @@ Once the resources have been created, a `kubeconfig` file is created in the [/k8
 
 ### Back up and restore
 
-For backup and restore operations, you can use the [preconfigured CloudBees CI Cluster Operations job](#create-daily-backups-using-a-cloudbeees-ci-cluster-operations-job) to automatically perform a daily backup, which can be used for Amazon EFS and Amazon EBS storage. 
+For backup and restore operations, you can use the [preconfigured CloudBees CI Cluster Operations job](#create-daily-backups-using-a-cloudbeees-ci-cluster-operations-job) to automatically perform a daily backup, which can be used for Amazon EFS and Amazon EBS storage.
 
 [Velero](#create-a-velero-backup) is an alternative for services that use Amazon EBS as storage. Velero not only takes a backup of the PVC snapshots, but also takes a backup of any other defined Kubernetes resources.
 
@@ -241,9 +241,9 @@ Or, issue the following command to take a Velero back up for a specific point in
 
 #### Restore from a Velero backup
 
-1. Make updates on the `team-a` controller (for example, add some jobs). 
+1. Make updates on the `team-a` controller (for example, add some jobs).
 2. Take a backup including the update that you made.
-3. Remove the latest update (for example, remove the jobs that you added). 
+3. Remove the latest update (for example, remove the jobs that you added).
 4. Issue the following command to restore the controller from the last backup:
 
    ```sh

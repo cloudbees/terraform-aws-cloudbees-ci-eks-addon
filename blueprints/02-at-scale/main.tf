@@ -72,38 +72,14 @@ module "eks_blueprints_addon_cbci" {
   trial_license = var.trial_license
 
   helm_config = {
-    create_namespace = false
-    values           = [file("k8s/cbci-values.yml")]
+    values = [file("k8s/cbci-values.yml")]
   }
 
-  secrets_file = "k8s/secrets-values.yml"
+  create_k8s_secrets = true
+  k8s_secrets_file   = "k8s/secrets-values.yml"
 
-}
+  prometheus_target = true
 
-resource "kubectl_manifest" "service_monitor_cb_controllers" {
-
-  depends_on = [module.eks_blueprints_addon_cbci]
-
-  yaml_body = file("k8s/kube-prom-stack-sm.yml")
-}
-
-resource "kubernetes_labels" "oc_sm_label" {
-
-  depends_on = [module.eks_blueprints_addon_cbci]
-
-  api_version = "v1"
-  kind        = "Service"
-  # This is true because the resources was already created by the
-  force = "true"
-
-  metadata {
-    name      = "cjoc"
-    namespace = module.eks_blueprints_addon_cbci.cbci_namespace
-  }
-
-  labels = {
-    "cloudbees.prometheus" = "true"
-  }
 }
 
 # EKS Blueprints Add-ons

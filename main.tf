@@ -1,8 +1,11 @@
 # Copyright (c) CloudBees, Inc.
 
+#Chart versions: https://artifacthub.io/packages/helm/cloudbees/cloudbees-core/
+#App version: https://docs.cloudbees.com/docs/release-notes/latest/cloudbees-ci/
+
 locals {
-  secret_data   = fileexists(var.secrets_file) ? yamldecode(file(var.secrets_file)) : {}
-  create_secret = length(local.secret_data) > 0
+  secret_data   = fileexists(var.k8s_secrets_file) ? yamldecode(file(var.k8s_secrets_file)) : {}
+  create_secret = alltrue([var.create_k8s_secrets, length(local.secret_data) > 0])
   oc_secrets_mount = [
     <<-EOT
       OperationsCenter:
@@ -19,56 +22,92 @@ locals {
             readOnly: true
       EOT
   ]
+  cbci_template_values = {
+    hosted_zone  = var.hosted_zone
+    cert_arn     = var.cert_arn
+    LicFirstName = var.trial_license["first_name"]
+    LicLastName  = var.trial_license["last_name"]
+    LicEmail     = var.trial_license["email"]
+    LicCompany   = var.trial_license["company"]
+  }
 }
 
+# It is required to be separted to purge correctly the cloudbees-ci release
 resource "kubernetes_namespace" "cbci" {
 
+  count = try(var.helm_config.create_namespace, true) ? 1 : 0
   metadata {
     name = try(var.helm_config.namespace, "cbci")
   }
 
 }
 
-# Secrets to be passed to Casc
+# Kubernetes Secrets to be passed to Casc
 # https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/docs/features/secrets.adoc#kubernetes-secrets
 resource "kubernetes_secret" "oc_secrets" {
   count = local.create_secret ? 1 : 0
 
   metadata {
     name      = "cbci-secrets"
-    namespace = kubernetes_namespace.cbci.metadata[0].name
+    namespace = kubernetes_namespace.cbci[0].metadata[0].name
   }
 
-  data = yamldecode(file(var.secrets_file))
+  data = yamldecode(file(var.k8s_secrets_file))
+}
+
+resource "kubectl_manifest" "service_monitor_cb_controllers" {
+  count = var.prometheus_target ? 1 : 0
+
+  yaml_body = <<YAML
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: servicemonitor-cbci
+  namespace: kube-prometheus-stack
+  labels:
+    release: kube-prometheus-stack
+    app.kubernetes.io/part-of: kube-prometheus-stack
+spec:
+  namespaceSelector:
+    matchNames:
+      - ${helm_release.cloudbees_ci.namespace}
+  selector:
+    matchLabels:
+      "cloudbees.prometheus": "true"
+  endpoints:
+    - port: http
+      interval: 30s
+      path: /prometheus/
+YAML
+}
+
+resource "kubernetes_labels" "oc_sm_label" {
+  count = var.prometheus_target ? 1 : 0
+
+  api_version = "v1"
+  kind        = "Service"
+  # This is true because the resources was already created by the
+  force = "true"
+
+  metadata {
+    name      = "cjoc"
+    namespace = helm_release.cloudbees_ci.namespace
+  }
+
+  labels = {
+    "cloudbees.prometheus" = "true"
+  }
 }
 
 resource "helm_release" "cloudbees_ci" {
-
-  name             = try(var.helm_config.name, "cloudbees-ci")
-  namespace        = try(var.helm_config.namespace, "cbci")
-  create_namespace = false
-  description      = try(var.helm_config.description, null)
-  chart            = "cloudbees-core"
-  #Chart versions: #https://artifacthub.io/packages/helm/cloudbees/cloudbees-core/
-  #App version: https://docs.cloudbees.com/docs/release-notes/latest/cloudbees-ci/
-  version    = try(var.helm_config.version, "3.16155.0+bdcd96dc9444")
-  repository = try(var.helm_config.repository, "https://public-charts.artifacts.cloudbees.com/repository/public/")
-  values = local.create_secret ? concat(var.helm_config.values, local.oc_secrets_mount, [templatefile("${path.module}/values.yml", {
-    hosted_zone  = var.hosted_zone
-    cert_arn     = var.cert_arn
-    LicFirstName = var.trial_license["first_name"]
-    LicLastName  = var.trial_license["last_name"]
-    LicEmail     = var.trial_license["email"]
-    LicCompany   = var.trial_license["company"]
-    })]) : concat(var.helm_config.values, [templatefile("${path.module}/values.yml", {
-    hosted_zone  = var.hosted_zone
-    cert_arn     = var.cert_arn
-    LicFirstName = var.trial_license["first_name"]
-    LicLastName  = var.trial_license["last_name"]
-    LicEmail     = var.trial_license["email"]
-    LicCompany   = var.trial_license["company"]
-  })])
-
+  name                       = try(var.helm_config.name, "cloudbees-ci")
+  namespace                  = try(var.helm_config.namespace, "cbci")
+  create_namespace           = false
+  description                = try(var.helm_config.description, null)
+  chart                      = "cloudbees-core"
+  version                    = try(var.helm_config.version, "3.16155.0+bdcd96dc9444")
+  repository                 = try(var.helm_config.repository, "https://public-charts.artifacts.cloudbees.com/repository/public/")
+  values                     = local.create_secret ? concat(var.helm_config.values, local.oc_secrets_mount, [templatefile("${path.module}/values.yml", local.cbci_template_values)]) : concat(var.helm_config.values, [templatefile("${path.module}/values.yml", local.cbci_template_values)])
   timeout                    = try(var.helm_config.timeout, 1200)
   repository_key_file        = try(var.helm_config.repository_key_file, null)
   repository_cert_file       = try(var.helm_config.repository_cert_file, null)
@@ -123,7 +162,19 @@ resource "helm_release" "cloudbees_ci" {
     }
   }
 
-  depends_on = [
-    kubernetes_namespace.cbci
-  ]
+  depends_on = [time_sleep.wait_30_seconds]
+
+}
+
+# Need to wait a few seconds when removing the cbci resource to give helm
+# time to finish cleaning up.
+#
+# Otherwise, after `terraform destroy`:
+# │ Error: uninstallation completed with 1 error(s): uninstall: Failed to purge
+#   the release: release: not found
+
+resource "time_sleep" "wait_30_seconds" {
+  depends_on = [kubernetes_namespace.cbci]
+
+  destroy_duration = "30s"
 }
