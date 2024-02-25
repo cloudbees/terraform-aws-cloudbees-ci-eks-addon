@@ -2,12 +2,25 @@
 
 #https://artifacthub.io/packages/helm/cloudbees/cloudbees-core/
 #https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/installing-eks-using-helm
+#https://docs.cloudbees.com/docs/cloudbees-ci-kb/latest/best-practices/prepare-jenkins-for-support
 
 Subdomain: true
 OperationsCenter:
   JavaOpts: >-
-      -XX:InitialRAMPercentage=70.0
-      -XX:MaxRAMPercentage=70.0
+      -Duser.timezone=Etc/UTC
+      -XX:InitialRAMPercentage=65.0
+      -XX:MaxRAMPercentage=65.0
+      -XX:+AlwaysPreTouch
+      -XX:+UseStringDeduplication
+      -XX:+ParallelRefProcEnabled
+      -XX:+HeapDumpOnOutOfMemoryError
+      -XX:HeapDumpPath=/var/jenkins_home/logs
+      -XX:+UnlockDiagnosticVMOptions
+      -XX:+UnlockExperimentalVMOptions
+      -Xlog:gc*=info,gc+heap=debug,gc+ref*=debug,gc+ergo*=trace,gc+age*=trace:file=/var/jenkins_home/gc.log:utctime,pid,level,tags:filecount=2,filesize=100M
+      -XX:ErrorFile=/var/jenkins_home/logs/hs_err_%p.log
+      -XX:+LogVMOutput
+      -XX:LogFile=/var/jenkins_home/logs/jvm.log
   Resources:
     Limits:
       Memory: "4G"
@@ -32,5 +45,14 @@ OperationsCenter:
       Company: ${LicCompany}
 Master:
   JavaOpts: >-
-    -XX:InitialRAMPercentage=70.0
-    -XX:MaxRAMPercentage=70.0
+    -Duser.timezone=Etc/UTC
+    -XX:InitialRAMPercentage=65.0
+    -XX:MaxRAMPercentage=65.0
+    -XX:+HeapDumpOnOutOfMemoryError
+    -XX:HeapDumpPath=/var/jenkins_home/logs
+    -XX:+UnlockDiagnosticVMOptions
+    -XX:+UnlockExperimentalVMOptions
+    -Xlog:gc*=info,gc+heap=debug,gc+ref*=debug,gc+ergo*=trace,gc+age*=trace:file=/var/jenkins_home/gc.log:utctime,pid,level,tags:filecount=2,filesize=100M
+    -XX:ErrorFile=/var/jenkins_home/logs/hs_err_%p.log
+    -XX:+LogVMOutput
+    -XX:LogFile=/var/jenkins_home/logs/jvm.log
