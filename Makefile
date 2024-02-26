@@ -38,8 +38,9 @@ preFlightChecks: guard-ROOT
 deploy: ## Deploy Terraform Blueprint passed as parameter. Example: ROOT=02-at-scale make deploy
 deploy: guard-ROOT preFlightChecks
 	@$(call helpers,INFO "Deploying CloudBees CI Blueprint $(ROOT) ...")
-ifeq ($(CI),false)
+	terraform -chdir=$(MKFILEDIR)/blueprints/$(ROOT) init
 	terraform -chdir=$(MKFILEDIR)/blueprints/$(ROOT) plan -no-color >> $(MKFILEDIR)/blueprints/$(ROOT)/tfplan.txt
+ifeq ($(CI),false)
 	@$(call helpers,ask-confirmation "Deploy $(ROOT). Check plan at blueprints/$(ROOT)/tfplan.txt")
 endif
 	@$(call helpers,tf-deploy $(ROOT))
