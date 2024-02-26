@@ -6,7 +6,7 @@ This document provides guidelines for contributing to the module.
 
 CloudBees welcomes you to use the GitHub issue tracker to report bugs or suggest features.
 
-When filing an issue, please check existing open, or recently closed, issues to ensure someone else has not already reported the issue. Also review the upstream repositories:
+When filing an issue, please check existing open, or recently closed, issues to ensure someone else has not already reported the issue. You should also review the upstream repositories:
 
 - [aws-ia/terraform-aws-eks-blueprints](https://github.com/aws-ia/terraform-aws-eks-blueprints)
 - [aws-ia/terraform-aws-eks-blueprints-addons](https://github.com/aws-ia/terraform-aws-eks-blueprints-addons/tree/main)
