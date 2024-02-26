@@ -109,13 +109,13 @@ Once you can access the Kubernetes API from your terminal, complete the followin
 
     If the command is successful, no output is returned.
 
-5. DNS propagation may take several minutes. Once propagation is complete, issue the following command and copy the output in your web browser.
+5. DNS propagation may take several minutes. Once propagation is complete, issue the following command and copy the output, and paste it into a web browser.
 
     ```sh
     terraform output cbci_oc_url
     ```
 
-6. Paste the output of the previous command into your browser to access the CloudBees CI setup wizard to finish with CloudBees CI Operations Center installation.
+6. Paste the output of the previous command into your browser to access the CloudBees CI setup wizard to complete the CloudBees CI operations center installation.
 
 7. Issue the following command to retrieve the first administrative user password (required):
 
