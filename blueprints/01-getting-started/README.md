@@ -13,7 +13,7 @@ Get started with the [CloudBees CI on modern platforms in Amazon Elastic Kuberne
 
 ## Architecture
 
-> [!NOTE] 
+> [!NOTE]
 > Node groups use an [AWS Graviton Processor](https://aws.amazon.com/ec2/graviton/) to ensure the best balance between price and performance for cloud workloads running on Amazon Elastic Compute Cloud (Amazon EC2).
 
 ![Architecture](img/getting-started.architect.drawio.svg)
@@ -84,7 +84,7 @@ Once you can access the Kubernetes API from your terminal, complete the followin
     ```sh
     eval $(terraform output --raw cbci_oc_pod)
     ```
-   
+
 2. Issue the following command to verify that the Ingress is ready and has assigned a valid `ADDRESS`:
 
     ```sh
@@ -96,33 +96,30 @@ Once you can access the Kubernetes API from your terminal, complete the followin
     ```sh
     eval $(terraform output --raw cbci_liveness_probe_int)
     ```
-   If the command is successful, no output is returned.
+
+    If the command is successful, no output is returned.
 
 4. Issue the following command to verify that the operations center service is running from outside the Kubernetes cluster:
 
     ```sh
     eval $(terraform output --raw cbci_liveness_probe_ext)
     ```
-   If the command is successful, no output is returned.
 
-5. DNS propagation may take a several minutes. Once propagation is complete, issue the following command and copy the output in your web browser.
+    If the command is successful, no output is returned.
+
+5. DNS propagation may take several minutes. Once propagation is complete, issue the following command and copy the output in your web browser.
 
     ```sh
     terraform output cbci_oc_url
     ```
-6. Paste the output of the previous command into your browser to access the CloudBees CI setup wizard to install CloudBees CI and the operations center.
 
-7. Once you have installed CloudBees CI and the operations center, issue the following command to retrieve your administrative user password:
+6. Paste the output of the previous command into your browser to access the CloudBees CI setup wizard to finish with CloudBees CI Operations Center installation.
+
+7. Issue the following command to retrieve the first administrative user password (required):
 
     ```sh
     eval $(terraform output --raw cbci_initial_admin_password)
     ```
-
-8. Open a browser and navigate to `http://cloudbees-core.example.com/cjoc/`.
-
-9. Sign in with the username `admin` and the password you retrieved.
-
-10. Install the suggested plugins.
 
 ## Destroy
 
