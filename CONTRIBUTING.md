@@ -6,33 +6,33 @@ This document provides guidelines for contributing to the module.
 
 CloudBees welcomes you to use the GitHub issue tracker to report bugs or suggest features.
 
-When filing an issue, please check existing open, or recently closed, issues to ensure someone else has not already reported the issue. You should also review the upstream repositories:
+When filing an issue:
 
-- [aws-ia/terraform-aws-eks-blueprints](https://github.com/aws-ia/terraform-aws-eks-blueprints)
-- [aws-ia/terraform-aws-eks-blueprints-addons](https://github.com/aws-ia/terraform-aws-eks-blueprints-addons/tree/main)
-
-Please try to include as much information as you can. Details like the following are incredibly useful:
-
-- A reproducible test case or series of steps
-- The version of code being used
-- Any modifications you have made relevant to the bug
-- Anything unusual about your environment or deployment
+1. Please check existing open, or recently closed, issues to ensure someone else has not already reported the issue. 
+2. Review the upstream repositories:
+   - [aws-ia/terraform-aws-eks-blueprints](https://github.com/aws-ia/terraform-aws-eks-blueprints)
+   - [aws-ia/terraform-aws-eks-blueprints-addons](https://github.com/aws-ia/terraform-aws-eks-blueprints-addons/tree/main)
+3. Try to include as much information as you can. Details like the following are incredibly useful:
+   - A reproducible test case or series of steps
+   - The version of code being used
+   - Any modifications you have made relevant to the bug
+   - Anything unusual about your environment or deployment
 
 ## Contribute via pull requests
 
-Contributions via pull requests are much appreciated. Before sending us a pull request, please ensure that:
+Contributions via pull requests are very appreciated. Before submitting a pull request, please ensure that you:
 
-1. You are working against the latest source on the `main` branch.
-2. You check existing open, and recently merged, pull requests to make sure someone else has not addressed the problem already.
-3. You open an issue to discuss any significant work - we do not want your time to be wasted.
+1. Are working against the latest source on the `main` branch.
+2. Check existing open, and recently merged, pull requests to make sure someone else has not already addressed the problem.
+3. Open an issue to discuss any significant work - we do not want your time to be wasted.
 
 To submit a pull request, please:
 
 1. Fork the repository.
-2. Modify the source; please focus on the specific change you are contributing. If you also reformat all the code, it will be hard for us to focus on your change.
+2. Modify the source; please focus on the specific change you are contributing. If you also reformat all the code, it is hard for us to focus on your change.
 3. **Ensure that local tests pass**.
-4. Commit to your fork using clear commit messages.
-5. Send us a pull request against the `dev` branch, answering any default questions in the pull request interface.
+4. Make commits to your fork using clear commit messages.
+5. Submit a pull request against the `dev` branch and answer any default questions in the pull request interface.
 6. Pay attention to any automated CI failures reported in the pull request, and stay involved in the conversation.
 
 GitHub provides additional documentation on [forking a repository](https://help.github.com/articles/fork-a-repo/) and
