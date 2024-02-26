@@ -9,9 +9,10 @@ Please provide a clear and concise description of the issue you are encountering
 
 If your request is for a new feature, please use the `Feature request` template.
 
-- [ ] ✋ I have searched the open/closed issues in this repository and my issue is not listed.
-- [ ] ✋ If the issue is related to an AWS EKS add-on, I have searched the open/closed issues in the upstream [aws-ia/terraform-aws-eks-blueprints](https://github.com/aws-ia/terraform-aws-eks-blueprints) and my issue is not listed.
-- [ ] ✋ If the issue is related to an AWS EKS add-on, I have checked that [upstream tests for the eks terraform blueprints add-on](https://github.com/aws-ia/terraform-aws-eks-blueprints-addons/tree/main/tests/complete) are passing.
+- [ ] I have searched the open/closed issues in this repository and my issue is not listed.
+- [ ] I have checked that local tests are passing.
+- [ ] If the issue is related to an AWS EKS add-on, I have searched the open/closed issues in the upstream [aws-ia/terraform-aws-eks-blueprints](https://github.com/aws-ia/terraform-aws-eks-blueprints) and my issue is not listed.
+- [ ] If the issue is related to an AWS EKS add-on, I have checked that [upstream tests for the eks terraform blueprints add-on](https://github.com/aws-ia/terraform-aws-eks-blueprints-addons/tree/main/tests/complete) are passing.
 
 ## ⚠️ Note
 
