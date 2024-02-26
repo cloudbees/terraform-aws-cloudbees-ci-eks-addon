@@ -19,6 +19,12 @@ ERROR () {
   exit 1
 }
 
+ask-confirmation () {
+  local msg=$1
+  INFO "Asking for your confirmation to $msg. [yes/No]"
+	read -r ans && [ "$ans" = "yes" ]
+}
+
 retry () {
   local retries="$1"
   local command="$2"

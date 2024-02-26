@@ -12,10 +12,6 @@ define helpers
 	source blueprints/helpers.sh && $(1)
 endef
 
-define confirmation
-	echo -n "Asking for your confirmation to $(1) [yes/No]" && read ans && [ $${ans:-No} = yes ]
-endef
-
 .PHONY: dRun
 dRun: ## Build (if not locally present) and Run the Blueprint Agent using Bash as Entrypoint. It is ideal starting point for all targets. Example: make dRun
 dRun:
@@ -44,7 +40,7 @@ deploy: guard-ROOT preFlightChecks
 	@$(call helpers,INFO "Deploying CloudBees CI Blueprint $(ROOT) ...")
 ifeq ($(CI),false)
 	terraform -chdir=$(MKFILEDIR)/blueprints/$(ROOT) plan -no-color >> $(MKFILEDIR)/blueprints/$(ROOT)/tfplan.txt
-	@$(call confirmation,Deploy $(ROOT))
+	@$(call helpers,ask-confirmation "Deploy $(ROOT). Check plan at blueprints/$(ROOT)/tfplan.txt")
 endif
 	@$(call helpers,tf-deploy $(ROOT))
 
