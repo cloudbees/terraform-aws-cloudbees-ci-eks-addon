@@ -231,7 +231,7 @@ To view the **backup-all-controllers** job:
 
 #### Create a Velero backup
 
-1. Issue the following command to create a Velero backup schedule for `team-a` (this could be also applied to `team-b`):
+1. Issue the following command to create a Velero backup schedule for `team-a` (this can also be applied to `team-b`):
 
    ```sh
    eval $(terraform output --raw velero_backup_schedule_team_a)
@@ -243,7 +243,7 @@ To view the **backup-all-controllers** job:
    eval $(terraform output --raw velero_backup_on_demand_team_a)
    ```
 
-#### Restore from a Velero backup
+#### Restore from a Velero on-demand backup
 
 1. Make updates on the `team-a` controller (for example, add some jobs).
 2. Take an on-demand backup including the update that you made.
