@@ -6,7 +6,7 @@ output "merged_helm_config" {
 }
 
 output "cbci_namespace" {
-  description = "Namespace for the CloudBees CI Addon."
+  description = "Namespace for the CloudBees CI add-on."
   value       = helm_release.cloudbees_ci.namespace
 }
 
