@@ -75,6 +75,8 @@ Once the resources have been created, a `kubeconfig` file is created in the [/k8
   eval $(terraform output --raw kubeconfig_export)
   ```
 
+  If the command is successful, no output is returned.
+
 ### CloudBees CI
 
 Once you can access the Kubernetes API from your terminal, complete the following steps.
