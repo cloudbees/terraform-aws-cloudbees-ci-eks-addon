@@ -57,4 +57,5 @@ tfplan*.txt
 .idea
 .vscode
 *.bkp
+*.dtmp
 *.save
