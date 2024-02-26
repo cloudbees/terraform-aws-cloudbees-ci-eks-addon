@@ -111,10 +111,10 @@ Since the Terraform variable `suffix` is used for this blueprint, you must updat
 >[!IMPORTANT]
 > This option can only be used before the blueprint has been deployed.
 
-1. Create a fork from the [cloudbees/casc-mc-cloudbees-ci-eks-addon](https://github.com/cloudbees/casc-mc-cloudbees-ci-eks-addon) GitHub repo to your GitHub organization and make any necessary edits to the controller CasC bundle (for example, add `cbci_s3` to the [bp02.parent/variables/variables.yaml](https://github.com/cloudbees/casc-mc-cloudbees-ci-eks-addon/blob/main/bp02.parent/variables/variables.yaml) file).
-2. Commit and push your changes to the forked repo in your organization.
-3. Create a fork from the [cloudbees/casc-oc-cloudbees-ci-eks-addon](https://github.com/cloudbees/casc-oc-cloudbees-ci-eks-addon) GitHub repo to your GitHub organization and make any necessary edits to the operations center CasC bundle (for example, add `scm_casc_mc_store` to the [bp02/variables/variables.yaml](https://github.com/cloudbees/casc-oc-cloudbees-ci-eks-addon/blob/main/bp02/variables/variables.yaml) and [bp02/items/items-folder-admin.yaml](https://github.com/cloudbees/casc-oc-cloudbees-ci-eks-addon/blob/main/bp02/items/items-folder-admin.yaml) files).
-4. Commit and push your changes to the forked repo in your organization.
+1. Create a fork from the [cloudbees/casc-mc-cloudbees-ci-eks-addon](https://github.com/cloudbees/casc-mc-cloudbees-ci-eks-addon) GitHub repository to your GitHub organization and make any necessary edits to the controller CasC bundle (for example, add `cbci_s3` to the [bp02.parent/variables/variables.yaml](https://github.com/cloudbees/casc-mc-cloudbees-ci-eks-addon/blob/main/bp02.parent/variables/variables.yaml) file).
+2. Commit and push your changes to the forked repository in your organization.
+3. Create a fork from the [cloudbees/casc-oc-cloudbees-ci-eks-addon](https://github.com/cloudbees/casc-oc-cloudbees-ci-eks-addon) GitHub repository to your GitHub organization and make any necessary edits to the operations center CasC bundle (for example, add `scm_casc_mc_store` to the [bp02/variables/variables.yaml](https://github.com/cloudbees/casc-oc-cloudbees-ci-eks-addon/blob/main/bp02/variables/variables.yaml) and [bp02/items/items-folder-admin.yaml](https://github.com/cloudbees/casc-oc-cloudbees-ci-eks-addon/blob/main/bp02/items/items-folder-admin.yaml) files).
+4. Commit and push your changes to the forked repository in your organization.
 5. In the [k8s/cbci-values.yml](k8s/cbci-values.yml) Helm file, update the `OperationsCenter.CasC.Retriever.scmRepo` field based on the files in this blueprint.
 6. Save the file and issue the `terraform apply` command.
 
