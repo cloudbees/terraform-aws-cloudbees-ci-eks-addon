@@ -97,7 +97,7 @@ When preparing to deploy, you must [customize the secrets file](#customize-secre
 
 ### Customize secrets file
 
-You must first customize your secrets file by copying the contents of [secrets-values.yml.example](k8s/secrets-values.yml.example) to `secrets-values.yml`. This provides [Docker secrets](https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/docs/features/secrets.adoc#docker-secrets) that can be consumed by CasC.
+You must first customize your secrets file by copying the contents of [secrets-values.yml.example](k8s/secrets-values.yml.example) to `secrets-values.yml`. This provides [Kubernetes secrets](https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/docs/features/secrets.adoc#kubernetes-secrets) that can be consumed by CasC.
 
 ### Update Amazon S3 bucket settings
 
@@ -124,7 +124,7 @@ Since the Terraform variable `suffix` is used for this blueprint, you must updat
 > - This option can only be used after the blueprint is deployed.
 > - If using CasC, the declarative definition overrides any configuration updates that are made in the UI the next time the controller is restarted.
 
-1. Sign in to the CloudBees CI controller UI.
+1. Sign in to the CloudBees CI controller UI as a user with **Administer** privileges.
 2. Navigate to **Manage Jenkins > AWS > Amazon S3 Bucket Access settings**, update the **S3 Bucket Name**, and select **Save**.
 3. Sign in to the CloudBees CI operations center UI as a user with **Administer** privileges.
    Note that access to back up jobs is restricted to admin users via role-based access control (RBAC).
@@ -141,9 +141,11 @@ Once the blueprint has been deployed, you can validate it.
 
 Once the resources have been created, a `kubeconfig` file is created in the [/k8s](k8s) folder. Issue the following command to define the [KUBECONFIG](https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/#the-kubeconfig-environment-variable) environment variable to point to the newly generated file:
 
-  ```sh
-  eval $(terraform output --raw kubeconfig_export)
-  ```
+   ```sh
+   eval $(terraform output --raw kubeconfig_export)
+   ```
+
+   If the command is successful, no output is returned.
 
 ### CloudBees CI
 
@@ -151,15 +153,16 @@ Once the resources have been created, a `kubeconfig` file is created in the [/k8
 
 2. Authentication in this blueprint uses three types of personas, each with a different authorization level. Each persona uses a different username, but has the same password. The authorization level defines a set of permissions configured using [RBAC](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-secure-guide/rbac). Additionally, the operations center and controller use [single sign-on (SS0)](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-secure-guide/using-sso). Issue the following command to retrieve the password:
 
-    ```sh
-    eval $(terraform output --raw cbci_general_password)
-    ```
+   ```sh
+   eval $(terraform output --raw cbci_general_password)
+   ```
 
 3. CasC is enabled for the [operations center](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/) (`cjoc`) and [controllers](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-controller/) (`team-b` and `team-c-ha`). `team-a` is not using CasC, to illustrate the difference between the two approaches. Issue the following command to verify that all controllers are in a `Running` state:
 
-    ```sh
-    eval $(terraform output --raw cbci_controllers_pods)
-    ```
+   ```sh
+   eval $(terraform output --raw cbci_controllers_pods)
+   ```
+
    If successful, it should indicate that 2 replicas are running for `team-c-ha` since [CloudBees CI HA/HS](https://docs.cloudbees.com/docs/cloudbees-ci/latest/ha-install-guide/) is enabled on this controller.
 
 4. Issue the following command to verify that horizontal pod autoscaling is enabled for `team-c-ha`:
@@ -176,24 +179,20 @@ Once the resources have been created, a `kubeconfig` file is created in the [/k8
    printenv | grep CBCI_ADMIN_TOKEN
    ```
 
-   If the command is not successful, issue the following command to validate that DNS propagation has completed:
-
-   ```sh
-   eval $(terraform output --raw cbci_liveness_probe_ext)
-   ```
 6. Once you have retrieved the API token, issue the following command to remotely trigger the `ws-cache` Pipeline from `team-b` using the [POST queue for hibernation API endpoint](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#_post_queue_for_hibernation):
 
    ```sh
-    eval $(terraform output --raw cbci_controller_b_hibernation_post_queue_ws_cache)
+   eval $(terraform output --raw cbci_controller_b_hibernation_post_queue_ws_cache)
    ```
 
-    If successful, an `HTTP/2 201` response is returned, indicating the REST API call has been correctly received by the CloudBees CI controller.
+   If successful, an `HTTP/2 201` response is returned, indicating the REST API call has been correctly received by the CloudBees CI controller.
 
-7. Issue the following command to trigger the build and schedule an agent pod to run the Pipeline code:
+7. Right after triggering the build, issue the following to validate Pod Agent provisioning to build the Pipeline code:
 
    ```sh
-    eval $(terraform output --raw cbci_agents_pods)
+   eval $(terraform output --raw cbci_agents_pods)
    ```
+
 8. In the CloudBees CI UI, sign on to the `team-b` controller.
 9. Navigate to the `ws-cache` Pipeline and select the first build, indicated by the `#1` build number.
 10. Select [CloudBees Pipeline Explorer](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-pipeline-explorer-plugin) and examine the build logs.
@@ -227,13 +226,13 @@ To view the **backup-all-controllers** job:
 
 #### Create a Velero backup
 
-Issue the following command to create a Velero backup schedule for `team-a` (this can be also applied to `team-b`):
+1. Issue the following command to create a Velero backup schedule for `team-a` (this could be also applied to `team-b`):
 
    ```sh
    eval $(terraform output --raw velero_backup_schedule_team_a)
    ```
 
-Or, issue the following command to take a Velero back up for a specific point in time for `team-a`:
+2. Issue the following command to take an on-demand Velero backup for a specific point in time for `team-a` based on the schedule definition:
 
    ```sh
    eval $(terraform output --raw velero_backup_on_demand_team_a)
@@ -242,7 +241,7 @@ Or, issue the following command to take a Velero back up for a specific point in
 #### Restore from a Velero backup
 
 1. Make updates on the `team-a` controller (for example, add some jobs).
-2. Take a backup including the update that you made.
+2. Take an on-demand backup including the update that you made.
 3. Remove the latest update (for example, remove the jobs that you added).
 4. Issue the following command to restore the controller from the last backup:
 
@@ -262,7 +261,7 @@ The [CloudBees Prometheus Metrics plugin](https://docs.cloudbees.com/docs/cloudb
 
 2. Issue the following command to access Kube Prometheus Stack dashboards from your web browser and verify that [Jenkins metrics](https://plugins.jenkins.io/metrics/) are available.
 
-     ```sh
+   ```sh
    eval $(terraform output --raw prometheus_dashboard)
    ```  
 
@@ -273,21 +272,22 @@ The [CloudBees Prometheus Metrics plugin](https://docs.cloudbees.com/docs/cloudb
 3. Issue the following command to access Grafana dashboards at `localhost:50002`. For the username, use `admin` and set the password using the `grafana_admin_password` terraform variable:
 
    ```sh
-    eval $(terraform output --raw grafana_dashboard)
+   eval $(terraform output --raw grafana_dashboard)
    ```
 
    If successful, the Grafana dashboard should be available at `http://localhost:50002`.
 
-   See configured Dashboards for CloudBees CI.
+   Browse to Dashboards > CloudBees CI.
 
 ### Logs
 
 For application logs, Fluent Bit acts as a router.
+
 - Short-term application logs live in the [Amazon CloudWatch Logs](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/WhatIsCloudWatchLogs.html) group, under `/aws/eks/<CLUSTER_NAME>/aws-fluentbit-logs` and contains log streams for all the Kubernetes services running in the cluster, including CloudBees CI applications.
 
-  ```sh
-    eval $(terraform output --raw aws_logstreams_fluentbit) | jq '.[] '
-  ```
+   ```sh
+   eval $(terraform output --raw aws_logstreams_fluentbit) | jq '.[] '
+   ```
 
 - Long-term application logs live in an Amazon S3 bucket.
 
