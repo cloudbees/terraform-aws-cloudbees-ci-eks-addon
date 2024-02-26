@@ -2,9 +2,25 @@
 
 This document provides guidelines for contributing to the module.
 
+## Reporting Bugs/Feature Requests
+
+We welcome you to use the GitHub issue tracker to report bugs or suggest features.
+
+When filing an issue, please check existing open, or recently closed, issues to make sure somebody else hasn't already reported the issue. Review also the upstream repositories:
+
+- [aws-ia/terraform-aws-eks-blueprints](https://github.com/aws-ia/terraform-aws-eks-blueprints)
+- [aws-ia/terraform-aws-eks-blueprints-addons](https://github.com/aws-ia/terraform-aws-eks-blueprints-addons/tree/main)
+
+Please try to include as much information as you can. Details like these are incredibly useful:
+
+- A reproducible test case or series of steps
+- The version of our code being used
+- Any modifications you've made relevant to the bug
+- Anything unusual about your environment or deployment
+
 ## Dependencies
 
-Validate your changes inside the blueprint agent described in the [Dockerfile](.docker).
+Validate your changes inside the blueprint agent described in the [Dockerfile](.docker). It is the same agent used for the CI pipeline (see CloudBees platform).
 
 > [!NOTE]
 > The agent and dependencies can be automated using the [Makefile](Makefile) at the root of the project, under the target `dRun`. It is the same Makefile used in the CloudBees CI pipeline.
