@@ -198,7 +198,7 @@ Once the resources have been created, a `kubeconfig` file is created in the [/k8
    eval $(terraform output --raw cbci_agents_pods)
    ```
 
-8. In the CloudBees CI UI, sign on to the `team-b` controller.
+8. In the CloudBees CI UI, sign in to the `team-b` controller.
 9. Navigate to the `ws-cache` pipeline and select the first build, indicated by the `#1` build number.
 10. Select [CloudBees Pipeline Explorer](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-pipeline-explorer-plugin) and examine the build logs.
 
@@ -229,15 +229,19 @@ To view the **backup-all-controllers** job:
 > [!NOTE]
 > If a build fails, it is likely related to a `suffix` that is included in your Terraform variables, and the recommendations from the [Deploy](#deploy) section were not followed.
 
-#### Create a Velero backup
+#### Create a Velero backup schedule
 
-1. Issue the following command to create a Velero backup schedule for `team-a` (this can also be applied to `team-b`):
+Issue the following command to create a Velero backup schedule for `team-a` (this can also be applied to `team-b`):
 
    ```sh
    eval $(terraform output --raw velero_backup_schedule_team_a)
    ```
+#### Take an on-demand Velero backup
 
-2. Issue the following command to take an on-demand Velero backup for a specific point in time for `team-a` based on the schedule definition:
+>[!NOTE]
+> When using this CloudBees CI add-on, you must [create at least one Velero backup schedule](#create-a-velero-backup-schedule) prior to taking an on-demand Velero backup.
+
+Issue the following command to take an on-demand Velero backup for a specific point in time for `team-a` based on the schedule definition:
 
    ```sh
    eval $(terraform output --raw velero_backup_on_demand_team_a)
@@ -246,7 +250,7 @@ To view the **backup-all-controllers** job:
 #### Restore from a Velero on-demand backup
 
 1. Make updates on the `team-a` controller (for example, add some jobs).
-2. Take an on-demand backup including the update that you made.
+2. [Take an on-demand Velero backup](#take-an-on-demand-velero-backup), including the update that you made.
 3. Remove the latest update (for example, remove the jobs that you added).
 4. Issue the following command to restore the controller from the last backup:
 
