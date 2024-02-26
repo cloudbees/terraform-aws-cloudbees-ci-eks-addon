@@ -222,7 +222,7 @@ The [CloudBees Backup plugin](https://docs.cloudbees.com/docs/cloudbees-ci/lates
 
 To view the **backup-all-controllers** job:
 
-1. Sign in to the CloudBees CI operations center UI. Note that access to back up jobs is restricted to admin users via RBAC.
+1. Sign in to the CloudBees CI operations center UI as a user with **Administer** privileges. Note that access to back up jobs is restricted to admin users via RBAC.
 2. From the operations center dashboard, select **All** to view all folders on the operations center.
 3. Navigate to the **admin** folder, and then select the **backup-all-controllers** Cluster Operations job.
 

@@ -8,7 +8,7 @@ CloudBees welcomes you to use the GitHub issue tracker to report bugs or suggest
 
 When filing an issue:
 
-1. Please check existing open and recently closed issues to ensure someone else has not already reported the issue. 
+1. Check existing open and recently closed issues to ensure someone else has not already reported the issue. 
 2. Review the upstream repositories:
    - [aws-ia/terraform-aws-eks-blueprints](https://github.com/aws-ia/terraform-aws-eks-blueprints)
    - [aws-ia/terraform-aws-eks-blueprints-addons](https://github.com/aws-ia/terraform-aws-eks-blueprints-addons/tree/main)
