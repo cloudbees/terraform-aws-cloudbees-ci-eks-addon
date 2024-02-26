@@ -51,3 +51,10 @@ backend*.tf
 
 # Terraform Plan file
 tfplan*.txt
+
+#Ignore auto-generated files and directories
+.DS_Store
+.idea
+.vscode
+*.bkp
+*.save
