@@ -39,12 +39,12 @@ To submit a pull request:
 > GitHub provides additional documentation on [forking a repository](https://help.github.com/articles/fork-a-repo/) and
 [creating a pull request](https://help.github.com/articles/creating-a-pull-request/).
 
-## CI Pipeline
+## CI pipeline
 
 Validate your pull request changes inside the blueprint agent described in the [Dockerfile](.docker). It is the same agent used for the CI pipeline [agent.yaml](.cloudbees/workflows/agent.yaml).
 
 > [!NOTE]
-> The agent and dependencies can be automated using the [Makefile](Makefile) at the root of the project, under the target `dRun`. It is the same Makefile used in the CloudBees CI Pipeline.
+> The agent and dependencies can be automated using the [Makefile](Makefile) at the root of the project, under the target `dRun`. It is the same Makefile used in the CloudBees CI pipeline.
 
 The [ci.yaml](.cloudbees/workflows/ci.yaml) blueprints are orchestrated into the [CloudBees platform](https://www.cloudbees.com/products/saas-platform) inside the [CloudBees Professional Services (PS) sub-organization](https://cloudbees.io/orgs/cloudbees~professional-services/components/94c50dcf-125e-4767-b9c5-58d6d669a1f6/runs).
 

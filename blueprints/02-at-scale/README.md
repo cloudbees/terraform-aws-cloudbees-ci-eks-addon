@@ -181,7 +181,7 @@ Once the resources have been created, a `kubeconfig` file is created in the [/k8
    ```sh
    eval $(terraform output --raw cbci_liveness_probe_ext)
    ```
-6. Once you have retrieved the API token, issue the following command to remotely trigger the `ws-cache` Pipeline from `team-b` using the [POST queue for hibernation API endpoint](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#_post_queue_for_hibernation):
+6. Once you have retrieved the API token, issue the following command to remotely trigger the `ws-cache` pipeline from `team-b` using the [POST queue for hibernation API endpoint](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#_post_queue_for_hibernation):
 
    ```sh
     eval $(terraform output --raw cbci_controller_b_hibernation_post_queue_ws_cache)
@@ -189,17 +189,17 @@ Once the resources have been created, a `kubeconfig` file is created in the [/k8
 
     If successful, an `HTTP/2 201` response is returned, indicating the REST API call has been correctly received by the CloudBees CI controller.
 
-7. Issue the following command to trigger the build and schedule an agent pod to run the Pipeline code:
+7. Issue the following command to trigger the build and schedule an agent pod to run the pipeline code:
 
    ```sh
     eval $(terraform output --raw cbci_agents_pods)
    ```
 8. In the CloudBees CI UI, sign on to the `team-b` controller.
-9. Navigate to the `ws-cache` Pipeline and select the first build, indicated by the `#1` build number.
+9. Navigate to the `ws-cache` pipeline and select the first build, indicated by the `#1` build number.
 10. Select [CloudBees Pipeline Explorer](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-pipeline-explorer-plugin) and examine the build logs.
 
 > [!NOTE]
-> - This Pipeline uses [CloudBees Workspace Caching](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-cache-step). Once the second build is complete, you can find the read cache operation at the beginning of the build logs and the write cache operation at the end of the build logs.
+> - This pipeline uses [CloudBees Workspace Caching](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-cache-step). Once the second build is complete, you can find the read cache operation at the beginning of the build logs and the write cache operation at the end of the build logs.
 > - If build logs contains `Failed to upload cache`, it is likely related to a `suffix` in your Terraform variables, and the recommendations from the [Deploy](#deploy) section were not followed.
 > - Transitions to the hibernation state may happen if the defined [grace period](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#_configuring_hibernation) of inactivity (idle) has been reached.
 
@@ -304,6 +304,6 @@ The following videos provide more insights regarding the capabilities presented 
 
 [![Troubleshooting Pipelines With CloudBees Pipeline Explorer](https://img.youtube.com/vi/OMXm6eYd1EQ/0.jpg)](https://www.youtube.com/watch?v=OMXm6eYd1EQ)
 
-[![Troubleshooting Pipelines With CloudBees Pipeline Explorer](https://img.youtube.com/vi/ESU9oN9JUCw/0.jpg)](https://www.youtube.com/watch?v=ESU9oN9JUCw)
+[![Getting Started with CloudBees Workspace Caching](https://img.youtube.com/vi/ESU9oN9JUCw/0.jpg)](https://www.youtube.com/watch?v=ESU9oN9JUCw)
 
 [![How to Monitor Jenkins With Grafana and Prometheus](https://img.youtube.com/vi/3H9eNIf9KZs/0.jpg)](https://www.youtube.com/watch?v=3H9eNIf9KZs)
