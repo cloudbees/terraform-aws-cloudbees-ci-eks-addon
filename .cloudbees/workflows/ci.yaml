@@ -11,7 +11,7 @@ on:
       - '**'
 
 env:
-  REPLAY_ID: "1"
+  REPLAY_ID: "2"
   AWS_REGION: "us-east-1"
   BUCKET_NAME_TF_STATE: "cbci-eks-addon-bp-tf-state"
   AWS_ROLE_TO_ASSUME: "infra-admin-ci"
