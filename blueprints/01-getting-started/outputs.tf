@@ -61,6 +61,6 @@ output "vpc_arn" {
 }
 
 output "eks_cluster_arn" {
-  description = "EKS cluster ARN."
+  description = "Amazon EKS cluster ARN."
   value       = module.eks.cluster_arn
 }
