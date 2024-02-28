@@ -29,28 +29,28 @@ Get started with the [CloudBees CI on modern platforms in Amazon Elastic Kuberne
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| hosted_zone | Route 53 Hosted Zone. CloudBees CI Apps is configured to use subdomains in this Hosted Zone. | `string` | n/a | yes |
-| trial_license | CloudBees CI Trial license details for evaluation. | `map(string)` | n/a | yes |
-| suffix | Unique suffix to be assigned to all resources. | `string` | `""` | no |
-| tags | Tags to apply to resources | `map(string)` | `{}` | no |
+| hosted_zone | Amazon Route 53 hosted zone. CloudBees CI applications are configured to use subdomains in this hosted zone. | `string` | n/a | yes |
+| trial_license | CloudBees CI trial license details for evaluation. | `map(string)` | n/a | yes |
+| suffix | Unique suffix to assign to all resources. | `string` | `""` | no |
+| tags | Tags to apply to resources. | `map(string)` | `{}` | no |
 
 ### Outputs
 
 | Name | Description |
 |------|-------------|
-| acm_certificate_arn | ACM certificate ARN |
-| cbci_helm | Helm configuration for CloudBees CI Add-on. It is accesible only via state files. |
-| cbci_initial_admin_password | Operation Center Service Initial Admin Password for CloudBees CI Add-on. |
-| cbci_liveness_probe_ext | Operation Center Service External Liveness Probe for CloudBees CI Add-on. |
-| cbci_liveness_probe_int | Operation Center Service Internal Liveness Probe for CloudBees CI Add-on. |
-| cbci_namespace | Namespace for CloudBees CI Add-on. |
-| cbci_oc_ing | Operation Center Ingress for CloudBees CI Add-on. |
-| cbci_oc_pod | Operation Center Pod for CloudBees CI Add-on. |
-| cbci_oc_url | URL of the CloudBees CI Operations Center for CloudBees CI Add-on. |
-| eks_cluster_arn | EKS cluster ARN |
-| kubeconfig_add | Add Kubeconfig to local configuration to access the K8s API. |
-| kubeconfig_export | Export KUBECONFIG environment variable to access to access the K8s API. |
-| vpc_arn | VPC ID |
+| acm_certificate_arn | AWS Certificate Manager (ACM) certificate for Amazon Resource Names (ARN). |
+| cbci_helm | Helm configuration for the CloudBees CI add-on. It is accessible via state files only. |
+| cbci_initial_admin_password | Operations center service initial admin password for the CloudBees CI add-on. |
+| cbci_liveness_probe_ext | Operations center service external liveness probe for the CloudBees CI add-on. |
+| cbci_liveness_probe_int | Operations center service internal liveness probe for the CloudBees CI add-on. |
+| cbci_namespace | Namespace for the CloudBees CI add-on. |
+| cbci_oc_ing | Operations center Ingress for the CloudBees CI add-on. |
+| cbci_oc_pod | Operations center pod for the CloudBees CI add-on. |
+| cbci_oc_url | URL of the CloudBees CI operations center for the CloudBees CI add-on. |
+| eks_cluster_arn | EKS cluster ARN. |
+| kubeconfig_add | Add kubeconfig to your local configuration to access the Kubernetes API. |
+| kubeconfig_export | Export the KUBECONFIG environment variable to access the Kubernetes API. |
+| vpc_arn | VPC ID. |
 <!-- END_TF_DOCS -->
 
 ## Deploy
