@@ -14,7 +14,6 @@ endef
 
 .PHONY: dRun
 dRun: ## Build (if not locally present) and Run the Blueprint Agent using Bash as Entrypoint. It is ideal starting point for all targets. Example: make dRun
-dRun:
 	$(eval IMAGE := $(shell docker image ls | grep -c local.cloudbees/bp-agent))
 	@if [ "$(IMAGE)" == "0" ]; then \
 		$(call helpers,INFO "Building Docker Image local.cloudbees/bp-agent:latest") && \
@@ -74,14 +73,13 @@ test: guard-ROOT deploy validate destroy clean
 
 .PHONY: test-all
 test-all: ## Runs test for all blueprints throughout their Terraform Lifecycle. Example: make test-all
-test-all:
 	$(call helpers,test-all)
 	@$(call helpers,INFO "All Tests target passed succesfully.")
 
-.PHONY: set-k8s-env
-set-k8s-env: ## Clean Blueprint passed as parameter. Example: ROOT=02-at-scale make clean
-set-k8s-env:
-	@$(call helpers,set-k8s-env)
+.PHONY: set-kube-env
+set-kube-env: ## Set K8s version according to file .k8.env. Example: make set-k8s-env
+	@echo "hola"
+	@#$(call helpers,set-k8s-env)
 	@$(call helpers,INFO "Set K8s Environment target was completed.")
 
 .PHONY: clean

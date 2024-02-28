@@ -16,11 +16,6 @@ locals {
 
   vpc_cidr = "10.0.0.0/16"
 
-  #https://kubernetes.io/releases/
-  #https://docs.cloudbees.com/docs/cloudbees-common/latest/supported-platforms/cloudbees-ci-cloud#_kubernetes
-  #vK8#
-  k8s_version = "1.27"
-
   route53_zone_id  = data.aws_route53_zone.this.id
   route53_zone_arn = data.aws_route53_zone.this.arn
   #Number of AZs per region https://docs.aws.amazon.com/ram/latest/userguide/working-with-az-ids.html
@@ -119,12 +114,16 @@ module "eks_blueprints_addons" {
 ################################################################################
 
 module "eks" {
-  source  = "terraform-aws-modules/eks/aws"
+  source = "terraform-aws-modules/eks/aws"
+  #vEKSTFMod#
   version = "19.17.1"
 
   cluster_name                   = local.cluster_name
-  cluster_version                = local.k8s_version
   cluster_endpoint_public_access = true
+  #https://kubernetes.io/releases/
+  #https://docs.cloudbees.com/docs/cloudbees-common/latest/supported-platforms/cloudbees-ci-cloud#_kubernetes
+  #vK8#
+  cluster_version = "1.27"
 
   vpc_id     = module.vpc.vpc_id
   subnet_ids = module.vpc.private_subnets

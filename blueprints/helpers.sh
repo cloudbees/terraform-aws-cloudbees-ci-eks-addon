@@ -140,6 +140,7 @@ set-k8s-env () {
   for bp in "${BLUEPRINTS[@]}"
   do
     sed -i -e "/#vK8#/{n;s/\".*\"/\"$vK8\"/;}" \
-      -e "/#vEKSBpAddonsTFMod#/{n;s/\".*\"/\"$vEKSBpAddonsTFMod\"/;}" main.tf
+      -e "/#vEKSBpAddonsTFMod#/{n;s/\".*\"/\"$vEKSBpAddonsTFMod\"/;}" \
+      -e "/#vEKSTFMod#/{n;s/\".*\"/\"$vEKSTFMod\"/;}" main.tf
   done
 }
