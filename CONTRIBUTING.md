@@ -70,6 +70,8 @@ When working with the repository for the first time, you must run `pre-commit`:
 1. Run `pre-commit install`.
 2. Run `pre-commit run --all-files`.
 
-## Release Drafter
+## Release
 
-This repository uses [Release Drafter](https://github.com/release-drafter/release-drafter); you must label pull requests accordingly.
+This project uses [Release Drafter](https://github.com/release-drafter/release-drafter); pull request labels should be set accordingly.
+Kubernetes environment versions are managed centrally in the [blueprints/.k8.env](blueprints/.k8.env) file.
+For a new release, the latest commits in the `main` branch should successfully pass the CI build.
