@@ -71,11 +71,11 @@ Once the blueprint has been deployed, you can validate it.
 
 Once the resources have been created, a `kubeconfig` file is created in the [/k8s](k8s) folder. Issue the following command to define the [KUBECONFIG](https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/#the-kubeconfig-environment-variable) environment variable to point to the newly generated file:
 
-  ```sh
+```sh
   eval $(terraform output --raw kubeconfig_export)
-  ```
+```
 
-  If the command is successful, no output is returned.
+If the command is successful, no output is returned.
 
 ### CloudBees CI
 
