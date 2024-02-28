@@ -52,7 +52,7 @@ validate: ## Validate CloudBees CI Blueprint deployment passed as parameter. Exa
 validate: tfChecks agentCheck
 ifeq ($(CI),false)
 ifneq ("$(wildcard $(MKFILEDIR)/blueprints/$(ROOT)/terraform.output)","")
-	@$(call confirmation,Validate $(ROOT))
+	@$(call helpers,ask-confirmation "Validate $(ROOT)")
 else
 	@$(call helpers,ERROR "Blueprint $(ROOT) did not complete the Deployment target thus it is not Ready to be validated.")
 endif
@@ -64,7 +64,7 @@ endif
 destroy: ## Destroy Terraform Blueprint passed as parameter. Example: ROOT=02-at-scale make destroy
 destroy: tfChecks agentCheck
 ifeq ($(CI),false)
-	@$(call confirmation,Destroy $(ROOT))
+	@$(call helpers,ask-confirmation "Destroy $(ROOT)")
 endif
 	@$(call helpers,tf-destroy $(ROOT))
 	@$(call helpers,INFO "CloudBees CI Blueprint $(ROOT) Destroy target finished succesfully.")
