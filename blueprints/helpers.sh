@@ -133,14 +133,14 @@ test-all () {
   done
 }
 
-set-k8s-env () {
+set-kube-env () {
   # shellcheck source=/dev/null
-  source .k8.env
-  sed -i "/#vCBCI_Helm#/{n;s/\".*\"/\"$vCBCI_Helm\"/;}" main.tf
+  source "$SCRIPTDIR/.k8.env"
+  sed -i "/#vCBCI_Helm#/{n;s/\".*\"/\"$vCBCI_Helm\"/;}" "$SCRIPTDIR/../main.tf"
   for bp in "${BLUEPRINTS[@]}"
   do
     sed -i -e "/#vK8#/{n;s/\".*\"/\"$vK8\"/;}" \
       -e "/#vEKSBpAddonsTFMod#/{n;s/\".*\"/\"$vEKSBpAddonsTFMod\"/;}" \
-      -e "/#vEKSTFMod#/{n;s/\".*\"/\"$vEKSTFMod\"/;}" main.tf
+      -e "/#vEKSTFMod#/{n;s/\".*\"/\"$vEKSTFMod\"/;}" "$SCRIPTDIR/$bp/main.tf"
   done
 }
