@@ -100,11 +100,12 @@ resource "kubernetes_labels" "oc_sm_label" {
 }
 
 resource "helm_release" "cloudbees_ci" {
-  name                       = try(var.helm_config.name, "cloudbees-ci")
-  namespace                  = try(var.helm_config.namespace, "cbci")
-  create_namespace           = false
-  description                = try(var.helm_config.description, null)
-  chart                      = "cloudbees-core"
+  name             = try(var.helm_config.name, "cloudbees-ci")
+  namespace        = try(var.helm_config.namespace, "cbci")
+  create_namespace = false
+  description      = try(var.helm_config.description, null)
+  chart            = "cloudbees-core"
+  #vCBCI_Helm#
   version                    = try(var.helm_config.version, "3.16155.0+bdcd96dc9444")
   repository                 = try(var.helm_config.repository, "https://public-charts.artifacts.cloudbees.com/repository/public/")
   values                     = local.create_secret ? concat(var.helm_config.values, local.oc_secrets_mount, [templatefile("${path.module}/values.yml", local.cbci_template_values)]) : concat(var.helm_config.values, [templatefile("${path.module}/values.yml", local.cbci_template_values)])

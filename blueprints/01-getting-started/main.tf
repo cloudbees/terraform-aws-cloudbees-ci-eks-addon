@@ -16,7 +16,9 @@ locals {
 
   vpc_cidr = "10.0.0.0/16"
 
+  #https://kubernetes.io/releases/
   #https://docs.cloudbees.com/docs/cloudbees-common/latest/supported-platforms/cloudbees-ci-cloud#_kubernetes
+  #vK8#
   k8s_version = "1.27"
 
   route53_zone_id  = data.aws_route53_zone.this.id
@@ -74,7 +76,8 @@ module "ebs_csi_driver_irsa" {
 }
 
 module "eks_blueprints_addons" {
-  source  = "aws-ia/eks-blueprints-addons/aws"
+  source = "aws-ia/eks-blueprints-addons/aws"
+  #vEKSBpAddonsTFMod#
   version = "1.15.1"
 
   cluster_name      = module.eks.cluster_name

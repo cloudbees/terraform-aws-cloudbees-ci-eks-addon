@@ -37,18 +37,17 @@ preFlightChecks: guard-ROOT
 .PHONY: deploy
 deploy: ## Deploy Terraform Blueprint passed as parameter. Example: ROOT=02-at-scale make deploy
 deploy: guard-ROOT preFlightChecks
-	@$(call helpers,INFO "Deploying CloudBees CI Blueprint $(ROOT) ...")
 	terraform -chdir=$(MKFILEDIR)/blueprints/$(ROOT) init
 	terraform -chdir=$(MKFILEDIR)/blueprints/$(ROOT) plan -no-color >> $(MKFILEDIR)/blueprints/$(ROOT)/tfplan.txt
 ifeq ($(CI),false)
 	@$(call helpers,ask-confirmation "Deploy $(ROOT). Check plan at blueprints/$(ROOT)/tfplan.txt")
 endif
-	@$(call helpers,tf-deploy $(ROOT))
+	@$(call helpers,tf-apply $(ROOT))
+	@$(call helpers,INFO "CloudBees CI Blueprint $(ROOT) Deploy target finished succesfully.")
 
 .PHONY: validate
 validate: ## Validate CloudBees CI Blueprint deployment passed as parameter. Example: ROOT=02-at-scale make validate
 validate: guard-ROOT preFlightChecks
-	@$(call helpers,INFO "Validating CloudBees CI Operation Center availability for $(ROOT) ...")
 ifeq ($(CI),false)
 ifneq ("$(wildcard $(MKFILEDIR)/blueprints/$(ROOT)/terraform.output)","")
 	@$(call confirmation,Validate $(ROOT))
@@ -57,34 +56,43 @@ else
 endif
 endif
 	@$(call helpers,probes $(ROOT))
+	@$(call helpers,INFO "CloudBees CI Blueprint $(ROOT) Validation target finished succesfully.")
 
 .PHONY: destroy
 destroy: ## Destroy Terraform Blueprint passed as parameter. Example: ROOT=02-at-scale make destroy
 destroy: guard-ROOT preFlightChecks
-	@$(call helpers,INFO "Destroying CloudBees CI Blueprint $(1) ...")
 ifeq ($(CI),false)
 	@$(call confirmation,Destroy $(ROOT))
 endif
 	@$(call helpers,tf-destroy $(ROOT))
+	@$(call helpers,INFO "CloudBees CI Blueprint $(ROOT) Destroy target finished succesfully.")
 
 .PHONY: test
 test: ## Runs a test for blueprint passed as parameters throughout their Terraform Lifecycle. Example: ROOT=02-at-scale make test
 test: guard-ROOT deploy validate destroy clean
+	@$(call helpers,INFO "Test target for $(ROOT) passed succesfully.")
 
 .PHONY: test-all
 test-all: ## Runs test for all blueprints throughout their Terraform Lifecycle. Example: make test-all
 test-all:
-	@$(call helpers,INFO "Running Test for all blueprints ...")
 	$(call helpers,test-all)
+	@$(call helpers,INFO "All Tests target passed succesfully.")
+
+.PHONY: set-k8s-env
+set-k8s-env: ## Clean Blueprint passed as parameter. Example: ROOT=02-at-scale make clean
+set-k8s-env:
+	@$(call helpers,set-k8s-env)
+	@$(call helpers,INFO "Set K8s Environment target was completed.")
 
 .PHONY: clean
 clean: ## Clean Blueprint passed as parameter. Example: ROOT=02-at-scale make clean
-clean: guard-ROOT preFlightChecks
+clean: guard-ROOT
 	@cd $(MKFILEDIR)/blueprints/$(ROOT) && find -name ".terraform" -type d | xargs rm -rf
 	@cd $(MKFILEDIR)/blueprints/$(ROOT) && find -name ".terraform.lock.hcl" -type f | xargs rm -f
 	@cd $(MKFILEDIR)/blueprints/$(ROOT) && find -name "kubeconfig_*.yaml" -type f | xargs rm -f
 	@cd $(MKFILEDIR)/blueprints/$(ROOT) && find -name "terraform.output" -type f | xargs rm -f
 	@cd $(MKFILEDIR)/blueprints/$(ROOT) && find -name terraform.log -type f | xargs rm -f
+	@$(call helpers,INFO "CloudBees CI Blueprint $(ROOT) Clean target finished succesfully.")
 
 .PHONY: help
 help: ## Makefile Help Page

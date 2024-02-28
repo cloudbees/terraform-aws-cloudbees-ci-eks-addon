@@ -6,6 +6,11 @@ set -euo pipefail
 
 SCRIPTDIR="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+declare -a BLUEPRINTS=(
+    "01-getting-started"
+    "02-at-scale"
+  )
+
 INFO () {
   printf "\033[36m[INFO] %s\033[0m\n" "$1"
 }
@@ -58,7 +63,7 @@ tf-output () {
 }
 
 #https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#deploy
-tf-deploy () {
+tf-apply () {
   local root=$1
   export TF_LOG_PATH="$SCRIPTDIR/$root/terraform.log"
   retry 2 "terraform -chdir=$SCRIPTDIR/$root apply -target=module.vpc -auto-approve"
@@ -121,13 +126,20 @@ probes () {
 }
 
 test-all () {
-  declare -a bluePrints=(
-    "01-getting-started"
-    "02-at-scale"
-  )
-  for bp in "${bluePrints[@]}"
+  for bp in "${BLUEPRINTS[@]}"
   do
     export ROOT="$bp"
     cd "$SCRIPTDIR"/.. && make test
+  done
+}
+
+set-k8s-env () {
+  # shellcheck source=/dev/null
+  source .k8.env
+  sed -i "/#vCBCI_Helm#/{n;s/\".*\"/\"$vCBCI_Helm\"/;}" main.tf
+  for bp in "${BLUEPRINTS[@]}"
+  do
+    sed -i -e "/#vK8#/{n;s/\".*\"/\"$vK8\"/;}" \
+      -e "/#vEKSBpAddonsTFMod#/{n;s/\".*\"/\"$vEKSBpAddonsTFMod\"/;}" main.tf
   done
 }
