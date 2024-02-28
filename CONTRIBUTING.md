@@ -2,16 +2,20 @@
 
 This document provides guidelines for contributing to the CloudBees CI add-on for Amazon EKS blueprints.
 
+## Design principles
+
+It follows the same approach as the [Terraform AWS EKS Blueprints for Terraform Patterns](https://aws-ia.github.io/terraform-aws-eks-blueprints/)
+
 ## Report bugs and feature requests
 
 CloudBees welcomes you to use the GitHub issue tracker to report bugs or suggest features.
 
 When filing an issue:
 
-1. Check existing open and recently closed issues to ensure someone else has not already reported the issue. 
+1. Check existing open and recently closed issues to ensure someone else has not already reported the issue.
 2. Review the upstream repositories:
-   - [aws-ia/terraform-aws-eks-blueprints](https://github.com/aws-ia/terraform-aws-eks-blueprints)
-   - [aws-ia/terraform-aws-eks-blueprints-addons](https://github.com/aws-ia/terraform-aws-eks-blueprints-addons/tree/main)
+   - [aws-ia/terraform-aws-eks-blueprints](https://github.com/aws-ia/terraform-aws-eks-blueprints/issues)
+   - [aws-ia/terraform-aws-eks-blueprints-addons](https://github.com/aws-ia/terraform-aws-eks-blueprints-addons/tree/main/issues)
 3. Try to include as much information as you can. Details like the following are incredibly useful:
    - A reproducible test case or series of steps
    - The version of code being used
