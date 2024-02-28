@@ -23,9 +23,9 @@ dRun: ## Build (if not locally present) and Run the Blueprint Agent using Bash a
 		-v $(MKFILEDIR):/$(BP_AGENT_USER)/cbci-eks-addon -v $(HOME)/.aws:/$(BP_AGENT_USER)/.aws \
 		local.cloudbees/bp-agent:latest
 
-.PHONY: preFlightChecksTF
-preFlightChecksTF: ## Run preflight checks for terraform according to getting-started/README.md . Example: ROOT=02-at-scale make preFlightChecks
-preFlightChecksTF: guard-ROOT
+.PHONY: tfChecks
+tfChecks: ## Run required terraform checks according to getting-started/README.md . Example: ROOT=02-at-scale make tfChecks
+tfChecks: guard-ROOT
 	@if [ ! -f blueprints/$(ROOT)/.auto.tfvars ]; then $(call helpers,ERROR "blueprints/$(ROOT)/.auto.tfvars file does not exist and it is required to store your own values"); fi
 	@if ([ ! -f blueprints/$(ROOT)/k8s/secrets-values.yml ] && [ $(ROOT) == "02-at-scale" ]); then $(call helpers,ERROR "blueprints/$(ROOT)/secrets-values.yml file does not exist and it is required to store your secrets"); fi
 	$(eval USER_ID := $(shell aws sts get-caller-identity | grep UserId | cut -d"," -f 1 | xargs ))
@@ -33,12 +33,12 @@ preFlightChecksTF: guard-ROOT
 	@$(call helpers,INFO "Terraform Preflight Checks OK for $(USER_ID)")
 
 .PHONY: agentCheck
-agentCheck: ## Run preflight checks for terraform according to getting-started/README.md . Example: ROOT=02-at-scale make preFlightChecks
+agentCheck: ## Run agent check providing a warning message in case it is not used. Example:  make agentCheck
 	@if [ "$(shell whoami)" != "$(BP_AGENT_USER)" ]; then $(call helpers,WARN "$(BP_AGENT_USER) user is not detected. Note that blueprints validations use the companion Blueprint Docker Agent available via: make dRun"); fi
 
 .PHONY: deploy
 deploy: ## Deploy Terraform Blueprint passed as parameter. Example: ROOT=02-at-scale make deploy
-deploy: preFlightChecksTF agentCheck
+deploy: tfChecks agentCheck
 	terraform -chdir=$(MKFILEDIR)/blueprints/$(ROOT) init
 	terraform -chdir=$(MKFILEDIR)/blueprints/$(ROOT) plan -no-color >> $(MKFILEDIR)/blueprints/$(ROOT)/tfplan.txt
 ifeq ($(CI),false)
@@ -49,7 +49,7 @@ endif
 
 .PHONY: validate
 validate: ## Validate CloudBees CI Blueprint deployment passed as parameter. Example: ROOT=02-at-scale make validate
-validate: preFlightChecksTF agentCheck
+validate: tfChecks agentCheck
 ifeq ($(CI),false)
 ifneq ("$(wildcard $(MKFILEDIR)/blueprints/$(ROOT)/terraform.output)","")
 	@$(call confirmation,Validate $(ROOT))
@@ -62,7 +62,7 @@ endif
 
 .PHONY: destroy
 destroy: ## Destroy Terraform Blueprint passed as parameter. Example: ROOT=02-at-scale make destroy
-destroy: preFlightChecksTF agentCheck
+destroy: tfChecks agentCheck
 ifeq ($(CI),false)
 	@$(call confirmation,Destroy $(ROOT))
 endif
