@@ -36,7 +36,7 @@ To submit a pull request:
 2. Modify the source and focus on the specific change you are contributing. If you reformat all the code, it is hard for reviewers to focus on your specific change.
 3. **Ensure that local tests pass**.
 4. Make commits to your fork using clear commit messages.
-5. Submit a pull request against the `dev` branch and answer any default questions in the pull request interface.
+5. Submit a pull request against the `develop` branch and answer any default questions in the pull request interface.
 6. Pay attention to any automated CI failures reported in the pull request, and stay involved in the conversation.
 
 >[!TIP]
