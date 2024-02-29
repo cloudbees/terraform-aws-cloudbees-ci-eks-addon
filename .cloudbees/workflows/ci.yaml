@@ -15,7 +15,7 @@ env:
   BUCKET_NAME_TF_STATE: "cbci-eks-addon-bp-tf-state"
   AWS_ROLE_TO_ASSUME: "infra-admin-ci"
   CLEAN_UP: "false"
-  REPLAY_STR: "0"
+  REPLAY_STR: "1"
   TF_AUTO_VARS_FILE: |
     tags = {
       "cb-owner" : "professional-services"
