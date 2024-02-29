@@ -135,7 +135,7 @@ test-all () {
 
 set-kube-env () {
   # shellcheck source=/dev/null
-  source "$SCRIPTDIR/.k8.env"
+  source "$SCRIPTDIR/.k8s.env"
   sed -i "/#vCBCI_Helm#/{n;s/\".*\"/\"$vCBCI_Helm\"/;}" "$SCRIPTDIR/../main.tf"
   for bp in "${BLUEPRINTS[@]}"
   do
