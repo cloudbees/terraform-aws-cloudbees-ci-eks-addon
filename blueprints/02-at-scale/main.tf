@@ -501,8 +501,8 @@ module "efs" {
     }
   }
 
-  # Backup policy
-  enable_backup_policy = true
+  #Issue #39
+  enable_backup_policy = false
 
   tags = var.tags
 }
