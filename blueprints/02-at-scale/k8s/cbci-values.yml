@@ -4,6 +4,9 @@
 #https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/installing-eks-using-helm
 
 OperationsCenter:
+  Ingress:
+    Annotations:
+      alb.ingress.kubernetes.io/target-group-attributes: stickiness.enabled=true
   NodeSelector:
     ci_type: cb-apps
   Tolerations:
