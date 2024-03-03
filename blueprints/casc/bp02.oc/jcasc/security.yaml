@@ -1,0 +1,17 @@
+jenkins:
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: "admin"
+          password: ${secJenkinsPass}
+        - id: "developer"
+          password: ${secJenkinsPass}
+        - id: "guest"
+          password: ${secJenkinsPass}
+  authorizationStrategy: "cloudBeesRoleBasedAccessControl"
+  remotingSecurity:
+    enabled: true
+  crumbIssuer:
+    standard:
+      excludeClientIPFromCrumb: true

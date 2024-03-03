@@ -19,8 +19,8 @@ OperationsCenter:
     Retriever:
       Enabled: true
       scmRepo: https://github.com/cloudbees/casc-cloudbees-ci-eks-addon.git
-      scmBranch: main
-      scmBundlePath: bp02.oc
+      scmBranch: develop
+      scmBundlePath: blueprints/casc/bp02.oc
       scmPollingInterval: PT20M
 Persistence:
   StorageClass: efs
