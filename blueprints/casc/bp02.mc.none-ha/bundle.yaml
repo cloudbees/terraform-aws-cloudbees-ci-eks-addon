@@ -1,0 +1,11 @@
+apiVersion: "1"
+id: "modern.none-ha"
+description: "CasC bundle for non-HA controllers. It is tested for the CloudBees CI blueprint add-on: At scale."
+version: "1"
+parent: "bp02.mc.parent"
+allowCapExceptions: true
+jcascMergeStrategy: "errorOnConflict"
+jcasc:
+  - jcasc
+items:
+  - items

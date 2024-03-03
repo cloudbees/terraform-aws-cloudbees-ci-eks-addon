@@ -1,0 +1,15 @@
+apiVersion: "1"
+id: "modern.ha"
+description: "CasC bundle for HA controllers. It is tested for the CloudBees CI blueprint add-on: At scale."
+version: "1"
+parent: "bp02.mc.parent"
+allowCapExceptions: true
+jcascMergeStrategy: "errorOnConflict"
+jcasc:
+  - jcasc
+plugins:
+  - plugins
+items:
+  - items
+catalog:
+  - catalog

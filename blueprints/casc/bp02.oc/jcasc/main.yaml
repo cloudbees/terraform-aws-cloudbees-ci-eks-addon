@@ -14,7 +14,12 @@ unclassified:
               credentialsId: "GH-token"
               remote: ${scm_casc_mm_store}
               traits:
-                - "gitBranchDiscovery"
+              - headWildcardFilter:
+                  includes: "develop"
+              - sparseCheckoutPaths:
+                  extension:
+                    sparseCheckoutPaths:
+                    - path: "/blueprints/casc/"
   cascAutoControllerProvisioning:
     provisionControllerOnCreation: true
   buildDiscarders:

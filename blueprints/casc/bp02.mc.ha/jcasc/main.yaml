@@ -1,0 +1,3 @@
+unclassified:
+  globalDefaultFlowDurabilityLevel:
+    durabilityHint: MAX_SURVIVABILITY
