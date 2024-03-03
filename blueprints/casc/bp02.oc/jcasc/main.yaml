@@ -14,6 +14,7 @@ unclassified:
               credentialsId: "GH-token"
               remote: ${scm_casc_mm_store}
               traits:
+              - "gitBranchDiscovery"
               - headWildcardFilter:
                   includes: "develop"
               - sparseCheckoutPaths:
