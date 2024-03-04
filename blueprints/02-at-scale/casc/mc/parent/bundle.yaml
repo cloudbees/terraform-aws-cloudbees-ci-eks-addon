@@ -1,0 +1,12 @@
+apiVersion: "1"
+id: "parent"
+description: "Parent CasC bundle. It is tested for the CloudBees CI blueprint add-on: At scale."
+version: "1"
+jcasc:
+  - jcasc
+plugins:
+  - plugins
+catalog:
+  - catalog
+variables:
+  - variables

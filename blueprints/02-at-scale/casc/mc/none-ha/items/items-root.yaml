@@ -1,0 +1,158 @@
+removeStrategy:
+  rbac: SYNC
+  items: NONE
+items:
+- kind: pipeline
+  name: downstream-artifact
+  concurrentBuild: true
+  definition:
+    cpsFlowDefinition:
+      sandbox: true
+      script: |-
+        pipeline {
+            agent{
+                label {
+                    label 'maven-spot'
+                    retries 3
+                }
+            }
+            environment {
+                ARTIFACT_SOURCE_JOB = 'upstream-artifact'
+            }
+            stages {
+                stage('Copy Artifacts') {
+                    steps {
+                        sh 'ls -la'
+                        copyArtifacts fingerprintArtifacts: true, projectName: env.ARTIFACT_SOURCE_JOB, selector: lastSuccessful()
+                    }
+                }
+                stage('Read Artifacts') {
+                    steps {
+                        sh 'ls -la'
+                        sh 'cat f_2'
+                    }
+                }
+            }
+        }
+  description: 'This pipeline demonstrates the usage of https://plugins.jenkins.io/artifact-manager-s3/ across pipelines.'
+  disabled: false
+  displayName: downstream-artifact
+  resumeBlocked: false
+- kind: pipeline
+  name: upstream-artifact
+  concurrentBuild: true
+  definition:
+    cpsFlowDefinition:
+      sandbox: true
+      script: |-
+        pipeline {
+            agent{
+                label {
+                    label 'maven-and-go-ondemand'
+                    retries 3
+                }
+            }
+            stages {
+                stage('Golang') {
+                    stages {
+                        stage ('Build'){
+                            steps {
+                                container('go') {
+                                    sh '''
+                                        echo "Build number ${BUILD_NUMBER}" >> f_1
+                                        go version >> f_1
+                                    '''
+                                }
+                            }
+                        }
+                        stage ('Archive f_1'){
+                            steps {
+                                container('go') {
+                                    archiveArtifacts artifacts: 'f_1', fingerprint: true
+                                }
+                            }
+                        }
+                    }
+                }
+                stage('Busybox') {
+                    stages {
+                        stage ("Unarchive"){
+                            steps {
+                                container('maven') {
+                                    dir ('unarchive'){
+                                        sh 'ls -la'
+                                        unarchive mapping: [f_1: 'f_1']
+                                        sh 'ls -la; cat f_1; mv f_1 f_2'
+                                    }
+                                }
+                            }
+                        }
+                        stage ('Build'){
+                            steps {
+                                container('maven') {
+                                    dir ('unarchive'){
+                                        sh 'mvn -version >> f_2'
+                                    }
+                                }
+                            }
+                        }
+                        stage ('Archive f_2'){
+                            steps {
+                                container('maven') {
+                                    dir ('unarchive'){
+                                        archiveArtifacts artifacts: 'f_2', fingerprint: true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+  disabled: false
+  description: 'This pipeline demonstrates the usage of https://plugins.jenkins.io/artifact-manager-s3/ in the same pipeline.'
+- kind: pipeline
+  name: ws-cache
+  concurrentBuild: true
+  definition:
+    cpsFlowDefinition:
+      sandbox: true
+      script: |-
+        pipeline {
+            agent{
+                label {
+                    label 'maven-and-go-ondemand'
+                    retries 3
+                }
+            }
+            environment {
+                MAVEN_PROJECT = 'https://github.com/jglick/simple-maven-project-with-tests'
+                CACHE = 'ws-cache-maven'
+            }
+            stages {
+                stage('Checkout') {
+                    steps {
+                        git env.MAVEN_PROJECT
+                    }
+                }
+                stage('Read') {
+                    steps {
+                        readCache name: env.CACHE
+                    }
+                }
+                stage('Build') {
+                    steps {
+                        container('maven') {
+                            sh 'mvn clean package -DskipTests -Dmaven.repo.local=./maven-repo'
+                        }
+                    }
+                }
+            }
+            post {
+                success {
+                    writeCache name: env.CACHE, includes: 'maven-repo/**'
+                }
+            }
+        }
+  description: 'This pipeline demonstrates the usage of https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-cache-step.'
+  disabled: false

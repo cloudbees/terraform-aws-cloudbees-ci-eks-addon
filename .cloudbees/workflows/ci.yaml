@@ -28,7 +28,7 @@ env:
       email = "platform.ci@cloudbees.com"
       company = "CloudBees Inc."
     }
-    suffix = "ci-v2"
+    suffix = "ci-v3"
 
 jobs:
 #TODO: Create 2 jobs once per blueprint, with 2 different hosted_zone. They depends on a init jobs to create the bucket
