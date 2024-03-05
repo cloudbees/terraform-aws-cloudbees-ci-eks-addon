@@ -30,6 +30,7 @@ locals {
     "tf-blueprint"  = local.name
     "tf-repository" = "github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon"
   })
+
 }
 
 ################################################################################
@@ -187,6 +188,9 @@ module "eks" {
   }
 
   create_cloudwatch_log_group = false
+
+  create_kms_key = true
+  kms_key_aliases = ["eks/${local.name}"]
 
   tags = local.tags
 }
