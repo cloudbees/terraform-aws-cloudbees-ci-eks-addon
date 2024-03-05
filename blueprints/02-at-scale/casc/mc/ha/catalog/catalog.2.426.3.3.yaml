@@ -1,5 +1,5 @@
-#NOTE: This plugin catalog contains the parent bundle's description plus its own description (for example, the mock-load-builder plugin)
-#Reason: Child plugin catalog overrides the parent plugin catalog
+#NOTE: This plugin catalog contains the parent bundle's description plus its own description (for example, the mock-load-builder plugin).
+#Reason: Child plugin catalog overrides the parent plugin catalog.
 type: "plugin-catalog"
 version: "1"
 name: "my-plugin-catalog"

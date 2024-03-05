@@ -20,7 +20,7 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
 - Cloudbees CI uses [Configuration as Code (CasC)](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/casc-intro) to enable [exciting new features for streamlined DevOps](https://www.cloudbees.com/blog/cloudbees-ci-exciting-new-features-for-streamlined-devops) and other enterprise features, such as [CloudBees CI hibernation](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#_hibernation_in_managed_masters).
   - The operations center configuration is hosted in [cloudbees/casc-oc-cloudbees-ci-eks-addon](https://github.com/cloudbees/casc-mc-cloudbees-ci-eks-addon) and deployed using the [CasC Bundle Retriever](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/bundle-retrieval-scm).
   - Managed controller configurations are hosted in [cloudbees/casc-mm-cloudbees-ci-eks-addon](https://github.com/cloudbees/casc-mm-cloudbees-ci-eks-addon) and managed from the operations center using [source control management (SCM)](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-controller/add-bundle#_adding_casc_bundles_from_an_scm_tool).
-  - The managed controllers are using [CasC bundle inheritance](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-controller/advanced#_configuring_bundle_inheritance_with_casc) (refer to [bp02.parent](https://github.com/cloudbees/casc-mc-cloudbees-ci-eks-addon/tree/main/bp02.parent)). This "parent" bundle is inherited by two types of "child" controller bundles: `ha` and `none-ha`, to accommodate [considerations about HA controllers](https://docs.cloudbees.com/docs/cloudbees-ci/latest/ha-install-guide/#_considerations_about_high_availability_ha).
+  - The managed controllers are using [CasC bundle inheritance](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-controller/advanced#_configuring_bundle_inheritance_with_casc) (refer to [parent](casc/mc/parent)). This "parent" bundle is inherited by two types of "child" controller bundles: `ha` and `none-ha`, to accommodate [considerations about HA controllers](https://docs.cloudbees.com/docs/cloudbees-ci/latest/ha-install-guide/#_considerations_about_high_availability_ha).
 
 > [!TIP]
 > A [resource group](https://docs.aws.amazon.com/ARG/latest/userguide/resource-groups.html) is also included, to get a full list of all resources created by this blueprint.
@@ -112,8 +112,10 @@ Since the Terraform variable `suffix` is used for this blueprint, you must updat
 > This option can only be used before the blueprint has been deployed.
 
 1. Create a fork from the [cloudbees/casc-cloudbees-ci-eks-addon](https://github.com/cloudbees/casc-cloudbees-ci-eks-addon) GitHub repository to your GitHub organization and make any necessary edits to the controller CasC bundle
-   - add `cbci_s3` to the [bp02.parent/variables/variables.yaml](https://github.com/cloudbees/casc-mc-cloudbees-ci-eks-addon/blob/main/bp02.parent/variables/variables.yaml) file
-   - add `scm_casc_mc_store` to the [bp02/variables/variables.yaml](https://github.com/cloudbees/casc-oc-cloudbees-ci-eks-addon/blob/main/bp02/variables/variables.yaml) and [bp02/items/items-folder-admin.yaml](https://github.com/cloudbees/casc-oc-cloudbees-ci-eks-addon/blob/main/bp02/items/items-folder-admin.yaml) files.
+   - Add `cbci_s3` to the [casc/mc/parent
+     /variables/variables.yaml](casc/mc/parent/variables/variables.yaml) file.
+   - Add `scm_casc_mc_store` to the [casc/oc/parent
+     /variables/variables.yaml](casc/oc/variables/variables.yaml) and [casc/oc/items/items-folder-admin.yaml](casc/oc/items/items-folder-admin.yaml) files.
 2. Commit and push your changes to the forked repository in your organization.
 3. In the [k8s/cbci-values.yml](k8s/cbci-values.yml) Helm file, update the `OperationsCenter.CasC.Retriever.scmRepo` field based on the files in this blueprint.
 4. Save the file and issue the `terraform apply` command.
@@ -209,14 +211,14 @@ Once the resources have been created, a `kubeconfig` file is created in the [/k8
 
 ### Back up and restore
 
-For backup and restore operations, you can use the [preconfigured CloudBees CI Cluster Operations job](#create-daily-backups-using-a-cloudbeees-ci-cluster-operations-job) to automatically perform a daily backup, which can be used for Amazon EFS and Amazon EBS storage.
+For backup and restore operations, you can use the [preconfigured CloudBees CI Cluster Operations job](#create-daily-backups-using-a-cloudbees-ci-cluster-operations-job) to automatically perform a daily backup, which can be used for Amazon EFS and Amazon EBS storage.
 
-[Velero](#create-a-velero-backup) is an alternative for services that use Amazon EBS as storage. Velero not only takes a backup of the PVC snapshots, but also takes a backup of any other defined Kubernetes resources.
+[Velero](#create-a-velero-backup-schedule) is an alternative for services that use Amazon EBS as storage. Velero not only takes a backup of the PVC snapshots, but also takes a backup of any other defined Kubernetes resources.
 
 > [!NOTE]
 > There is no alternative for services using Amazon EFS storage. Although [AWS Backup](https://aws.amazon.com/backup/) includes this Amazon EFS drive as a protected resource, there is not currently a best practice to dynamically restore Amazon EFS PVCs. For more information, refer to [Issue 39](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/issues/39).
 
-#### Create daily backups using a CloudBeees CI Cluster Operations job
+#### Create daily backups using a CloudBees CI Cluster Operations job
 
 The [CloudBees Backup plugin](https://docs.cloudbees.com/docs/cloudbees-ci/latest/backup-restore/cloudbees-backup-plugin) is enabled for all controllers and the operations center using [Amazon S3 as storage](https://docs.cloudbees.com/docs/cloudbees-ci/latest/backup-restore/cloudbees-backup-plugin#_amazon_s3). The preconfigured **backup-all-controllers** [Cluster Operations](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/cluster-operations) job is scheduled to run daily from the operations center to back up all controllers.
 

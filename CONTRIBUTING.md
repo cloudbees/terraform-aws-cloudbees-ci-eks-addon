@@ -15,7 +15,7 @@ When filing an issue:
 1. Check existing open and recently closed issues to ensure someone else has not already reported the issue.
 2. Review the upstream repositories:
    - [aws-ia/terraform-aws-eks-blueprints](https://github.com/aws-ia/terraform-aws-eks-blueprints/issues)
-   - [aws-ia/terraform-aws-eks-blueprints-addons](https://github.com/aws-ia/terraform-aws-eks-blueprints-addons/tree/main/issues)
+   - [aws-ia/terraform-aws-eks-blueprints-addons](https://github.com/aws-ia/terraform-aws-eks-blueprints-addons/issues)
 3. Try to include as much information as you can. Details like the following are incredibly useful:
    - A reproducible test case or series of steps
    - The version of code being used
@@ -36,7 +36,7 @@ To submit a pull request:
 2. Modify the source and focus on the specific change you are contributing. If you reformat all the code, it is hard for reviewers to focus on your specific change.
 3. **Ensure that local tests pass**.
 4. Make commits to your fork using clear commit messages.
-5. Submit a pull request against the `dev` branch and answer any default questions in the pull request interface.
+5. Submit a pull request against the `develop` branch and answer any default questions in the pull request interface.
 6. Pay attention to any automated CI failures reported in the pull request, and stay involved in the conversation.
 
 >[!TIP]
@@ -73,5 +73,5 @@ When working with the repository for the first time, you must run `pre-commit`:
 ## Release
 
 This project uses [Release Drafter](https://github.com/release-drafter/release-drafter); pull request labels should be set accordingly.
-Kubernetes environment versions are managed centrally in the [blueprints/.k8.env](blueprints/.k8.env) file.
+Kubernetes' environment versions are managed centrally in the [blueprints/.k8.env](blueprints/.k8s.env) file.
 For a new release, the latest commits in the `main` branch should successfully pass the CI build.
