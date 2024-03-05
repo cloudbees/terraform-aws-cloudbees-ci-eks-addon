@@ -2,4 +2,5 @@ variables:
   - message: "Welcome to the CloudBees CI on EKS Add-on using Blueprint 02!"
   - scm_casc_mm_store: "https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon.git"
   #It requires to be updated in case var suffix is provided in tf files (e.g cbci-bp02-<YOUR-SUFFIX>-s3).
-  #- cbci_s3: "cbci-bp02-s3"
+  - cbci_s3: "cbci-bp02-s3"
+  - casc_branch: "develop"
