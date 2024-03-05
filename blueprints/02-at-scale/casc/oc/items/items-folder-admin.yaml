@@ -82,8 +82,8 @@ items:
                   safeDelaySeconds: 0
                   store:
                     s3Store:
-                      bucketName: "${cbci_s3}"
-                      #bucketName: "cbci-bp02-s3" cbci_s3
+                      #bucketName: "${cbci_s3}"
+                      bucketName: "cbci-bp02-s3"
                       bucketFolder: cbci/backup
                       region: us-east-1
               itemSource:

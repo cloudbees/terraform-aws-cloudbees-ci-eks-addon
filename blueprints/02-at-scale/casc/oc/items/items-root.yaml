@@ -40,7 +40,8 @@ items:
               "cloudbees.prometheus" : "true"
     properties:
       - configurationAsCode:
-          bundle: "${casc_branch}/none-ha"
+          #bundle: "${casc_branch}/none-ha"
+          bundle: "develop/none-ha"
   # Casc, HA
   - kind: managedController
     name: team-c-ha
@@ -74,4 +75,5 @@ items:
               "cloudbees.prometheus" : "true"
     properties:
       - configurationAsCode:
-          bundle: "${casc_branch}/ha"
+          #bundle: "${casc_branch}/ha"
+          bundle: "develop/ha"
