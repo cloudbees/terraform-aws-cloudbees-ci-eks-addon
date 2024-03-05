@@ -51,11 +51,10 @@ endif
 validate: ## Validate CloudBees CI Blueprint deployment passed as parameter. Example: ROOT=02-at-scale make validate
 validate: tfChecks agentCheck
 ifeq ($(CI),false)
-ifneq ("$(wildcard $(MKFILEDIR)/blueprints/$(ROOT)/terraform.output)","")
-	@$(call helpers,ask-confirmation "Validate $(ROOT)")
-else
-	@$(call helpers,ERROR "Blueprint $(ROOT) did not complete the Deployment target thus it is not Ready to be validated.")
+ifeq ($(wildcard $(MKFILEDIR)/blueprints/$(ROOT)/terraform.output),)
+	@$(call helpers,WARN "Blueprint $(ROOT) did not complete the Deployment target thus it is not Ready to be validated.")
 endif
+	@$(call helpers,ask-confirmation "Validate $(ROOT)")
 endif
 	@$(call helpers,probes $(ROOT))
 	@$(call helpers,INFO "CloudBees CI Blueprint $(ROOT) Validation target finished succesfully.")
