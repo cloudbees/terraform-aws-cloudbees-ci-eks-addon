@@ -2,7 +2,7 @@
 
 # Copyright (c) CloudBees, Inc.
 
-set -euos pipefail
+set -euo pipefail
 
 SCRIPTDIR="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -75,13 +75,17 @@ tf-apply () {
 #https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#destroy
 tf-destroy () {
   local root=$1
+  local ci_only=$2
   export TF_LOG_PATH="$SCRIPTDIR/$root/terraform.log"
-  retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.eks_blueprints_addon_cbci -auto-approve"
-  retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.eks_blueprints_addons -auto-approve"
-  retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.eks -auto-approve"
-  retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.acm -auto-approve"
-  retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -auto-approve"
-  rm -f "$SCRIPTDIR/$root/terraform.output"
+  if [ "$ci_only" == "true" ]; then #This option is used for debugging purposes
+    retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.eks_blueprints_addon_cbci -auto-approve"
+  else
+    retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.eks_blueprints_addon_cbci -auto-approve"
+    retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.eks_blueprints_addons -auto-approve"
+    retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.eks -auto-approve"
+    retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -auto-approve"
+    rm -f "$SCRIPTDIR/$root/terraform.output"
+  fi
 }
 
 probes () {
@@ -133,6 +137,14 @@ test-all () {
   done
 }
 
+clean() {
+  cd "$SCRIPTDIR/$root" && find -name ".terraform" -type d | xargs rm -rf
+	cd "$SCRIPTDIR/$root" && find -name ".terraform.lock.hcl" -type f | xargs rm -f
+	cd "$SCRIPTDIR/$root" && find -name "kubeconfig_*.yaml" -type f | xargs rm -f
+	cd "$SCRIPTDIR/$root" && find -name "terraform.output" -type f | xargs rm -f
+	cd "$SCRIPTDIR/$root" && find -name terraform.log -type f | xargs rm -f
+}
+
 set-kube-env () {
   # shellcheck source=/dev/null
   source "$SCRIPTDIR/.k8s.env"
@@ -150,4 +162,28 @@ set-casc-branch () {
   sed -i "s/scmBranch: .*/scmBranch: $branch/g" "$SCRIPTDIR/02-at-scale/k8s/cbci-values.yml"
   sed -i "s|bundle: \".*/none-ha\"|bundle: \"$branch/none-ha\"|g" "$SCRIPTDIR/02-at-scale/casc/oc/items/items-root.yaml"
   sed -i "s|bundle: \".*/ha\"|bundle: \"$branch/ha\"|g" "$SCRIPTDIR/02-at-scale/casc/oc/items/items-root.yaml"
+}
+
+#https://github.com/kyounger/casc-plugin-dependency-calculation/blob/master/README.md#using-the-docker-image
+#NOTE: Using --platform linux/x86_64 to avoid issues with M1 Macs
+casc-docker-run () {
+  docker run --platform linux/x86_64 -v "$(pwd)":"$(pwd)" -w "$(pwd)" -u "$(id -u)":"$(id -g)" --rm -it ghcr.io/kyounger/casc-plugin-dependency-calculation bash
+}
+
+casc-script-exec () {
+  local version="$1"
+  local type="$2"
+  local plugins_source="$3"
+  actual_plugins_folder=/tmp/tmp-plugin-calculations
+  mkdir -p $actual_plugins_folder || rm -rf "$actual_plugins_folder/*.*"
+  cascdeps \
+		-v "$version" \
+		-t "$type" \
+		-f "$plugins_source" \
+		-F "$actual_plugins_folder/plugins.yaml" \
+		-c "$actual_plugins_folder/plugin-catalog.yaml" \
+		-C "$actual_plugins_folder/plugin-catalog-offline.yaml" \
+		-s \
+		-g "$actual_plugins_folder/plugins-minimal-for-generation-only.yaml" \
+		-G "$actual_plugins_folder/plugins-minimal.yaml"
 }
