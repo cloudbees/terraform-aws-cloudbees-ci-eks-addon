@@ -2,7 +2,7 @@
 
 # Copyright (c) CloudBees, Inc.
 
-set -euo pipefail
+set -euox pipefail
 
 SCRIPTDIR="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -22,6 +22,20 @@ WARN () {
 ERROR () {
   printf "\033[0;31m[ERROR] %s\033[0m\n" "$1"
   exit 1
+}
+
+
+bpAgent-dRun (){
+  local bpAgentUser="bp-agent"
+  local bpAgentLocalImage="local.cloudbees/bp-agent"
+  local image=$(docker image ls | grep -c "$bpAgentLocalImage")
+	if [ "$image" -eq 0 ]; then \
+		INFO "Building Docker Image local.cloudbees/bp-agent:latest" && \
+		docker build . --file "$SCRIPTDIR/../.docker/Dockerfile.rootless" --tag "$bpAgentLocalImage"; \
+		fi
+	docker run --rm -it --name "$bpAgentUser" \
+		-v "$SCRIPTDIR/..":"/$bpAgentUser/cbci-eks-addon" -v "$HOME/.aws":"/$bpAgentUser/.aws" \
+		"$bpAgentLocalImage"
 }
 
 ask-confirmation () {
