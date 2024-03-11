@@ -32,7 +32,9 @@ plugins:
   - id: javadoc # cap src
   - id: jsch # cap src
   - id: junit # cap dep src
+  - id: ldap # cap src
   - id: managed-master-hibernation # cap src
+  - id: mock-load-builder # 3rd src
   - id: momentjs # 3rd src
   - id: operations-center-notification # cap src
   - id: pipeline-event-step # cap src

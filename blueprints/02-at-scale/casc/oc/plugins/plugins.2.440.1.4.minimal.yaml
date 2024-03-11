@@ -21,5 +21,6 @@ plugins:
   - id: cloudbees-prometheus # cap src
   - id: github # cap src
   - id: jsch # cap src
+  - id: ldap # cap src
   - id: popper2-api # cap src
   - id: sshd # cap src
