@@ -1,15 +1,15 @@
 jenkins:
   securityRealm:
-    local:
-      allowsSignup: false
-      users:
-        - id: "admin"
-          password: ${secJenkinsPass}
-        - id: "developer"
-          password: ${secJenkinsPass}
-        - id: "guest"
-          password: ${secJenkinsPass}
-  authorizationStrategy: "cloudBeesRoleBasedAccessControl"
+    ldap:
+      configurations:
+      - managerDN: "cn=admin,dc=acme,dc=org"
+        managerPasswordSecret: "admin"
+        rootDN: "dc=acme,dc=org"
+        server: "ldap-service.auth.svc.cluster.local"
+        userSearch: "cn={0}"
+  authorizationStrategy:
+    loggedInUsersCanDoAnything:
+      allowAnonymousRead: false
   remotingSecurity:
     enabled: true
   crumbIssuer:
