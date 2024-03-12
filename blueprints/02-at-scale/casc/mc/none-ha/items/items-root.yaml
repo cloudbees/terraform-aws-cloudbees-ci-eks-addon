@@ -1,3 +1,5 @@
+removeStrategy:
+  items: NONE
 items:
 - kind: pipeline
   name: downstream-artifact
