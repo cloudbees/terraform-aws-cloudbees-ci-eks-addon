@@ -40,11 +40,11 @@ jobs:
       with:
         dockerfile: .docker/agent/Dockerfile.root
         context: .
-        destination: ${{ env.REGISTRY }}/${{ env.AGENT_NAME }}:${{ env.APP_VERSION }}
+        destination: ${{ env.REGISTRY }}/${{ env.AGENT_NAME }}:${{ env.VERSION }}
 
     - name: Build, tag, and push Openldap docker image to CloudBees PS Amazon ECR
       uses: cloudbees-io/kaniko@v1
       with:
         dockerfile: .docker/openldap/Dockerfile.root
         context: .
-        destination: ${{ env.REGISTRY }}/${{ env.OPENLDAP_NAME }}:${{ env.APP_VERSION }}
+        destination: ${{ env.REGISTRY }}/${{ env.OPENLDAP_NAME }}:${{ env.VERSION }}
