@@ -8,7 +8,7 @@ name: agent
 on:
   push:
     branches:
-      #Update witn an existing branch name to run the workflow
+      #Update with a valid branch pattern to run the workflow
       - 'do-not-build'
 
 env:
