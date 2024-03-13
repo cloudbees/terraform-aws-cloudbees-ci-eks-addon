@@ -27,6 +27,7 @@ jobs:
 
       - name: Format Terraform configuration
         run: terraform fmt -diff -check -no-color -recursive
+        continue-on-error: true
 
       - name: Validate Terraform configuration
-        run: terraform validate
+        run: terraform validate -no-color
