@@ -1,7 +1,7 @@
 # Copyright (c) CloudBees, Inc.
 
 output "merged_helm_config" {
-  description = "(merged) Helm configuration for CloudBees CI."
+  description = "(merged) Helm configuration for CloudBees CI test."
   value       = helm_release.cloudbees_ci
 }
 
