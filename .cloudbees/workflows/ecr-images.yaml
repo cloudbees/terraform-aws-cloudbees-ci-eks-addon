@@ -38,13 +38,13 @@ jobs:
     - name: Build, tag, and push Agent docker image to CloudBees PS Amazon ECR
       uses: cloudbees-io/kaniko@v1
       with:
-        dockerfile: .docker/agent/Dockerfile.root
+        dockerfile: .docker/agent/agent.root.Dockerfile
         context: .
         destination: ${{ env.REGISTRY }}/${{ env.AGENT_NAME }}:${{ env.VERSION }}
 
     - name: Build, tag, and push Openldap docker image to CloudBees PS Amazon ECR
       uses: cloudbees-io/kaniko@v1
       with:
-        dockerfile: .docker/openldap/Dockerfile.root
+        dockerfile: .docker/openldap/ldap.Dockerfile
         context: .
         destination: ${{ env.REGISTRY }}/${{ env.OPENLDAP_NAME }}:${{ env.VERSION }}
