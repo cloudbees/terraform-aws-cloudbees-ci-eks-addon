@@ -1,0 +1,39 @@
+# Copyright (c) CloudBees, Inc.
+
+apiVersion: automation.cloudbees.io/v1alpha1
+kind: workflow
+name: agent
+
+#TODO: Replace by pull_request when it is supported
+on:
+  push:
+    branches:
+      - '**'
+
+env:
+  REGISTRY: index.docker.io
+  REPOSITORY: carlosrodlop
+  IMAGE: openldap
+  VERSION: latest
+  DOCKERFILE: .docker/ldap/openldap.Dockerfile
+
+jobs:
+  #TODO: Verify if the repository is created before running this job. If not, create it (including tags).
+  build_and_push_images:
+    steps:
+    - name: Checkout code
+      uses: cloudbees-io/checkout@v1
+
+    - name: Set up Docker Hub registry
+      uses: cloudbees-io/configure-oci-credentials@v1
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ env.REPOSITORY }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Build, tag, and push image to Docker Hub
+      uses: cloudbees-io/kaniko@v1
+      with:
+        dockerfile: ${{ env.DOCKERFILE }}
+        context: .
+        destination: ${{ env.REPOSITORY }}/${{ env.IMAGE }}:${{ env.VERSION }}
