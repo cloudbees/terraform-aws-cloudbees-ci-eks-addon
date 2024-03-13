@@ -188,6 +188,16 @@ module "eks_blueprints_addons" {
       "${local.fluentbit_s3_location}/*"
     ]
   }
+
+  helm_releases = {
+    osixia-openldap = {
+      name             = "osixia-openldap"
+      namespace        = "auth"
+      create_namespace = true
+      chart            = "k8s/osixia-openldap"
+    }
+  }
+
   tags = local.tags
 }
 

@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ldap
+  labels:
+    app: ldap
+spec:
+  selector:
+    matchLabels:
+      app: ldap
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: ldap
+    spec:
+      containers:
+        - name: ldap
+          image: {{ .Values.openldap.image | quote }}
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: ldap-data
+              mountPath: /var/lib/ldap
+            - name: ldap-config
+              mountPath: /etc/ldap/slapd.d
+          ports:
+            - containerPort: 389
+              name: openldap
+      volumes:
+        - name: ldap-data
+          hostPath:
+            path: "/data/ldap/db"
+        - name: ldap-config
+          hostPath:
+            path: "/data/ldap/config"
+        - name: ldap-certs
+          hostPath:
+            path: "/data/ldap/certs"
