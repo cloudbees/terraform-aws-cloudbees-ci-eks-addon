@@ -5,7 +5,7 @@
 #  tag:custom:url=...        - sets a custom url (e.g. https://artifacts.acme.test/my-plugin/1.0/my-plugin.jpi)
 #  tag:custom:requires=...   - spaced separated list of required dependencies (e.g. badge envinject)
 
-# Plugin Categories:
+# Plugin categories:
 #  cap - is this a CAP plugin?
 #  3rd - is this a 3rd party plugin?
 #  old - is this a deprecated plugin?
