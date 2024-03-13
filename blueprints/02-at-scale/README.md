@@ -151,7 +151,7 @@ Once the resources have been created, a `kubeconfig` file is created in the [/k8
 
 1. Complete the steps to [validate CloudBees CI](../01-getting-started/README.md#cloudbees-ci), if you have not done so already.
 
-2. Authentication in this blueprint is based on LDAP and uses two types of personas (Admin and Developer), each with a different authorization level. Each persona uses a different username (cn), check password in [.docker/ldap/data.ldif](./../../.docker/ldap/data.ldif) . The authorization level defines a set of permissions configured using [RBAC](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-secure-guide/rbac). Additionally, the operations center and controller use [single sign-on (SS0)](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-secure-guide/using-sso). Issue the following command to retrieve the password of the `admin_cbci_a` user
+2. Authentication in this blueprint is based on LDAP and uses two types of personas (Admin and Developer), each with a different authorization level. Each persona uses a different username (cn); you can find the password in [.docker/ldap/data.ldif](./../../.docker/ldap/data.ldif). The authorization level defines a set of permissions configured using [RBAC](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-secure-guide/rbac). Additionally, the operations center and controller use [single sign-on (SS0)](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-secure-guide/using-sso). Issue the following command to retrieve the password of the `admin_cbci_a` user
 
    ```sh
    eval $(terraform output --raw ldap_admin_password)
