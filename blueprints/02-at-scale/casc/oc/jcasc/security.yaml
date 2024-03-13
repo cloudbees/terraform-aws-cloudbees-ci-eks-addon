@@ -7,9 +7,7 @@ jenkins:
         rootDN: "dc=acme,dc=org"
         server: "ldap-service.auth.svc.cluster.local"
         userSearch: "cn={0}"
-  authorizationStrategy:
-    loggedInUsersCanDoAnything:
-      allowAnonymousRead: false
+  authorizationStrategy: "cloudBeesRoleBasedAccessControl"
   remotingSecurity:
     enabled: true
   crumbIssuer:
