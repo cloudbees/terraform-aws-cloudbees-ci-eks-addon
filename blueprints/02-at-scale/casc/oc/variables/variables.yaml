@@ -1,5 +1,5 @@
 variables:
-  - message: "Welcome to the CloudBees CI on EKS Add-on using Blueprint 02!"
+  - message: "Welcome to the CloudBees CI blueprint add-on: At scale!"
   - scm_casc_mm_store: "https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon.git"
   #Issue #70
   #- cbci_s3: "cbci-bp02-s3"

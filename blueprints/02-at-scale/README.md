@@ -17,10 +17,10 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
   | [Metrics Server](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/metrics-server/)               | This is a requirement for CloudBees CI HA/HS controllers for horizontal pod autoscaling.                                                                                                     |
   | [Velero](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/velero/)                               | Backs up and restores Kubernetes resources and volume snapshots, which is only compatible with Amazon Elastic Block Store (Amazon EBS).                                                      |
 
-- Cloudbees CI uses [Configuration as Code (CasC)](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/casc-intro) (see [casc](casc) folder) to enable [exciting new features for streamlined DevOps](https://www.cloudbees.com/blog/cloudbees-ci-exciting-new-features-for-streamlined-devops) and other enterprise features, such as [CloudBees CI hibernation](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#_hibernation_in_managed_masters).
-  - The operations is using the [CasC Bundle Retriever](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/bundle-retrieval-scm).
+- Cloudbees CI uses [Configuration as Code (CasC)](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/casc-intro) (refer to the [casc](casc) folder) to enable [exciting new features for streamlined DevOps](https://www.cloudbees.com/blog/cloudbees-ci-exciting-new-features-for-streamlined-devops) and other enterprise features, such as [CloudBees CI hibernation](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#_hibernation_in_managed_masters).
+  - The operations center is using the [CasC Bundle Retriever](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/bundle-retrieval-scm).
   - Managed controller configurations are managed from the operations center using [source control management (SCM)](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-controller/add-bundle#_adding_casc_bundles_from_an_scm_tool).
-  - The managed controllers are using [CasC bundle inheritance](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-controller/advanced#_configuring_bundle_inheritance_with_casc) (refer to [parent](casc/mc/parent)). This "parent" bundle is inherited by two types of "child" controller bundles: `ha` and `none-ha`, to accommodate [considerations about HA controllers](https://docs.cloudbees.com/docs/cloudbees-ci/latest/ha-install-guide/#_considerations_about_high_availability_ha).
+  - The managed controllers are using [CasC bundle inheritance](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-controller/advanced#_configuring_bundle_inheritance_with_casc) (refer to the [parent](casc/mc/parent) folder). This "parent" bundle is inherited by two types of "child" controller bundles: `ha` and `none-ha`, to accommodate [considerations about HA controllers](https://docs.cloudbees.com/docs/cloudbees-ci/latest/ha-install-guide/#_considerations_about_high_availability_ha).
 
 > [!TIP]
 > A [resource group](https://docs.aws.amazon.com/ARG/latest/userguide/resource-groups.html) is also included, to get a full list of all resources created by this blueprint.
@@ -77,7 +77,7 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
 | grafana_dashboard | Provides access to Grafana dashboards. |
 | kubeconfig_add | Add kubeconfig to the local configuration to access the Kubernetes API. |
 | kubeconfig_export | Export the KUBECONFIG environment variable to access the Kubernetes API. |
-| ldap_admin_password | Ldap password for admin_cbci_a user for the CloudBees CI add-on. Check .docker/ldap/data.ldif. |
+| ldap_admin_password | LDAP password for admin_cbci_a user for the CloudBees CI add-on. Check .docker/ldap/data.ldif. |
 | prometheus_active_targets | Checks active Prometheus targets from the operations center. |
 | prometheus_dashboard | Provides access to Prometheus dashboards. |
 | s3_cbci_arn | CloudBees CI Amazon S3 bucket ARN. |
@@ -111,9 +111,9 @@ Since the Terraform variable `suffix` is used for this blueprint, you must updat
 >[!IMPORTANT]
 > This option can only be used before the blueprint has been deployed.
 
-1. Create a fork from the [cloudbees/terraform-aws-cloudbees-ci-eks-addon](https://github.com/cloudbees/casc-cloudbees-ci-eks-addon) GitHub repository to your GitHub organization and make any necessary edits to the controller CasC bundle
-   - Update `cbci_s3` in the [casc/mc/parent/variables/variables.yaml](casc/mc/parent/variables/variables.yaml) file including your preffix.
-   - Update `scm_casc_mc_store` to the [casc/oc/variables/variables.yaml](casc/oc/variables/variables.yaml) and `bucketName` in [casc/oc/items/items-admin-jobs-folder.yaml](casc/oc/items/items-admin-jobs-folder.yaml) file.
+1. Create a fork of the [cloudbees/terraform-aws-cloudbees-ci-eks-addon](https://github.com/cloudbees/casc-cloudbees-ci-eks-addon) GitHub repository to your GitHub organization and make any necessary edits to the controller CasC bundle.
+   - Update `cbci_s3` in the [casc/mc/parent/variables/variables.yaml](casc/mc/parent/variables/variables.yaml) file, including your custom prefix.
+   - Update `scm_casc_mc_store` in the [casc/oc/variables/variables.yaml](casc/oc/variables/variables.yaml) file and `bucketName` in the [casc/oc/items/items-admin-jobs-folder.yaml](casc/oc/items/items-admin-jobs-folder.yaml) file.
 2. Commit and push your changes to the forked repository in your organization.
 3. In the [k8s/cbci-values.yml](k8s/cbci-values.yml) Helm file, update the `OperationsCenter.CasC.Retriever.scmRepo` field based on the files in this blueprint.
 4. Save the file and issue the `terraform apply` command.
@@ -151,7 +151,7 @@ Once the resources have been created, a `kubeconfig` file is created in the [/k8
 
 1. Complete the steps to [validate CloudBees CI](../01-getting-started/README.md#cloudbees-ci), if you have not done so already.
 
-2. Authentication in this blueprint is based on LDAP and uses two types of personas (Admin and Developer), each with a different authorization level. Each persona uses a different username (cn), check password in [.docker/ldap/data.ldif](./../../.docker/ldap/data.ldif) . The authorization level defines a set of permissions configured using [RBAC](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-secure-guide/rbac). Additionally, the operations center and controller use [single sign-on (SS0)](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-secure-guide/using-sso). Issue the following command to retrieve the password of the `admin_cbci_a` user
+2. Authentication in this blueprint is based on LDAP and uses two types of personas (Admin and Developer), each with a different authorization level. Each persona uses a different username (cn); you can find the password in [.docker/ldap/data.ldif](./../../.docker/ldap/data.ldif). The authorization level defines a set of permissions configured using [RBAC](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-secure-guide/rbac). Additionally, the operations center and controller use [single sign-on (SS0)](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-secure-guide/using-sso). Issue the following command to retrieve the password of the `admin_cbci_a` user
 
    ```sh
    eval $(terraform output --raw ldap_admin_password)
@@ -193,7 +193,7 @@ Once the resources have been created, a `kubeconfig` file is created in the [/k8
 
    If successful, an `HTTP/2 201` response is returned, indicating the REST API call has been correctly received by the CloudBees CI controller.
 
-5. Right after triggering the build, issue the following to validate Pod Agent provisioning to build the pipeline code:
+5. Right after triggering the build, issue the following to validate pod agent provisioning to build the pipeline code:
 
    ```sh
    eval $(terraform output --raw cbci_agents_pods)
