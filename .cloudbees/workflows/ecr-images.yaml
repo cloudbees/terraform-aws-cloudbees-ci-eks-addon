@@ -11,14 +11,15 @@ on:
       - '**'
 
 env:
-  REGISTRY: public.ecr.aws/r1n1q0e5
+  REGISTRY_NAME: public.ecr.aws/r1n1q0e5
   AGENT_NAME: cloudbees-labs/tf-aws-cb-ci-eks-addon-agent
   OPENLDAP_NAME: cloudbees-labs/tf-aws-cb-ci-eks-addon-ldap
   VERSION: latest
   AWS_REGION: us-east-1
 
 jobs:
-  build:
+  #TODO: Verify if the repository is created before running this job. If not, create it.
+  build_and_push_images:
     steps:
     - name: Checkout code
       uses: cloudbees-io/checkout@v1
@@ -40,11 +41,11 @@ jobs:
       with:
         dockerfile: .docker/agent/agent.root.Dockerfile
         context: .
-        destination: ${{ env.REGISTRY }}/${{ env.AGENT_NAME }}:${{ env.VERSION }}
+        destination: ${{ env.REGISTRY_NAME }}/${{ env.AGENT_NAME }}:${{ env.VERSION }}
 
     - name: Build, tag, and push Openldap docker image to CloudBees PS Amazon ECR
       uses: cloudbees-io/kaniko@v1
       with:
         dockerfile: .docker/openldap/ldap.Dockerfile
         context: .
-        destination: ${{ env.REGISTRY }}/${{ env.OPENLDAP_NAME }}:${{ env.VERSION }}
+        destination: ${{ env.REGISTRY_NAME }}/${{ env.OPENLDAP_NAME }}:${{ env.VERSION }}
