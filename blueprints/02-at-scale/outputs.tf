@@ -41,7 +41,7 @@ output "cbci_liveness_probe_ext" {
 }
 
 output "ldap_admin_password" {
-  description = "Ldap password for admin_cbci_a user for the CloudBees CI add-on. Check .docker/ldap/data.ldif."
+  description = "LDAP password for admin_cbci_a user for the CloudBees CI add-on. Check .docker/ldap/data.ldif."
   value       = "kubectl get secret cbci-secrets -n ${module.eks_blueprints_addon_cbci.cbci_namespace} -o jsonpath='{.data.secJenkinsPass}' | base64 -d"
 }
 
