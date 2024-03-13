@@ -2,7 +2,7 @@
 SHELL           	:= /usr/bin/env bash
 MAKEFLAGS       	+= --no-print-directory
 CI 					?= false
-CBCI_ONLY			?= false
+BP_AGENT_USER       := bp-agent
 MKFILEDIR 			:= $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 
 #https://developer.hashicorp.com/terraform/internals/debugging
