@@ -13,7 +13,7 @@ on:
 env:
   REGISTRY: index.docker.io
   REPOSITORY: carlosrodlop
-  IMAGE: openldap
+  IMAGE: ooldap.debian
   VERSION: latest
   DOCKERFILE: .docker/ldap/openldap.Dockerfile
 
