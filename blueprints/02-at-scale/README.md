@@ -46,7 +46,7 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
 |------|-------------|------|---------|:--------:|
 | hosted_zone | Amazon Route 53 hosted zone. CloudBees CI applications are configured to use subdomains in this hosted zone. | `string` | n/a | yes |
 | trial_license | CloudBees CI trial license details for evaluation. | `map(string)` | n/a | yes |
-| grafana_admin_password | Grafana admin password. | `string` | `"change.me"` | no |
+| grafana_admin_password | Grafana administrator password. | `string` | `"change.me"` | no |
 | suffix | Unique suffix to assign to all resources. When adding the suffix, it requires changes in CloudBees CI for the validation phase. | `string` | `""` | no |
 | tags | Tags to apply to resources. | `map(string)` | `{}` | no |
 
