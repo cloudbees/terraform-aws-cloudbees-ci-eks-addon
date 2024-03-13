@@ -112,7 +112,7 @@ Since the Terraform variable `suffix` is used for this blueprint, you must updat
 > This option can only be used before the blueprint has been deployed.
 
 1. Create a fork from the [cloudbees/terraform-aws-cloudbees-ci-eks-addon](https://github.com/cloudbees/casc-cloudbees-ci-eks-addon) GitHub repository to your GitHub organization and make any necessary edits to the controller CasC bundle
-   - Update `cbci_s3` in the [casc/mc/parent/variables/variables.yaml](casc/mc/parent/variables/variables.yaml) file including your preffix.
+   - Update `cbci_s3` in the [casc/mc/parent/variables/variables.yaml](casc/mc/parent/variables/variables.yaml) file, including your custom prefix.
    - Update `scm_casc_mc_store` to the [casc/oc/variables/variables.yaml](casc/oc/variables/variables.yaml) and `bucketName` in [casc/oc/items/items-admin-jobs-folder.yaml](casc/oc/items/items-admin-jobs-folder.yaml) file.
 2. Commit and push your changes to the forked repository in your organization.
 3. In the [k8s/cbci-values.yml](k8s/cbci-values.yml) Helm file, update the `OperationsCenter.CasC.Retriever.scmRepo` field based on the files in this blueprint.
