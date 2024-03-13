@@ -193,7 +193,7 @@ Once the resources have been created, a `kubeconfig` file is created in the [/k8
 
    If successful, an `HTTP/2 201` response is returned, indicating the REST API call has been correctly received by the CloudBees CI controller.
 
-5. Right after triggering the build, issue the following to validate Pod Agent provisioning to build the pipeline code:
+5. Right after triggering the build, issue the following to validate pod agent provisioning to build the pipeline code:
 
    ```sh
    eval $(terraform output --raw cbci_agents_pods)
