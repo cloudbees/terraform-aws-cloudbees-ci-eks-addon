@@ -1,2 +1,12 @@
+# Admin
+
 * @carlosrodlop
-* @kellie-freeman
+
+# Center of Excellence team as owners for files that require documentation review.
+
+*.md @cloudbees/team-docs-coe
+LICENSE @cloudbees/team-docs-coe
+outputs.tf @cloudbees/team-docs-coe
+variables.tf @cloudbees/team-docs-coe
+casc/ @cloudbees/team-docs-coe
+img/ @cloudbees/team-docs-coe

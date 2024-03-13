@@ -1,0 +1,15 @@
+jenkins:
+  securityRealm:
+    ldap:
+      configurations:
+      - managerDN: "cn=admin,dc=acme,dc=org"
+        managerPasswordSecret: "admin"
+        rootDN: "dc=acme,dc=org"
+        server: "ldap-service.auth.svc.cluster.local"
+        userSearch: "cn={0}"
+  authorizationStrategy: "cloudBeesRoleBasedAccessControl"
+  remotingSecurity:
+    enabled: true
+  crumbIssuer:
+    standard:
+      excludeClientIPFromCrumb: true

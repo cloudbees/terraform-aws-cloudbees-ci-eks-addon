@@ -47,7 +47,7 @@ Get started with the [CloudBees CI on modern platforms in Amazon Elastic Kuberne
 | cbci_oc_ing | Operations center Ingress for the CloudBees CI add-on. |
 | cbci_oc_pod | Operations center pod for the CloudBees CI add-on. |
 | cbci_oc_url | URL of the CloudBees CI operations center for the CloudBees CI add-on. |
-| eks_cluster_arn | EKS cluster ARN. |
+| eks_cluster_arn | Amazon EKS cluster ARN. |
 | kubeconfig_add | Add kubeconfig to your local configuration to access the Kubernetes API. |
 | kubeconfig_export | Export the KUBECONFIG environment variable to access the Kubernetes API. |
 | vpc_arn | VPC ID. |
@@ -71,11 +71,11 @@ Once the blueprint has been deployed, you can validate it.
 
 Once the resources have been created, a `kubeconfig` file is created in the [/k8s](k8s) folder. Issue the following command to define the [KUBECONFIG](https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/#the-kubeconfig-environment-variable) environment variable to point to the newly generated file:
 
-  ```sh
+```sh
   eval $(terraform output --raw kubeconfig_export)
-  ```
+```
 
-  If the command is successful, no output is returned.
+If the command is successful, no output is returned.
 
 ### CloudBees CI
 
@@ -109,7 +109,7 @@ Once you can access the Kubernetes API from your terminal, complete the followin
 
     If the command is successful, no output is returned.
 
-5. DNS propagation may take several minutes. Once propagation is complete, issue the following command and copy the output, and paste it into a web browser.
+5. DNS propagation may take several minutes. Once propagation is complete, issue the following command, copy the output, and then paste it into a web browser.
 
     ```sh
     terraform output cbci_oc_url

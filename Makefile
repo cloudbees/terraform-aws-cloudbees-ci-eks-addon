@@ -1,8 +1,8 @@
 .DEFAULT_GOAL   	:= help
 SHELL           	:= /usr/bin/env bash
 MAKEFLAGS       	+= --no-print-directory
-BP_AGENT_USER		:= bp-agent
 CI 					?= false
+BP_AGENT_USER       := bp-agent
 MKFILEDIR 			:= $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 
 #https://developer.hashicorp.com/terraform/internals/debugging
@@ -12,16 +12,9 @@ define helpers
 	source blueprints/helpers.sh && $(1)
 endef
 
-.PHONY: dRun
-dRun: ## Build (if not locally present) and Run the Blueprint Agent using Bash as Entrypoint. It is ideal starting point for all targets. Example: make dRun
-	$(eval IMAGE := $(shell docker image ls | grep -c local.cloudbees/bp-agent))
-	@if [ "$(IMAGE)" == "0" ]; then \
-		$(call helpers,INFO "Building Docker Image local.cloudbees/bp-agent:latest") && \
-		docker build . --file $(MKFILEDIR)/.docker/Dockerfile.rootless --tag local.cloudbees/bp-agent:latest; \
-		fi
-	docker run --rm -it --name bp-agent \
-		-v $(MKFILEDIR):/$(BP_AGENT_USER)/cbci-eks-addon -v $(HOME)/.aws:/$(BP_AGENT_USER)/.aws \
-		local.cloudbees/bp-agent:latest
+##########################
+# Blueprint User
+##########################
 
 .PHONY: tfChecks
 tfChecks: ## Run required terraform checks according to getting-started/README.md . Example: ROOT=02-at-scale make tfChecks
@@ -34,7 +27,11 @@ tfChecks: guard-ROOT
 
 .PHONY: agentCheck
 agentCheck: ## Run agent check providing a warning message in case it is not used. Example:  make agentCheck
-	@if [ "$(shell whoami)" != "$(BP_AGENT_USER)" ]; then $(call helpers,WARN "$(BP_AGENT_USER) user is not detected. Note that blueprints validations use the companion Blueprint Docker Agent available via: make dRun"); fi
+	@if [ "$(shell whoami)" != "$(BP_AGENT_USER)" ]; then $(call helpers,WARN "$(BP_AGENT_USER) user is not detected. Blueprint Docker Agent available via: make bpAgent-dRun"); fi
+
+.PHONY: bpAgent-dRun
+bpAgent-dRun: ## Build (if not locally present) and Run the Blueprint Agent using Bash as Entrypoint. It is ideal starting point for all targets. Example: make bpAgent-dRun
+	@$(call helpers,bpAgent-dRun)
 
 .PHONY: deploy
 deploy: ## Deploy Terraform Blueprint passed as parameter. Example: ROOT=02-at-scale make deploy
@@ -51,11 +48,10 @@ endif
 validate: ## Validate CloudBees CI Blueprint deployment passed as parameter. Example: ROOT=02-at-scale make validate
 validate: tfChecks agentCheck
 ifeq ($(CI),false)
-ifneq ("$(wildcard $(MKFILEDIR)/blueprints/$(ROOT)/terraform.output)","")
-	@$(call helpers,ask-confirmation "Validate $(ROOT)")
-else
-	@$(call helpers,ERROR "Blueprint $(ROOT) did not complete the Deployment target thus it is not Ready to be validated.")
+ifeq ($(wildcard $(MKFILEDIR)/blueprints/$(ROOT)/terraform.output),)
+	@$(call helpers,WARN "Blueprint $(ROOT) did not complete the Deployment target thus it is not Ready to be validated.")
 endif
+	@$(call helpers,ask-confirmation "Validate $(ROOT)")
 endif
 	@$(call helpers,probes $(ROOT))
 	@$(call helpers,INFO "CloudBees CI Blueprint $(ROOT) Validation target finished succesfully.")
@@ -64,10 +60,20 @@ endif
 destroy: ## Destroy Terraform Blueprint passed as parameter. Example: ROOT=02-at-scale make destroy
 destroy: tfChecks agentCheck
 ifeq ($(CI),false)
-	@$(call helpers,ask-confirmation "Destroy $(ROOT)")
+	@$(call helpers,ask-confirmation "Destroy $(ROOT) in mode CBCI_ONLY=$(CBCI_ONLY)")
 endif
-	@$(call helpers,tf-destroy $(ROOT))
+	@$(call helpers,tf-destroy $(ROOT) $(CBCI_ONLY))
 	@$(call helpers,INFO "CloudBees CI Blueprint $(ROOT) Destroy target finished succesfully.")
+
+.PHONY: clean
+clean: ## Clean Blueprint passed as parameter. Example: ROOT=02-at-scale make clean
+clean: guard-ROOT agentCheck
+	@$(call helpers,clean $(ROOT))
+	@$(call helpers,INFO "CloudBees CI Blueprint $(ROOT) Clean target finished succesfully.")
+
+##########################
+# Blueprint Admin
+##########################
 
 .PHONY: test
 test: ## Runs a test for blueprint passed as parameters throughout their Terraform Lifecycle. Example: ROOT=02-at-scale make test
@@ -85,15 +91,26 @@ set-kube-env: agentCheck
 	@$(call helpers,set-kube-env)
 	@$(call helpers,INFO "Setting Kube environment finished succesfully.")
 
-.PHONY: clean
-clean: ## Clean Blueprint passed as parameter. Example: ROOT=02-at-scale make clean
-clean: guard-ROOT agentCheck
-	@cd $(MKFILEDIR)/blueprints/$(ROOT) && find -name ".terraform" -type d | xargs rm -rf
-	@cd $(MKFILEDIR)/blueprints/$(ROOT) && find -name ".terraform.lock.hcl" -type f | xargs rm -f
-	@cd $(MKFILEDIR)/blueprints/$(ROOT) && find -name "kubeconfig_*.yaml" -type f | xargs rm -f
-	@cd $(MKFILEDIR)/blueprints/$(ROOT) && find -name "terraform.output" -type f | xargs rm -f
-	@cd $(MKFILEDIR)/blueprints/$(ROOT) && find -name terraform.log -type f | xargs rm -f
-	@$(call helpers,INFO "CloudBees CI Blueprint $(ROOT) Clean target finished succesfully.")
+.PHONY: set-casc-branch
+set-casc-branch: ## Update Casc bundle repository to the branch passed as parameter. Example: ROOT=main make set-casc-branch
+set-casc-branch: agentCheck guard-BRANCH
+	@$(call helpers,set-casc-branch $(BRANCH))
+	@$(call helpers,INFO "Setting Casc Branch finished succesfully.")
+
+#https://github.com/kyounger/casc-plugin-dependency-calculation/blob/master/README.md#using-the-docker-image
+.PHONY: cascCal-dRun
+cascCal-dRun: ## Run Docker Container for Casc Plugin Dependency Calculations. Example: make cascCal-dRun
+	@$(call helpers,casc-docker-run)
+
+#https://github.com/kyounger/casc-plugin-dependency-calculation/blob/master/README.md#using-the-docker-image
+.PHONY: cascCal-script
+cascCal-script: ## Run Casc Plugin Dependency Calculations Script passing a version, type and source as parameters. Example: VERSION=2.440.1.3 TYPE=oc SOURCE="./blueprints/02-at-scale/casc/oc/plugins/plugins.2.426.3.3.minimal.yaml" make cascCal-script
+cascCal-script: guard-VERSION guard-SOURCE guard-TYPE
+	@$(call helpers,casc-script-exec $(VERSION) $(TYPE) $(SOURCE))
+
+##########################
+# Global
+##########################
 
 .PHONY: help
 help: ## Makefile Help Page

@@ -30,6 +30,7 @@ locals {
     "tf-blueprint"  = local.name
     "tf-repository" = "github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon"
   })
+
 }
 
 ################################################################################
@@ -188,7 +189,49 @@ module "eks" {
 
   create_cloudwatch_log_group = false
 
+  create_kms_key  = true
+  kms_key_aliases = ["eks/${local.name}"]
+
   tags = local.tags
+}
+
+# Storage Classes
+
+resource "kubernetes_annotations" "gp2" {
+  api_version = "storage.k8s.io/v1"
+  kind        = "StorageClass"
+  # This is true because the resources was already created by the ebs-csi-driver addon
+  force = "true"
+
+  metadata {
+    name = "gp2"
+  }
+
+  annotations = {
+    "storageclass.kubernetes.io/is-default-class" = "false"
+  }
+}
+
+resource "kubernetes_storage_class_v1" "gp3" {
+  metadata {
+    name = "gp3"
+
+    annotations = {
+      "storageclass.kubernetes.io/is-default-class" = "true"
+    }
+  }
+
+  storage_provisioner    = "ebs.csi.aws.com"
+  allow_volume_expansion = true
+  reclaim_policy         = "Delete"
+  volume_binding_mode    = "WaitForFirstConsumer"
+
+  parameters = {
+    encrypted = "true"
+    fsType    = "ext4"
+    type      = "gp3"
+  }
+
 }
 
 resource "null_resource" "create_kubeconfig" {

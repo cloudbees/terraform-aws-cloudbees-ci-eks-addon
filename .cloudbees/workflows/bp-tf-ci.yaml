@@ -28,10 +28,9 @@ env:
       email = "platform.ci@cloudbees.com"
       company = "CloudBees Inc."
     }
-    suffix = "ci-v2"
+    suffix = "ci-v3"
 
 jobs:
-#TODO: Create 2 jobs once per blueprint, with 2 different hosted_zone. They depends on a init jobs to create the bucket
   init:
     steps:
 
@@ -45,8 +44,9 @@ jobs:
         role-external-id: cloudbees
         role-duration-seconds: "3600"
 
+    #TODO: Add tags for the bucket
     - name: Create Terraform Backend Bucket if not exists
-      uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
+      uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
       shell: bash
       run: |
         aws s3api create-bucket \
@@ -72,7 +72,7 @@ jobs:
       uses: cloudbees-io/checkout@v1
 
     - name: 01-getting-started - Deploy
-      uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
+      uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
       env:
         ROOT: 01-getting-started
         TF_VAR_hosted_zone: bp01.aws.ps.beescloud.com
@@ -93,7 +93,7 @@ jobs:
         [ "${{ env.CLEAN_UP }}" = "true" ] && echo "Skipping... Clean up mode." || CI=true make deploy
 
     - name: 01-getting-started - Validate
-      uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
+      uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
       env:
         ROOT: 01-getting-started
       shell: bash
@@ -101,7 +101,7 @@ jobs:
         [ "${{ env.CLEAN_UP }}" = "true" ] && echo "Skipping... Clean up mode." || CI=true make validate
 
     - name: 01-getting-started - Destroy
-      uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
+      uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
       env:
         ROOT: 01-getting-started
         TF_VAR_hosted_zone: bp01.aws.ps.beescloud.com
@@ -129,7 +129,7 @@ jobs:
       uses: cloudbees-io/checkout@v1
 
     - name: 02-at-scale - Deploy
-      uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
+      uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
       env:
         ROOT: 02-at-scale
         TF_VAR_hosted_zone: bp02.aws.ps.beescloud.com
@@ -155,7 +155,7 @@ jobs:
         [ "${{ env.CLEAN_UP }}" = "true" ] && echo "Skipping... Clean up mode." || CI=true make deploy
 
     - name: 02-at-scale - Validate
-      uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
+      uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
       env:
         ROOT: 02-at-scale
       shell: bash
@@ -163,7 +163,7 @@ jobs:
         [ "${{ env.CLEAN_UP }}" = "true" ] && echo "Skipping... Clean up mode." || CI=true make validate
 
     - name: 02-at-scale - Destroy
-      uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon:latest
+      uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
       env:
         ROOT: 02-at-scale
         TF_VAR_hosted_zone: bp02.aws.ps.beescloud.com

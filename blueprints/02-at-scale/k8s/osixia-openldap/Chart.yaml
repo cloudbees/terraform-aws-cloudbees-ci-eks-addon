@@ -1,0 +1,9 @@
+apiVersion: v2
+name: osixia-openldap
+description: Simple a Helm chart to deploy a Osixia OpenLDAP server with mock data for CloudBees CI blueprint add-on Blueprints.
+
+type: application
+
+version: 0.1.0
+
+appVersion: "1.5.0"

@@ -1,0 +1,62 @@
+jenkins:
+  systemMessage: ${message}
+  numExecutors: 0
+unclassified:
+  bundleStorageService:
+    activated: true
+    activeBundle:
+      name: "casc-mm-store"
+      retriever:
+        SCM:
+          defaultVersion: "main"
+          scmSource:
+            git:
+              credentialsId: "GH-token"
+              remote: ${scm_casc_mm_store}
+              traits:
+              - "gitBranchDiscovery"
+              - headWildcardFilter:
+                  includes: "develop"
+              - sparseCheckoutPaths:
+                  extension:
+                    sparseCheckoutPaths:
+                    - path: "/blueprints/02-at-scale/casc/mc/"
+  cascAutoControllerProvisioning:
+    provisionControllerOnCreation: true
+  buildDiscarders:
+    configuredBuildDiscarders:
+      - "jobBuildDiscarder"
+      - simpleBuildDiscarder:
+          discarder:
+            logRotator:
+              numToKeepStr: "3"
+cloudBeesCasCServer:
+  defaultBundle: "develop/none-ha"
+  visibility: true
+beekeeper:
+  enabled: true
+  securityWarnings:
+    enabledForCore: true
+    enabledForPlugins: true
+  upgrades:
+    autoDowngradePlugins: false
+    autoUpgradePlugins: true
+security:
+  controllerExecutorCount:
+    enforce:
+      count: 0
+masterprovisioning:
+  kubernetes:
+    nodeSelectors: "ci_type=cb-apps"
+    yaml: |-
+      ---
+      apiVersion: "apps/v1"
+      kind: "StatefulSet"
+      spec:
+        template:
+            spec:
+              tolerations:
+              - key: "dedicated"
+                operator: "Equal"
+                value: "cb-apps"
+                effect: "NoSchedule"

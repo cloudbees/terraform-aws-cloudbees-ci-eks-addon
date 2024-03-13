@@ -1,0 +1,94 @@
+
+beekeeper:
+  enabled: true
+  securityWarnings:
+    enabledForCore: true
+    enabledForPlugins: true
+  upgrades:
+    autoDowngradePlugins: false
+    autoUpgradePlugins: true
+unclassified:
+  timestamper:
+    allPipelines: true
+  buildDiscarders:
+    configuredBuildDiscarders:
+      - "jobBuildDiscarder"
+      - simpleBuildDiscarder:
+          discarder:
+            logRotator:
+              numToKeepStr: "3"
+  artifactManager:
+    artifactManagerFactories:
+    - jclouds:
+        provider: "s3"
+  workspaceCache:
+    cacheManager: "s3"
+  hibernationConfiguration:
+    enabled: true
+    gracePeriod: 3600
+aws:
+  s3:
+    container: ${cbci_s3}
+    disableSessionToken: false
+    prefix: "cbci/"
+    useHttp: false
+    usePathStyleUrl: false
+    useTransferAcceleration: false
+kube:
+  podTemplatesConfiguration:
+    templates:
+      - containers:
+          - args: "99d"
+            command: "sleep"
+            image: "maven:3.9.6-amazoncorretto-8"
+            name: "maven"
+            ttyEnabled: true
+            workingDir: "/home/jenkins/agent"
+            resourceRequestMemory: "500Mi"
+            resourceLimitMemory: "1Gi"
+            resourceRequestCpu: "250m"
+          - args: "99d"
+            command: "sleep"
+            image: "golang:alpine3.19"
+            name: "go"
+            ttyEnabled: true
+            workingDir: "/home/jenkins/agent"
+            resourceRequestMemory: "500Mi"
+            resourceLimitMemory: "1Gi"
+            resourceRequestCpu: "250m"
+        label: "maven-and-go-ondemand"
+        name: "maven-and-go-ondemand"
+        nodeSelector: "ci_type=build-linux"
+        nodeUsageMode: NORMAL
+        yaml: |-
+          apiVersion: v1
+          kind: Pod
+          spec:
+            tolerations:
+              - key: "dedicated"
+                operator: "Equal"
+                value: "build-linux"
+                effect: "NoSchedule"
+      - containers:
+          - args: "99d"
+            command: "sleep"
+            image: "maven:3.9.6-amazoncorretto-8"
+            name: "maven"
+            ttyEnabled: true
+            workingDir: "/home/jenkins/agent"
+            resourceRequestMemory: "500Mi"
+            resourceLimitMemory: "1Gi"
+            resourceRequestCpu: "250m"
+        label: "maven-spot"
+        name: "maven-spot"
+        nodeSelector: "ci_type=build-linux-spot"
+        nodeUsageMode: NORMAL
+        yaml: |-
+          apiVersion: v1
+          kind: Pod
+          spec:
+            tolerations:
+              - key: "dedicated"
+                operator: "Equal"
+                value: "build-linux-spot"
+                effect: "NoSchedule"

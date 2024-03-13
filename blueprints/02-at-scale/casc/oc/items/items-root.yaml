@@ -1,0 +1,77 @@
+removeStrategy:
+  rbac: SYNC
+  items: NONE
+items:
+  # Non-Casc
+  - kind: managedController
+    name: team-a
+    configuration:
+      kubernetes:
+        memory: 2048
+        cpus: 1.0
+        disk: 20
+        storageClassName: "gp3"
+  # Casc, Non-HA
+  - kind: managedController
+    name: team-b
+    configuration:
+      kubernetes:
+        memory: 6144
+        cpus: 2.0
+        disk: 5
+        storageClassName: "gp3"
+        yaml: |-
+          ---
+          apiVersion: "apps/v1"
+          kind: "StatefulSet"
+          spec:
+            template:
+                spec:
+                  tolerations:
+                  - key: "dedicated"
+                    operator: "Equal"
+                    value: "cb-apps"
+                    effect: "NoSchedule"
+          ---
+          apiVersion: "v1"
+          kind: "Service"
+          metadata:
+            labels:
+              "cloudbees.prometheus" : "true"
+    properties:
+      - configurationAsCode:
+          bundle: "develop/none-ha"
+  # Casc, HA
+  - kind: managedController
+    name: team-c-ha
+    configuration:
+      kubernetes:
+        memory: 6144
+        cpus: 2.0
+        disk: 5
+        replication:
+          config:
+            maxReplicas: 4
+            replicas: 2
+            targetCPUUtilizationPercentage: 50
+        yaml: |-
+          ---
+          apiVersion: "apps/v1"
+          kind: "Deployment"
+          spec:
+            template:
+                spec:
+                  tolerations:
+                  - key: "dedicated"
+                    operator: "Equal"
+                    value: "cb-apps"
+                    effect: "NoSchedule"
+          ---
+          apiVersion: "v1"
+          kind: "Service"
+          metadata:
+            labels:
+              "cloudbees.prometheus" : "true"
+    properties:
+      - configurationAsCode:
+          bundle: "develop/ha"

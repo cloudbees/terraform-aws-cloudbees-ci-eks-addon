@@ -17,10 +17,10 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
   | [Metrics Server](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/metrics-server/)               | This is a requirement for CloudBees CI HA/HS controllers for horizontal pod autoscaling.                                                                                                     |
   | [Velero](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/velero/)                               | Backs up and restores Kubernetes resources and volume snapshots, which is only compatible with Amazon Elastic Block Store (Amazon EBS).                                                      |
 
-- Cloudbees CI uses [Configuration as Code (CasC)](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/casc-intro) to enable [exciting new features for streamlined DevOps](https://www.cloudbees.com/blog/cloudbees-ci-exciting-new-features-for-streamlined-devops) and other enterprise features, such as [CloudBees CI hibernation](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#_hibernation_in_managed_masters).
-  - The operations center configuration is hosted in [cloudbees/casc-oc-cloudbees-ci-eks-addon](https://github.com/cloudbees/casc-mc-cloudbees-ci-eks-addon) and deployed using the [CasC Bundle Retriever](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/bundle-retrieval-scm).
-  - Managed controller configurations are hosted in [cloudbees/casc-mm-cloudbees-ci-eks-addon](https://github.com/cloudbees/casc-mm-cloudbees-ci-eks-addon) and managed from the operations center using [source control management (SCM)](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-controller/add-bundle#_adding_casc_bundles_from_an_scm_tool).
-  - The managed controllers are using [CasC bundle inheritance](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-controller/advanced#_configuring_bundle_inheritance_with_casc) (refer to [bp02.parent](https://github.com/cloudbees/casc-mc-cloudbees-ci-eks-addon/tree/main/bp02.parent)). This "parent" bundle is inherited by two types of "child" controller bundles: `ha` and `none-ha`, to accommodate [considerations about HA controllers](https://docs.cloudbees.com/docs/cloudbees-ci/latest/ha-install-guide/#_considerations_about_high_availability_ha).
+- Cloudbees CI uses [Configuration as Code (CasC)](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/casc-intro) (refer to the [casc](casc) folder) to enable [exciting new features for streamlined DevOps](https://www.cloudbees.com/blog/cloudbees-ci-exciting-new-features-for-streamlined-devops) and other enterprise features, such as [CloudBees CI hibernation](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#_hibernation_in_managed_masters).
+  - The operations center is using the [CasC Bundle Retriever](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/bundle-retrieval-scm).
+  - Managed controller configurations are managed from the operations center using [source control management (SCM)](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-controller/add-bundle#_adding_casc_bundles_from_an_scm_tool).
+  - The managed controllers are using [CasC bundle inheritance](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-controller/advanced#_configuring_bundle_inheritance_with_casc) (refer to the [parent](casc/mc/parent) folder). This "parent" bundle is inherited by two types of "child" controller bundles: `ha` and `none-ha`, to accommodate [considerations about HA controllers](https://docs.cloudbees.com/docs/cloudbees-ci/latest/ha-install-guide/#_considerations_about_high_availability_ha).
 
 > [!TIP]
 > A [resource group](https://docs.aws.amazon.com/ARG/latest/userguide/resource-groups.html) is also included, to get a full list of all resources created by this blueprint.
@@ -61,13 +61,12 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
 | cbci_controller_b_hibernation_post_queue_ws_cache | team-b hibernation monitor endpoint to the build workspace cache. It expects CBCI_ADMIN_TOKEN as the environment variable. |
 | cbci_controller_c_hpa | team-c horizontal pod autoscaling. |
 | cbci_controllers_pods | Operations center pod for the CloudBees CI add-on. |
-| cbci_general_password | Operations center service initial admin password for the CloudBees CI add-on. Additionally, there are developer and guest users using the same password. |
 | cbci_helm | Helm configuration for the CloudBees CI add-on. It is accessible only via state files. |
 | cbci_liveness_probe_ext | Operations center service external liveness probe for the CloudBees CI add-on. |
 | cbci_liveness_probe_int | Operations center service internal liveness probe for the CloudBees CI add-on. |
 | cbci_namespace | Namespace for the CloudBees CI add-on. |
-| cbci_oc_export_admin_api_token | Exports the operations center admin API token to access the REST API when CSRF is enabled. It expects CBCI_ADMIN_CRUMB as the environment variable. |
-| cbci_oc_export_admin_crumb | Exports the operations center admin crumb, to access the REST API when CSRF is enabled. |
+| cbci_oc_export_admin_api_token | Exports the operations center admin_cbci_a API token to access the REST API when CSRF is enabled. It expects CBCI_ADMIN_CRUMB as the environment variable. |
+| cbci_oc_export_admin_crumb | Exports the operations center admin_cbci_a crumb, to access the REST API when CSRF is enabled. |
 | cbci_oc_ing | Operations center Ingress for the CloudBees CI add-on. |
 | cbci_oc_pod | Operations center pod for the CloudBees CI add-on. |
 | cbci_oc_take_backups | Operations center cluster operations build for the on-demand back up. It expects CBCI_ADMIN_TOKEN as the environment variable. |
@@ -78,6 +77,7 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
 | grafana_dashboard | Provides access to Grafana dashboards. |
 | kubeconfig_add | Add kubeconfig to the local configuration to access the Kubernetes API. |
 | kubeconfig_export | Export the KUBECONFIG environment variable to access the Kubernetes API. |
+| ldap_admin_password | LDAP password for admin_cbci_a user for the CloudBees CI add-on. Check .docker/ldap/data.ldif. |
 | prometheus_active_targets | Checks active Prometheus targets from the operations center. |
 | prometheus_dashboard | Provides access to Prometheus dashboards. |
 | s3_cbci_arn | CloudBees CI Amazon S3 bucket ARN. |
@@ -95,9 +95,9 @@ When preparing to deploy, you must [customize the secrets file](#customize-secre
 > [!TIP]
 > To understand the minimum required settings, refer to [Get started - Deploy](../01-getting-started/README.md#deploy).
 
-### Customize secrets file
+### Secrets file
 
-You must first customize your secrets file by copying the contents of [secrets-values.yml.example](k8s/secrets-values.yml.example) to `secrets-values.yml`. This provides [Kubernetes secrets](https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/docs/features/secrets.adoc#kubernetes-secrets) that can be consumed by CasC.
+You must create your secrets file by copying the contents of [secrets-values.yml.example](k8s/secrets-values.yml.example) to `secrets-values.yml`. This provides [Kubernetes secrets](https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/docs/features/secrets.adoc#kubernetes-secrets) that can be consumed by CasC.
 
 ### Update Amazon S3 bucket settings
 
@@ -111,12 +111,12 @@ Since the Terraform variable `suffix` is used for this blueprint, you must updat
 >[!IMPORTANT]
 > This option can only be used before the blueprint has been deployed.
 
-1. Create a fork from the [cloudbees/casc-mc-cloudbees-ci-eks-addon](https://github.com/cloudbees/casc-mc-cloudbees-ci-eks-addon) GitHub repository to your GitHub organization and make any necessary edits to the controller CasC bundle (for example, add `cbci_s3` to the [bp02.parent/variables/variables.yaml](https://github.com/cloudbees/casc-mc-cloudbees-ci-eks-addon/blob/main/bp02.parent/variables/variables.yaml) file).
+1. Create a fork of the [cloudbees/terraform-aws-cloudbees-ci-eks-addon](https://github.com/cloudbees/casc-cloudbees-ci-eks-addon) GitHub repository to your GitHub organization and make any necessary edits to the controller CasC bundle.
+   - Update `cbci_s3` in the [casc/mc/parent/variables/variables.yaml](casc/mc/parent/variables/variables.yaml) file, including your custom prefix.
+   - Update `scm_casc_mc_store` in the [casc/oc/variables/variables.yaml](casc/oc/variables/variables.yaml) file and `bucketName` in the [casc/oc/items/items-admin-jobs-folder.yaml](casc/oc/items/items-admin-jobs-folder.yaml) file.
 2. Commit and push your changes to the forked repository in your organization.
-3. Create a fork from the [cloudbees/casc-oc-cloudbees-ci-eks-addon](https://github.com/cloudbees/casc-oc-cloudbees-ci-eks-addon) GitHub repository to your GitHub organization and make any necessary edits to the operations center CasC bundle (for example, add `scm_casc_mc_store` to the [bp02/variables/variables.yaml](https://github.com/cloudbees/casc-oc-cloudbees-ci-eks-addon/blob/main/bp02/variables/variables.yaml) and [bp02/items/items-folder-admin.yaml](https://github.com/cloudbees/casc-oc-cloudbees-ci-eks-addon/blob/main/bp02/items/items-folder-admin.yaml) files).
-4. Commit and push your changes to the forked repository in your organization.
-5. In the [k8s/cbci-values.yml](k8s/cbci-values.yml) Helm file, update the `OperationsCenter.CasC.Retriever.scmRepo` field based on the files in this blueprint.
-6. Save the file and issue the `terraform apply` command.
+3. In the [k8s/cbci-values.yml](k8s/cbci-values.yml) Helm file, update the `OperationsCenter.CasC.Retriever.scmRepo` field based on the files in this blueprint.
+4. Save the file and issue the `terraform apply` command.
 
 #### Option 2: Update Amazon S3 bucket name using the CloudBees CI UI
 
@@ -151,13 +151,13 @@ Once the resources have been created, a `kubeconfig` file is created in the [/k8
 
 1. Complete the steps to [validate CloudBees CI](../01-getting-started/README.md#cloudbees-ci), if you have not done so already.
 
-2. Authentication in this blueprint uses three types of personas, each with a different authorization level. Each persona uses a different username, but has the same password. The authorization level defines a set of permissions configured using [RBAC](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-secure-guide/rbac). Additionally, the operations center and controller use [single sign-on (SS0)](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-secure-guide/using-sso). Issue the following command to retrieve the password:
+2. Authentication in this blueprint is based on LDAP and uses two types of personas (Admin and Developer), each with a different authorization level. Each persona uses a different username (cn); you can find the password in [.docker/ldap/data.ldif](./../../.docker/ldap/data.ldif). The authorization level defines a set of permissions configured using [RBAC](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-secure-guide/rbac). Additionally, the operations center and controller use [single sign-on (SS0)](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-secure-guide/using-sso). Issue the following command to retrieve the password of the `admin_cbci_a` user
 
    ```sh
-   eval $(terraform output --raw cbci_general_password)
+   eval $(terraform output --raw ldap_admin_password)
    ```
 
-3. CasC is enabled for the [operations center](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/) (`cjoc`) and [controllers](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-controller/) (`team-b` and `team-c-ha`). `team-a` is not using CasC, to illustrate the difference between the two approaches. Issue the following command to verify that all controllers are in a `Running` state:
+1. CasC is enabled for the [operations center](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/) (`cjoc`) and [controllers](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-controller/) (`team-b` and `team-c-ha`). `team-a` is not using CasC, to illustrate the difference between the two approaches. Issue the following command to verify that all controllers are in a `Running` state:
 
    ```sh
    eval $(terraform output --raw cbci_controllers_pods)
@@ -165,13 +165,13 @@ Once the resources have been created, a `kubeconfig` file is created in the [/k8
 
    If successful, it should indicate that 2 replicas are running for `team-c-ha` since [CloudBees CI HA/HS](https://docs.cloudbees.com/docs/cloudbees-ci/latest/ha-install-guide/) is enabled on this controller.
 
-4. Issue the following command to verify that horizontal pod autoscaling is enabled for `team-c-ha`:
+2. Issue the following command to verify that horizontal pod autoscaling is enabled for `team-c-ha`:
 
    ```sh
    eval $(terraform output --raw cbci_controller_c_hpa)
    ```
 
-5. Issue the following command to retrieve an [API token](https://docs.cloudbees.com/docs/cloudbees-ci-api/latest/api-authentication) for the `admin` user with the correct permissions for the required actions:
+3. Issue the following command to retrieve an [API token](https://docs.cloudbees.com/docs/cloudbees-ci-api/latest/api-authentication) for the `admin_cbci_a` user with the correct permissions for the required actions:
 
    ```sh
    eval $(terraform output --raw cbci_oc_export_admin_crumb) && \
@@ -184,7 +184,8 @@ Once the resources have been created, a `kubeconfig` file is created in the [/k8
    ```sh
    eval $(terraform output --raw cbci_liveness_probe_ext)
    ```
-6. Once you have retrieved the API token, issue the following command to remotely trigger the `ws-cache` pipeline from `team-b` using the [POST queue for hibernation API endpoint](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#_post_queue_for_hibernation):
+
+4. Once you have retrieved the API token, issue the following command to remotely trigger the `ws-cache` pipeline from `team-b` using the [POST queue for hibernation API endpoint](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#_post_queue_for_hibernation):
 
    ```sh
    eval $(terraform output --raw cbci_controller_b_hibernation_post_queue_ws_cache)
@@ -192,15 +193,15 @@ Once the resources have been created, a `kubeconfig` file is created in the [/k8
 
    If successful, an `HTTP/2 201` response is returned, indicating the REST API call has been correctly received by the CloudBees CI controller.
 
-7. Right after triggering the build, issue the following to validate Pod Agent provisioning to build the pipeline code:
+5. Right after triggering the build, issue the following to validate pod agent provisioning to build the pipeline code:
 
    ```sh
    eval $(terraform output --raw cbci_agents_pods)
    ```
 
-8. In the CloudBees CI UI, sign in to the `team-b` controller.
-9. Navigate to the `ws-cache` pipeline and select the first build, indicated by the `#1` build number.
-10. Select [CloudBees Pipeline Explorer](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-pipeline-explorer-plugin) and examine the build logs.
+6.  In the CloudBees CI UI, sign in to the `team-b` controller.
+7.  Navigate to the `ws-cache` pipeline and select the first build, indicated by the `#1` build number.
+8.  Select [CloudBees Pipeline Explorer](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-pipeline-explorer-plugin) and examine the build logs.
 
 > [!NOTE]
 > - This pipeline uses [CloudBees Workspace Caching](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-cache-step). Once the second build is complete, you can find the read cache operation at the beginning of the build logs and the write cache operation at the end of the build logs.
@@ -209,14 +210,14 @@ Once the resources have been created, a `kubeconfig` file is created in the [/k8
 
 ### Back up and restore
 
-For backup and restore operations, you can use the [preconfigured CloudBees CI Cluster Operations job](#create-daily-backups-using-a-cloudbeees-ci-cluster-operations-job) to automatically perform a daily backup, which can be used for Amazon EFS and Amazon EBS storage.
+For backup and restore operations, you can use the [preconfigured CloudBees CI Cluster Operations job](#create-daily-backups-using-a-cloudbees-ci-cluster-operations-job) to automatically perform a daily backup, which can be used for Amazon EFS and Amazon EBS storage.
 
-[Velero](#create-a-velero-backup) is an alternative for services that use Amazon EBS as storage. Velero not only takes a backup of the PVC snapshots, but also takes a backup of any other defined Kubernetes resources.
+[Velero](#create-a-velero-backup-schedule) is an alternative for services that use Amazon EBS as storage. Velero not only takes a backup of the PVC snapshots, but also takes a backup of any other defined Kubernetes resources.
 
 > [!NOTE]
 > There is no alternative for services using Amazon EFS storage. Although [AWS Backup](https://aws.amazon.com/backup/) includes this Amazon EFS drive as a protected resource, there is not currently a best practice to dynamically restore Amazon EFS PVCs. For more information, refer to [Issue 39](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/issues/39).
 
-#### Create daily backups using a CloudBeees CI Cluster Operations job
+#### Create daily backups using a CloudBees CI Cluster Operations job
 
 The [CloudBees Backup plugin](https://docs.cloudbees.com/docs/cloudbees-ci/latest/backup-restore/cloudbees-backup-plugin) is enabled for all controllers and the operations center using [Amazon S3 as storage](https://docs.cloudbees.com/docs/cloudbees-ci/latest/backup-restore/cloudbees-backup-plugin#_amazon_s3). The preconfigured **backup-all-controllers** [Cluster Operations](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/cluster-operations) job is scheduled to run daily from the operations center to back up all controllers.
 

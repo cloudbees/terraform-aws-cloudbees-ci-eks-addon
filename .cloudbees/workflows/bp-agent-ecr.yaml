@@ -12,12 +12,14 @@ on:
 
 env:
   REGISTRY: public.ecr.aws/r1n1q0e5
-  APP_NAME: cloudbees-labs/terraform-aws-cloudbees-ci-eks-addon
-  APP_VERSION: latest
+  RESPOSITORY: cloudbees-labs/tf-aws-cb-ci-eks-addon-agent
+  VERSION: latest
   AWS_REGION: us-east-1
+  DOCKERFILE: .docker/agent/agent.root.Dockerfile
 
 jobs:
-  build:
+  #TODO: Verify if the repository is created before running this job. If not, create it (including tags).
+  build_and_push_images:
     steps:
     - name: Checkout code
       uses: cloudbees-io/checkout@v1
@@ -37,6 +39,6 @@ jobs:
     - name: Build, tag, and push docker image to Amazon ECR
       uses: cloudbees-io/kaniko@v1
       with:
-        dockerfile: .docker/Dockerfile.root
+        dockerfile: ${{ env.DOCKERFILE }}
         context: .
-        destination: ${{ env.REGISTRY }}/${{ env.APP_NAME }}:${{ env.APP_VERSION }}
+        destination: ${{ env.REGISTRY }}/${{ env.RESPOSITORY }}:${{ env.VERSION }}
