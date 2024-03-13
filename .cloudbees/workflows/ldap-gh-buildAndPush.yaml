@@ -12,7 +12,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  REPOSITORY: carlosrodlop
+  REPOSITORY: cloudbees/terraform-aws-cloudbees-ci-eks-addon
   IMAGE: ooldap.debian
   VERSION: latest
   DOCKERFILE: .docker/ldap/openldap.Dockerfile
