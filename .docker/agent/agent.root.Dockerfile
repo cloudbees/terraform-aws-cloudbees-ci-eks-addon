@@ -1,6 +1,6 @@
 # Copyright (c) CloudBees, Inc.
 
-# CloudBees.io currentlky only supports root user to operate with the Workspace
+# CloudBees.io currently only supports root user to operate with the Workspace
 
 FROM alpine:3.19.0
 
