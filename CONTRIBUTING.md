@@ -45,7 +45,7 @@ To submit a pull request:
 
 ## CI pipeline
 
-Validate your pull request changes inside the blueprint agent described in the [Dockerfile](.docker/agent). It is the same agent used for the CI pipeline [agent.yaml](.cloudbees/workflows/agent-ecr-buildAndPush.yaml).
+Validate your pull request changes inside the blueprint agent described in the [Dockerfile](.docker/agent). It is the same agent used for the CI pipeline [bp-agent-ecr.yaml](.cloudbees/workflows/bp-agent-ecr.yaml).
 
 > [!NOTE]
 > The agent and dependencies can be automated using the [Makefile](Makefile) at the root of the project, under the target `bpAgent-dRun`. It is the same Makefile used in the CloudBees CI pipeline.
