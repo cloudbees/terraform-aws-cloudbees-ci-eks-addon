@@ -28,8 +28,7 @@ ERROR () {
 bpAgent-dRun (){
   local bpAgentUser="bp-agent"
   local bpAgentLocalImage="local.cloudbees/bp-agent"
-  local image=$(docker image ls | grep -c "$bpAgentLocalImage")
-	if [ "$image" -eq 0 ]; then \
+	if [ "$(docker image ls | grep -c "$bpAgentLocalImage")" -eq 0 ]; then \
 		INFO "Building Docker Image local.cloudbees/bp-agent:latest" && \
 		docker build . --file "$SCRIPTDIR/../.docker/agent/agent.rootless.Dockerfile" --tag "$bpAgentLocalImage"; \
 		fi
@@ -148,19 +147,22 @@ test-all () {
 }
 
 clean() {
-  cd "$SCRIPTDIR/$root" && find -name ".terraform" -type d | xargs rm -rf
-	cd "$SCRIPTDIR/$root" && find -name ".terraform.lock.hcl" -type f | xargs rm -f
-	cd "$SCRIPTDIR/$root" && find -name "kubeconfig_*.yaml" -type f | xargs rm -f
-	cd "$SCRIPTDIR/$root" && find -name "terraform.output" -type f | xargs rm -f
-	cd "$SCRIPTDIR/$root" && find -name terraform.log -type f | xargs rm -f
+  cd "$SCRIPTDIR/$root" && 
+    find . -name ".terraform" -type d -exec rm -rf + && \
+	  find . -name ".terraform.lock.hcl" -type f -exec xargs rm -f + && \
+	  find . -name "kubeconfig_*.yaml" -type f -exec xargs rm -f + && \
+	  find . -name "terraform.output" -type f -exec xargs rm -f + && \
+	  find . -name terraform.log -type f -exec xargs rm -f + 
 }
 
 set-kube-env () {
   # shellcheck source=/dev/null
   source "$SCRIPTDIR/.k8s.env"
+  # shellcheck disable=SC2154
   sed -i "/#vCBCI_Helm#/{n;s/\".*\"/\"$vCBCI_Helm\"/;}" "$SCRIPTDIR/../main.tf"
   for bp in "${BLUEPRINTS[@]}"
   do
+    # shellcheck disable=SC2154
     sed -i -e "/#vK8#/{n;s/\".*\"/\"$vK8\"/;}" \
       -e "/#vEKSBpAddonsTFMod#/{n;s/\".*\"/\"$vEKSBpAddonsTFMod\"/;}" \
       -e "/#vEKSTFMod#/{n;s/\".*\"/\"$vEKSTFMod\"/;}" "$SCRIPTDIR/$bp/main.tf"
