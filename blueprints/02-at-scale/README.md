@@ -61,13 +61,12 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
 | cbci_controller_b_hibernation_post_queue_ws_cache | team-b hibernation monitor endpoint to the build workspace cache. It expects CBCI_ADMIN_TOKEN as the environment variable. |
 | cbci_controller_c_hpa | team-c horizontal pod autoscaling. |
 | cbci_controllers_pods | Operations center pod for the CloudBees CI add-on. |
-| cbci_general_password | Operations center service initial admin password for the CloudBees CI add-on. Additionally, there are developer and guest users using the same password. |
 | cbci_helm | Helm configuration for the CloudBees CI add-on. It is accessible only via state files. |
 | cbci_liveness_probe_ext | Operations center service external liveness probe for the CloudBees CI add-on. |
 | cbci_liveness_probe_int | Operations center service internal liveness probe for the CloudBees CI add-on. |
 | cbci_namespace | Namespace for the CloudBees CI add-on. |
-| cbci_oc_export_admin_api_token | Exports the operations center admin API token to access the REST API when CSRF is enabled. It expects CBCI_ADMIN_CRUMB as the environment variable. |
-| cbci_oc_export_admin_crumb | Exports the operations center admin crumb, to access the REST API when CSRF is enabled. |
+| cbci_oc_export_admin_api_token | Exports the operations center admin_cbci_a API token to access the REST API when CSRF is enabled. It expects CBCI_ADMIN_CRUMB as the environment variable. |
+| cbci_oc_export_admin_crumb | Exports the operations center admin_cbci_a crumb, to access the REST API when CSRF is enabled. |
 | cbci_oc_ing | Operations center Ingress for the CloudBees CI add-on. |
 | cbci_oc_pod | Operations center pod for the CloudBees CI add-on. |
 | cbci_oc_take_backups | Operations center cluster operations build for the on-demand back up. It expects CBCI_ADMIN_TOKEN as the environment variable. |
@@ -78,6 +77,7 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
 | grafana_dashboard | Provides access to Grafana dashboards. |
 | kubeconfig_add | Add kubeconfig to the local configuration to access the Kubernetes API. |
 | kubeconfig_export | Export the KUBECONFIG environment variable to access the Kubernetes API. |
+| ldap_admin_password | Ldap password for admin_cbci_a user for the CloudBees CI add-on. Check .docker/ldap/data.ldif. |
 | prometheus_active_targets | Checks active Prometheus targets from the operations center. |
 | prometheus_dashboard | Provides access to Prometheus dashboards. |
 | s3_cbci_arn | CloudBees CI Amazon S3 bucket ARN. |
