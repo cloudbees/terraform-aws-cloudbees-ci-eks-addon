@@ -5,5 +5,7 @@ jcasc:
   - jcasc 
 plugins:
   - plugins
+rbac:
+  - rbac
 variables:
   - variables
