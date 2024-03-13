@@ -116,8 +116,8 @@ probes () {
       INFO "Initial Admin Password: $INITIAL_PASS."
   fi
   if [ "$root" == "02-at-scale" ]; then
-    GENERAL_PASS=$(eval "$(tf-output "$root" cbci_general_password)"); \
-    INFO "General Password all users: $GENERAL_PASS."
+    ADMIN_CBCI_A_PASS=$(eval "$(tf-output "$root" cbci_general_password)"); \
+    INFO "Password for admin_cbci_a: $ADMIN_CBCI_A_PASS."
     until [ "$(eval "$(tf-output "$root" cbci_controllers_pods)" | awk '{ print $3 }' | grep -v STATUS | grep -v -c Running)" == 0 ]; do sleep $wait && echo "Waiting for Controllers Pod to get into Ready State..."; done ;\
       eval "$(tf-output "$root" cbci_controllers_pods)" && INFO "All Controllers Pods are Ready."
     until eval "$(tf-output "$root" cbci_controller_c_hpa)"; do sleep $wait && echo "Waiting for Team C HPA to get Ready..."; done ;\
