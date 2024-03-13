@@ -44,6 +44,7 @@ jobs:
         role-external-id: cloudbees
         role-duration-seconds: "3600"
 
+    #TODO: Add tags for the bucket
     - name: Create Terraform Backend Bucket if not exists
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
       shell: bash

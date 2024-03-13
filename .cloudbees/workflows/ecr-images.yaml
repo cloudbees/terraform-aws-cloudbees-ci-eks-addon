@@ -18,7 +18,7 @@ env:
   AWS_REGION: us-east-1
 
 jobs:
-  #TODO: Verify if the repository is created before running this job. If not, create it.
+  #TODO: Verify if the repository is created before running this job. If not, create it (including tags).
   build_and_push_images:
     steps:
     - name: Checkout code
