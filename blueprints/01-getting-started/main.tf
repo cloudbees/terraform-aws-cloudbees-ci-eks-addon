@@ -189,7 +189,7 @@ module "eks" {
 
   create_cloudwatch_log_group = false
 
-  create_kms_key = true
+  create_kms_key  = true
   kms_key_aliases = ["eks/${local.name}"]
 
   tags = local.tags
