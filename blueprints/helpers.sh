@@ -31,7 +31,7 @@ bpAgent-dRun (){
   local image=$(docker image ls | grep -c "$bpAgentLocalImage")
 	if [ "$image" -eq 0 ]; then \
 		INFO "Building Docker Image local.cloudbees/bp-agent:latest" && \
-		docker build . --file "$SCRIPTDIR/../.docker/Dockerfile.rootless" --tag "$bpAgentLocalImage"; \
+		docker build . --file "$SCRIPTDIR/../.docker/agent/agent.rootless.Dockerfile" --tag "$bpAgentLocalImage"; \
 		fi
 	docker run --rm -it --name "$bpAgentUser" \
 		-v "$SCRIPTDIR/..":"/$bpAgentUser/cbci-eks-addon" -v "$HOME/.aws":"/$bpAgentUser/.aws" \
@@ -89,17 +89,13 @@ tf-apply () {
 #https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#destroy
 tf-destroy () {
   local root=$1
-  local ci_only=$2
   export TF_LOG_PATH="$SCRIPTDIR/$root/terraform.log"
-  if [ "$ci_only" == "true" ]; then #This option is used for debugging purposes
-    retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.eks_blueprints_addon_cbci -auto-approve"
-  else
-    retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.eks_blueprints_addon_cbci -auto-approve"
-    retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.eks_blueprints_addons -auto-approve"
-    retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.eks -auto-approve"
-    retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -auto-approve"
-    rm -f "$SCRIPTDIR/$root/terraform.output"
-  fi
+  retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.eks_blueprints_addon_cbci -auto-approve"
+  retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.eks_blueprints_addon_cbci -auto-approve"
+  retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.eks_blueprints_addons -auto-approve"
+  retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.eks -auto-approve"
+  retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -auto-approve"
+  rm -f "$SCRIPTDIR/$root/terraform.output"
 }
 
 probes () {
@@ -174,6 +170,7 @@ set-kube-env () {
 set-casc-branch () {
   local branch=$1
   sed -i "s/scmBranch: .*/scmBranch: $branch/g" "$SCRIPTDIR/02-at-scale/k8s/cbci-values.yml"
+  sed -i "s|defaultBundle: \".*/none-ha\"|defaultBundle: \"$branch/none-ha\"|g" "$SCRIPTDIR/02-at-scale/casc/oc/jcasc/main.yaml"
   sed -i "s|bundle: \".*/none-ha\"|bundle: \"$branch/none-ha\"|g" "$SCRIPTDIR/02-at-scale/casc/oc/items/items-root.yaml"
   sed -i "s|bundle: \".*/ha\"|bundle: \"$branch/ha\"|g" "$SCRIPTDIR/02-at-scale/casc/oc/items/items-root.yaml"
 }
