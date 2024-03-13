@@ -19,7 +19,7 @@ jobs:
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v1
         with:
-          terraform_wrapper: false
+          terraform_wrapper: true
           # Match this value with .docker/agent
           terraform_version: 1.6.6
 
@@ -32,18 +32,4 @@ jobs:
 
       - name: Validate Terraform configuration
         run: terraform validate
-      
-      - uses: actions/github-script@v6
-        if: github.event_name == 'pull_request'
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
-            #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
-            #### Terraform Validation 🤖\`${{ steps.validate.outcome }}\`
-            <details><summary>Validation Output</summary>
-      
-            \`\`\`\n
-            ${{ steps.validate.outputs.stdout }}
-            \`\`\`
 
