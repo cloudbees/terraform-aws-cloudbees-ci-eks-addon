@@ -47,7 +47,7 @@ Get started with the [CloudBees CI on modern platforms in Amazon Elastic Kuberne
 | cbci_oc_ing | Operations center Ingress for the CloudBees CI add-on. |
 | cbci_oc_pod | Operations center pod for the CloudBees CI add-on. |
 | cbci_oc_url | URL of the CloudBees CI operations center for the CloudBees CI add-on. |
-| eks_cluster_arn | EKS cluster ARN. |
+| eks_cluster_arn | Amazon EKS cluster ARN. |
 | kubeconfig_add | Add kubeconfig to your local configuration to access the Kubernetes API. |
 | kubeconfig_export | Export the KUBECONFIG environment variable to access the Kubernetes API. |
 | vpc_arn | VPC ID. |
