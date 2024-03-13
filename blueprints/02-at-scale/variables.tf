@@ -26,7 +26,7 @@ variable "suffix" {
 }
 
 variable "grafana_admin_password" {
-  description = "Grafana admin password."
+  description = "Grafana administrator password."
   default     = "change.me"
   type        = string
 }
