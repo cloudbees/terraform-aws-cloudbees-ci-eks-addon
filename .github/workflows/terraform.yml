@@ -47,4 +47,3 @@ jobs:
             ${{ steps.validate.outputs.stdout }}
             \`\`\`
 
-            </details>
