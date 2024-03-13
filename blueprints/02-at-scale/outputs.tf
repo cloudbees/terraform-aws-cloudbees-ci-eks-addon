@@ -40,8 +40,8 @@ output "cbci_liveness_probe_ext" {
   value       = module.eks_blueprints_addon_cbci.cbci_liveness_probe_ext
 }
 
-output "cbci_general_password" {
-  description = "Operations center service initial admin password for the CloudBees CI add-on. Additionally, there are developer and guest users using the same password."
+output "ldap_admin_password" {
+  description = "Ldap password for admin_cbci_a user for the CloudBees CI add-on. Check .docker/ldap/data.ldif."
   value       = "kubectl get secret cbci-secrets -n ${module.eks_blueprints_addon_cbci.cbci_namespace} -o jsonpath='{.data.secJenkinsPass}' | base64 -d"
 }
 
@@ -51,18 +51,18 @@ output "cbci_oc_url" {
 }
 
 output "cbci_oc_export_admin_crumb" {
-  description = "Exports the operations center admin crumb, to access the REST API when CSRF is enabled."
-  value       = "export CBCI_ADMIN_CRUMB=$(curl -s '${module.eks_blueprints_addon_cbci.cbci_oc_url}/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,%22:%22,//crumb)' --cookie-jar /tmp/cookies.txt --user admin:$(kubectl get secret cbci-secrets -n cbci -o jsonpath='{.data.secJenkinsPass}' | base64 -d))"
+  description = "Exports the operations center admin_cbci_a crumb, to access the REST API when CSRF is enabled."
+  value       = "export CBCI_ADMIN_CRUMB=$(curl -s '${module.eks_blueprints_addon_cbci.cbci_oc_url}/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,%22:%22,//crumb)' --cookie-jar /tmp/cookies.txt --user admin_cbci_a:$(kubectl get secret cbci-secrets -n cbci -o jsonpath='{.data.secJenkinsPass}' | base64 -d))"
 }
 
 output "cbci_oc_export_admin_api_token" {
-  description = "Exports the operations center admin API token to access the REST API when CSRF is enabled. It expects CBCI_ADMIN_CRUMB as the environment variable."
-  value       = "export CBCI_ADMIN_TOKEN=$(curl -s '${module.eks_blueprints_addon_cbci.cbci_oc_url}/user/admin/descriptorByName/jenkins.security.ApiTokenProperty/generateNewToken' --user admin:$(kubectl get secret cbci-secrets -n cbci -o jsonpath='{.data.secJenkinsPass}' | base64 -d)  --data 'newTokenName=kb-token' --cookie /tmp/cookies.txt -H $CBCI_ADMIN_CRUMB | jq -r .data.tokenValue)"
+  description = "Exports the operations center admin_cbci_a API token to access the REST API when CSRF is enabled. It expects CBCI_ADMIN_CRUMB as the environment variable."
+  value       = "export CBCI_ADMIN_TOKEN=$(curl -s '${module.eks_blueprints_addon_cbci.cbci_oc_url}/user/admin_cbci_a/descriptorByName/jenkins.security.ApiTokenProperty/generateNewToken' --user admin_cbci_a:$(kubectl get secret cbci-secrets -n cbci -o jsonpath='{.data.secJenkinsPass}' | base64 -d)  --data 'newTokenName=kb-token' --cookie /tmp/cookies.txt -H $CBCI_ADMIN_CRUMB | jq -r .data.tokenValue)"
 }
 
 output "cbci_oc_take_backups" {
   description = "Operations center cluster operations build for the on-demand back up. It expects CBCI_ADMIN_TOKEN as the environment variable."
-  value       = "curl -i -XPOST -u admin:$CBCI_ADMIN_TOKEN ${module.eks_blueprints_addon_cbci.cbci_oc_url}/job/admin/job/backup-all-controllers/build"
+  value       = "curl -i -XPOST -u admin_cbci_a:$CBCI_ADMIN_TOKEN ${module.eks_blueprints_addon_cbci.cbci_oc_url}/job/admin_cbci_a/job/backup-all-controllers/build"
 }
 
 output "cbci_controllers_pods" {
@@ -77,7 +77,7 @@ output "cbci_controller_c_hpa" {
 
 output "cbci_controller_b_hibernation_post_queue_ws_cache" {
   description = "team-b hibernation monitor endpoint to the build workspace cache. It expects CBCI_ADMIN_TOKEN as the environment variable."
-  value       = "curl -i -XPOST -u admin:$CBCI_ADMIN_TOKEN ${local.hibernation_monitor_url}/hibernation/queue/team-b/job/ws-cache/build"
+  value       = "curl -i -XPOST -u admin_cbci_a:$CBCI_ADMIN_TOKEN ${local.hibernation_monitor_url}/hibernation/queue/team-b/job/ws-cache/build"
 }
 
 output "cbci_agents_pods" {
