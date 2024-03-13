@@ -79,9 +79,9 @@ tf-output () {
 tf-apply () {
   local root=$1
   export TF_LOG_PATH="$SCRIPTDIR/$root/terraform.log"
-  retry 2 "terraform -chdir=$SCRIPTDIR/$root apply -target=module.vpc -auto-approve"
-  retry 2 "terraform -chdir=$SCRIPTDIR/$root apply -target=module.eks -auto-approve"
-  retry 2 "terraform -chdir=$SCRIPTDIR/$root apply -auto-approve"
+  retry 3 "terraform -chdir=$SCRIPTDIR/$root apply -target=module.vpc -auto-approve"
+  retry 3 "terraform -chdir=$SCRIPTDIR/$root apply -target=module.eks -auto-approve"
+  retry 3 "terraform -chdir=$SCRIPTDIR/$root apply -auto-approve"
   terraform -chdir="$SCRIPTDIR/$root" output > "$SCRIPTDIR/$root/terraform.output"
 }
 
