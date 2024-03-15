@@ -31,7 +31,7 @@ unclassified:
             logRotator:
               numToKeepStr: "3"
 cloudBeesCasCServer:
-  defaultBundle: "develop/none-ha"
+  defaultBundle: "main/none-ha"
   visibility: true
 beekeeper:
   enabled: true
