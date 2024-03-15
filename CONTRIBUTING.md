@@ -76,7 +76,7 @@ The [bp-tf-ci.yaml](.cloudbees/workflows/bp-tf-ci.yaml) blueprints are orchestra
 
 ## Release
 
-Pre-requisites:
+Prerequisites:
 
 1. Project Admins create a Pull Request from `develop` to `main`.
 
