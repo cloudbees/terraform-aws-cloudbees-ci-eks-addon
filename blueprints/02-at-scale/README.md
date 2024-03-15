@@ -90,7 +90,7 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
 
 ## Deploy
 
-In addition to the minimum required settings explained in [Get started - Deploy](../01-getting-started/README.md#deploy), when preparing to deploy, you must [customize the secrets file](#customize-secrets-file) and [update Amazon S3 bucket settings in Casc](#update-amazon-s3-bucket-settings)
+In addition to the minimum required settings explained in [Get started - Deploy](../01-getting-started/README.md#deploy), when preparing to deploy, you must [create the secrets file](#create-the-secrets-file) and [update Amazon S3 bucket settings](#update-amazon-s3-bucket-settings)
 
 > [!TIP]
 > The `deploy` phase can be orchestrated via the companion [Makefile](../../Makefile).
