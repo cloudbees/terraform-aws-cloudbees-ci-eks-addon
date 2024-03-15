@@ -39,7 +39,7 @@ To submit a pull request:
 5. Submit a pull request against the `develop` branch and answer any default questions in the pull request interface.
 
 > [!IMPORTANT]
-> Validate Casc Bundle SCM is pointing to the `develop` branch.
+> You must validate that the CasC bundle source control management (SCM) tool is pointing to the `develop` branch.
 
 6. Pay attention to any automated CI failures reported in the pull request, and stay involved in the conversation.
 
