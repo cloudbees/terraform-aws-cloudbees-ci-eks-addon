@@ -37,13 +37,26 @@ To submit a pull request:
 3. **Ensure that local tests pass**.
 4. Make commits to your fork using clear commit messages.
 5. Submit a pull request against the `develop` branch and answer any default questions in the pull request interface.
+
+> [!IMPORTANT]
+> Validate Casc Bundle SCM is pointing to the `develop` branch.
+
 6. Pay attention to any automated CI failures reported in the pull request, and stay involved in the conversation.
 
 >[!TIP]
 > GitHub provides additional documentation on [forking a repository](https://help.github.com/articles/fork-a-repo/) and
 [creating a pull request](https://help.github.com/articles/creating-a-pull-request/).
 
-## CI pipeline
+### Pre-commits: Linting, formatting and secrets scanning
+
+Many of the files in the repository can be lined or formatted to maintain a standard of quality. Additionally, secret leaks are watched via [gitleaks](https://github.com/zricethezav/gitleaks#pre-commit) and [git-secrets](https://github.com/awslabs/git-secrets).
+
+When working with the repository for the first time, you must run `pre-commit`:
+
+1. Run `pre-commit install`.
+2. Run `pre-commit run --all-files`.
+
+## Blueprint Terraform CI pipeline
 
 Validate your pull request changes inside the blueprint agent described in the [Dockerfile](.docker/agent). It is the same agent used for the CI pipeline [bp-agent-ecr.yaml](.cloudbees/workflows/bp-agent-ecr.yaml).
 
@@ -61,17 +74,17 @@ The [bp-tf-ci.yaml](.cloudbees/workflows/bp-tf-ci.yaml) blueprints are orchestra
 > [!IMPORTANT]
 > CloudBees Platform currently only supports push events. Therefore, pull requests are sent to the `dev` branch for integration.
 
-## Pre-commits: Linting, formatting and secrets scanning
-
-Many of the files in the repository can be lined or formatted to maintain a standard of quality. Additionally, secret leaks are watched via [gitleaks](https://github.com/zricethezav/gitleaks#pre-commit) and [git-secrets](https://github.com/awslabs/git-secrets).
-
-When working with the repository for the first time, you must run `pre-commit`:
-
-1. Run `pre-commit install`.
-2. Run `pre-commit run --all-files`.
-
 ## Release
 
+Pre-requisites:
+
+1. Project Admins create a Pull Request from `develop` to `main`.
+
+> [!IMPORTANT]
+> Validate Casc Bundle SCM is pointing to the `main` branch.
+
+2. Once it is merged, ensure `main` branch successfully passes the [Terraform CI build](#Blueprint Terraform_CI_pipeline).
+
 This project uses [Release Drafter](https://github.com/release-drafter/release-drafter); pull request labels should be set accordingly.
+
 Kubernetes' environment versions are managed centrally in the [blueprints/.k8.env](blueprints/.k8s.env) file.
-For a new release, the latest commits in the `main` branch should successfully pass the CI build.
