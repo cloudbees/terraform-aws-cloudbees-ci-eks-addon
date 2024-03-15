@@ -83,7 +83,7 @@ Prerequisites:
 > [!IMPORTANT]
 > Validate Casc Bundle SCM is pointing to the `main` branch.
 
-2. Once it is merged, ensure `main` branch successfully passes the [Terraform CI build](#Blueprint Terraform_CI_pipeline).
+2. Once the pull request is merged, verify that the `main` branch successfully passes the [Terraform CI build](#blueprint-terraform-ci-pipeline).
 
 This project uses [Release Drafter](https://github.com/release-drafter/release-drafter); pull request labels should be set accordingly.
 
