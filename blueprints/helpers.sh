@@ -171,7 +171,7 @@ set-kube-env () {
 
 set-casc-branch () {
   local branch=$1
-  sed -i "s/scmBranch: .*/scmBranch: $branch/g" "$SCRIPTDIR/02-at-scale/k8s/cbci-values.yml"
+  sed -i "s|scmBranch: .*|scmBranch: $branch|g" "$SCRIPTDIR/02-at-scale/k8s/cbci-values.yml"
   sed -i "s|defaultBundle: \".*/none-ha\"|defaultBundle: \"$branch/none-ha\"|g" "$SCRIPTDIR/02-at-scale/casc/oc/jcasc/main.yaml"
   sed -i "s|bundle: \".*/none-ha\"|bundle: \"$branch/none-ha\"|g" "$SCRIPTDIR/02-at-scale/casc/oc/items/items-root.yaml"
   sed -i "s|bundle: \".*/ha\"|bundle: \"$branch/ha\"|g" "$SCRIPTDIR/02-at-scale/casc/oc/items/items-root.yaml"

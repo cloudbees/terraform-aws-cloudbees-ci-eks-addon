@@ -39,7 +39,6 @@ plugins:
   - id: operations-center-notification # cap src
   - id: pipeline-event-step # cap src
   - id: pipeline-model-definition # cap src
-  - id: pipeline-stage-view # cap src
   - id: pipeline-utility-steps # 3rd src
   - id: popper-api # 3rd dep src
   - id: popper2-api # cap src

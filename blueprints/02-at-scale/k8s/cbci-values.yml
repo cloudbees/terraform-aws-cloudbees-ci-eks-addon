@@ -19,15 +19,16 @@ OperationsCenter:
     Retriever:
       Enabled: true
       scmRepo: https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon.git
-      scmBranch: develop
+      scmBranch: main
       scmBundlePath: blueprints/02-at-scale/casc/oc
       scmPollingInterval: PT20M
 Persistence:
   StorageClass: efs
 Hibernation:
   Enabled: true
-Agents:
-  SeparateNamespace:
-    Enabled: true
-    Create: true
-    Name: cbci-agents
+# BEE-47031
+# Agents:
+#   SeparateNamespace:
+#     Enabled: true
+#     Create: true
+#     Name: cbci-agents
