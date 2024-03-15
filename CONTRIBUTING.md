@@ -78,7 +78,7 @@ The [bp-tf-ci.yaml](.cloudbees/workflows/bp-tf-ci.yaml) blueprints are orchestra
 
 Prerequisites:
 
-1. Project Admins create a Pull Request from `develop` to `main`.
+1. Project administrators must create a pull request from the `develop` branch to the `main` branch.
 
 > [!IMPORTANT]
 > Validate Casc Bundle SCM is pointing to the `main` branch.
