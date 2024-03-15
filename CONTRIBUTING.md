@@ -4,7 +4,7 @@ This document provides guidelines for contributing to the CloudBees CI add-on fo
 
 ## Design principles
 
-It follows the same approach as the [Terraform AWS EKS Blueprints for Terraform Patterns](https://aws-ia.github.io/terraform-aws-eks-blueprints/)
+It follows the same approach as the [Terraform AWS EKS Blueprints for Terraform Patterns](https://aws-ia.github.io/terraform-aws-eks-blueprints/).
 
 ## Report bugs and feature requests
 
