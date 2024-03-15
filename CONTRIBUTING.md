@@ -49,7 +49,7 @@ To submit a pull request:
 
 ### Pre-commits: Linting, formatting and secrets scanning
 
-Many of the files in the repository can be lined or formatted to maintain a standard of quality. Additionally, secret leaks are watched via [gitleaks](https://github.com/zricethezav/gitleaks#pre-commit) and [git-secrets](https://github.com/awslabs/git-secrets).
+Many of the files in the repository can be linted or formatted to maintain a standard of quality. Additionally, secret leaks are watched via [gitleaks](https://github.com/zricethezav/gitleaks#pre-commit) and [git-secrets](https://github.com/awslabs/git-secrets).
 
 When working with the repository for the first time, you must run `pre-commit`:
 
