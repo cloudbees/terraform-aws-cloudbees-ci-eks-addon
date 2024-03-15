@@ -44,9 +44,6 @@ module "eks_blueprints_addon_cbci" {
 
 By default, it uses a minimum required configuration described in the Helm chart [values.yaml](values.yml) file. If you need to override any default settings with the chart, you can do so by passing the `helm_config` variable.
 
-> [!TIP]
-> The blueprints lifecycle (`deploy` > `validate` > `destroy`) can be orchestrated via the companion [Makefile](Makefile).
-
 ## Prerequisites
 
 ### Tools
@@ -54,7 +51,7 @@ By default, it uses a minimum required configuration described in the Helm chart
 The blueprint `deploy` and `destroy` phases use the same requirements provided in the [AWS EKS Blueprints for Terraform - Prerequisites](https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#prerequisites). However, the blueprint `validate` phase may require additional tooling, such as `jq` and `velero`.
 
 > [!NOTE]
-> There is a companion [Dockerfile](.docker) to run the blueprints in a containerized development environment, ensuring all dependencies are met. It can be built using the [Makefile](Makefile) target `make dRun`.
+> There is a companion [Dockerfile](.docker/agent/agent.rootless.Dockerfile) to run the blueprints in a containerized development environment, ensuring all dependencies are met. It can be built using the [Makefile](Makefile) target `make bpAgent-dRun`.
 
 ### AWS authentication
 
