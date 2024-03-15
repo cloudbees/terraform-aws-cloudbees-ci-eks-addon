@@ -81,7 +81,7 @@ Prerequisites:
 1. Project administrators must create a pull request from the `develop` branch to the `main` branch.
 
 > [!IMPORTANT]
-> Validate Casc Bundle SCM is pointing to the `main` branch.
+> You must validate that the CasC bundle SCM tool is pointing to the `main` branch.
 
 2. Once the pull request is merged, verify that the `main` branch successfully passes the [Terraform CI build](#blueprint-terraform-ci-pipeline).
 
