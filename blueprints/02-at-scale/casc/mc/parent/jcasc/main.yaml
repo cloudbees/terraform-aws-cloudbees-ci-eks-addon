@@ -92,10 +92,4 @@ kube:
                 operator: "Equal"
                 value: "build-linux-spot"
                 effect: "NoSchedule"
-jenkins:
-  log:
-    recorders:
-    - loggers:
-      - level: "ALL"
-        name: "com.cloudbees.opscenter.client.plugin.SecurityEnforcer"
-      name: "com.cloudbees.opscenter.client.plugin.SecurityEnforcer - ALL"
+
