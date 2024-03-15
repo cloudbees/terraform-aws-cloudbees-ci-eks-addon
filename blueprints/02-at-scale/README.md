@@ -90,18 +90,18 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
 
 ## Deploy
 
-In addition to the minimum required settings explained in [Get started - Deploy](../01-getting-started/README.md#deploy), when preparing to deploy, you must [customize the secrets file](#customize-secrets-file) and [update Amazon S3 bucket settings in Casc](#update-amazon-s3-bucket-settings)
+In addition to the minimum required settings explained in [Get started - Deploy](../01-getting-started/README.md#deploy), when preparing to deploy, you must [create the secrets file](#create-the-secrets-file) and [update Amazon S3 bucket settings](#update-amazon-s3-bucket-settings)
 
 > [!TIP]
 > The `deploy` phase can be orchestrated via the companion [Makefile](../../Makefile).
 
-### Secrets file
+### Create the secrets file
 
 You must create your secrets file by copying the contents of [secrets-values.yml.example](k8s/secrets-values.yml.example) to `secrets-values.yml`. This provides [Kubernetes secrets](https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/docs/features/secrets.adoc#kubernetes-secrets) that can be consumed by CasC.
 
 ### Update Amazon S3 bucket settings
 
-Since the Terraform variable `suffix` is used for this blueprint (optional), you must update the Amazon S3 bucket name for CloudBees CI controllers and the Amazon S3 bucket for the backup controller cluster operations. To update the Amazon S3 bucket name, you have the following options:
+Since the optional Terraform variable `suffix` is used for this blueprint, you must update the Amazon S3 bucket name for CloudBees CI controllers and the Amazon S3 bucket for the backup controller cluster operations. To update the Amazon S3 bucket name, you have the following options:
 
  - [Option 1: Update Amazon S3 bucket name using CasC](#option-1-update-amazon-s3-bucket-name-using-casc)
  - [Option 2: Update Amazon S3 bucket name using the CloudBees CI UI](#option-2-update-amazon-s3-bucket-name-using-the-cloudbees-ci-ui)
