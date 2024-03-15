@@ -26,8 +26,9 @@ Persistence:
   StorageClass: efs
 Hibernation:
   Enabled: true
-Agents:
-  SeparateNamespace:
-    Enabled: true
-    Create: true
-    Name: cbci-agents
+# BEE-47031
+# Agents:
+#   SeparateNamespace:
+#     Enabled: true
+#     Create: true
+#     Name: cbci-agents
