@@ -4,4 +4,4 @@
 
 openldap:
   # -- Image for OpenLDAP with mock data
-  image: "carlosrodlop/ooldap.debian:latest"
+  image: "ghcr.io/cloudbees/terraform-aws-cloudbees-ci-eks-addon/ooldap.debian:latest"
