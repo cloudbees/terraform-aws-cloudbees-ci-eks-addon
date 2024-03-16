@@ -35,7 +35,8 @@ locals {
     "cloudbees.prometheus" = "true"
   }
 
-  prometheus_sm_labels_yaml = "\"cloudbees.prometheus\" : \"true\""
+  prometheus_sm_labels_yaml = yamlencode(local.prometheus_sm_labels)
+
 }
 
 # It is required to be separted to purge correctly the cloudbees-ci release
@@ -79,7 +80,7 @@ spec:
       - ${helm_release.cloudbees_ci.namespace}
   selector:
     matchLabels:
-      "cloudbees.prometheus" : "true"
+      ${local.prometheus_sm_labels_yaml}
   endpoints:
     - port: http
       interval: 30s
