@@ -92,7 +92,7 @@ set-kube-env: agentCheck
 	@$(call helpers,INFO "Setting Kube environment finished succesfully.")
 
 .PHONY: set-casc-branch
-set-casc-branch: ## Update Casc bundle repository to the branch passed as parameter. Example: ROOT=main make set-casc-branch
+set-casc-branch: ## Update Casc bundle repository to the branch passed as parameter. Example: BRANCH=main make set-casc-branch
 set-casc-branch: agentCheck guard-BRANCH
 	@$(call helpers,set-casc-branch $(BRANCH))
 	@$(call helpers,INFO "Setting Casc Branch finished succesfully.")
