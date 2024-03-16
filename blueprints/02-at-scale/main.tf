@@ -49,6 +49,10 @@ locals {
   cloudwatch_logs_expiration_days = 7
   s3_objects_expiration_days      = 90
 
+  # BEE-47031: replace cbci-agents by  cbci
+  cbci_agents_ns = "cbci"
+  cbci_admin_user = "admin_cbci_a"
+
 }
 
 resource "time_static" "epoch" {
