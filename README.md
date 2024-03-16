@@ -107,6 +107,7 @@ The CloudBees CI add-on uses `helms release` for its resources definition, makin
 | cbci_oc_ing | Operations center Ingress for the CloudBees CI add-on. |
 | cbci_oc_pod | Operations center pod for the CloudBees CI add-on. |
 | cbci_oc_url | Operations center URL for the CloudBees CI add-on using a subdomain and certificates. |
+| cbci_secrets | Kubernetes secrets name for CloudBees CI. Optional. |
 | merged_helm_config | (merged) Helm configuration for CloudBees CI. |
 <!-- END_TF_DOCS -->
 
