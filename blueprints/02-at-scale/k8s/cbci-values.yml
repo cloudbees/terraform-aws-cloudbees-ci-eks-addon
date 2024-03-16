@@ -8,11 +8,11 @@ OperationsCenter:
     Annotations:
       alb.ingress.kubernetes.io/target-group-attributes: stickiness.enabled=true
   NodeSelector:
-    ci_type: cb-apps
+    ${cbciAppsSelector}
   Tolerations:
     - key: dedicated
       operator: Equal
-      value: cb-apps
+      value: ${cbciAppsTolerationsValue}
       effect: NoSchedule
   CasC:
     Enabled: true
@@ -31,4 +31,4 @@ Hibernation:
 #   SeparateNamespace:
 #     Enabled: true
 #     Create: true
-#     Name: ${agents-ns}
+#     Name: ${cbciAgentsNamespace}
