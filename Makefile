@@ -37,7 +37,7 @@ bpAgent-dRun: ## Build (if not locally present) and Run the Blueprint Agent usin
 deploy: ## Deploy Terraform Blueprint passed as parameter. Example: ROOT=02-at-scale make deploy
 deploy: tfChecks agentCheck
 	terraform -chdir=$(MKFILEDIR)/blueprints/$(ROOT) init
-	terraform -chdir=$(MKFILEDIR)/blueprints/$(ROOT) plan -no-color >> $(MKFILEDIR)/blueprints/$(ROOT)/tfplan.txt
+	terraform -chdir=$(MKFILEDIR)/blueprints/$(ROOT) plan -no-color > $(MKFILEDIR)/blueprints/$(ROOT)/tfplan.txt
 ifeq ($(CI),false)
 	@$(call helpers,ask-confirmation "Deploy $(ROOT). Check plan at blueprints/$(ROOT)/tfplan.txt")
 endif
