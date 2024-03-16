@@ -4,6 +4,7 @@
 #App version: https://docs.cloudbees.com/docs/release-notes/latest/cloudbees-ci/
 
 locals {
+  cbci_secrets_name = "cbci-secrets"
   secret_data   = fileexists(var.k8s_secrets_file) ? yamldecode(file(var.k8s_secrets_file)) : {}
   create_secret = alltrue([var.create_k8s_secrets, length(local.secret_data) > 0])
   oc_secrets_mount = [
@@ -15,7 +16,7 @@ locals {
         ExtraVolumes:
           - name: cbci-secrets
             secret:
-              secretName: cbci-secrets
+              secretName: ${local.cbci_secrets_name}
         ExtraVolumeMounts:
           - name: cbci-secrets
             mountPath: /var/run/secrets/cbci
@@ -30,6 +31,11 @@ locals {
     LicEmail     = var.trial_license["email"]
     LicCompany   = var.trial_license["company"]
   }
+  prometheus_sm_labels = {
+    "cloudbees.prometheus" = "true"
+  }
+
+  prometheus_sm_labels_yaml = "\"cloudbees.prometheus\" : \"true\""
 }
 
 # It is required to be separted to purge correctly the cloudbees-ci release
@@ -48,7 +54,7 @@ resource "kubernetes_secret" "oc_secrets" {
   count = local.create_secret ? 1 : 0
 
   metadata {
-    name      = "cbci-secrets"
+    name      = local.cbci_secrets_name
     namespace = kubernetes_namespace.cbci[0].metadata[0].name
   }
 
@@ -73,7 +79,7 @@ spec:
       - ${helm_release.cloudbees_ci.namespace}
   selector:
     matchLabels:
-      "cloudbees.prometheus": "true"
+      "cloudbees.prometheus" : "true"
   endpoints:
     - port: http
       interval: 30s
@@ -94,9 +100,7 @@ resource "kubernetes_labels" "oc_sm_label" {
     namespace = helm_release.cloudbees_ci.namespace
   }
 
-  labels = {
-    "cloudbees.prometheus" = "true"
-  }
+  labels = local.prometheus_sm_labels
 }
 
 resource "helm_release" "cloudbees_ci" {
