@@ -493,10 +493,9 @@ resource "null_resource" "create_kubeconfig" {
 
   depends_on = [module.eks]
 
-  # Remove comment block to force the update of the kubeconfig file
-  # triggers = {
-  #   always_run = timestamp()
-  # }
+  triggers = {
+    always_run = timestamp()
+  }
   provisioner "local-exec" {
     command = "aws eks update-kubeconfig --name ${module.eks.cluster_name} --region ${local.region} --kubeconfig ${local.kubeconfig_file_path}"
   }
