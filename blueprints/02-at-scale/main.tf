@@ -23,11 +23,23 @@ locals {
   vpc_cidr = "10.0.0.0/16"
 
   #https://docs.aws.amazon.com/eks/latest/userguide/choosing-instance-type.html
-  k8s_instance_types = {
-    "common-apps" = ["m5.8xlarge"]
-    "cb-apps"     = ["m7g.xlarge"]
-    "agents"      = ["m7g.4xlarge"]
+  mng = {
+    common_apps ={
+      instance_types = ["m5.8xlarge"]
+    }
+    cbci_apps = {
+      instance_types = ["m7g.xlarge"]
+      taint_value    = "cb-apps"
+      labels = {
+        ci_type = "cb-apps"
+      }
+    }
+    agents = {
+      instance_types = ["m7g.4xlarge"]
+    }
   }
+
+  cbci_apps_labels_yaml   = yamlencode(local.mng["cbci_apps"]["labels"])
 
   route53_zone_id  = data.aws_route53_zone.this.id
   route53_zone_arn = data.aws_route53_zone.this.arn
@@ -73,7 +85,11 @@ module "eks_blueprints_addon_cbci" {
   trial_license = var.trial_license
 
   helm_config = {
-    values = [file("k8s/cbci-values.yml")]
+    values = [templatefile("k8s/cbci-values.yml", {
+      cbciAppsSelector = local.cbci_apps_labels_yaml
+      cbciAppsTolerationsValue = local.mng["cbci_apps"]["taint_value"]
+      cbciAgentsNamespace = local.cbci_agents_ns
+    })]
   }
 
   create_k8s_secrets = true
@@ -280,7 +296,7 @@ module "eks" {
   eks_managed_node_groups = {
     mg_k8sApps = {
       node_group_name = "mg-k8s-apps"
-      instance_types  = local.k8s_instance_types["common-apps"]
+      instance_types  = local.mng["common_apps"]["instance_types"]
       capacity_type   = "ON_DEMAND"
       min_size        = 1
       max_size        = 3
@@ -288,22 +304,20 @@ module "eks" {
     }
     mg_cbApps = {
       node_group_name = "mng-cb-apps"
-      instance_types  = local.k8s_instance_types["cb-apps"]
+      instance_types  = local.mng["cbci_apps"]["instance_types"]
       capacity_type   = "ON_DEMAND"
       min_size        = 1
       max_size        = 6
       desired_size    = 1
-      taints          = [{ key = "dedicated", value = "cb-apps", effect = "NO_SCHEDULE" }]
-      labels = {
-        ci_type = "cb-apps"
-      }
+      taints          = [{ key = "dedicated", value = "${local.mng["cbci_apps"]["taint_value"]}", effect = "NO_SCHEDULE" }]
+      labels          = local.mng["cbci_apps"]["labels"]
       create_iam_role = false
       iam_role_arn    = aws_iam_role.managed_ng.arn
       ami_type        = "AL2_ARM_64" #For Graviton
     }
     mg_cbAgents = {
       node_group_name = "mng-agent"
-      instance_types  = local.k8s_instance_types["agents"]
+      instance_types  = local.mng["agents"]["instance_types"]
       capacity_type   = "ON_DEMAND"
       min_size        = 1
       max_size        = 3
@@ -316,7 +330,7 @@ module "eks" {
     }
     mg_cbAgents_spot = {
       node_group_name = "mng-agent-spot"
-      instance_types  = local.k8s_instance_types["agents"]
+      instance_types  = local.mng["agents"]["instance_types"]
       capacity_type   = "SPOT"
       min_size        = 1
       max_size        = 3
