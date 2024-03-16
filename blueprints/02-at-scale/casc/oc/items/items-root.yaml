@@ -37,7 +37,7 @@ items:
           kind: "Service"
           metadata:
             labels:
-              "cloudbees.prometheus" : "true"
+              "cloudbees.prometheus": "true"
     properties:
       - configurationAsCode:
           bundle: "develop/none-ha"
@@ -71,7 +71,7 @@ items:
           kind: "Service"
           metadata:
             labels:
-              "cloudbees.prometheus" : "true"
+              "cloudbees.prometheus": "true"
     properties:
       - configurationAsCode:
           bundle: "develop/ha"
