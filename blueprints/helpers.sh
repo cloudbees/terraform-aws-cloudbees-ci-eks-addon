@@ -2,7 +2,7 @@
 
 # Copyright (c) CloudBees, Inc.
 
-set -euox pipefail
+set -euo pipefail
 
 SCRIPTDIR="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -90,7 +90,6 @@ tf-destroy () {
   local root=$1
   export TF_LOG_PATH="$SCRIPTDIR/$root/terraform.log"
   retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.eks_blueprints_addon_cbci -auto-approve"
-  retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.eks_blueprints_addon_cbci -auto-approve"
   retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.eks_blueprints_addons -auto-approve"
   retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.eks -auto-approve"
   retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -auto-approve"
@@ -115,14 +114,22 @@ probes () {
       INFO "Initial Admin Password: $INITIAL_PASS."
   fi
   if [ "$root" == "02-at-scale" ]; then
-    ADMIN_CBCI_A_PASS=$(eval "$(tf-output "$root" cbci_general_password)"); \
-    INFO "Password for admin_cbci_a: $ADMIN_CBCI_A_PASS."
+    ADMIN_CBCI_A_PASS=$(eval "$(tf-output "$root" ldap_admin_password)") && \
+      if [ -n "$ADMIN_CBCI_A_PASS" ]; then
+        INFO "Password for admin_cbci_a: $ADMIN_CBCI_A_PASS."
+      else
+        ERROR "Problem while getting Password for admin_cbci_a."
+      fi
     until [ "$(eval "$(tf-output "$root" cbci_controllers_pods)" | awk '{ print $3 }' | grep -v STATUS | grep -v -c Running)" == 0 ]; do sleep $wait && echo "Waiting for Controllers Pod to get into Ready State..."; done ;\
       eval "$(tf-output "$root" cbci_controllers_pods)" && INFO "All Controllers Pods are Ready."
     until eval "$(tf-output "$root" cbci_controller_c_hpa)"; do sleep $wait && echo "Waiting for Team C HPA to get Ready..."; done ;\
       INFO "Team C HPA is Ready."
     eval "$(tf-output "$root" cbci_oc_export_admin_crumb)" && eval "$(tf-output "$root" cbci_oc_export_admin_api_token)" && \
-      if [ -n "$CBCI_ADMIN_TOKEN" ]; then INFO "Admin Token: $CBCI_ADMIN_TOKEN"; else ERROR "Problem while getting Admin Token"; fi
+      if [ -n "$CBCI_ADMIN_TOKEN" ]; then 
+        INFO "Admin Token: $CBCI_ADMIN_TOKEN"
+      else 
+        ERROR "Problem while getting Admin Token"
+      fi
     eval "$(tf-output "$root" cbci_controller_b_hibernation_post_queue_ws_cache)" > /tmp/ws-cache-build-trigger && \
       grep "HTTP/2 201" /tmp/ws-cache-build-trigger && \
       INFO "Hibernation Post Queue WS Cache is working."
