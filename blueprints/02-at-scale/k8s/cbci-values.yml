@@ -31,4 +31,4 @@ Hibernation:
 #   SeparateNamespace:
 #     Enabled: true
 #     Create: true
-#     Name: cbci-agents
+#     Name: ${agents-ns}
