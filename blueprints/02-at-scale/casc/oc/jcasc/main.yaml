@@ -16,7 +16,7 @@ unclassified:
               traits:
               - "gitBranchDiscovery"
               - headWildcardFilter:
-                  includes: "develop"
+                  includes: "main"
               - sparseCheckoutPaths:
                   extension:
                     sparseCheckoutPaths:
