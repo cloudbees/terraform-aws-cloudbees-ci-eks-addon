@@ -72,7 +72,7 @@ The [bp-tf-ci.yaml](.cloudbees/workflows/bp-tf-ci.yaml) blueprints are orchestra
 - AWS Route 53 zone name, to create DNS records.
 
 > [!IMPORTANT]
-> CloudBees Platform currently only supports push events. Therefore, pull requests are sent to the `dev` branch for integration.
+> CloudBees Platform currently only supports push events. Therefore, pull requests are sent to the `develop` branch for integration.
 
 ## Release
 
