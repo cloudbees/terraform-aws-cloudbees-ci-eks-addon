@@ -14,7 +14,6 @@ env:
   AWS_REGION: "us-east-1"
   BUCKET_NAME_TF_STATE: "cbci-eks-addon-bp-tf-state"
   AWS_ROLE_TO_ASSUME: "infra-admin-ci"
-  CLEAN_UP: "false"
   REPLAY_STR: "1"
   TF_AUTO_VARS_FILE: |
     tags = {
@@ -54,6 +53,8 @@ jobs:
           --region ${{ env.AWS_REGION }} || echo "Bucket ${{ env.BUCKET_NAME_TF_STATE }} already exists"
 
   bp01:
+    env:
+      CLEAN_UP: "true"
     needs:
       - init
     steps:
@@ -111,6 +112,8 @@ jobs:
           || CI=true make destroy
 
   bp02:
+    env:
+        CLEAN_UP: "false"
     needs:
       - init
     steps:
