@@ -6,7 +6,7 @@ name: ci
 
 #TODO: Replace by pull_request when it is supported
 on:
-  push:
+  pull-request:
     branches:
       - '**'
 
@@ -54,7 +54,7 @@ jobs:
 
   bp01:
     env:
-      CLEAN_UP: "true"
+      CLEAN_UP: "false"
     needs:
       - init
     steps:
