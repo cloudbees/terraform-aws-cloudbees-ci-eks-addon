@@ -266,7 +266,7 @@ The [CloudBees Prometheus Metrics plugin](https://docs.cloudbees.com/docs/cloudb
 1. Issue the following command to verify that the CloudBees CI targets are connected to Prometheus:
 
    ```sh
-   eval $(terraform output --raw prometheus_active_targets) | jq '.data.activeTargets[] | select(.labels.container=="jenkins" or .labels.job=="cjoc") | {job: .labels.job, instance: .labels.instance, status: .health}'
+   eval $(terraform output --raw prometheus_active_targets) | jq '.data.activeTargets[] | select(.labels.container=="jenkins") | {job: .labels.job, instance: .labels.instance, status: .health}'
    ```
 
 2. Issue the following command to access Kube Prometheus Stack dashboards from your web browser and verify that [Jenkins metrics](https://plugins.jenkins.io/metrics/) are available.
@@ -308,15 +308,3 @@ To tear down and remove the resources created in the blueprint, refer to [Amazon
 
 > [!TIP]
 > The `destroy` phase can be orchestrated via the companion [Makefile](../../Makefile).
-
-## Additional resources
-
-The following videos provide more insights regarding the capabilities presented in this blueprint:
-
-[![Getting Started with CloudBees CI High Availability](https://img.youtube.com/vi/Qkf9HaA2wio/0.jpg)](https://www.youtube.com/watch?v=Qkf9HaA2wio)
-
-[![Troubleshooting Pipelines With CloudBees Pipeline Explorer](https://img.youtube.com/vi/OMXm6eYd1EQ/0.jpg)](https://www.youtube.com/watch?v=OMXm6eYd1EQ)
-
-[![Getting Started with CloudBees Workspace Caching](https://img.youtube.com/vi/ESU9oN9JUCw/0.jpg)](https://www.youtube.com/watch?v=ESU9oN9JUCw)
-
-[![How to Monitor Jenkins With Grafana and Prometheus](https://img.youtube.com/vi/3H9eNIf9KZs/0.jpg)](https://www.youtube.com/watch?v=3H9eNIf9KZs)
