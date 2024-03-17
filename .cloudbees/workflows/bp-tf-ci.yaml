@@ -151,7 +151,7 @@ jobs:
         }
         EOT
         cat <<EOT >> blueprints/${{ env.ROOT }}/k8s/secrets-values.yml
-        secJenkinsPass: "P4ssw0rd"
+        secJenkinsPass: "admin_pass" # Required. Do not update!
         secGithubUser: "exampleUser"
         secGithubToken: "ExampleToken"
         EOT
