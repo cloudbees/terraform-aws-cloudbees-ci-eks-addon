@@ -8,8 +8,8 @@ Subdomain: true
 OperationsCenter:
   JavaOpts: >-
       -Duser.timezone=Etc/UTC
-      -XX:InitialRAMPercentage=65.0
-      -XX:MaxRAMPercentage=65.0
+      -XX:InitialRAMPercentage=50.0
+      -XX:MaxRAMPercentage=50.0
       -XX:+AlwaysPreTouch
       -XX:+UseStringDeduplication
       -XX:+ParallelRefProcEnabled
@@ -46,8 +46,8 @@ OperationsCenter:
 Master:
   JavaOpts: >-
     -Duser.timezone=Etc/UTC
-    -XX:InitialRAMPercentage=65.0
-    -XX:MaxRAMPercentage=65.0
+    -XX:InitialRAMPercentage=50.0
+    -XX:MaxRAMPercentage=50.0
     -XX:+HeapDumpOnOutOfMemoryError
     -XX:HeapDumpPath=/var/jenkins_home/logs
     -XX:+UnlockDiagnosticVMOptions
