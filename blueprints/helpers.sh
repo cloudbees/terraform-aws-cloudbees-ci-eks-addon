@@ -138,7 +138,7 @@ probes () {
     eval "$(tf-output "$root" velero_backup_schedule_team_a)" && eval "$(tf-output "$root" velero_backup_on_demand_team_a)" > "/tmp/backup.txt" && \
       grep "Backup completed with status: Completed" "/tmp/backup.txt" && \
       INFO "Velero backups are working"
-    until eval "$(tf-output "$root" prometheus_active_targets)" | jq '.data.activeTargets[] | select(.labels.container=="jenkins" or .labels.job=="cjoc") | {job: .labels.job, instance: .labels.instance, status: .health}'; do sleep $wait && echo "Waiting for CloudBees CI Prometheus Targets..."; done ;\
+    until eval "$(tf-output "$root" prometheus_active_targets)" | jq '.data.activeTargets[] | select(.labels.container=="jenkins") | {job: .labels.job, instance: .labels.instance, status: .health}'; do sleep $wait && echo "Waiting for CloudBees CI Prometheus Targets..."; done ;\
       INFO "CloudBees CI Targets are loaded in Prometheus."
     until eval "$(tf-output "$root" aws_logstreams_fluentbit)" | jq '.[] '; do sleep $wait && echo "Waiting for CloudBees CI Log streams in CloudWatch..."; done ;\
       INFO "CloudBees CI Log Streams are already in Cloud Watch."
@@ -154,12 +154,10 @@ test-all () {
 }
 
 clean() {
-  cd "$SCRIPTDIR/$root" && 
-    find . -name ".terraform" -type d -exec rm -rf + && \
-	  find . -name ".terraform.lock.hcl" -type f -exec xargs rm -f + && \
-	  find . -name "kubeconfig_*.yaml" -type f -exec xargs rm -f + && \
-	  find . -name "terraform.output" -type f -exec xargs rm -f + && \
-	  find . -name terraform.log -type f -exec xargs rm -f + 
+  local root=$1
+  cd "$SCRIPTDIR/$root" && \
+    rm -rf ".terraform" && \
+	  rm -f ".terraform.lock.hcl" "k8s/kubeconfig_*.yaml"  "terraform.output" "terraform.log" "tfplan.txt"
 }
 
 set-kube-env () {
