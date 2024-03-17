@@ -44,9 +44,6 @@ module "eks_blueprints_addon_cbci" {
 
 By default, it uses a minimum required configuration described in the Helm chart [values.yaml](values.yml) file. If you need to override any default settings with the chart, you can do so by passing the `helm_config` variable.
 
-> [!TIP]
-> The blueprints lifecycle (`deploy` > `validate` > `destroy`) can be orchestrated via the companion [Makefile](Makefile).
-
 ## Prerequisites
 
 ### Tools
@@ -54,7 +51,7 @@ By default, it uses a minimum required configuration described in the Helm chart
 The blueprint `deploy` and `destroy` phases use the same requirements provided in the [AWS EKS Blueprints for Terraform - Prerequisites](https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#prerequisites). However, the blueprint `validate` phase may require additional tooling, such as `jq` and `velero`.
 
 > [!NOTE]
-> There is a companion [Dockerfile](.docker) to run the blueprints in a containerized development environment, ensuring all dependencies are met. It can be built using the [Makefile](Makefile) target `make dRun`.
+> There is a companion [Dockerfile](.docker/agent/agent.rootless.Dockerfile) to run the blueprints in a containerized development environment, ensuring all dependencies are met. It can be built using the [Makefile](Makefile) target `make bpAgent-dRun`.
 
 ### AWS authentication
 
@@ -97,7 +94,7 @@ The CloudBees CI add-on uses `helms release` for its resources definition, makin
 | create_k8s_secrets | Create the Kubernetes secret cbci-secrets. It can be consumed by CasC. | `bool` | `false` | no |
 | helm_config | CloudBees CI Helm chart configuration. | `any` | <pre>{<br>  "values": [<br>    ""<br>  ]<br>}</pre> | no |
 | k8s_secrets_file | Secrets file .yml path containing the secrets names:values for cbci-secrets. | `string` | `"secrets-values.yml"` | no |
-| prometheus_target | Create resources to be uses CloudBees CI as Prometheus Target. | `bool` | `false` | no |
+| prometheus_target | Create Service Monitor to discover CloudBees CI Apps Prometheus Target dinamically. It is designed to be enabled with AWS EKS Terraform Addon Kube Prometheus Stack. | `bool` | `false` | no |
 
 ### Outputs
 
@@ -110,6 +107,7 @@ The CloudBees CI add-on uses `helms release` for its resources definition, makin
 | cbci_oc_ing | Operations center Ingress for the CloudBees CI add-on. |
 | cbci_oc_pod | Operations center pod for the CloudBees CI add-on. |
 | cbci_oc_url | Operations center URL for the CloudBees CI add-on using a subdomain and certificates. |
+| cbci_secrets | Kubernetes secrets name for CloudBees CI. Optional. |
 | merged_helm_config | (merged) Helm configuration for CloudBees CI. |
 <!-- END_TF_DOCS -->
 

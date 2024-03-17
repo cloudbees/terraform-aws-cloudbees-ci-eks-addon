@@ -48,7 +48,7 @@ variable "k8s_secrets_file" {
 }
 
 variable "prometheus_target" {
-  description = "Create resources to be uses CloudBees CI as Prometheus Target."
+  description = "Create Service Monitor to discover CloudBees CI Apps Prometheus Target dinamically. It is designed to be enabled with AWS EKS Terraform Addon Kube Prometheus Stack."
   default     = false
   type        = bool
 }

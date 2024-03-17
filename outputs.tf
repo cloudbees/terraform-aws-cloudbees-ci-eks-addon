@@ -39,3 +39,8 @@ output "cbci_liveness_probe_ext" {
   description = "Operations center service external liveness probe for the CloudBees CI add-on."
   value       = "curl -sSf https://cjoc.${var.hosted_zone}/whoAmI/api/json > /dev/null"
 }
+
+output "cbci_secrets" {
+  description = "Kubernetes secrets name for CloudBees CI. Optional."
+  value       = local.create_secret ? kubernetes_secret.oc_secrets[0].metadata[0].name : "No secrets created"
+}

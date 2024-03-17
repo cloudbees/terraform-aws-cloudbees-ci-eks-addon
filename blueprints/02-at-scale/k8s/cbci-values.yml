@@ -8,27 +8,34 @@ OperationsCenter:
     Annotations:
       alb.ingress.kubernetes.io/target-group-attributes: stickiness.enabled=true
   NodeSelector:
-    ci_type: cb-apps
+    ${cbciAppsSelector}
   Tolerations:
-    - key: dedicated
+    - key: ${cbciAppsTolerationKey}
       operator: Equal
-      value: cb-apps
+      value: ${cbciAppsTolerationValue}
       effect: NoSchedule
   CasC:
     Enabled: true
     Retriever:
       Enabled: true
       scmRepo: https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon.git
-      scmBranch: main
+      scmBranch: develop
       scmBundlePath: blueprints/02-at-scale/casc/oc
       scmPollingInterval: PT20M
 Persistence:
   StorageClass: efs
 Hibernation:
   Enabled: true
+  NodeSelector:
+    ${cbciAppsSelector}
+  Tolerations:
+    - key: ${cbciAppsTolerationKey}
+      operator: Equal
+      value: ${cbciAppsTolerationValue}
+      effect: NoSchedule
 # BEE-47031
 # Agents:
 #   SeparateNamespace:
 #     Enabled: true
 #     Create: true
-#     Name: cbci-agents
+#     Name: ${cbciAgentsNamespace}

@@ -4,7 +4,7 @@ This document provides guidelines for contributing to the CloudBees CI add-on fo
 
 ## Design principles
 
-It follows the same approach as the [Terraform AWS EKS Blueprints for Terraform Patterns](https://aws-ia.github.io/terraform-aws-eks-blueprints/)
+It follows the same approach as the [Terraform AWS EKS Blueprints for Terraform Patterns](https://aws-ia.github.io/terraform-aws-eks-blueprints/).
 
 ## Report bugs and feature requests
 
@@ -37,13 +37,26 @@ To submit a pull request:
 3. **Ensure that local tests pass**.
 4. Make commits to your fork using clear commit messages.
 5. Submit a pull request against the `develop` branch and answer any default questions in the pull request interface.
+
+> [!IMPORTANT]
+> You must validate that the CasC bundle source control management (SCM) tool is pointing to the `develop` branch.
+
 6. Pay attention to any automated CI failures reported in the pull request, and stay involved in the conversation.
 
 >[!TIP]
 > GitHub provides additional documentation on [forking a repository](https://help.github.com/articles/fork-a-repo/) and
 [creating a pull request](https://help.github.com/articles/creating-a-pull-request/).
 
-## CI pipeline
+### Pre-commits: Linting, formatting and secrets scanning
+
+Many of the files in the repository can be linted or formatted to maintain a standard of quality. Additionally, secret leaks are watched via [gitleaks](https://github.com/zricethezav/gitleaks#pre-commit) and [git-secrets](https://github.com/awslabs/git-secrets).
+
+When working with the repository for the first time, you must run `pre-commit`:
+
+1. Run `pre-commit install`.
+2. Run `pre-commit run --all-files`.
+
+## Blueprint Terraform CI pipeline
 
 Validate your pull request changes inside the blueprint agent described in the [Dockerfile](.docker/agent). It is the same agent used for the CI pipeline [bp-agent-ecr.yaml](.cloudbees/workflows/bp-agent-ecr.yaml).
 
@@ -59,19 +72,19 @@ The [bp-tf-ci.yaml](.cloudbees/workflows/bp-tf-ci.yaml) blueprints are orchestra
 - AWS Route 53 zone name, to create DNS records.
 
 > [!IMPORTANT]
-> CloudBees Platform currently only supports push events. Therefore, pull requests are sent to the `dev` branch for integration.
-
-## Pre-commits: Linting, formatting and secrets scanning
-
-Many of the files in the repository can be lined or formatted to maintain a standard of quality. Additionally, secret leaks are watched via [gitleaks](https://github.com/zricethezav/gitleaks#pre-commit) and [git-secrets](https://github.com/awslabs/git-secrets).
-
-When working with the repository for the first time, you must run `pre-commit`:
-
-1. Run `pre-commit install`.
-2. Run `pre-commit run --all-files`.
+> CloudBees Platform currently only supports push events. Therefore, pull requests are sent to the `develop` branch for integration.
 
 ## Release
 
+Prerequisites:
+
+1. Project administrators must create a pull request from the `develop` branch to the `main` branch.
+
+> [!IMPORTANT]
+> You must validate that the CasC bundle SCM tool is pointing to the `main` branch.
+
+2. Once the pull request is merged, verify that the `main` branch successfully passes the [Terraform CI build](#blueprint-terraform-ci-pipeline).
+
 This project uses [Release Drafter](https://github.com/release-drafter/release-drafter); pull request labels should be set accordingly.
+
 Kubernetes' environment versions are managed centrally in the [blueprints/.k8.env](blueprints/.k8s.env) file.
-For a new release, the latest commits in the `main` branch should successfully pass the CI build.

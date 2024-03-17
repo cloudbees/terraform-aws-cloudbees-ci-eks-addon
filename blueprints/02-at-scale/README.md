@@ -57,7 +57,7 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
 | acm_certificate_arn | AWS Certificate Manager (ACM) certificate for Amazon Resource Names (ARN). |
 | aws_backup_efs_protected_resource | AWS description for the Amazon EFS drive used to back up protected resources. |
 | aws_logstreams_fluentbit | AWS CloudWatch log streams from Fluent Bit. |
-| cbci_agents_pods | Retrieves a list of agent pods running in the cbci-agents namespace. |
+| cbci_agents_pods | Retrieves a list of agent pods running in the agents namespace. |
 | cbci_controller_b_hibernation_post_queue_ws_cache | team-b hibernation monitor endpoint to the build workspace cache. It expects CBCI_ADMIN_TOKEN as the environment variable. |
 | cbci_controller_c_hpa | team-c horizontal pod autoscaling. |
 | cbci_controllers_pods | Operations center pod for the CloudBees CI add-on. |
@@ -65,8 +65,8 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
 | cbci_liveness_probe_ext | Operations center service external liveness probe for the CloudBees CI add-on. |
 | cbci_liveness_probe_int | Operations center service internal liveness probe for the CloudBees CI add-on. |
 | cbci_namespace | Namespace for the CloudBees CI add-on. |
-| cbci_oc_export_admin_api_token | Exports the operations center admin_cbci_a API token to access the REST API when CSRF is enabled. It expects CBCI_ADMIN_CRUMB as the environment variable. |
-| cbci_oc_export_admin_crumb | Exports the operations center admin_cbci_a crumb, to access the REST API when CSRF is enabled. |
+| cbci_oc_export_admin_api_token | Exports the operations center cbci_admin_user API token to access the REST API when CSRF is enabled. It expects CBCI_ADMIN_CRUMB as the environment variable. |
+| cbci_oc_export_admin_crumb | Exports the operations center cbci_admin_user crumb, to access the REST API when CSRF is enabled. |
 | cbci_oc_ing | Operations center Ingress for the CloudBees CI add-on. |
 | cbci_oc_pod | Operations center pod for the CloudBees CI add-on. |
 | cbci_oc_take_backups | Operations center cluster operations build for the on-demand back up. It expects CBCI_ADMIN_TOKEN as the environment variable. |
@@ -77,7 +77,7 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
 | grafana_dashboard | Provides access to Grafana dashboards. |
 | kubeconfig_add | Add kubeconfig to the local configuration to access the Kubernetes API. |
 | kubeconfig_export | Export the KUBECONFIG environment variable to access the Kubernetes API. |
-| ldap_admin_password | LDAP password for admin_cbci_a user for the CloudBees CI add-on. Check .docker/ldap/data.ldif. |
+| ldap_admin_password | LDAP password for cbci_admin_user user for the CloudBees CI add-on. Check .docker/ldap/data.ldif. |
 | prometheus_active_targets | Checks active Prometheus targets from the operations center. |
 | prometheus_dashboard | Provides access to Prometheus dashboards. |
 | s3_cbci_arn | CloudBees CI Amazon S3 bucket ARN. |
@@ -90,18 +90,18 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
 
 ## Deploy
 
-When preparing to deploy, you must [customize the secrets file](#customize-secrets-file) and [update Amazon S3 bucket settings](#update-amazon-s3-bucket-settings).
+In addition to the minimum required settings explained in [Get started - Deploy](../01-getting-started/README.md#deploy), when preparing to deploy, you must [create the secrets file](#create-the-secrets-file) and [update Amazon S3 bucket settings](#update-amazon-s3-bucket-settings)
 
 > [!TIP]
-> To understand the minimum required settings, refer to [Get started - Deploy](../01-getting-started/README.md#deploy).
+> The `deploy` phase can be orchestrated via the companion [Makefile](../../Makefile).
 
-### Secrets file
+### Create the secrets file
 
 You must create your secrets file by copying the contents of [secrets-values.yml.example](k8s/secrets-values.yml.example) to `secrets-values.yml`. This provides [Kubernetes secrets](https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/docs/features/secrets.adoc#kubernetes-secrets) that can be consumed by CasC.
 
 ### Update Amazon S3 bucket settings
 
-Since the Terraform variable `suffix` is used for this blueprint, you must update the Amazon S3 bucket name for CloudBees CI controllers and the Amazon S3 bucket for the backup controller cluster operations. To update the Amazon S3 bucket name, you have the following options:
+Since the optional Terraform variable `suffix` is used for this blueprint, you must update the Amazon S3 bucket name for CloudBees CI controllers and the Amazon S3 bucket for the backup controller cluster operations. To update the Amazon S3 bucket name, you have the following options:
 
  - [Option 1: Update Amazon S3 bucket name using CasC](#option-1-update-amazon-s3-bucket-name-using-casc)
  - [Option 2: Update Amazon S3 bucket name using the CloudBees CI UI](#option-2-update-amazon-s3-bucket-name-using-the-cloudbees-ci-ui)
@@ -266,7 +266,7 @@ The [CloudBees Prometheus Metrics plugin](https://docs.cloudbees.com/docs/cloudb
 1. Issue the following command to verify that the CloudBees CI targets are connected to Prometheus:
 
    ```sh
-   eval $(terraform output --raw prometheus_active_targets) | jq '.data.activeTargets[] | select(.labels.container=="jenkins" or .labels.job=="cjoc") | {job: .labels.job, instance: .labels.instance, status: .health}'
+   eval $(terraform output --raw prometheus_active_targets) | jq '.data.activeTargets[] | select(.labels.container=="jenkins") | {job: .labels.job, instance: .labels.instance, status: .health}'
    ```
 
 2. Issue the following command to access Kube Prometheus Stack dashboards from your web browser and verify that [Jenkins metrics](https://plugins.jenkins.io/metrics/) are available.
@@ -306,14 +306,5 @@ For CloudBees CI build logs:
 
 To tear down and remove the resources created in the blueprint, refer to [Amazon EKS Blueprints for Terraform - Destroy](https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#destroy).
 
-## Additional resources
-
-The following videos provide more insights regarding the capabilities presented in this blueprint:
-
-[![Getting Started with CloudBees CI High Availability](https://img.youtube.com/vi/Qkf9HaA2wio/0.jpg)](https://www.youtube.com/watch?v=Qkf9HaA2wio)
-
-[![Troubleshooting Pipelines With CloudBees Pipeline Explorer](https://img.youtube.com/vi/OMXm6eYd1EQ/0.jpg)](https://www.youtube.com/watch?v=OMXm6eYd1EQ)
-
-[![Getting Started with CloudBees Workspace Caching](https://img.youtube.com/vi/ESU9oN9JUCw/0.jpg)](https://www.youtube.com/watch?v=ESU9oN9JUCw)
-
-[![How to Monitor Jenkins With Grafana and Prometheus](https://img.youtube.com/vi/3H9eNIf9KZs/0.jpg)](https://www.youtube.com/watch?v=3H9eNIf9KZs)
+> [!TIP]
+> The `destroy` phase can be orchestrated via the companion [Makefile](../../Makefile).

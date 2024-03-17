@@ -8,7 +8,7 @@ unclassified:
       name: "casc-mm-store"
       retriever:
         SCM:
-          defaultVersion: "main"
+          defaultVersion: ${casc_branch}
           scmSource:
             git:
               credentialsId: "GH-token"
@@ -16,7 +16,7 @@ unclassified:
               traits:
               - "gitBranchDiscovery"
               - headWildcardFilter:
-                  includes: "develop"
+                  includes: ${casc_branch}
               - sparseCheckoutPaths:
                   extension:
                     sparseCheckoutPaths:

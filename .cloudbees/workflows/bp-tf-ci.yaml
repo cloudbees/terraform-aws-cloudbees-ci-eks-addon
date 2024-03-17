@@ -15,7 +15,7 @@ env:
   BUCKET_NAME_TF_STATE: "cbci-eks-addon-bp-tf-state"
   AWS_ROLE_TO_ASSUME: "infra-admin-ci"
   CLEAN_UP: "true"
-  REPLAY_STR: "0"
+  REPLAY_STR: "1"
   TF_AUTO_VARS_FILE: |
     tags = {
       "cb-owner" : "professional-services"
@@ -25,7 +25,7 @@ env:
     trial_license = {
       first_name  = "CloudBees.io"
       last_name  = "Platform"
-      email = "platform.ci@cloudbees.com"
+      email = "ci.user@cloudbees.io"
       company = "CloudBees Inc."
     }
     suffix = "ci-v3"

@@ -37,10 +37,10 @@ items:
           kind: "Service"
           metadata:
             labels:
-              "cloudbees.prometheus" : "true"
+              "cloudbees.prometheus": "true"
     properties:
       - configurationAsCode:
-          bundle: "main/none-ha"
+          bundle: "develop/none-ha"
   # Casc, HA
   - kind: managedController
     name: team-c-ha
@@ -71,7 +71,7 @@ items:
           kind: "Service"
           metadata:
             labels:
-              "cloudbees.prometheus" : "true"
+              "cloudbees.prometheus": "true"
     properties:
       - configurationAsCode:
-          bundle: "main/ha"
+          bundle: "develop/ha"

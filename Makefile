@@ -37,7 +37,7 @@ bpAgent-dRun: ## Build (if not locally present) and Run the Blueprint Agent usin
 deploy: ## Deploy Terraform Blueprint passed as parameter. Example: ROOT=02-at-scale make deploy
 deploy: tfChecks agentCheck
 	terraform -chdir=$(MKFILEDIR)/blueprints/$(ROOT) init
-	terraform -chdir=$(MKFILEDIR)/blueprints/$(ROOT) plan -no-color >> $(MKFILEDIR)/blueprints/$(ROOT)/tfplan.txt
+	terraform -chdir=$(MKFILEDIR)/blueprints/$(ROOT) plan -no-color > $(MKFILEDIR)/blueprints/$(ROOT)/tfplan.txt
 ifeq ($(CI),false)
 	@$(call helpers,ask-confirmation "Deploy $(ROOT). Check plan at blueprints/$(ROOT)/tfplan.txt")
 endif
@@ -92,7 +92,7 @@ set-kube-env: agentCheck
 	@$(call helpers,INFO "Setting Kube environment finished succesfully.")
 
 .PHONY: set-casc-branch
-set-casc-branch: ## Update Casc bundle repository to the branch passed as parameter. Example: ROOT=main make set-casc-branch
+set-casc-branch: ## Update Casc bundle repository to the branch passed as parameter. Example: BRANCH=main make set-casc-branch
 set-casc-branch: agentCheck guard-BRANCH
 	@$(call helpers,set-casc-branch $(BRANCH))
 	@$(call helpers,INFO "Setting Casc Branch finished succesfully.")

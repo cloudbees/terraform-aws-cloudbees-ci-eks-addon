@@ -2,7 +2,7 @@
 
 # Copyright (c) CloudBees, Inc.
 
-set -euox pipefail
+set -euo pipefail
 
 SCRIPTDIR="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -90,7 +90,6 @@ tf-destroy () {
   local root=$1
   export TF_LOG_PATH="$SCRIPTDIR/$root/terraform.log"
   retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.eks_blueprints_addon_cbci -auto-approve"
-  retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.eks_blueprints_addon_cbci -auto-approve"
   retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.eks_blueprints_addons -auto-approve"
   retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.eks -auto-approve"
   retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -auto-approve"
@@ -115,14 +114,22 @@ probes () {
       INFO "Initial Admin Password: $INITIAL_PASS."
   fi
   if [ "$root" == "02-at-scale" ]; then
-    ADMIN_CBCI_A_PASS=$(eval "$(tf-output "$root" cbci_general_password)"); \
-    INFO "Password for admin_cbci_a: $ADMIN_CBCI_A_PASS."
+    ADMIN_CBCI_A_PASS=$(eval "$(tf-output "$root" ldap_admin_password)") && \
+      if [ -n "$ADMIN_CBCI_A_PASS" ]; then
+        INFO "Password for admin_cbci_a: $ADMIN_CBCI_A_PASS."
+      else
+        ERROR "Problem while getting Password for admin_cbci_a."
+      fi
     until [ "$(eval "$(tf-output "$root" cbci_controllers_pods)" | awk '{ print $3 }' | grep -v STATUS | grep -v -c Running)" == 0 ]; do sleep $wait && echo "Waiting for Controllers Pod to get into Ready State..."; done ;\
       eval "$(tf-output "$root" cbci_controllers_pods)" && INFO "All Controllers Pods are Ready."
     until eval "$(tf-output "$root" cbci_controller_c_hpa)"; do sleep $wait && echo "Waiting for Team C HPA to get Ready..."; done ;\
       INFO "Team C HPA is Ready."
     eval "$(tf-output "$root" cbci_oc_export_admin_crumb)" && eval "$(tf-output "$root" cbci_oc_export_admin_api_token)" && \
-      if [ -n "$CBCI_ADMIN_TOKEN" ]; then INFO "Admin Token: $CBCI_ADMIN_TOKEN"; else ERROR "Problem while getting Admin Token"; fi
+      if [ -n "$CBCI_ADMIN_TOKEN" ]; then 
+        INFO "Admin Token: $CBCI_ADMIN_TOKEN"
+      else 
+        ERROR "Problem while getting Admin Token"
+      fi
     eval "$(tf-output "$root" cbci_controller_b_hibernation_post_queue_ws_cache)" > /tmp/ws-cache-build-trigger && \
       grep "HTTP/2 201" /tmp/ws-cache-build-trigger && \
       INFO "Hibernation Post Queue WS Cache is working."
@@ -131,7 +138,7 @@ probes () {
     eval "$(tf-output "$root" velero_backup_schedule_team_a)" && eval "$(tf-output "$root" velero_backup_on_demand_team_a)" > "/tmp/backup.txt" && \
       grep "Backup completed with status: Completed" "/tmp/backup.txt" && \
       INFO "Velero backups are working"
-    until eval "$(tf-output "$root" prometheus_active_targets)" | jq '.data.activeTargets[] | select(.labels.container=="jenkins" or .labels.job=="cjoc") | {job: .labels.job, instance: .labels.instance, status: .health}'; do sleep $wait && echo "Waiting for CloudBees CI Prometheus Targets..."; done ;\
+    until eval "$(tf-output "$root" prometheus_active_targets)" | jq '.data.activeTargets[] | select(.labels.container=="jenkins") | {job: .labels.job, instance: .labels.instance, status: .health}'; do sleep $wait && echo "Waiting for CloudBees CI Prometheus Targets..."; done ;\
       INFO "CloudBees CI Targets are loaded in Prometheus."
     until eval "$(tf-output "$root" aws_logstreams_fluentbit)" | jq '.[] '; do sleep $wait && echo "Waiting for CloudBees CI Log streams in CloudWatch..."; done ;\
       INFO "CloudBees CI Log Streams are already in Cloud Watch."
@@ -147,12 +154,10 @@ test-all () {
 }
 
 clean() {
-  cd "$SCRIPTDIR/$root" && 
-    find . -name ".terraform" -type d -exec rm -rf + && \
-	  find . -name ".terraform.lock.hcl" -type f -exec xargs rm -f + && \
-	  find . -name "kubeconfig_*.yaml" -type f -exec xargs rm -f + && \
-	  find . -name "terraform.output" -type f -exec xargs rm -f + && \
-	  find . -name terraform.log -type f -exec xargs rm -f + 
+  local root=$1
+  cd "$SCRIPTDIR/$root" && \
+    rm -rf ".terraform" && \
+	  rm -f ".terraform.lock.hcl" "k8s/kubeconfig_*.yaml"  "terraform.output" "terraform.log" "tfplan.txt"
 }
 
 set-kube-env () {
@@ -172,7 +177,7 @@ set-kube-env () {
 set-casc-branch () {
   local branch=$1
   sed -i "s|scmBranch: .*|scmBranch: $branch|g" "$SCRIPTDIR/02-at-scale/k8s/cbci-values.yml"
-  sed -i "s|defaultBundle: \".*/none-ha\"|defaultBundle: \"$branch/none-ha\"|g" "$SCRIPTDIR/02-at-scale/casc/oc/jcasc/main.yaml"
+  sed -i "s|casc_branch: .*|casc_branch: $branch|g" "$SCRIPTDIR/02-at-scale/casc/oc/variables/variables.yaml"
   sed -i "s|bundle: \".*/none-ha\"|bundle: \"$branch/none-ha\"|g" "$SCRIPTDIR/02-at-scale/casc/oc/items/items-root.yaml"
   sed -i "s|bundle: \".*/ha\"|bundle: \"$branch/ha\"|g" "$SCRIPTDIR/02-at-scale/casc/oc/items/items-root.yaml"
 }
