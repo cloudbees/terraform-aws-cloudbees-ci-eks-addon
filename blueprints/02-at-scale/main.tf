@@ -29,7 +29,11 @@ locals {
     }
     cbci_apps = {
       instance_types = ["m7g.xlarge"]
-      taint_value    = "cb-apps"
+      taints   = {
+        key    = "dedicated"
+        value  = "cb-apps"
+        effect = "NO_SCHEDULE"
+      }
       labels = {
         ci_type = "cb-apps"
       }
@@ -39,7 +43,7 @@ locals {
     }
   }
 
-  cbci_apps_labels_yaml   = yamlencode(local.mng["cbci_apps"]["labels"])
+  cbci_apps_labels_yaml   = replace(yamlencode(local.mng["cbci_apps"]["labels"]), "/\"/", "")
 
   route53_zone_id  = data.aws_route53_zone.this.id
   route53_zone_arn = data.aws_route53_zone.this.arn
@@ -87,7 +91,8 @@ module "eks_blueprints_addon_cbci" {
   helm_config = {
     values = [templatefile("k8s/cbci-values.yml", {
       cbciAppsSelector = local.cbci_apps_labels_yaml
-      cbciAppsTolerationsValue = local.mng["cbci_apps"]["taint_value"]
+      cbciAppsTolerationKey = local.mng["cbci_apps"]["taints"].key
+      cbciAppsTolerationValue = local.mng["cbci_apps"]["taints"].value
       cbciAgentsNamespace = local.cbci_agents_ns
     })]
   }
@@ -309,7 +314,7 @@ module "eks" {
       min_size        = 1
       max_size        = 6
       desired_size    = 1
-      taints          = [{ key = "dedicated", value = "${local.mng["cbci_apps"]["taint_value"]}", effect = "NO_SCHEDULE" }]
+      taints          = [local.mng["cbci_apps"]["taints"]]
       labels          = local.mng["cbci_apps"]["labels"]
       create_iam_role = false
       iam_role_arn    = aws_iam_role.managed_ng.arn

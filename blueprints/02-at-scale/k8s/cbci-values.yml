@@ -10,9 +10,9 @@ OperationsCenter:
   NodeSelector:
     ${cbciAppsSelector}
   Tolerations:
-    - key: dedicated
+    - key: ${cbciAppsTolerationKey}
       operator: Equal
-      value: ${cbciAppsTolerationsValue}
+      value: ${cbciAppsTolerationValue}
       effect: NoSchedule
   CasC:
     Enabled: true
@@ -26,6 +26,13 @@ Persistence:
   StorageClass: efs
 Hibernation:
   Enabled: true
+  NodeSelector:
+    ${cbciAppsSelector}
+  Tolerations:
+    - key: ${cbciAppsTolerationKey}
+      operator: Equal
+      value: ${cbciAppsTolerationValue}
+      effect: NoSchedule
 # BEE-47031
 # Agents:
 #   SeparateNamespace:
