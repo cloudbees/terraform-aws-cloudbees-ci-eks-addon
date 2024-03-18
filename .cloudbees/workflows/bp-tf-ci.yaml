@@ -4,7 +4,7 @@ apiVersion: automation.cloudbees.io/v1alpha1
 kind: workflow
 name: ci
 
-#TODO: Replace by pull_request when it is supported
+#TODO: Replace by pull-request when it is supported
 on:
   push:
     branches:
@@ -14,8 +14,7 @@ env:
   AWS_REGION: "us-east-1"
   BUCKET_NAME_TF_STATE: "cbci-eks-addon-bp-tf-state"
   AWS_ROLE_TO_ASSUME: "infra-admin-ci"
-  CLEAN_UP: "true"
-  REPLAY_STR: "1"
+  REPLAY_STR: "0"
   TF_AUTO_VARS_FILE: |
     tags = {
       "cb-owner" : "professional-services"
@@ -54,6 +53,8 @@ jobs:
           --region ${{ env.AWS_REGION }} || echo "Bucket ${{ env.BUCKET_NAME_TF_STATE }} already exists"
 
   bp01:
+    env:
+      CLEAN_UP: "false"
     needs:
       - init
     steps:
@@ -111,6 +112,8 @@ jobs:
           || CI=true make destroy
 
   bp02:
+    env:
+        CLEAN_UP: "false"
     needs:
       - init
     steps:
@@ -148,7 +151,7 @@ jobs:
         }
         EOT
         cat <<EOT >> blueprints/${{ env.ROOT }}/k8s/secrets-values.yml
-        secJenkinsPass: "P4ssw0rd"
+        secJenkinsPass: "admin_pass" # Required. Do not update!
         secGithubUser: "exampleUser"
         secGithubToken: "ExampleToken"
         EOT

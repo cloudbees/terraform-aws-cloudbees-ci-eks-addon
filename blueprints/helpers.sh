@@ -2,7 +2,7 @@
 
 # Copyright (c) CloudBees, Inc.
 
-set -euo pipefail
+set -euox pipefail
 
 SCRIPTDIR="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -23,7 +23,6 @@ ERROR () {
   printf "\033[0;31m[ERROR] %s\033[0m\n" "$1"
   exit 1
 }
-
 
 bpAgent-dRun (){
   local bpAgentUser="bp-agent"
@@ -133,8 +132,8 @@ probes () {
     eval "$(tf-output "$root" cbci_controller_b_hibernation_post_queue_ws_cache)" > /tmp/ws-cache-build-trigger && \
       grep "HTTP/2 201" /tmp/ws-cache-build-trigger && \
       INFO "Hibernation Post Queue WS Cache is working."
-    until [ "$(eval "$(tf-output "$root" cbci_agents_pods)" | awk '{ print $3 }' | grep -v STATUS | grep -c Running)" == 1 ]; do echo "Waiting for Agents Pod to get into Ready State..."; done ;\
-      eval "$(tf-output "$root" cbci_agents_pods)" && INFO "Agent Pods are Ready."
+    until [ "$(eval "$(tf-output "$root" cbci_agents_events_stopping)" | wc -l)" -ge 3 ]; do sleep $wait && echo "Waiting for Agent Pod to complete to run a job"; done ;\
+      eval "$(tf-output "$root" cbci_agents_events_stopping)" && INFO "Agent Pods are Ready."
     eval "$(tf-output "$root" velero_backup_schedule_team_a)" && eval "$(tf-output "$root" velero_backup_on_demand_team_a)" > "/tmp/backup.txt" && \
       grep "Backup completed with status: Completed" "/tmp/backup.txt" && \
       INFO "Velero backups are working"
@@ -169,8 +168,7 @@ set-kube-env () {
   do
     # shellcheck disable=SC2154
     sed -i -e "/#vK8#/{n;s/\".*\"/\"$vK8\"/;}" \
-      -e "/#vEKSBpAddonsTFMod#/{n;s/\".*\"/\"$vEKSBpAddonsTFMod\"/;}" \
-      -e "/#vEKSTFMod#/{n;s/\".*\"/\"$vEKSTFMod\"/;}" "$SCRIPTDIR/$bp/main.tf"
+      -e "/#vEKSBpAddonsTFMod#/{n;s/\".*\"/\"$vEKSBpAddonsTFMod\"/;}"
   done
 }
 
