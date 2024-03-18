@@ -33,10 +33,11 @@ Contributions via pull requests are appreciated. Before submitting a pull reques
 To submit a pull request:
 
 1. Fork the repository.
-2. Modify the source and focus on the specific change you are contributing. If you reformat all the code, it is hard for reviewers to focus on your specific change.
-3. **Ensure that local tests pass**.
-4. Make commits to your fork using clear commit messages.
-5. Submit a pull request against the `develop` branch and answer any default questions in the pull request interface.
+2. Create feature branch extending from the `main` branch.
+3. Modify the source and focus on the specific change you are contributing. If you reformat all the code, it is hard for reviewers to focus on your specific change.
+4. **Ensure that local tests pass**.
+5. Make commits to your fork using clear commit messages.
+6. Submit a pull request against the `develop` branch and answer any default questions in the pull request interface.
 
 > [!IMPORTANT]
 > You must validate that the CasC bundle source control management (SCM) tool is pointing to the `develop` branch.
