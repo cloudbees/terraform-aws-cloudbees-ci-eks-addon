@@ -169,8 +169,7 @@ set-kube-env () {
   do
     # shellcheck disable=SC2154
     sed -i -e "/#vK8#/{n;s/\".*\"/\"$vK8\"/;}" \
-      -e "/#vEKSBpAddonsTFMod#/{n;s/\".*\"/\"$vEKSBpAddonsTFMod\"/;}" \
-      -e "/#vEKSTFMod#/{n;s/\".*\"/\"$vEKSTFMod\"/;}" "$SCRIPTDIR/$bp/main.tf"
+      -e "/#vEKSBpAddonsTFMod#/{n;s/\".*\"/\"$vEKSBpAddonsTFMod\"/;}"
   done
 }
 
