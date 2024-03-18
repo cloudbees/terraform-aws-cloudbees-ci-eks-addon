@@ -57,6 +57,7 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
 | acm_certificate_arn | AWS Certificate Manager (ACM) certificate for Amazon Resource Names (ARN). |
 | aws_backup_efs_protected_resource | AWS description for the Amazon EFS drive used to back up protected resources. |
 | aws_logstreams_fluentbit | AWS CloudWatch log streams from Fluent Bit. |
+| cbci_agents_events_stopping | Retrieves a list of agent pods running in the agents namespace. |
 | cbci_agents_pods | Retrieves a list of agent pods running in the agents namespace. |
 | cbci_controller_b_hibernation_post_queue_ws_cache | team-b hibernation monitor endpoint to the build workspace cache. It expects CBCI_ADMIN_TOKEN as the environment variable. |
 | cbci_controller_c_hpa | team-c horizontal pod autoscaling. |
