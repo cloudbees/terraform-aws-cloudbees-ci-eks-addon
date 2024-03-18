@@ -69,6 +69,8 @@ locals {
   cbci_agents_ns = "cbci"
   cbci_admin_user = "admin_cbci_a"
 
+  cbci_agent_podtemplname_validation ="maven-and-go-ondemand"
+
 }
 
 resource "time_static" "epoch" {

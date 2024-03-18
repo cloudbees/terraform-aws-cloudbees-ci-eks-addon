@@ -85,6 +85,11 @@ output "cbci_agents_pods" {
   value       = "kubectl get pods -n ${local.cbci_agents_ns} -l jenkins=slave"
 }
 
+output "cbci_agents_events_stopping" {
+  description = "Retrieves a list of agent pods running in the agents namespace."
+  value       = "kubectl get events -n ${local.cbci_agents_ns} | grep -e 'pod/${local.cbci_agent_podtemplname_validation}' | grep 'Normal' | grep 'Stopping container'"
+}
+
 output "acm_certificate_arn" {
   description = "AWS Certificate Manager (ACM) certificate for Amazon Resource Names (ARN)."
   value       = module.acm.acm_certificate_arn
