@@ -24,7 +24,6 @@ ERROR () {
   exit 1
 }
 
-
 bpAgent-dRun (){
   local bpAgentUser="bp-agent"
   local bpAgentLocalImage="local.cloudbees/bp-agent"
@@ -133,7 +132,9 @@ probes () {
     eval "$(tf-output "$root" cbci_controller_b_hibernation_post_queue_ws_cache)" > /tmp/ws-cache-build-trigger && \
       grep "HTTP/2 201" /tmp/ws-cache-build-trigger && \
       INFO "Hibernation Post Queue WS Cache is working."
-    until [ "$(eval "$(tf-output "$root" cbci_agents_events_stopping)" | wc -l)" -ge 3 ]; do echo "Waiting for Agent Pod to complete to run a job"; done ;\
+    # until [ "$(eval "$(tf-output "$root" cbci_agents_events_stopping)" | wc -l)" -ge 3 ]; do sleep $wait && echo "Waiting for Agent Pod to complete to run a job"; done ;\
+    #   eval "$(tf-output "$root" cbci_agents_events_stopping)" && INFO "Agent Pods are Ready."
+    until [ "$(eval "$(tf-output "$root" cbci_agents_events_stopping)" | wc -l)" -ge 3 ]; do sleep $wait && eval "$(kubectl get events -n cbci --sort-by='.lastTimestamp' | grep maven-and-go-ondemand)"; done ;\
       eval "$(tf-output "$root" cbci_agents_events_stopping)" && INFO "Agent Pods are Ready."
     eval "$(tf-output "$root" velero_backup_schedule_team_a)" && eval "$(tf-output "$root" velero_backup_on_demand_team_a)" > "/tmp/backup.txt" && \
       grep "Backup completed with status: Completed" "/tmp/backup.txt" && \
