@@ -28,11 +28,12 @@ Implementation examples are included in the [blueprints](blueprints) folder, how
 
 ```terraform
 module "eks_blueprints_addon_cbci" {
-  source = "REPLACE_ME"
-
-  hostname     = "example.domain.com"
+  source  = "cloudbees/cloudbees-ci-eks-addon/aws"
+  version = "~> 3.16720.0"
+  
+  hosted_zone    = "example.domain.com"
   cert_arn     = "arn:aws:acm:us-east-1:0000000:certificate/0000000-aaaa-bbb-ccc-thisIsAnExample"
-  temp_license = {
+  trial_license = {
     first_name  = "Foo"
     last_name  = "Bar"
     email = "foo.bar@acme.com"
