@@ -189,6 +189,7 @@ casc-docker-run () {
 casc-script-exec () {
   # shellcheck source=/dev/null
   source "$SCRIPTDIR/.k8s.env"
+  # shellcheck disable=SC2154
   local version="$vCBCI_App"
   local type="$1"
   local plugins_source="$2"
