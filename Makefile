@@ -60,7 +60,7 @@ endif
 destroy: ## Destroy Terraform Blueprint passed as parameter. Example: ROOT=02-at-scale make destroy
 destroy: tfChecks agentCheck
 ifeq ($(CI),false)
-	@$(call helpers,ask-confirmation "Destroy $(ROOT) in mode CBCI_ONLY=$(CBCI_ONLY)")
+	@$(call helpers,ask-confirmation "Destroy $(ROOT)")
 endif
 	@$(call helpers,tf-destroy $(ROOT) $(CBCI_ONLY))
 	@$(call helpers,INFO "CloudBees CI Blueprint $(ROOT) Destroy target finished succesfully.")
