@@ -65,8 +65,7 @@ locals {
   cloudwatch_logs_expiration_days = 7
   s3_objects_expiration_days      = 90
 
-  # BEE-47031: replace cbci-agents by  cbci
-  cbci_agents_ns = "cbci"
+  cbci_agents_ns = "cbci-agents"
   cbci_admin_user = "admin_cbci_a"
 
   cbci_agent_podtemplname_validation ="maven-and-go-ondemand"
@@ -240,10 +239,8 @@ module "eks" {
 
   cluster_name                   = local.cluster_name
   cluster_endpoint_public_access = true
-  #https://kubernetes.io/releases/
-  #https://docs.cloudbees.com/docs/cloudbees-common/latest/supported-platforms/cloudbees-ci-cloud#_kubernetes
   #vK8#
-  cluster_version = "1.27"
+  cluster_version = "1.28"
 
   vpc_id     = module.vpc.vpc_id
   subnet_ids = module.vpc.private_subnets
