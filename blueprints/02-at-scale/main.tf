@@ -28,7 +28,7 @@ locals {
       instance_types = ["m5.8xlarge"]
     }
     cbci_apps = {
-      instance_types = ["m7g.xlarge"]
+      instance_types = ["m7g.2xlarge"]
       taints   = {
         key    = "dedicated"
         value  = "cb-apps"
@@ -247,6 +247,7 @@ module "eks" {
 
   eks_managed_node_group_defaults = {
     disk_size = 50
+    ami_type  = "AL2_ARM_64" #For Graviton
   }
 
   # Security groups based on the best practices doc https://docs.aws.amazon.com/eks/latest/userguide/sec-group-reqs.html.
@@ -304,6 +305,7 @@ module "eks" {
       min_size        = 1
       max_size        = 3
       desired_size    = 1
+      ami_type        = "AL2_x86_64"
     }
     mg_cbApps = {
       node_group_name = "mng-cb-apps"
@@ -316,7 +318,6 @@ module "eks" {
       labels          = local.mng["cbci_apps"]["labels"]
       create_iam_role = false
       iam_role_arn    = aws_iam_role.managed_ng.arn
-      ami_type        = "AL2_ARM_64" #For Graviton
     }
     mg_cbAgents = {
       node_group_name = "mng-agent"
@@ -329,7 +330,6 @@ module "eks" {
       labels = {
         ci_type = "build-linux"
       }
-      ami_type = "AL2_ARM_64" #For Graviton
     }
     mg_cbAgents_spot = {
       node_group_name = "mng-agent-spot"
@@ -342,7 +342,6 @@ module "eks" {
       labels = {
         ci_type = "build-linux-spot"
       }
-      ami_type = "AL2_ARM_64" #For Graviton
     }
   }
 
