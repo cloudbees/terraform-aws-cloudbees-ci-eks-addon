@@ -28,7 +28,7 @@ locals {
       instance_types = ["m5.8xlarge"]
     }
     cbci_apps = {
-      instance_types = ["m7g.xlarge"]
+      instance_types = ["m7g.2xlarge"]
       taints   = {
         key    = "dedicated"
         value  = "cb-apps"
@@ -65,8 +65,7 @@ locals {
   cloudwatch_logs_expiration_days = 7
   s3_objects_expiration_days      = 90
 
-  # BEE-47031: replace cbci-agents by  cbci
-  cbci_agents_ns = "cbci"
+  cbci_agents_ns = "cbci-agents"
   cbci_admin_user = "admin_cbci_a"
 
   cbci_agent_podtemplname_validation ="maven-and-go-ondemand"
@@ -240,16 +239,15 @@ module "eks" {
 
   cluster_name                   = local.cluster_name
   cluster_endpoint_public_access = true
-  #https://kubernetes.io/releases/
-  #https://docs.cloudbees.com/docs/cloudbees-common/latest/supported-platforms/cloudbees-ci-cloud#_kubernetes
   #vK8#
-  cluster_version = "1.27"
+  cluster_version = "1.28"
 
   vpc_id     = module.vpc.vpc_id
   subnet_ids = module.vpc.private_subnets
 
   eks_managed_node_group_defaults = {
     disk_size = 50
+    ami_type  = "AL2_ARM_64" #For Graviton
   }
 
   # Security groups based on the best practices doc https://docs.aws.amazon.com/eks/latest/userguide/sec-group-reqs.html.
@@ -307,6 +305,7 @@ module "eks" {
       min_size        = 1
       max_size        = 3
       desired_size    = 1
+      ami_type        = "AL2_x86_64"
     }
     mg_cbApps = {
       node_group_name = "mng-cb-apps"
@@ -319,7 +318,6 @@ module "eks" {
       labels          = local.mng["cbci_apps"]["labels"]
       create_iam_role = false
       iam_role_arn    = aws_iam_role.managed_ng.arn
-      ami_type        = "AL2_ARM_64" #For Graviton
     }
     mg_cbAgents = {
       node_group_name = "mng-agent"
@@ -332,7 +330,6 @@ module "eks" {
       labels = {
         ci_type = "build-linux"
       }
-      ami_type = "AL2_ARM_64" #For Graviton
     }
     mg_cbAgents_spot = {
       node_group_name = "mng-agent-spot"
@@ -345,7 +342,6 @@ module "eks" {
       labels = {
         ci_type = "build-linux-spot"
       }
-      ami_type = "AL2_ARM_64" #For Graviton
     }
   }
 

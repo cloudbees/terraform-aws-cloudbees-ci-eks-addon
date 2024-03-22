@@ -33,9 +33,8 @@ Hibernation:
       operator: Equal
       value: ${cbciAppsTolerationValue}
       effect: NoSchedule
-# BEE-47031
-# Agents:
-#   SeparateNamespace:
-#     Enabled: true
-#     Create: true
-#     Name: ${cbciAgentsNamespace}
+Agents:
+  SeparateNamespace:
+    Enabled: true
+    Create: true
+    Name: ${cbciAgentsNamespace}

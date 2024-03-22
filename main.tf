@@ -1,9 +1,7 @@
 # Copyright (c) CloudBees, Inc.
 
-#Chart versions: https://artifacthub.io/packages/helm/cloudbees/cloudbees-core/
-#App version: https://docs.cloudbees.com/docs/release-notes/latest/cloudbees-ci/
-
 locals {
+  cbci_ns = "cbci"
   cbci_secrets_name = "cbci-secrets"
   secret_data   = fileexists(var.k8s_secrets_file) ? yamldecode(file(var.k8s_secrets_file)) : {}
   create_secret = alltrue([var.create_k8s_secrets, length(local.secret_data) > 0])
@@ -44,7 +42,7 @@ resource "kubernetes_namespace" "cbci" {
 
   count = try(var.helm_config.create_namespace, true) ? 1 : 0
   metadata {
-    name = try(var.helm_config.namespace, "cbci")
+    name = try(var.helm_config.namespace, local.cbci_ns)
   }
 
 }
@@ -111,7 +109,7 @@ resource "helm_release" "cloudbees_ci" {
   description      = try(var.helm_config.description, null)
   chart            = "cloudbees-core"
   #vCBCI_Helm#
-  version                    = try(var.helm_config.version, "3.16720.0+8c1db08cd647")
+  version                    = try(var.helm_config.version, "3.17108.0")
   repository                 = try(var.helm_config.repository, "https://public-charts.artifacts.cloudbees.com/repository/public/")
   values                     = local.create_secret ? concat(var.helm_config.values, local.oc_secrets_mount, [templatefile("${path.module}/values.yml", local.cbci_template_values)]) : concat(var.helm_config.values, [templatefile("${path.module}/values.yml", local.cbci_template_values)])
   timeout                    = try(var.helm_config.timeout, 1200)

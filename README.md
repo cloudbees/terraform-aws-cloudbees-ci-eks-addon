@@ -1,7 +1,7 @@
 # CloudBees CI add-on for Amazon EKS blueprints
 
 <p align="center">
-  <a href="https://www.cloudbees.com/capabilities/continuous-integration"><img alt="Continuous Integration for Jenkins in the Enterprise" src="https://images.ctfassets.net/vtn4rfaw6n2j/4dkyIw9VG39voD21C18YJz/692394b012c1ad7f2fc192dd484fdd47/image-grid-800x480-page-ci-simplify-your-jenkins-experience.png" height="120px" /></a>
+  <a href="https://www.cloudbees.com/capabilities/continuous-integration"><img alt="CloudBees CI add-on for Amazon EKS blueprints" src="https://images.ctfassets.net/vtn4rfaw6n2j/7FKeUjwsXI1d2JPUIvSMZJ/be286872ace9ca3b6b66a64adbb3c16a/cb-tag-sm.svg"/></a>
   <p align="center">Deploy CloudBees CI to Amazon Web Services (AWS) Elastic Kubernetes Service (EKS) clusters</p>
 
 ---
@@ -20,19 +20,20 @@
 The CloudBees CI [AWS partner add-on](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/aws-partner-addons/) streamlines the adoption and experimentation of CloudBees CI enterprise features by:
 
 - Encapsulating the deployment of [CloudBees CI on modern platforms in AWS EKS](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/installing-eks-using-helm#_configuring_your_environment) into a Terraform module.
-- Providing a series of [blueprints](blueprints) that implement the CloudBees CI add-on module for use with [Amazon EKS blueprints for Terraform](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/), which are aligned with the [EKS Best Practices Guides](https://aws.github.io/aws-eks-best-practices/).
+- Providing a series of [blueprints](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/tree/main/blueprints) that implement the CloudBees CI add-on module for use with [Amazon EKS blueprints for Terraform](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/), which are aligned with the [EKS Best Practices Guides](https://aws.github.io/aws-eks-best-practices/).
 
 ## Usage
 
-Implementation examples are included in the [blueprints](blueprints) folder, however this is the simplest example of usage:
+Implementation examples are included in the [blueprints](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/tree/main/blueprints) folder, however this is the simplest example of usage:
 
 ```terraform
 module "eks_blueprints_addon_cbci" {
-  source = "REPLACE_ME"
-
-  hostname     = "example.domain.com"
+  source  = "cloudbees/cloudbees-ci-eks-addon/aws"
+  version = "~> 3.16720.0"
+  
+  hosted_zone    = "example.domain.com"
   cert_arn     = "arn:aws:acm:us-east-1:0000000:certificate/0000000-aaaa-bbb-ccc-thisIsAnExample"
-  temp_license = {
+  trial_license = {
     first_name  = "Foo"
     last_name  = "Bar"
     email = "foo.bar@acme.com"
@@ -51,7 +52,7 @@ By default, it uses a minimum required configuration described in the Helm chart
 The blueprint `deploy` and `destroy` phases use the same requirements provided in the [AWS EKS Blueprints for Terraform - Prerequisites](https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#prerequisites). However, the blueprint `validate` phase may require additional tooling, such as `jq` and `velero`.
 
 > [!NOTE]
-> There is a companion [Dockerfile](.docker/agent/agent.rootless.Dockerfile) to run the blueprints in a containerized development environment, ensuring all dependencies are met. It can be built using the [Makefile](Makefile) target `make bpAgent-dRun`.
+> There is a companion [Dockerfile](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/tree/main/.docker) to run the blueprints in a containerized development environment, ensuring all dependencies are met. It can be built locally using the [Makefile](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/blob/main/Makefile) target `make bpAgent-dRun`.
 
 ### AWS authentication
 
