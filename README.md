@@ -20,11 +20,11 @@
 The CloudBees CI [AWS partner add-on](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/aws-partner-addons/) streamlines the adoption and experimentation of CloudBees CI enterprise features by:
 
 - Encapsulating the deployment of [CloudBees CI on modern platforms in AWS EKS](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/installing-eks-using-helm#_configuring_your_environment) into a Terraform module.
-- Providing a series of [blueprints](blueprints) that implement the CloudBees CI add-on module for use with [Amazon EKS blueprints for Terraform](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/), which are aligned with the [EKS Best Practices Guides](https://aws.github.io/aws-eks-best-practices/).
+- Providing a series of [blueprints](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/tree/main/blueprints) that implement the CloudBees CI add-on module for use with [Amazon EKS blueprints for Terraform](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/), which are aligned with the [EKS Best Practices Guides](https://aws.github.io/aws-eks-best-practices/).
 
 ## Usage
 
-Implementation examples are included in the [blueprints](blueprints) folder, however this is the simplest example of usage:
+Implementation examples are included in the [blueprints](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/tree/main/blueprints) folder, however this is the simplest example of usage:
 
 ```terraform
 module "eks_blueprints_addon_cbci" {
@@ -52,7 +52,7 @@ By default, it uses a minimum required configuration described in the Helm chart
 The blueprint `deploy` and `destroy` phases use the same requirements provided in the [AWS EKS Blueprints for Terraform - Prerequisites](https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#prerequisites). However, the blueprint `validate` phase may require additional tooling, such as `jq` and `velero`.
 
 > [!NOTE]
-> There is a companion [Dockerfile](.docker/agent/agent.rootless.Dockerfile) to run the blueprints in a containerized development environment, ensuring all dependencies are met. It can be built using the [Makefile](Makefile) target `make bpAgent-dRun`.
+> There is a companion [Dockerfile](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/tree/main/.docker) to run the blueprints in a containerized development environment, ensuring all dependencies are met. It can be built locally using the [Makefile](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/blob/main/Makefile) target `make bpAgent-dRun`.
 
 ### AWS authentication
 
