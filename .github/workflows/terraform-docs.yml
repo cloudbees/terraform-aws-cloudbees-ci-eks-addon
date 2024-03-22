@@ -5,6 +5,10 @@ name: "Documentation: terraform-docs"
 
 on:
   pull_request:
+    paths:
+      - '**.tf'
+      - '**.yaml'
+      - '**.yml'
 
 jobs:
   docs:
