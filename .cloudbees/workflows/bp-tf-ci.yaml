@@ -14,7 +14,7 @@ env:
   AWS_REGION: "us-east-1"
   BUCKET_NAME_TF_STATE: "cbci-eks-addon-bp-tf-state"
   AWS_ROLE_TO_ASSUME: "infra-admin-ci"
-  REPLAY_STR: "2"
+  REPLAY_STR: "0"
   TF_AUTO_VARS_FILE: |
     tags = {
       "cb-owner" : "professional-services"
@@ -54,7 +54,7 @@ jobs:
 
   bp01:
     env:
-      CLEAN_UP: "false"
+      CLEAN_UP: "true"
     needs:
       - init
     steps:
@@ -113,7 +113,7 @@ jobs:
 
   bp02:
     env:
-        CLEAN_UP: "false"
+        CLEAN_UP: "true"
     needs:
       - init
     steps:
