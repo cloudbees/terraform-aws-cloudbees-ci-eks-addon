@@ -32,15 +32,9 @@ version-resolver:
 template: |
   ## Versions
 
-  ClodBees CI:
+  ClodBees CI: [![Application](https://img.shields.io/badge/x.xx.x.x-informational?style=flat-square)](https://docs.cloudbees.com/docs/release-notes/latest/cloudbees-ci/modern-cloud-platforms/x.xx.x.x)
 
-  [![Helm Chart](https://img.shields.io/badge/Chart-xxxxx-informational?style=flat-square)](https://artifacthub.io/packages/helm/cloudbees/cloudbees-core)
-  [![Application](https://img.shields.io/badge/App-xxxxx-informational?style=flat-square)](https://docs.cloudbees.com/docs/release-notes/latest/cloudbees-ci)
-
-  Tested on:
-
-  [![EKS Blueprints](https://img.shields.io/badge/EKSBlueprints-xxxxx-informational?style=flat-square)](https://docs.aws.amazon.com/eks/latest/userguide/kubernetes-versions.html)
-  [![K8s](https://img.shields.io/badge/K8s-xxxxx-informational?style=flat-square)](https://docs.aws.amazon.com/eks/latest/userguide/kubernetes-versions.html)
+  See [.k8s.env](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/blob/main/blueprints/.k8s.env)
 
   ## Changes
 
