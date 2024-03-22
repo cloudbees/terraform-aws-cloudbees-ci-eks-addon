@@ -168,7 +168,7 @@ set-kube-env () {
   do
     # shellcheck disable=SC2154
     sed -i -e "/#vK8#/{n;s/\".*\"/\"$vK8\"/;}" \
-      -e "/#vEKSBpAddonsTFMod#/{n;s/\".*\"/\"$vEKSBpAddonsTFMod\"/;}"
+      -e "/#vEKSBpAddonsTFMod#/{n;s/\".*\"/\"$vEKSBpAddonsTFMod\"/;}" "$SCRIPTDIR/$bp/main.tf"
   done
 }
 
@@ -187,9 +187,11 @@ casc-docker-run () {
 }
 
 casc-script-exec () {
-  local version="$1"
-  local type="$2"
-  local plugins_source="$3"
+  # shellcheck source=/dev/null
+  source "$SCRIPTDIR/.k8s.env"
+  local version="$vCBCI_App"
+  local type="$1"
+  local plugins_source="$2"
   actual_plugins_folder=/tmp/tmp-plugin-calculations
   mkdir -p $actual_plugins_folder || rm -rf "$actual_plugins_folder/*.*"
   cascdeps \

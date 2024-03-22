@@ -120,10 +120,8 @@ module "eks" {
 
   cluster_name                   = local.cluster_name
   cluster_endpoint_public_access = true
-  #https://kubernetes.io/releases/
-  #https://docs.cloudbees.com/docs/cloudbees-common/latest/supported-platforms/cloudbees-ci-cloud#_kubernetes
   #vK8#
-  cluster_version = "1.27"
+  cluster_version = "1.28"
 
   vpc_id     = module.vpc.vpc_id
   subnet_ids = module.vpc.private_subnets

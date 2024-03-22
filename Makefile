@@ -104,9 +104,9 @@ cascCal-dRun: ## Run Docker Container for Casc Plugin Dependency Calculations. E
 
 #https://github.com/kyounger/casc-plugin-dependency-calculation/blob/master/README.md#using-the-docker-image
 .PHONY: cascCal-script
-cascCal-script: ## Run Casc Plugin Dependency Calculations Script passing a version, type and source as parameters. Example: VERSION=2.440.1.3 TYPE=oc SOURCE="./blueprints/02-at-scale/casc/oc/plugins/plugins.2.426.3.3.minimal.yaml" make cascCal-script
-cascCal-script: guard-VERSION guard-SOURCE guard-TYPE
-	@$(call helpers,casc-script-exec $(VERSION) $(TYPE) $(SOURCE))
+cascCal-script: ## Run Casc Plugin Dependency Calculations Script passing type and source as parameters. Version is read from .k8s.env. Example: TYPE=oc SOURCE="./blueprints/02-at-scale/casc/oc/plugins/plugins.2.426.3.3.minimal.yaml" make cascCal-script
+cascCal-script: guard-SOURCE guard-TYPE
+	@$(call helpers,casc-script-exec $(TYPE) $(SOURCE))
 
 ##########################
 # Global
