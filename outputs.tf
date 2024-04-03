@@ -32,12 +32,12 @@ output "cbci_oc_ing" {
 
 output "cbci_liveness_probe_int" {
   description = "Operations center service internal liveness probe for the CloudBees CI add-on."
-  value       = "kubectl exec -n ${helm_release.cloudbees_ci.namespace} -ti cjoc-0 --container jenkins -- curl -sSf localhost:8080/whoAmI/api/json > /dev/null"
+  value       = "kubectl exec -n ${helm_release.cloudbees_ci.namespace} -ti cjoc-0 --container jenkins -- curl -sSf localhost:8080/whoAmI/api/json?tree=authenticated > /dev/null"
 }
 
 output "cbci_liveness_probe_ext" {
   description = "Operations center service external liveness probe for the CloudBees CI add-on."
-  value       = "curl -sSf https://cjoc.${var.hosted_zone}/whoAmI/api/json > /dev/null"
+  value       = "curl -sSf https://cjoc.${var.hosted_zone}/whoAmI/api/json?tree=authenticated > /dev/null"
 }
 
 output "cbci_secrets" {
