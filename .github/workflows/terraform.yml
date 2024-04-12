@@ -9,31 +9,104 @@ on:
       - '**.yaml'
       - '**.yml'
 
+permissions: read-all
+
+env:
+  TERRAFORM_DOCS_VERSION: v0.16.0
+  TFLINT_VERSION: v0.50.3
+
+concurrency:
+  group: '${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}'
+  cancel-in-progress: true
+
 jobs:
-  terraform:
-    name: Terraform
+  collectInputs:
+    name: Collect workflow inputs
     runs-on: ubuntu-latest
-
+    outputs:
+      directories: ${{ steps.dirs.outputs.directories }}
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get root directories
+        id: dirs
+        uses: clowdhaus/terraform-composite-actions/directories@v1.9.0
+
+  preCommitMinVersions:
+    name: Min TF pre-commit
+    needs: collectInputs
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        directory: ${{ fromJson(needs.collectInputs.outputs.directories) }}
+    steps:
+      - name: Remove default Terraform
+        run: rm -rf $(which terraform)
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: dorny/paths-filter@v3
+        id: changes
         with:
-          fetch-depth: 1
+          # We only need to check Terraform files for the current directory
+          # because the `preCommitMaxVersion` job will run the full,
+          # exhaustive checks (always)
+          filters: |
+            src:
+              - '${{ matrix.directory }}/*.tf'
 
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v1
+      - name: Terraform min/max versions
+        uses: clowdhaus/terraform-min-max@v1.3.0
+        if: steps.changes.outputs.src== 'true'
+        id: minMax
         with:
-          terraform_wrapper: true
-          # Match this value with .docker/agent
-          terraform_version: 1.6.6
+          directory: ${{ matrix.directory }}
 
-      - name: Initialize Terraform
-        run: terraform init
+      - name: Pre-commit Terraform ${{ steps.minMax.outputs.minVersion }}
+        uses: clowdhaus/terraform-composite-actions/pre-commit@v1.9.0
+        # Run only validate pre-commit check on min version supported
+        if: ${{ matrix.directory !=  '.' && steps.changes.outputs.src== 'true' }}
+        with:
+          terraform-version: ${{ steps.minMax.outputs.minVersion }}
+          args: 'terraform_validate --color=always --show-diff-on-failure --files ${{ matrix.directory }}/*'
 
-      - name: Format Terraform configuration
-        run: terraform fmt -diff -check -no-color -recursive
-        continue-on-error: true
+      - name: Pre-commit Terraform ${{ steps.minMax.outputs.minVersion }}
+        uses: clowdhaus/terraform-composite-actions/pre-commit@v1.9.0
+        # Run only validate pre-commit check on min version supported
+        if: ${{ matrix.directory ==  '.' && steps.changes.outputs.src== 'true' }}
+        with:
+          terraform-version: ${{ steps.minMax.outputs.minVersion }}
+          args: 'terraform_validate --color=always --show-diff-on-failure --files $(ls *.tf)'
 
-      - name: Validate Terraform configuration
-        run: terraform validate
+  preCommitMaxVersion:
+    name: Max TF pre-commit
+    runs-on: ubuntu-latest
+    needs: collectInputs
+    steps:
+      - name: Remove default Terraform
+        run: rm -rf $(which terraform)
 
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            src:
+              - '**/*.tf'
+
+      - name: Terraform min/max versions
+        id: minMax
+        uses: clowdhaus/terraform-min-max@v1.3.0
+        if: steps.changes.outputs.src== 'true'
+
+      - name: Pre-commit Terraform ${{ steps.minMax.outputs.maxVersion }}
+        uses: clowdhaus/terraform-composite-actions/pre-commit@v1.9.0
+        if: steps.changes.outputs.src== 'true'
+        with:
+          terraform-version: ${{ steps.minMax.outputs.maxVersion }}
+          terraform-docs-version: ${{ env.TERRAFORM_DOCS_VERSION }}
+          tflint-version: ${{ env.TFLINT_VERSION }}
