@@ -123,12 +123,7 @@ probes () {
       eval "$(tf-output "$root" cbci_controllers_pods)" && INFO "All Controllers Pods are Ready."
     until eval "$(tf-output "$root" cbci_controller_c_hpa)"; do sleep $wait && echo "Waiting for Team C HPA to get Ready..."; done ;\
       INFO "Team C HPA is Ready."
-    eval "$(tf-output "$root" cbci_oc_export_admin_crumb)" && eval "$(tf-output "$root" cbci_oc_export_admin_api_token)" && \
-      if [ -n "$CBCI_ADMIN_TOKEN" ]; then 
-        INFO "Admin Token: $CBCI_ADMIN_TOKEN"
-      else 
-        ERROR "Problem while getting Admin Token"
-      fi
+    until { eval "$(tf-output "$root" cbci_oc_export_admin_crumb)" && eval "$(tf-output "$root" cbci_oc_export_admin_api_token)" && [ -n "$CBCI_ADMIN_TOKEN" ]; }; do sleep $wait && echo "Waiting for Admin Token..."; done && INFO "Admin Token: $CBCI_ADMIN_TOKEN"
     eval "$(tf-output "$root" cbci_controller_b_hibernation_post_queue_ws_cache)" > /tmp/ws-cache-build-trigger && \
       grep "HTTP/2 201" /tmp/ws-cache-build-trigger && \
       INFO "Hibernation Post Queue WS Cache is working."
