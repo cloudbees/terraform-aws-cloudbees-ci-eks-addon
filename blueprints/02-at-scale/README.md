@@ -28,7 +28,9 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
 ## Architecture
 
 > [!NOTE]
-> - Node groups use [Graviton Processor](https://aws.amazon.com/ec2/graviton/) to ensure the best balance between price and performance for cloud workloads running on Amazon Elastic Compute Cloud (Amazon EC2).
+> - CloudBees CI Node groups use [Graviton Processor](https://aws.amazon.com/ec2/graviton/) to ensure the best balance between price and performance for cloud workloads running on Amazon Elastic Compute Cloud (Amazon EC2).
+> - CloudBees CI Node groups use [Bottlerocket OS](https://aws.amazon.com/bottlerocket/) that is purpose-built by Amazon Web Services for running containers. Bottlerocket includes only the essential software required to run containers, and ensures that the underlying software is always secure.
+> - CloudBees CI Spot agents node groups meet with [Building for Cost optimization and Resilience for EKS with Spot Instances](https://aws.amazon.com/blogs/compute/cost-optimization-and-resilience-eks-with-spot-instances/) and [Best practices for using EC2 Spot Instances with Amazon EKS](https://repost.aws/knowledge-center/eks-spot-instance-best-practices) (but using Autoscaler instead of Karpeter).
 > - Amazon S3 storage permissions for workspace caching and the artifact manager are based on an [instance profile](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2_instance-profiles.html) rather than creating a user with AWS Identity and Access Management (IAM) permissions. Therefore, it is expected that credentials validation from CloudBees CI will fail.
 
 ![Architecture](img/at-scale.architect.drawio.svg)

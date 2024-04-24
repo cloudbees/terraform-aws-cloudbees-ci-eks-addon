@@ -22,8 +22,11 @@ locals {
   azs = slice(data.aws_availability_zones.available.names, 0, 2)
 
   #https://docs.aws.amazon.com/eks/latest/userguide/choosing-instance-type.html
-  k8s_instance_types = {
-    "graviton3" = ["m7g.xlarge"]
+  #https://docs.aws.amazon.com/eks/latest/APIReference/API_Nodegroup.html
+  mng = {
+    start = {
+      instance_types = ["m7g.xlarge"] #Graviton3
+    }
   }
 
   tags = merge(var.tags, {
@@ -177,8 +180,8 @@ module "eks" {
   eks_managed_node_groups = {
     mg_start = {
       node_group_name = "managed-start"
-      instance_types  = local.k8s_instance_types["graviton3"]
-      ami_type        = "AL2_ARM_64"
+      instance_types  = local.mng["start"]["instance_types"]
+      ami_type        = "BOTTLEROCKET_ARM_64"
       capacity_type   = "ON_DEMAND"
       disk_size       = 25
       desired_size    = 2

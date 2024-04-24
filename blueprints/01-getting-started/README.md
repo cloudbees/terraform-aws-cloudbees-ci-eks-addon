@@ -14,7 +14,8 @@ Get started with the [CloudBees CI on modern platforms in Amazon Elastic Kuberne
 ## Architecture
 
 > [!NOTE]
-> Node groups use an [AWS Graviton Processor](https://aws.amazon.com/ec2/graviton/) to ensure the best balance between price and performance for cloud workloads running on Amazon Elastic Compute Cloud (Amazon EC2).
+> - Node groups use an [AWS Graviton Processor](https://aws.amazon.com/ec2/graviton/) to ensure the best balance between price and performance for cloud workloads running on Amazon Elastic Compute Cloud (Amazon EC2).
+> - Node groups use [Bottlerocket OS](https://aws.amazon.com/bottlerocket/) that is purpose-built by Amazon Web Services for running containers. Bottlerocket includes only the essential software required to run containers, and ensures that the underlying software is always secure.
 
 ![Architecture](img/getting-started.architect.drawio.svg)
 
