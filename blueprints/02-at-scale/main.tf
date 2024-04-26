@@ -337,7 +337,7 @@ module "eks" {
     common_apps = {
       node_group_name = "mg-common-apps"
       instance_types  = local.mng["common_apps"]["instance_types"]
-      ami_type        = "AL2_x86_64"
+      ami_type        = "AL2023_x86_64_STANDARD"
       platform        = "linux"
       min_size        = 1
       max_size        = 3
