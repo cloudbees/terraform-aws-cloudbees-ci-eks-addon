@@ -22,15 +22,8 @@ locals {
 
   vpc_cidr = "10.0.0.0/16"
 
-  #https://docs.aws.amazon.com/eks/latest/userguide/choosing-instance-type.html
-  #https://docs.aws.amazon.com/eks/latest/APIReference/API_Nodegroup.html
   mng = {
-    #Note: osixia/openldap is not compatible either Bottlerocket, neither Graviton.
-    common_apps = {
-      instance_types = ["m5d.xlarge"]
-    }
     cbci_apps = {
-      instance_types = ["m7g.2xlarge"] #Graviton
       taints = {
         key    = "dedicated"
         value  = "cb-apps"
@@ -40,17 +33,7 @@ locals {
         ci_type = "cb-apps"
       }
     }
-    agents = {
-      instance_types = { #Graviton
-        demand_2x = ["m7g.large"]
-        #https://aws.amazon.com/blogs/compute/cost-optimization-and-resilience-eks-with-spot-instances/
-        #https://www.eksworkshop.com/docs/fundamentals/managed-node-groups/spot/instance-diversification
-        #ec2-instance-selector --vcpus 4 --memory 16 --region us-east-1 --deny-list 't.*' --current-generation -a arm64 --gpus 0 --usage-class spot
-        spot_4x = ["im4gn.xlarge", "m6g.xlarge", "m6gd.xlarge", "m7g.xlarge", "m7gd.xlarge"]
-        #ec2-instance-selector --vcpus 8 --memory 32 --region us-east-1 --deny-list 't.*' --current-generation -a arm64 --gpus 0 --usage-class spot
-        spot_8x = ["im4gn.2xlarge", "m6g.2xlarge", "m6gd.2xlarge", "m7g.2xlarge", "m7gd.2xlarge"]
-      }
-    }
+
   }
 
   cbci_apps_labels_yaml = replace(yamlencode(local.mng["cbci_apps"]["labels"]), "/\"/", "")
@@ -325,18 +308,19 @@ module "eks" {
     }
   }
 
+  #https://docs.aws.amazon.com/eks/latest/userguide/choosing-instance-type.html
+  #https://docs.aws.amazon.com/eks/latest/APIReference/API_Nodegroup.html
   eks_managed_node_group_defaults = {
     capacity_type = "ON_DEMAND"
     ami_type      = "BOTTLEROCKET_ARM_64"
     platform      = "bottlerocket"
     disk_size     = 50
   }
-
-  #https://aws.amazon.com/blogs/containers/amazon-eks-cluster-multi-zone-auto-scaling-groups/
   eks_managed_node_groups = {
+    #Note: osixia/openldap is not compatible either Bottlerocket, neither Graviton.
     common_apps = {
       node_group_name = "mg-common-apps"
-      instance_types  = local.mng["common_apps"]["instance_types"]
+      instance_types  = ["m5d.xlarge"]
       ami_type        = "AL2023_x86_64_STANDARD"
       platform        = "linux"
       min_size        = 1
@@ -345,7 +329,7 @@ module "eks" {
     }
     cb_apps = {
       node_group_name = "mg-cb-apps"
-      instance_types  = local.mng["cbci_apps"]["instance_types"]
+      instance_types  = ["m7g.2xlarge"] #Graviton
       min_size        = 1
       max_size        = 6
       desired_size    = 1
@@ -356,7 +340,7 @@ module "eks" {
     }
     cb_agents_2x = {
       node_group_name = "mg-agent-2x"
-      instance_types  = local.mng["agents"]["instance_types"]["demand_2x"]
+      instance_types  = ["m7g.large"] #Graviton
       min_size        = 1
       max_size        = 3
       desired_size    = 1
@@ -365,26 +349,30 @@ module "eks" {
         ci_type = "build-linux"
       }
     }
+    #https://aws.amazon.com/blogs/compute/cost-optimization-and-resilience-eks-with-spot-instances/
+    #https://www.eksworkshop.com/docs/fundamentals/managed-node-groups/spot/instance-diversification
     cb_agents_spot_4x = {
       node_group_name = "mng-agent-spot-4x"
-      instance_types  = local.mng["agents"]["instance_types"]["spot_4x"]
-      capacity_type   = "SPOT"
-      min_size        = 0
-      max_size        = 3
-      desired_size    = 0
-      taints          = [{ key = "dedicated", value = "build-linux-spot", effect = "NO_SCHEDULE" }]
+      #ec2-instance-selector --vcpus 4 --memory 16 --region us-east-1 --deny-list 't.*' --current-generation -a arm64 --gpus 0 --usage-class spot
+      instance_types = ["im4gn.xlarge", "m6g.xlarge", "m6gd.xlarge", "m7g.xlarge", "m7gd.xlarge"] #Graviton
+      capacity_type  = "SPOT"
+      min_size       = 0
+      max_size       = 3
+      desired_size   = 0
+      taints         = [{ key = "dedicated", value = "build-linux-spot", effect = "NO_SCHEDULE" }]
       labels = {
         ci_type = "build-linux-spot"
       }
     }
     cb_agents_spot_8x = {
       node_group_name = "mng-agent-spot-8x"
-      instance_types  = local.mng["agents"]["instance_types"]["spot_8x"]
-      capacity_type   = "SPOT"
-      min_size        = 0
-      max_size        = 3
-      desired_size    = 0
-      taints          = [{ key = "dedicated", value = "build-linux-spot", effect = "NO_SCHEDULE" }]
+      #ec2-instance-selector --vcpus 8 --memory 32 --region us-east-1 --deny-list 't.*' --current-generation -a arm64 --gpus 0 --usage-class spot
+      instance_types = ["im4gn.2xlarge", "m6g.2xlarge", "m6gd.2xlarge", "m7g.2xlarge", "m7gd.2xlarge"] #Graviton
+      capacity_type  = "SPOT"
+      min_size       = 0
+      max_size       = 3
+      desired_size   = 0
+      taints         = [{ key = "dedicated", value = "build-linux-spot", effect = "NO_SCHEDULE" }]
       labels = {
         ci_type = "build-linux-spot"
       }
