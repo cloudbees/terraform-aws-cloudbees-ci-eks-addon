@@ -119,7 +119,7 @@ module "eks_blueprints_addons" {
 ################################################################################
 
 module "eks" {
-  source = "terraform-aws-modules/eks/aws"
+  source  = "terraform-aws-modules/eks/aws"
   version = "19.17.1"
 
   cluster_name                   = local.cluster_name

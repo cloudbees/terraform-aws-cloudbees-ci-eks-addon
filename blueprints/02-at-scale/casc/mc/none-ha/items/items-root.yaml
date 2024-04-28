@@ -41,7 +41,7 @@ items:
             }
             post {
                 failure {
-                    echo "Check Manage Jenkins > AWS > Amazon S3 Bucket Access settings matches with your s3 name terraform output!" 
+                    echo "Check Manage Jenkins > AWS > Amazon S3 Bucket Access settings matches with your s3 name terraform output!"
                 }
             }
         }
@@ -122,7 +122,7 @@ items:
             }
             post {
                 failure {
-                    echo "Check Manage Jenkins > AWS > Amazon S3 Bucket Access settings matches with your s3 name terraform output!" 
+                    echo "Check Manage Jenkins > AWS > Amazon S3 Bucket Access settings matches with your s3 name terraform output!"
                 }
             }
         }
@@ -171,7 +171,7 @@ items:
                     writeCache name: env.CACHE, includes: 'maven-repo/**'
                 }
                 failure {
-                    echo "Check Manage Jenkins > AWS > Amazon S3 Bucket Access settings matches with your s3 name terraform output!" 
+                    echo "Check Manage Jenkins > AWS > Amazon S3 Bucket Access settings matches with your s3 name terraform output!"
                 }
             }
         }

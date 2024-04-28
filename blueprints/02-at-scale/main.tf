@@ -26,12 +26,12 @@ locals {
   #https://docs.aws.amazon.com/eks/latest/APIReference/API_Nodegroup.html
   mng = {
     #Note: osixia/openldap is not compatible either Bottlerocket, neither Graviton.
-    common_apps ={
+    common_apps = {
       instance_types = ["m5d.xlarge"]
     }
     cbci_apps = {
       instance_types = ["m7g.2xlarge"] #Graviton
-      taints   = {
+      taints = {
         key    = "dedicated"
         value  = "cb-apps"
         effect = "NO_SCHEDULE"
@@ -42,18 +42,18 @@ locals {
     }
     agents = {
       instance_types = { #Graviton
-        demand_2x   = ["m7g.large"]
+        demand_2x = ["m7g.large"]
         #https://aws.amazon.com/blogs/compute/cost-optimization-and-resilience-eks-with-spot-instances/
         #https://www.eksworkshop.com/docs/fundamentals/managed-node-groups/spot/instance-diversification
         #ec2-instance-selector --vcpus 4 --memory 16 --region us-east-1 --deny-list 't.*' --current-generation -a arm64 --gpus 0 --usage-class spot
-        spot_4x     = ["im4gn.xlarge","m6g.xlarge","m6gd.xlarge", "m7g.xlarge","m7gd.xlarge"]
+        spot_4x = ["im4gn.xlarge", "m6g.xlarge", "m6gd.xlarge", "m7g.xlarge", "m7gd.xlarge"]
         #ec2-instance-selector --vcpus 8 --memory 32 --region us-east-1 --deny-list 't.*' --current-generation -a arm64 --gpus 0 --usage-class spot
-        spot_8x     = ["im4gn.2xlarge","m6g.2xlarge","m6gd.2xlarge", "m7g.2xlarge","m7gd.2xlarge"]
+        spot_8x = ["im4gn.2xlarge", "m6g.2xlarge", "m6gd.2xlarge", "m7g.2xlarge", "m7gd.2xlarge"]
       }
     }
   }
 
-  cbci_apps_labels_yaml   = replace(yamlencode(local.mng["cbci_apps"]["labels"]), "/\"/", "")
+  cbci_apps_labels_yaml = replace(yamlencode(local.mng["cbci_apps"]["labels"]), "/\"/", "")
 
   route53_zone_id  = data.aws_route53_zone.this.id
   route53_zone_arn = data.aws_route53_zone.this.arn
@@ -75,10 +75,10 @@ locals {
   cloudwatch_logs_expiration_days = 7
   s3_objects_expiration_days      = 90
 
-  cbci_agents_ns = "cbci-agents"
+  cbci_agents_ns  = "cbci-agents"
   cbci_admin_user = "admin_cbci_a"
 
-  cbci_agent_podtemplname_validation ="maven-and-go-ondemand"
+  cbci_agent_podtemplname_validation = "maven-and-go-ondemand"
 
 }
 
@@ -102,10 +102,10 @@ module "eks_blueprints_addon_cbci" {
 
   helm_config = {
     values = [templatefile("k8s/cbci-values.yml", {
-      cbciAppsSelector = local.cbci_apps_labels_yaml
-      cbciAppsTolerationKey = local.mng["cbci_apps"]["taints"].key
+      cbciAppsSelector        = local.cbci_apps_labels_yaml
+      cbciAppsTolerationKey   = local.mng["cbci_apps"]["taints"].key
       cbciAppsTolerationValue = local.mng["cbci_apps"]["taints"].value
-      cbciAgentsNamespace = local.cbci_agents_ns
+      cbciAgentsNamespace     = local.cbci_agents_ns
     })]
   }
 
@@ -234,7 +234,7 @@ module "eks_blueprints_addons" {
   cert_manager = {
     wait = true
   }
-  enable_bottlerocket_update_operator = true #Important: Update timing can be customized. 
+  enable_bottlerocket_update_operator = true #Important: Update timing can be customized.
 
   helm_releases = {
     osixia-openldap = {
@@ -244,11 +244,11 @@ module "eks_blueprints_addons" {
       chart            = "k8s/osixia-openldap"
     }
     aws-node-termination-handler = {
-      name             = "aws-node-termination-handler"
-      namespace        = "kube-system"
-      chart            = "aws-node-termination-handler"
-      chart_version    = "0.21.0"
-      repository       = "https://aws.github.io/eks-charts"
+      name          = "aws-node-termination-handler"
+      namespace     = "kube-system"
+      chart         = "aws-node-termination-handler"
+      chart_version = "0.21.0"
+      repository    = "https://aws.github.io/eks-charts"
       values = [
         <<-EOT
           nodeSelector:
@@ -268,7 +268,7 @@ module "eks_blueprints_addons" {
 # EKS Cluster
 
 module "eks" {
-  source = "terraform-aws-modules/eks/aws"
+  source  = "terraform-aws-modules/eks/aws"
   version = "19.17.1"
 
   cluster_name                   = local.cluster_name
@@ -326,10 +326,10 @@ module "eks" {
   }
 
   eks_managed_node_group_defaults = {
-    capacity_type   = "ON_DEMAND"
-    ami_type        = "BOTTLEROCKET_ARM_64"
-    platform        = "bottlerocket"
-    disk_size       = 50
+    capacity_type = "ON_DEMAND"
+    ami_type      = "BOTTLEROCKET_ARM_64"
+    platform      = "bottlerocket"
+    disk_size     = 50
   }
 
   #https://aws.amazon.com/blogs/containers/amazon-eks-cluster-multi-zone-auto-scaling-groups/

@@ -92,4 +92,3 @@ kube:
                 operator: "Equal"
                 value: "build-linux-spot"
                 effect: "NoSchedule"
-
