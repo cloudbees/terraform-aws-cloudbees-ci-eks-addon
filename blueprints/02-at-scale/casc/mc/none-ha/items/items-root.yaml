@@ -11,15 +11,21 @@ items:
       script: |-
         pipeline {
             agent{
-                label {
-                    label 'maven-spot'
-                    retries 3
-                }
+                label 'maven-spot'
+            }
+            options {
+                retry(3)
+                timeout(time: 1, unit: 'HOURS')
             }
             environment {
                 ARTIFACT_SOURCE_JOB = 'upstream-artifact'
             }
             stages {
+                stage('Build Upstream') {
+                    steps {
+                        build 'upstream-artifact'
+                    }
+                }
                 stage('Copy Artifacts') {
                     steps {
                         sh 'ls -la'
@@ -31,6 +37,11 @@ items:
                         sh 'ls -la'
                         sh 'cat f_2'
                     }
+                }
+            }
+            post {
+                failure {
+                    echo "Check Manage Jenkins > AWS > Amazon S3 Bucket Access settings matches with your s3 name terraform output!"
                 }
             }
         }
@@ -46,11 +57,12 @@ items:
       sandbox: true
       script: |-
         pipeline {
+            options {
+                retry(3)
+                timeout(time: 1, unit: 'HOURS')
+            }
             agent{
-                label {
-                    label 'maven-and-go-ondemand'
-                    retries 3
-                }
+                label 'maven-and-go-ondemand'
             }
             stages {
                 stage('Golang') {
@@ -108,6 +120,11 @@ items:
                     }
                 }
             }
+            post {
+                failure {
+                    echo "Check Manage Jenkins > AWS > Amazon S3 Bucket Access settings matches with your s3 name terraform output!"
+                }
+            }
         }
   disabled: false
   description: 'This pipeline demonstrates the usage of https://plugins.jenkins.io/artifact-manager-s3/ in the same pipeline.'
@@ -119,11 +136,12 @@ items:
       sandbox: true
       script: |-
         pipeline {
+            options {
+                retry(3)
+                timeout(time: 1, unit: 'HOURS')
+            }
             agent{
-                label {
-                    label 'maven-and-go-ondemand'
-                    retries 3
-                }
+                label 'maven-and-go-ondemand'
             }
             environment {
                 MAVEN_PROJECT = 'https://github.com/jglick/simple-maven-project-with-tests'
@@ -151,6 +169,9 @@ items:
             post {
                 success {
                     writeCache name: env.CACHE, includes: 'maven-repo/**'
+                }
+                failure {
+                    echo "Check Manage Jenkins > AWS > Amazon S3 Bucket Access settings matches with your s3 name terraform output!"
                 }
             }
         }
