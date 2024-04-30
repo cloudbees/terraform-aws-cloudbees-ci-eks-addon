@@ -16,7 +16,7 @@ variable "trial_license" {
 }
 
 variable "suffix" {
-  description = "Unique suffix to assign to all resources. When adding the suffix, it requires changes in CloudBees CI for the validation phase."
+  description = "Unique suffix to assign to all resources. When adding the suffix, changes are required in CloudBees CI for the validation phase."
   default     = ""
   type        = string
   validation {

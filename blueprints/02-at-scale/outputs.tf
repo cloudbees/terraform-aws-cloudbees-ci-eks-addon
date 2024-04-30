@@ -10,7 +10,7 @@ output "kubeconfig_add" {
 }
 
 output "cbci_helm" {
-  description = "Helm configuration for the CloudBees CI add-on. It is accessible only via state files."
+  description = "Helm configuration for the CloudBees CI add-on. It is accessible via state files only."
   value       = module.eks_blueprints_addon_cbci.merged_helm_config
   sensitive   = true
 }
@@ -41,7 +41,7 @@ output "cbci_liveness_probe_ext" {
 }
 
 output "ldap_admin_password" {
-  description = "LDAP password for cbci_admin_user user for the CloudBees CI add-on. Check .docker/ldap/data.ldif."
+  description = "LDAP password for the cbci_admin_user user for the CloudBees CI add-on. Check .docker/ldap/data.ldif."
   value       = "kubectl get secret ${module.eks_blueprints_addon_cbci.cbci_secrets} -n ${module.eks_blueprints_addon_cbci.cbci_namespace} -o jsonpath='{.data.secJenkinsPass}' | base64 -d"
 }
 
@@ -126,7 +126,7 @@ output "efs_access_points" {
 }
 
 output "aws_backup_efs_protected_resource" {
-  description = "AWS description for the Amazon EFS drive used to back up protected resources."
+  description = "AWS description for the Amazon EFS drive that is used to back up protected resources."
   value       = "aws backup describe-protected-resource --resource-arn ${module.efs.arn} --region ${local.region}"
 }
 
@@ -146,7 +146,7 @@ output "velero_backup_on_demand_team_a" {
 }
 
 output "velero_restore_team_a" {
-  description = "Restores team-a from backup. It is also applicable for the rest of the scheduled backups."
+  description = "Restores team-a from a backup. It is also applicable for the rest of the scheduled backups."
   value       = "kubectl delete all -n ${module.eks_blueprints_addon_cbci.cbci_namespace} -l tenant=team-a; kubectl delete pvc -n ${module.eks_blueprints_addon_cbci.cbci_namespace} -l tenant=team-a; kubectl delete ep -n ${module.eks_blueprints_addon_cbci.cbci_namespace} -l tenant=team-a; velero restore create --from-schedule ${local.velero_bk_demo}"
 }
 

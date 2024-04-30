@@ -27,14 +27,14 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
 
 ## Architecture
 
-![Architecture](img/at-scale.architect.drawio.svg)
+> [!NOTE]
+> - The CloudBees CI node groups use the following specifications:
+>    - Instance type: [AWS Graviton Processor](https://aws.amazon.com/ec2/graviton/)
+>    - Amazon Machine Image (AMI) type: [Bottlerocket OS](https://aws.amazon.com/bottlerocket/)
+>    - The Spot agents node groups follow the principles described in [Building for Cost optimization and Resilience for EKS with Spot Instances](https://aws.amazon.com/blogs/compute/cost-optimization-and-resilience-eks-with-spot-instances/).
+> - Amazon S3 storage permissions are based on an [instance profile](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2_instance-profiles.html), rather than creating a user with an AWS identity and IAM permissions. It is expected that the credentials validation from CloudBees CI will fail.
 
-- CloudBees CI Node groups specifications:
-  - Instance Type: [Graviton Processor](https://aws.amazon.com/ec2/graviton/) family
-  - AMI Type: [Bottlerocket OS](https://aws.amazon.com/bottlerocket/)
-  - Spot agents node groups meet with [Building for Cost optimization and Resilience for EKS with Spot Instances](https://aws.amazon.com/blogs/compute/cost-optimization-and-resilience-eks-with-spot-instances/).
-- Amazon S3 storage permissions are based on an [instance profile](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2_instance-profiles.html) rather than creating a user with AWS Identity and Access Management (IAM) permissions.
-  - It is expected that credentials validation from CloudBees CI fails.
+![Architecture](img/at-scale.architect.drawio.svg)
 
 ### Kubernetes cluster
 
