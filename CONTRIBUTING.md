@@ -41,7 +41,7 @@ To submit a pull request:
 7. Pay attention to any automated CI failures reported in the pull request, and stay involved in the conversation.
 
 > [!IMPORTANT]
-> Updates on CasC bundles requires to be pushed to a public repository/branch before terraform apply (defaults to `https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon.git/main`. It follows a mono-repo approach, where the CasC bundles and `blueprints` are stored in the same repository.)
+> If you make updates to CasC bundles, you must push the changes to a public repository/branch before running `terraform apply`. The default is `https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon.git/main`, which follows a monorepo approach where the CasC bundles and `blueprints` are stored in the same repository.
 
 >[!TIP]
 > GitHub provides additional documentation on [forking a repository](https://help.github.com/articles/fork-a-repo/) and
