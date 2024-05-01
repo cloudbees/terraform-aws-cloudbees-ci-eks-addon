@@ -70,8 +70,11 @@ The two main components of CloudBees CI - the operations center and managed cont
 - Amazon EFS file systems are scoped to an AWS region and can be accessed from any availability zone in the region that the file system was created in. Using Amazon EFS as a storage class for the operations center and managed controllers allows pods to be rescheduled successfully onto healthy nodes in the event of an availability zone outage. Amazon EFS is more expensive than Amazon EBS, but provides greater fault tolerance.
 
 > [!IMPORTANT]  
-> - CloudBees CI High Availability (HA) (active-active) requires Amazon EFS. For more information, refer to [CloudBees CI EKS storage requirements](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/eks-pre-install-requirements-helm#_storage_requirements).
-> - For more information on pricing, refer to [Amazon EBS pricing](https://aws.amazon.com/ebs/pricing/) and [Amazon EFS pricing](https://aws.amazon.com/efs/pricing/).
+> CloudBees CI High Availability (HA) (active-active) requires Amazon EFS. For more information, refer to [CloudBees CI EKS storage requirements](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/eks-pre-install-requirements-helm#_storage_requirements).
+
+> [!NOTE]
+> - For more information on pricing and cost analysis, refer to [Amazon EBS pricing](https://aws.amazon.com/ebs/pricing/, [Amazon EFS pricing](https://aws.amazon.com/efs/pricing/), and [CloudBees CI with HA Mode Enabled: Sample cost analysis on AWS](https://www.cloudbees.com/blog/cloudbees-ci-with-ha-mode-enabled-sample-cost-analysis-on-aws).
+> - For more information on performance, refer to [Amazon EBS performance](https://docs.aws.amazon.com/ebs/latest/userguide/ebs-performance.html, [Amazon EFS performance](https://docs.aws.amazon.com/efs/latest/ug/performance.html), and [Analyzing CloudBees CI's High Availability: Performance, Bottlenecks, and Conclusions](https://www.cloudbees.com/blog/analyzing-cloudbees-ci-high-availability-performance-bottlenecks-and).
 
 ## CloudBees CI trial license
 
