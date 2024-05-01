@@ -41,6 +41,6 @@ output "cbci_liveness_probe_ext" {
 }
 
 output "cbci_secrets" {
-  description = "Kubernetes secrets name for CloudBees CI. Optional."
+  description = "Optional. Kubernetes secrets name for CloudBees CI."
   value       = local.create_secret ? kubernetes_secret.oc_secrets[0].metadata[0].name : "No secrets created"
 }
