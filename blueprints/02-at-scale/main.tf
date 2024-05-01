@@ -239,6 +239,19 @@ module "eks_blueprints_addons" {
         EOT
       ]
     }
+    grafana-tempo = {
+      name          = "tempo"
+      namespace     = "kube-prometheus-stack"
+      chart         = "tempo"
+      chart_version = "1.7.2"
+      repository    = "https://grafana.github.io/helm-charts"
+      values = [
+        <<-EOT
+          tempoQuery:
+            enabled: true
+        EOT
+      ]
+    }
   }
 
   tags = local.tags

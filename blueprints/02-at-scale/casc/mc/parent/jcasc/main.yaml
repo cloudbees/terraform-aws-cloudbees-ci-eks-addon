@@ -26,6 +26,8 @@ unclassified:
   hibernationConfiguration:
     enabled: true
     gracePeriod: 3600
+  openTelemetry:
+      endpoint: ${ot_endpoint}
 aws:
   s3:
     container: ${cbci_s3}
