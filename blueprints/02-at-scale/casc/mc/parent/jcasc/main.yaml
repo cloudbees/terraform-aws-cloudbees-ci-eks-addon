@@ -27,7 +27,7 @@ unclassified:
     enabled: true
     gracePeriod: 3600
   openTelemetry:
-      endpoint: "http://tempo.kube-prometheus-stack.svc.cluster.local:4317"
+      endpoint: ${ot_endpoint}
 aws:
   s3:
     container: ${cbci_s3}
