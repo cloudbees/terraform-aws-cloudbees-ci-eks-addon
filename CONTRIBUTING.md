@@ -52,10 +52,8 @@ To submit a pull request:
 
 Many of the files in the repository can be linted or formatted to maintain a standard of quality. Additionally, secret leaks are watched via [gitleaks](https://github.com/zricethezav/gitleaks#pre-commit) and [git-secrets](https://github.com/awslabs/git-secrets).
 
-When working with the repository for the first time, you must run `pre-commit`:
-
-1. Run `pre-commit install`.
-2. Run `pre-commit run --all-files`.
+1. When working with the repository for the first time, you must install `pre-commit`. For more information, refer to [pre-commit installation](https://pre-commit.com/#installation).
+2. If the automated checks fail when you create a pull request, run `pre-commit run --all-files`.
 
 ## Blueprint Terraform CI pipeline
 
