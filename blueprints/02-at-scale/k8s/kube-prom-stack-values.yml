@@ -96,6 +96,16 @@ additionalPrometheusRulesMap:
               summary: "{{ $labels.pod }} too many jobs queued"
               description: "{{ $labels.pod }} has {{ $value }} jobs stuck in queue"
 grafana:
+  datasources:
+    datasources.yaml:
+      apiVersion: 1
+      datasources:
+        - name: Tempo
+          type: tempo
+          url: http://tempo.kube-prometheus-stack.svc.cluster.local:3100
+          access: proxy
+          isDefault: false
+
   dashboardProviders:
     dashboardproviders.yaml:
       apiVersion: 1
