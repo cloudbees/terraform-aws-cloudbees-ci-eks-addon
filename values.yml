@@ -7,6 +7,7 @@
 Subdomain: true
 OperationsCenter:
   JavaOpts: >-
+      -Dcom.cloudbees.masterprovisioning.kubernetes.KubernetesMasterProvisioning.deleteClaim=true
       -Duser.timezone=Etc/UTC
       -XX:InitialRAMPercentage=50.0
       -XX:MaxRAMPercentage=50.0
