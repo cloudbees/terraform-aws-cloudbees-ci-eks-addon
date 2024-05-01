@@ -71,7 +71,7 @@ The two main components of CloudBees CI - the operations center and managed cont
 
 > [!IMPORTANT]  
 > - CloudBees CI High Availability (HA) (active-active) requires Amazon EFS. For more information, refer to [CloudBees CI EKS storage requirements](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/eks-pre-install-requirements-helm#_storage_requirements).
-> - For more information on pricing, refer to [Amazon EBS pricing](https://aws.amazon.com/ebs/pricing/) and [Amazon EFS pricing](https://aws.amazon.com/efs/pricing/).
+> - For more information on pricing, refer to [Amazon EBS pricing](https://aws.amazon.com/ebs/pricing/) and [Amazon EFS pricing](https://aws.amazon.com/efs/pricing/). Additionally, [CloudBees CI with HA Mode Enabled: Sample cost analysis on AWS](https://www.cloudbees.com/blog/cloudbees-ci-with-ha-mode-enabled-sample-cost-analysis-on-aws) is a useful resource for understanding the cost implications of using Amazon EFS vs EBS.
 
 ## CloudBees CI trial license
 
