@@ -20,11 +20,11 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
 
 - [Amazon EKS blueprints Helm Release Add-on](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/helm-release/) is used to install the following applications:
 
-| Helm Chart | Description |
-|-----------|--------------|
-| [Osixia Openldap](https://github.com/osixia/docker-openldap) | LDAP server. |
-| [AWS Node Termination Handler](https://github.com/osixia/docker-openldap) | Gracefully handle EC2 instance shutdown within Kubernetes (Addon is not compatible with Managed Instance Group see [issues#23](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/issues/23)). |
-| [Grafana Tempo](https://github.com/osixia/docker-openldap) | Tracing backend for [Jenkins OpenTelemetry](https://plugins.jenkins.io/opentelemetry/).  |
+  | Helm Chart | Description |
+  |-------------------------------|-------------|
+  | [Osixia Openldap](https://github.com/osixia/docker-openldap) | LDAP server. |
+  | [AWS Node Termination Handler](https://github.com/aws/aws-node-termination-handler) | Gracefully handles EC2 instance shutdown within Kubernetes. Note that this add-on is not compatible with managed instance groups. For more information, refer to [issue #23](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/issues/23)). |
+  | [Grafana Tempo](https://github.com/osixia/docker-openldap) | Provides backend tracing for [Jenkins OpenTelemetry](https://plugins.jenkins.io/opentelemetry/). |
 
 - Cloudbees CI uses [Configuration as Code (CasC)](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/casc-intro) (refer to the [casc](casc) folder) to enable [exciting new features for streamlined DevOps](https://www.cloudbees.com/blog/cloudbees-ci-exciting-new-features-for-streamlined-devops) and other enterprise features, such as [CloudBees CI hibernation](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#_hibernation_in_managed_masters).
   - The operations center is using the [CasC Bundle Retriever](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/bundle-retrieval-scm).
