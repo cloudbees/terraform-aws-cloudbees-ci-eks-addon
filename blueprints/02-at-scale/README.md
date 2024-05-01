@@ -28,8 +28,11 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
 ## Architecture
 
 > [!NOTE]
-> - Node groups use [Graviton Processor](https://aws.amazon.com/ec2/graviton/) to ensure the best balance between price and performance for cloud workloads running on Amazon Elastic Compute Cloud (Amazon EC2).
-> - Amazon S3 storage permissions for workspace caching and the artifact manager are based on an [instance profile](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2_instance-profiles.html) rather than creating a user with AWS Identity and Access Management (IAM) permissions. Therefore, it is expected that credentials validation from CloudBees CI will fail.
+> - The CloudBees CI node groups use the following specifications:
+>    - Instance type: [AWS Graviton Processor](https://aws.amazon.com/ec2/graviton/)
+>    - Amazon Machine Image (AMI) type: [Bottlerocket OS](https://aws.amazon.com/bottlerocket/)
+>    - The Spot agents node groups follow the principles described in [Building for Cost optimization and Resilience for EKS with Spot Instances](https://aws.amazon.com/blogs/compute/cost-optimization-and-resilience-eks-with-spot-instances/).
+> - Amazon S3 storage permissions are based on an [instance profile](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2_instance-profiles.html), rather than creating a user with an AWS identity and IAM permissions. It is expected that the credentials validation from CloudBees CI will fail.
 
 ![Architecture](img/at-scale.architect.drawio.svg)
 
@@ -47,7 +50,7 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
 | hosted_zone | Amazon Route 53 hosted zone. CloudBees CI applications are configured to use subdomains in this hosted zone. | `string` | n/a | yes |
 | trial_license | CloudBees CI trial license details for evaluation. | `map(string)` | n/a | yes |
 | grafana_admin_password | Grafana admin password. | `string` | `"change.me"` | no |
-| suffix | Unique suffix to assign to all resources. When adding the suffix, it requires changes in CloudBees CI for the validation phase. | `string` | `""` | no |
+| suffix | Unique suffix to assign to all resources. When adding the suffix, changes are required in CloudBees CI for the validation phase. | `string` | `""` | no |
 | tags | Tags to apply to resources. | `map(string)` | `{}` | no |
 
 ### Outputs
@@ -55,14 +58,14 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
 | Name | Description |
 |------|-------------|
 | acm_certificate_arn | AWS Certificate Manager (ACM) certificate for Amazon Resource Names (ARN). |
-| aws_backup_efs_protected_resource | AWS description for the Amazon EFS drive used to back up protected resources. |
+| aws_backup_efs_protected_resource | AWS description for the Amazon EFS drive that is used to back up protected resources. |
 | aws_logstreams_fluentbit | AWS CloudWatch log streams from Fluent Bit. |
 | cbci_agents_events_stopping | Retrieves a list of agent pods running in the agents namespace. |
 | cbci_agents_pods | Retrieves a list of agent pods running in the agents namespace. |
 | cbci_controller_b_hibernation_post_queue_ws_cache | team-b hibernation monitor endpoint to the build workspace cache. It expects CBCI_ADMIN_TOKEN as the environment variable. |
 | cbci_controller_c_hpa | team-c horizontal pod autoscaling. |
 | cbci_controllers_pods | Operations center pod for the CloudBees CI add-on. |
-| cbci_helm | Helm configuration for the CloudBees CI add-on. It is accessible only via state files. |
+| cbci_helm | Helm configuration for the CloudBees CI add-on. It is accessible via state files only. |
 | cbci_liveness_probe_ext | Operations center service external liveness probe for the CloudBees CI add-on. |
 | cbci_liveness_probe_int | Operations center service internal liveness probe for the CloudBees CI add-on. |
 | cbci_namespace | Namespace for the CloudBees CI add-on. |
@@ -78,14 +81,14 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
 | grafana_dashboard | Provides access to Grafana dashboards. |
 | kubeconfig_add | Add kubeconfig to the local configuration to access the Kubernetes API. |
 | kubeconfig_export | Export the KUBECONFIG environment variable to access the Kubernetes API. |
-| ldap_admin_password | LDAP password for cbci_admin_user user for the CloudBees CI add-on. Check .docker/ldap/data.ldif. |
+| ldap_admin_password | LDAP password for the cbci_admin_user user for the CloudBees CI add-on. Check .docker/ldap/data.ldif. |
 | prometheus_active_targets | Checks active Prometheus targets from the operations center. |
 | prometheus_dashboard | Provides access to Prometheus dashboards. |
 | s3_cbci_arn | CloudBees CI Amazon S3 bucket ARN. |
 | s3_cbci_name | CloudBees CI Amazon S3 bucket name. It is required by CloudBees CI for workspace caching and artifact management. |
 | velero_backup_on_demand_team_a | Takes an on-demand Velero backup from the schedule for team-a. |
 | velero_backup_schedule_team_a | Creates a Velero backup schedule for team-a and deletes the existing backup, if it exists. It can be applied for other controllers using Amazon EBS. |
-| velero_restore_team_a | Restores team-a from backup. It is also applicable for the rest of the scheduled backups. |
+| velero_restore_team_a | Restores team-a from a backup. It is also applicable for the rest of the scheduled backups. |
 | vpc_arn | VPC ID. |
 <!-- END_TF_DOCS -->
 

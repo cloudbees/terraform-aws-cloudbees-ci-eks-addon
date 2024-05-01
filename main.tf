@@ -1,10 +1,10 @@
 # Copyright (c) CloudBees, Inc.
 
 locals {
-  cbci_ns = "cbci"
+  cbci_ns           = "cbci"
   cbci_secrets_name = "cbci-secrets"
-  secret_data   = fileexists(var.k8s_secrets_file) ? yamldecode(file(var.k8s_secrets_file)) : {}
-  create_secret = alltrue([var.create_k8s_secrets, length(local.secret_data) > 0])
+  secret_data       = fileexists(var.k8s_secrets_file) ? yamldecode(file(var.k8s_secrets_file)) : {}
+  create_secret     = alltrue([var.create_k8s_secrets, length(local.secret_data) > 0])
   oc_secrets_mount = [
     <<-EOT
       OperationsCenter:

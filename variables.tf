@@ -36,7 +36,7 @@ variable "trial_license" {
 }
 
 variable "create_k8s_secrets" {
-  description = "Create the Kubernetes secret cbci-secrets. It can be consumed by CasC."
+  description = "Create the Kubernetes secret cbci-secrets. It can be consumed by CloudBees CasC."
   default     = false
   type        = bool
 }
@@ -48,7 +48,7 @@ variable "k8s_secrets_file" {
 }
 
 variable "prometheus_target" {
-  description = "Create Service Monitor to discover CloudBees CI Apps Prometheus Target dinamically. It is designed to be enabled with AWS EKS Terraform Addon Kube Prometheus Stack."
+  description = "Creates a service monitor to discover the CloudBees CI Prometheus target dynamically. It is designed to be enabled with the AWS EKS Terraform Addon Kube Prometheus Stack."
   default     = false
   type        = bool
 }
