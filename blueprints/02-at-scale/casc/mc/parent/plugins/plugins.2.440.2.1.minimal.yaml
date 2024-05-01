@@ -36,9 +36,11 @@ plugins:
   - id: managed-master-hibernation # cap src
   - id: mock-load-builder # 3rd src
   - id: momentjs # 3rd src
+  - id: opentelemetry # 3rd
   - id: operations-center-notification # cap src
   - id: pipeline-event-step # cap src
-  - id: pipeline-model-definition # cap src
+  - id: pipeline-graph-analysis # cap dep
+  - id: pipeline-model-definition # cap dep src
   - id: pipeline-utility-steps # 3rd src
   - id: popper-api # 3rd dep src
   - id: popper2-api # cap src

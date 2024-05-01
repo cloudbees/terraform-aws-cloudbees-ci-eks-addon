@@ -16,9 +16,11 @@ configurations:
       cloudbees-prometheus:
         version: "1.4"
       mock-load-builder:
-        version: "72.va_d24249b_1400"
+        version: "105.v1fc7e407a_0b_1"
       momentjs:
         version: "1.1.1"
+      opentelemetry:
+        version: "3.1092.va_2a_c52b_dd182"
       pipeline-utility-steps:
         version: "2.16.2"
       popper-api:
