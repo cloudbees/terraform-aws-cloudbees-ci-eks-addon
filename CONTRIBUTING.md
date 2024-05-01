@@ -38,11 +38,10 @@ To submit a pull request:
 4. **Ensure that local tests pass**.
 5. Make commits to your fork using clear commit messages.
 6. Submit a pull request against the `develop` branch and answer any default questions in the pull request interface.
+7. Pay attention to any automated CI failures reported in the pull request, and stay involved in the conversation.
 
 > [!IMPORTANT]
-> You must validate that the CasC bundle source control management (SCM) tool is pointing to the `develop` branch.
-
-6. Pay attention to any automated CI failures reported in the pull request, and stay involved in the conversation.
+> Updates on CasC bundles requires to be pushed to a public repository/branch before terraform apply (defaults to `https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon.git/main`. It follows a mono-repo approach, where the CasC bundles and `blueprints` are stored in the same repository.)
 
 >[!TIP]
 > GitHub provides additional documentation on [forking a repository](https://help.github.com/articles/fork-a-repo/) and
