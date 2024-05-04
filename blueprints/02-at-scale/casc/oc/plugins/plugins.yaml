@@ -1,0 +1,10 @@
+plugins:
+  - id: cloudbees-casc-client
+  - id: cloudbees-casc-items-commons
+  - id: cloudbees-casc-items-server
+  - id: cloudbees-prometheus
+  - id: github
+  - id: jsch
+  - id: ldap
+  - id: popper2-api
+  - id: sshd
