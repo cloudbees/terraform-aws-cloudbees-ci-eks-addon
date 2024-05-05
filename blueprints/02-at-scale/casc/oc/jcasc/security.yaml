@@ -2,14 +2,30 @@ jenkins:
   securityRealm:
     ldap:
       configurations:
-      - managerDN: "cn=admin,dc=acme,dc=org"
-        managerPasswordSecret: "admin"
-        rootDN: "dc=acme,dc=org"
-        server: "ldap-service.auth.svc.cluster.local"
-        userSearch: "cn={0}"
+      - managerDN: ${ldap_ManagerDN}
+        managerPasswordSecret: ${ldap_ManagerPasswordSecret}
+        rootDN: ${ldap_RootDN}
+        server: ${ldap_Server}
+        userSearch: ${ldap_UserSearch}
   authorizationStrategy: "cloudBeesRoleBasedAccessControl"
   remotingSecurity:
     enabled: true
   crumbIssuer:
     standard:
       excludeClientIPFromCrumb: true
+credentials:
+  system:
+    domainCredentials:
+    - credentials:
+      - usernamePassword:
+          description: "GH-User-token"
+          id: "GH-User-token"
+          password: ${secGithubUser}
+          scope: GLOBAL
+          username: ${secGithubToken}
+          usernameSecret: true
+      - string:
+          description: "GH-ST-token"
+          id: "GH-ST-token"
+          scope: GLOBAL
+          secret: ${secGithubToken}
