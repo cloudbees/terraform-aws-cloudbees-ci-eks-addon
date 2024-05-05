@@ -174,30 +174,3 @@ set-casc-branch () {
   sed -i "s|bundle: \".*/none-ha\"|bundle: \"$branch/none-ha\"|g" "$SCRIPTDIR/02-at-scale/casc/oc/items/items-root.yaml"
   sed -i "s|bundle: \".*/ha\"|bundle: \"$branch/ha\"|g" "$SCRIPTDIR/02-at-scale/casc/oc/items/items-root.yaml"
 }
-
-#https://github.com/kyounger/casc-plugin-dependency-calculation/blob/master/README.md#using-the-docker-image
-#NOTE: Using --platform linux/x86_64 to avoid issues with M1 Macs
-casc-docker-run () {
-  docker run --platform linux/x86_64 -v "$(pwd)":"$(pwd)" -w "$(pwd)" -u "$(id -u)":"$(id -g)" --rm -it ghcr.io/kyounger/casc-plugin-dependency-calculation bash
-}
-
-casc-script-exec () {
-  # shellcheck source=/dev/null
-  source "$SCRIPTDIR/.k8s.env"
-  # shellcheck disable=SC2154
-  local version="$vCBCI_App"
-  local type="$1"
-  local plugins_source="$2"
-  actual_plugins_folder=/tmp/tmp-plugin-calculations
-  mkdir -p $actual_plugins_folder || rm -rf "$actual_plugins_folder/*.*"
-  cascdeps \
-		-v "$version" \
-		-t "$type" \
-		-f "$plugins_source" \
-		-F "$actual_plugins_folder/plugins.yaml" \
-		-c "$actual_plugins_folder/plugin-catalog.yaml" \
-		-C "$actual_plugins_folder/plugin-catalog-offline.yaml" \
-		-s \
-		-g "$actual_plugins_folder/plugins-minimal-for-generation-only.yaml" \
-		-G "$actual_plugins_folder/plugins-minimal.yaml"
-}

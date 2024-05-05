@@ -97,17 +97,6 @@ set-casc-branch: agentCheck guard-BRANCH
 	@$(call helpers,set-casc-branch $(BRANCH))
 	@$(call helpers,INFO "Setting Casc Branch finished succesfully.")
 
-#https://github.com/kyounger/casc-plugin-dependency-calculation/blob/master/README.md#using-the-docker-image
-.PHONY: cascCal-dRun
-cascCal-dRun: ## Run Docker Container for Casc Plugin Dependency Calculations. Example: make cascCal-dRun
-	@$(call helpers,casc-docker-run)
-
-#https://github.com/kyounger/casc-plugin-dependency-calculation/blob/master/README.md#using-the-docker-image
-.PHONY: cascCal-script
-cascCal-script: ## Run Casc Plugin Dependency Calculations Script passing type and source as parameters. Version is read from .k8s.env. Example: TYPE=oc SOURCE="./blueprints/02-at-scale/casc/oc/plugins/plugins.2.426.3.3.minimal.yaml" make cascCal-script
-cascCal-script: guard-SOURCE guard-TYPE
-	@$(call helpers,casc-script-exec $(TYPE) $(SOURCE))
-
 ##########################
 # Global
 ##########################
