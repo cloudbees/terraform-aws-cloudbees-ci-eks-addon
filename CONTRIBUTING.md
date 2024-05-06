@@ -87,7 +87,7 @@ Before a new CloudBees CI Helm chart is released, new features for this addon an
 
 2. Create a PR against the `main` branch. including the Helm chart update plus other updates available in the integration branch (`develop`). Ensure that the field `source` in the `eks_blueprints_addon_cbci` at blueprints is pointing to the remote [terraform registry version](https://registry.terraform.io/modules/cloudbees/cloudbees-ci-eks-addon/aws/latest) and `version >= "x.x.x"`.
 3. Once the pull request is merged, verify that the `main` branch successfully passes the [Terraform CI build](#blueprint-terraform-ci-pipeline).
-4. Create a [new release](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/releases). The release version semantics follows the Helm chart convention.
+4. Create a [new release](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/releases). The release version semantics follow the Helm chart convention.
 
 > [!IMPORTANT]
 > This project uses a mono-repository approach where the CasC bundles and `blueprints` are stored in the same repository.  In the `main` branch CasC bundle SCM configuration should point to the `main` branch.
