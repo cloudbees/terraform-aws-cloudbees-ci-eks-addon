@@ -78,7 +78,7 @@ CloudBees CI Terraform EKS Addon versions try to be in sync with the [CloudBees 
 Before a new CloudBees CI Helm chart is released, new features for this addon and its companion blueprints are merged into the integration branch (`develop`). When a new version of the CloudBees CI Helm chart is released, the addon is updated to the new version following this process:
 
 1. Test the update in the integration branch (`develop`).
-   - Update The field `version` in CloudBees CI Terraform EKS Addon update needs to be updated to the new [version of the Helm chart](https://artifacthub.io/packages/helm/cloudbees/cloudbees-core/)
+   - Update the `version` field if CloudBees CI Terraform EKS Addon update needs to be updated to the new [version of the Helm chart](https://artifacthub.io/packages/helm/cloudbees/cloudbees-core/).
    - The field `source` in the `eks_blueprints_addon_cbci` at blueprints folder must point to the local to the CloudBees CI Terraform EKS Addon the root of the repository `source = "../../"` (not to the remote [terraform registry version](https://registry.terraform.io/modules/cloudbees/cloudbees-ci-eks-addon/aws/latest))
    - Test the update locally
 
