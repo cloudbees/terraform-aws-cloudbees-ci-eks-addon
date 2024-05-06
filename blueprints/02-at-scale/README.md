@@ -221,7 +221,7 @@ Once the resources have been created, a `kubeconfig` file is created in the [/k8
 > - If build logs contains `Failed to upload cache`, it is likely related to a `suffix` in your Terraform variables, and the recommendations from the [Deploy](#deploy) section were not followed.
 > - Transitions to the hibernation state may happen if the defined [grace period](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#_configuring_hibernation) of inactivity (idle) has been reached.
 
-### Back up and restore
+#### Back up and restore
 
 For backup and restore operations, you can use the [preconfigured CloudBees CI Cluster Operations job](#create-daily-backups-using-a-cloudbees-ci-cluster-operations-job) to automatically perform a daily backup, which can be used for Amazon EFS and Amazon EBS storage.
 
@@ -231,7 +231,7 @@ For backup and restore operations, you can use the [preconfigured CloudBees CI C
 > - An installation that has been completely converted to CasC may not need traditional backups; a restore operation could consist simply of running a CasC bootstrap script. This is only an option for a customer who has translated every significant system setting and job configuration to CasC. Even then it may be desirable to perform a filesystem-level restore from backup in order to preserve transient data such as build history.
 > - There is no alternative for services using Amazon EFS storage. Although [AWS Backup](https://aws.amazon.com/backup/) includes this Amazon EFS drive as a protected resource, there is not currently a best practice to dynamically restore Amazon EFS PVCs. For more information, refer to [Issue 39](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/issues/39).
 
-#### Create daily backups using a CloudBees CI Cluster Operations job
+##### Create daily backups using a CloudBees CI Cluster Operations job
 
 The [CloudBees Backup plugin](https://docs.cloudbees.com/docs/cloudbees-ci/latest/backup-restore/cloudbees-backup-plugin) is enabled for all controllers and the operations center using [Amazon S3 as storage](https://docs.cloudbees.com/docs/cloudbees-ci/latest/backup-restore/cloudbees-backup-plugin#_amazon_s3). The preconfigured **backup-all-controllers** [Cluster Operations](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/cluster-operations) job is scheduled to run daily from the operations center to back up all controllers.
 
@@ -244,7 +244,7 @@ To view the **backup-all-controllers** job:
 > [!NOTE]
 > If a build fails, it is likely related to a `suffix` that is included in your Terraform variables, and the recommendations from the [Deploy](#deploy) section were not followed.
 
-#### Create a Velero backup schedule
+##### Create a Velero backup schedule
 
 Issue the following command to create a Velero backup schedule for selected controller `team-b` (this can also be applied to `team-a`):
 
@@ -252,7 +252,7 @@ Issue the following command to create a Velero backup schedule for selected cont
    eval $(terraform output --raw velero_backup_schedule)
    ```
 
-#### Take an on-demand Velero backup
+##### Take an on-demand Velero backup
 
 >[!NOTE]
 > When using this CloudBees CI add-on, you must [create at least one Velero backup schedule](#create-a-velero-backup-schedule) prior to taking an on-demand Velero backup.
@@ -263,7 +263,7 @@ Issue the following command to take an on-demand Velero backup for a specific po
    eval $(terraform output --raw velero_backup_on_demand)
    ```
 
-#### Restore from a Velero on-demand backup
+##### Restore from a Velero on-demand backup
 
 1. Make updates on the `team-b` controller (for example, add some jobs and generate builds).
 2. [Take an on-demand Velero backup](#take-an-on-demand-velero-backup), including the updates that you made.
@@ -275,9 +275,14 @@ Issue the following command to take an on-demand Velero backup for a specific po
    eval $(terraform output --raw velero_restore)
    ```
 
-### Metrics
+### Observability
 
-The [CloudBees Prometheus Metrics plugin](https://docs.cloudbees.com/docs/cloudbees-ci/latest/monitoring/prometheus-plugin) exposes [Jenkins Metrics](https://plugins.jenkins.io/metrics/) for Prometheus.
+#### Metrics and Tracing
+
+Grafana is used to visualize and query:
+
+- [Jenkins Metrics](https://plugins.jenkins.io/metrics/) that are stored in Prometheus.
+- [Jenkins Tracing via OpenTelemetry](https://plugins.jenkins.io/opentelemetry/) that stored into Grafana Tempo.
 
 1. Issue the following command to verify that the CloudBees CI targets are connected to Prometheus:
 
@@ -299,17 +304,27 @@ The [CloudBees Prometheus Metrics plugin](https://docs.cloudbees.com/docs/cloudb
    eval $(terraform output --raw grafana_dashboard)
    ```
 
-   If successful, the Grafana dashboard should be available at `http://localhost:50002`. Navigate to **Dashboards > CloudBees CI**.
+   If successful, the Grafana dashboard should be available at `http://localhost:50002`.
 
-### Logs
+   - For Jenkins Metrics Dashboards navigate to **Dashboards > CloudBees CI**. Then, select the controller pod to view the metrics.
+
+   ![CloudBees CI Dashboard](img/observability/cbci-dashboard.png)
+
+   - For Tracing Data, navigate to **Home > Explore > Select Tempo > Select `Query Type: Search`**. Then, select the `service name: jenkins` and the desired `Span Name` to `Run Query`. The following image shows an example of the ws-cache pipeline build.
+
+   ![CloudBees CI Tracing Example](img/observability/cbci-tracing-example.png)
+
+#### Logs
 
 For application logs, Fluent Bit acts as a router.
 
-- Short-term application logs live in the [Amazon CloudWatch Logs](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/WhatIsCloudWatchLogs.html) group, under `/aws/eks/<CLUSTER_NAME>/aws-fluentbit-logs` and contains log streams for all the Kubernetes services running in the cluster, including CloudBees CI applications.
+- Short-term application logs live in the [Amazon CloudWatch Logs](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/WhatIsCloudWatchLogs.html) group, under `/aws/eks/<CLUSTER_NAME>/aws-fluentbit-logs` and contains log streams for all the Kubernetes services running in the cluster, including CloudBees CI applications and Agents. The following image shows an example of team b controller logs.
 
    ```sh
    eval $(terraform output --raw aws_logstreams_fluentbit) | jq '.[] '
    ```
+
+   ![CloudBees CI Logs Example](img/observability/cbci-fluenbit-example.png)
 
 - Long-term application logs live in an Amazon S3 bucket.
 
