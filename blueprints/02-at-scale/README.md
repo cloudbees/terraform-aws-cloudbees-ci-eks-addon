@@ -95,9 +95,9 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
 | prometheus_dashboard | Provides access to Prometheus dashboards. |
 | s3_cbci_arn | CloudBees CI Amazon S3 bucket ARN. |
 | s3_cbci_name | CloudBees CI Amazon S3 bucket name. It is required by CloudBees CI for workspace caching and artifact management. |
-| velero_backup_on_demand_team_a | Takes an on-demand Velero backup from the schedule for team-a. |
-| velero_backup_schedule_team_a | Creates a Velero backup schedule for team-a and deletes the existing backup, if it exists. It can be applied for other controllers using Amazon EBS. |
-| velero_restore_team_a | Restores team-a from a backup. It is also applicable for the rest of the scheduled backups. |
+| velero_backup_on_demand | Takes an on-demand Velero backup from the schedule for selected controller using Block Storage. |
+| velero_backup_schedule | Creates a Velero backup schedule for selected controller using Block Storage and deletes the existing schedulle, if it exists. |
+| velero_restore | Restores selected controller using Block Storage from a backup. |
 | vpc_arn | VPC ID. |
 <!-- END_TF_DOCS -->
 
@@ -245,31 +245,32 @@ To view the **backup-all-controllers** job:
 
 #### Create a Velero backup schedule
 
-Issue the following command to create a Velero backup schedule for `team-a` (this can also be applied to `team-b`):
+Issue the following command to create a Velero backup schedule for selected controller `team-b` (this can also be applied to `team-a`):
 
    ```sh
-   eval $(terraform output --raw velero_backup_schedule_team_a)
+   eval $(terraform output --raw velero_backup_schedule)
    ```
+
 #### Take an on-demand Velero backup
 
 >[!NOTE]
 > When using this CloudBees CI add-on, you must [create at least one Velero backup schedule](#create-a-velero-backup-schedule) prior to taking an on-demand Velero backup.
 
-Issue the following command to take an on-demand Velero backup for a specific point in time for `team-a` based on the schedule definition:
+Issue the following command to take an on-demand Velero backup for a specific point in time for `team-b` based on the schedule definition:
 
    ```sh
-   eval $(terraform output --raw velero_backup_on_demand_team_a)
+   eval $(terraform output --raw velero_backup_on_demand)
    ```
 
 #### Restore from a Velero on-demand backup
 
-1. Make updates on the `team-a` controller (for example, add some jobs).
-2. [Take an on-demand Velero backup](#take-an-on-demand-velero-backup), including the update that you made.
-3. Remove the latest update (for example, remove the jobs that you added).
+1. Make updates on the `team-b` controller (for example, add some jobs and generate builds).
+2. [Take an on-demand Velero backup](#take-an-on-demand-velero-backup), including the updates that you made.
+3. Remove the latest update (for example, remove jobs you create and build on existing jobs).
 4. Issue the following command to restore the controller from the last backup:
 
    ```sh
-   eval $(terraform output --raw velero_restore_team_a)
+   eval $(terraform output --raw velero_restore)
    ```
 
 ### Metrics

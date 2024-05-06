@@ -51,7 +51,8 @@ locals {
   fluentbit_s3_location = "${module.cbci_s3_bucket.s3_bucket_arn}/fluentbit"
   velero_s3_location    = "${module.cbci_s3_bucket.s3_bucket_arn}/velero"
 
-  velero_bk_demo = "team-a-pvc-bk"
+  velero_controller_selector = "tenant=team-a,tenant=team-b" #Only for controllers using Block Storage (EBS volumes in AWS)
+  velero_schedulle_name      = "team-aAndB-velero-schedulle"
 
   epoch_millis = time_static.epoch.unix * 1000
 

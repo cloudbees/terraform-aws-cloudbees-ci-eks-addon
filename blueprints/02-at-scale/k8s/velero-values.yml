@@ -7,3 +7,11 @@ kubectl:
   image:
     #Issue #60
     tag: 1.26.14-debian-11-r6
+
+initContainers:
+- name: inject-metadata-velero-plugin
+  image: ghcr.io/cloudbees-oss/inject-metadata-velero-plugin:main
+  imagePullPolicy: Always
+  volumeMounts:
+  - mountPath: /target
+    name: plugins
