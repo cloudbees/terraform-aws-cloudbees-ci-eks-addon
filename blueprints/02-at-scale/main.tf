@@ -51,8 +51,10 @@ locals {
   fluentbit_s3_location = "${module.cbci_s3_bucket.s3_bucket_arn}/fluentbit"
   velero_s3_location    = "${module.cbci_s3_bucket.s3_bucket_arn}/velero"
 
-  velero_controller_selector = "tenant=team-a,tenant=team-b" #Only for controllers using Block Storage (EBS volumes in AWS)
-  velero_schedulle_name      = "team-aAndB-velero-schedulle"
+  #Velero Backups: Only for controllers using Block Storage (EBS volumes in AWS)
+  velero_controller_backup          = "team-b"
+  velero_controller_backup_selector = "tenant=${local.velero_controller_backup}"
+  velero_schedule_name              = "schedule-${local.velero_controller_backup}"
 
   epoch_millis = time_static.epoch.unix * 1000
 
@@ -168,6 +170,24 @@ module "eks_blueprints_addons" {
   velero = {
     values             = [file("k8s/velero-values.yml")]
     s3_backup_location = local.velero_s3_location
+    set = [{
+      name  = "initContainers"
+      value = <<-EOT
+      - name: velero-plugin-for-aws
+        image: velero/velero-plugin-for-aws:v1.7.1
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+          - mountPath: /target
+            name: plugins
+      #https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/restart-aborted-builds#_restarting_builds_after_a_restore
+      - name: inject-metadata-velero-plugin
+        image: ghcr.io/cloudbees-oss/inject-metadata-velero-plugin:main
+        imagePullPolicy: Always
+        volumeMounts:
+          - mountPath: /target
+            name: plugins
+      EOT
+    }]
   }
   enable_kube_prometheus_stack = true
   kube_prometheus_stack = {
