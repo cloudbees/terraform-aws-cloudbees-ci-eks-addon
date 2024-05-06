@@ -80,7 +80,7 @@ Before a new CloudBees CI Helm chart is released, new features for this addon an
 1. Test the update in the integration branch (`develop`).
    - Update the `version` field if CloudBees CI Terraform EKS Addon update needs to be updated to the new [version of the Helm chart](https://artifacthub.io/packages/helm/cloudbees/cloudbees-core/).
    - The field `source` in the `eks_blueprints_addon_cbci` in the blueprints folder must point to the local CloudBees CI Terraform EKS Addon root of the repository `source = "../../"` (not to the remote [terraform registry version](https://registry.terraform.io/modules/cloudbees/cloudbees-ci-eks-addon/aws/latest)).
-   - Test the update locally
+   - Test the update locally.
 
 > [!TIP]
 > Use the following targets from [Makefile](Makefile): `deploy` > `validate` > `destroy`.
