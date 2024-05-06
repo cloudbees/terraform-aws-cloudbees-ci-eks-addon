@@ -95,9 +95,9 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
 | prometheus_dashboard | Provides access to Prometheus dashboards. |
 | s3_cbci_arn | CloudBees CI Amazon S3 bucket ARN. |
 | s3_cbci_name | CloudBees CI Amazon S3 bucket name. It is required by CloudBees CI for workspace caching and artifact management. |
-| velero_backup_on_demand_team_a | Takes an on-demand Velero backup from the schedule for team-a. |
-| velero_backup_schedule_team_a | Creates a Velero backup schedule for team-a and deletes the existing backup, if it exists. It can be applied for other controllers using Amazon EBS. |
-| velero_restore_team_a | Restores team-a from a backup. It is also applicable for the rest of the scheduled backups. |
+| velero_backup_on_demand | Takes an on-demand Velero backup from the schedule for selected controller using Block Storage. |
+| velero_backup_schedule | Creates a Velero backup schedule for selected controller using Block Storage and deletes the existing schedulle, if it exists. |
+| velero_restore | Restores selected controller using Block Storage from a backup. |
 | vpc_arn | VPC ID. |
 <!-- END_TF_DOCS -->
 
@@ -225,10 +225,11 @@ Once the resources have been created, a `kubeconfig` file is created in the [/k8
 
 For backup and restore operations, you can use the [preconfigured CloudBees CI Cluster Operations job](#create-daily-backups-using-a-cloudbees-ci-cluster-operations-job) to automatically perform a daily backup, which can be used for Amazon EFS and Amazon EBS storage.
 
-[Velero](#create-a-velero-backup-schedule) is an alternative for services that use Amazon EBS as storage. Velero not only takes a backup of the PVC snapshots, but also takes a backup of any other defined Kubernetes resources.
+[Velero](#create-a-velero-backup-schedule) is an alternative for services only for controllers using Amazon EBS. Velero commands and configuration in this blueprint follow [Using Velero back up and restore Kubernetes cluster resources](https://docs.cloudbees.com/docs/cloudbees-ci/latest/backup-restore/velero-dr).
 
 > [!NOTE]
-> There is no alternative for services using Amazon EFS storage. Although [AWS Backup](https://aws.amazon.com/backup/) includes this Amazon EFS drive as a protected resource, there is not currently a best practice to dynamically restore Amazon EFS PVCs. For more information, refer to [Issue 39](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/issues/39).
+> - An installation that has been completely converted to CasC may not need traditional backups; a restore operation could consist simply of running a CasC bootstrap script. This is only an option for a customer who has translated every significant system setting and job configuration to CasC. Even then it may be desirable to perform a filesystem-level restore from backup in order to preserve transient data such as build history.
+> - There is no alternative for services using Amazon EFS storage. Although [AWS Backup](https://aws.amazon.com/backup/) includes this Amazon EFS drive as a protected resource, there is not currently a best practice to dynamically restore Amazon EFS PVCs. For more information, refer to [Issue 39](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/issues/39).
 
 #### Create daily backups using a CloudBees CI Cluster Operations job
 
@@ -245,31 +246,33 @@ To view the **backup-all-controllers** job:
 
 #### Create a Velero backup schedule
 
-Issue the following command to create a Velero backup schedule for `team-a` (this can also be applied to `team-b`):
+Issue the following command to create a Velero backup schedule for selected controller `team-b` (this can also be applied to `team-a`):
 
    ```sh
-   eval $(terraform output --raw velero_backup_schedule_team_a)
+   eval $(terraform output --raw velero_backup_schedule)
    ```
+
 #### Take an on-demand Velero backup
 
 >[!NOTE]
 > When using this CloudBees CI add-on, you must [create at least one Velero backup schedule](#create-a-velero-backup-schedule) prior to taking an on-demand Velero backup.
 
-Issue the following command to take an on-demand Velero backup for a specific point in time for `team-a` based on the schedule definition:
+Issue the following command to take an on-demand Velero backup for a specific point in time for `team-b` based on the schedule definition:
 
    ```sh
-   eval $(terraform output --raw velero_backup_on_demand_team_a)
+   eval $(terraform output --raw velero_backup_on_demand)
    ```
 
 #### Restore from a Velero on-demand backup
 
-1. Make updates on the `team-a` controller (for example, add some jobs).
-2. [Take an on-demand Velero backup](#take-an-on-demand-velero-backup), including the update that you made.
-3. Remove the latest update (for example, remove the jobs that you added).
-4. Issue the following command to restore the controller from the last backup:
+1. Make updates on the `team-b` controller (for example, add some jobs and generate builds).
+2. [Take an on-demand Velero backup](#take-an-on-demand-velero-backup), including the updates that you made.
+3. Remove the latest update (for example, remove jobs you create and build on existing jobs).
+4. Manage `team-b` > Deprovision the controller.
+5. Issue the following command to restore the controller from the last backup:
 
    ```sh
-   eval $(terraform output --raw velero_restore_team_a)
+   eval $(terraform output --raw velero_restore)
    ```
 
 ### Metrics
