@@ -306,7 +306,7 @@ Grafana is used to visualize and query:
 
    If successful, the Grafana dashboard should be available at `http://localhost:50002`.
 
-   - For Jenkins Metrics Dashboards navigate to **Dashboards > CloudBees CI**. Then, select the controller pod to view the metrics. The following image shows metric for team-b.
+   - For Jenkins Metrics Dashboards navigate to **Dashboards > CloudBees CI**. Then, select the controller pod to view the metrics. The following image shows metrics for team-b.
 
    ![CloudBees CI Dashboard](img/observability/cbci-dashboard.png)
 
