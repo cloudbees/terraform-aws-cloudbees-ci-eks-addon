@@ -170,7 +170,7 @@ Once the resources have been created, a `kubeconfig` file is created in the [/k8
    eval $(terraform output --raw ldap_admin_password)
    ```
 
-1. CasC is enabled for the [operations center](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/) (`cjoc`) and [controllers](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-controller/) (`team-b` and `team-c-ha`). `team-a` is not using CasC, to illustrate the difference between the two approaches. Issue the following command to verify that all controllers are in a `Running` state:
+3. CasC is enabled for the [operations center](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/) (`cjoc`) and [controllers](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-controller/) (`team-b` and `team-c-ha`). `team-a` is not using CasC, to illustrate the difference between the two approaches. Issue the following command to verify that all controllers are in a `Running` state:
 
    ```sh
    eval $(terraform output --raw cbci_controllers_pods)
@@ -178,13 +178,13 @@ Once the resources have been created, a `kubeconfig` file is created in the [/k8
 
    If successful, it should indicate that 2 replicas are running for `team-c-ha` since [CloudBees CI HA/HS](https://docs.cloudbees.com/docs/cloudbees-ci/latest/ha-install-guide/) is enabled on this controller.
 
-2. Issue the following command to verify that horizontal pod autoscaling is enabled for `team-c-ha`:
+4. Issue the following command to verify that horizontal pod autoscaling is enabled for `team-c-ha`:
 
    ```sh
    eval $(terraform output --raw cbci_controller_c_hpa)
    ```
 
-3. Issue the following command to retrieve an [API token](https://docs.cloudbees.com/docs/cloudbees-ci-api/latest/api-authentication) for the `admin_cbci_a` user with the correct permissions for the required actions:
+5. Issue the following command to retrieve an [API token](https://docs.cloudbees.com/docs/cloudbees-ci-api/latest/api-authentication) for the `admin_cbci_a` user with the correct permissions for the required actions:
 
    ```sh
    eval $(terraform output --raw cbci_oc_export_admin_crumb) && \
@@ -198,7 +198,7 @@ Once the resources have been created, a `kubeconfig` file is created in the [/k8
    eval $(terraform output --raw cbci_liveness_probe_ext)
    ```
 
-4. Once you have retrieved the API token, issue the following command to remotely trigger the `ws-cache` pipeline from `team-b` using the [POST queue for hibernation API endpoint](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#_post_queue_for_hibernation):
+6. Once you have retrieved the API token, issue the following command to remotely trigger the `ws-cache` pipeline from `team-b` using the [POST queue for hibernation API endpoint](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#_post_queue_for_hibernation):
 
    ```sh
    eval $(terraform output --raw cbci_controller_b_hibernation_post_queue_ws_cache)
@@ -206,15 +206,15 @@ Once the resources have been created, a `kubeconfig` file is created in the [/k8
 
    If successful, an `HTTP/2 201` response is returned, indicating the REST API call has been correctly received by the CloudBees CI controller.
 
-5. Right after triggering the build, issue the following to validate pod agent provisioning to build the pipeline code:
+7. Right after triggering the build, issue the following to validate pod agent provisioning to build the pipeline code:
 
    ```sh
    eval $(terraform output --raw cbci_agents_pods)
    ```
 
-6.  In the CloudBees CI UI, sign in to the `team-b` controller.
-7.  Navigate to the `ws-cache` pipeline and select the first build, indicated by the `#1` build number.
-8.  Select [CloudBees Pipeline Explorer](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-pipeline-explorer-plugin) and examine the build logs.
+8. In the CloudBees CI UI, sign in to the `team-b` controller.
+9. Navigate to the `ws-cache` pipeline and select the first build, indicated by the `#1` build number.
+10. Select [CloudBees Pipeline Explorer](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-pipeline-explorer-plugin) and examine the build logs.
 
 > [!NOTE]
 > - This pipeline uses [CloudBees Workspace Caching](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-cache-step). Once the second build is complete, you can find the read cache operation at the beginning of the build logs and the write cache operation at the end of the build logs.
