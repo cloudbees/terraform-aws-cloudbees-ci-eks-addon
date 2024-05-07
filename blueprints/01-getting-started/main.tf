@@ -175,8 +175,7 @@ module "eks" {
       node_group_name = "managed-start"
       capacity_type   = "ON_DEMAND"
       instance_types  = ["m7g.xlarge"] #Graviton
-      ami_type        = "BOTTLEROCKET_ARM_64"
-      platform        = "bottlerocket"
+      ami_type        = "AL2023_ARM_64_STANDARD"
       disk_size       = 25
       desired_size    = 2
     }

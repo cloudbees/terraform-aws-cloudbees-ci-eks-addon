@@ -17,7 +17,7 @@ Get started with the [CloudBees CI on modern platforms in Amazon Elastic Kuberne
 
 - Node groups specification:
   - Instance Type: [Graviton Processor](https://aws.amazon.com/ec2/graviton/) family
-  - AMI Type: [Bottlerocket OS](https://aws.amazon.com/bottlerocket/)
+  - AMI Type: [Amazon EKS-Optimized Amazon Linux 2023](https://aws.amazon.com/blogs/containers/amazon-eks-optimized-amazon-linux-2023-amis-now-available/)
 
 ### Kubernetes cluster
 
