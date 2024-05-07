@@ -79,9 +79,8 @@ resource "time_static" "epoch" {
 # CloudBees CI Add-ons
 
 module "eks_blueprints_addon_cbci" {
-  source = "../../"
-  #source  = "cloudbees/cloudbees-ci-eks-addon/aws"
-  #version = ">= 3.17108.0"
+  source  = "cloudbees/cloudbees-ci-eks-addon/aws"
+  version = ">= 3.17108.0"
 
   hosted_zone   = var.hosted_zone
   cert_arn      = module.acm.acm_certificate_arn
@@ -234,13 +233,18 @@ module "eks_blueprints_addons" {
       "${local.fluentbit_s3_location}/*"
     ]
   }
-
-  enable_cert_manager = true #Requirement for Bottlerocket Update Operator
+  #Cert Manager - Requirement for Bottlerocket Update Operator
+  enable_cert_manager = true
   cert_manager = {
     wait = true
   }
-  enable_bottlerocket_update_operator = true #Important: Update timing can be customized.
-
+  #Important: Update timing can be customized
+  #Bottlerocket Update Operator
+  enable_bottlerocket_update_operator = true
+  bottlerocket_update_operator = {
+    values = [file("k8s/bottlerocket-update-operator.yml")]
+  }
+  #Additional Helm Releases
   helm_releases = {
     osixia-openldap = {
       name             = "osixia-openldap"
@@ -347,20 +351,36 @@ module "eks" {
   #https://docs.aws.amazon.com/eks/latest/APIReference/API_Nodegroup.html
   eks_managed_node_group_defaults = {
     capacity_type = "ON_DEMAND"
-    ami_type      = "BOTTLEROCKET_ARM_64"
-    platform      = "bottlerocket"
     disk_size     = 50
+    #Bottlerocket configuration. All Nodes groups are Bottlerocket but common_apps
+    ami_type = "BOTTLEROCKET_ARM_64"
+    platform = "bottlerocket"
+    #BottleRocket Settings: https://bottlerocket.dev/en/os/1.19.x/api/settings/
+    enable_bootstrap_user_data = true
+    bootstrap_extra_args       = <<-EOT
+            [settings.host-containers.admin]
+            enabled = false
+            [settings.host-containers.control]
+            enabled = true
+            [settings.kernel]
+            lockdown = "integrity"
+            [settings.kubernetes.node-labels]
+            "bottlerocket.aws/updater-interface-version" = "2.0.0"
+          EOT
   }
   eks_managed_node_groups = {
     #Note: osixia/openldap is not compatible either Bottlerocket, neither Graviton.
     common_apps = {
-      node_group_name = "mg-common-apps"
-      instance_types  = ["m5d.xlarge"]
-      ami_type        = "AL2023_x86_64_STANDARD"
-      platform        = "linux"
-      min_size        = 1
-      max_size        = 3
-      desired_size    = 1
+      node_group_name            = "mg-common-apps"
+      instance_types             = ["m5d.xlarge"]
+      ami_type                   = "AL2023_x86_64_STANDARD"
+      platform                   = "linux"
+      min_size                   = 1
+      max_size                   = 3
+      desired_size               = 1
+      enable_bootstrap_user_data = false
+      bootstrap_extra_args       = <<-EOT
+          EOT
     }
     cb_apps = {
       node_group_name = "mg-cb-apps"
