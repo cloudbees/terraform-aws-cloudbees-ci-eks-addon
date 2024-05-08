@@ -85,6 +85,11 @@ test-all: ## Runs test for all blueprints throughout their Terraform Lifecycle. 
 	@$(call helpers,test-all)
 	@$(call helpers,INFO "All Tests target passed succesfully.")
 
+.PHONY: pre-commit
+pre-commit: ## Run pre-commits in all files. It is a recommended step before sending PR. Example: make pre-commit
+	pre-commit run --all-files
+	@$(call helpers,INFO "End of pre-commits checks.")
+
 .PHONY: set-kube-env
 set-kube-env: ## Set K8s version according to file .k8.env. Example: make set-kube-env
 set-kube-env: agentCheck
