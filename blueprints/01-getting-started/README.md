@@ -13,10 +13,11 @@ Get started with the [CloudBees CI on modern platforms in Amazon Elastic Kuberne
 
 ## Architecture
 
-> [!NOTE]
-> Node groups use an [AWS Graviton Processor](https://aws.amazon.com/ec2/graviton/) to ensure the best balance between price and performance for cloud workloads running on Amazon Elastic Compute Cloud (Amazon EC2).
-
 ![Architecture](img/getting-started.architect.drawio.svg)
+
+- Node groups specification:
+  - Instance Type: [Graviton Processor](https://aws.amazon.com/ec2/graviton/) family
+  - AMI Type: [Amazon EKS-Optimized Amazon Linux 2023](https://aws.amazon.com/blogs/containers/amazon-eks-optimized-amazon-linux-2023-amis-now-available/)
 
 ### Kubernetes cluster
 

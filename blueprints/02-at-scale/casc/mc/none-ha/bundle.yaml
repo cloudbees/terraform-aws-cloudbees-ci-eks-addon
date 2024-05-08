@@ -1,4 +1,4 @@
-apiVersion: "1"
+apiVersion: "2"
 id: "none-ha"
 description: "CasC bundle for non-HA controllers. It is tested for the CloudBees CI blueprint add-on: At scale."
 version: "1"

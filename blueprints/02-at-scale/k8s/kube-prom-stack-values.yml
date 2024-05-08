@@ -96,10 +96,28 @@ additionalPrometheusRulesMap:
               summary: "{{ $labels.pod }} too many jobs queued"
               description: "{{ $labels.pod }} has {{ $value }} jobs stuck in queue"
 grafana:
+  datasources:
+    datasources.yaml:
+      apiVersion: 1
+      datasources:
+        - name: Tempo
+          type: tempo
+          url: http://tempo.kube-prometheus-stack.svc.cluster.local:3100
+          access: proxy
+          isDefault: false
+
   dashboardProviders:
     dashboardproviders.yaml:
       apiVersion: 1
       providers:
+        - name: "grafana-dashboards-kubernetes"
+          orgId: 1
+          folder: "Kubernetes"
+          type: file
+          disableDeletion: true
+          editable: true
+          options:
+            path: /var/lib/grafana/dashboards/grafana-dashboards-kubernetes
         - name: "grafana-dashboards-cloudbees"
           orgId: 1
           folder: "CloudBees"
@@ -109,6 +127,19 @@ grafana:
           options:
             path: /var/lib/grafana/dashboards/grafana-dashboards-cloudbees
   dashboards:
+    grafana-dashboards-kubernetes:
+        k8s-views-global:
+          url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-global.json
+          token: ""
+        k8s-views-namespaces:
+          url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-namespaces.json
+          token: ""
+        k8s-views-nodes:
+          url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-nodes.json
+          token: ""
+        k8s-views-pods:
+          url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-pods.json
+          token: ""
     grafana-dashboards-cloudbees:
       cb-controllers:
         url: https://raw.githubusercontent.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/main/blueprints/02-at-scale/k8s/kube-prom-stack-grafana-db.json

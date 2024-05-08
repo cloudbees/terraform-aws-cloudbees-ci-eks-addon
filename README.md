@@ -30,7 +30,7 @@ Implementation examples are included in the [blueprints](https://github.com/clou
 module "eks_blueprints_addon_cbci" {
   source  = "cloudbees/cloudbees-ci-eks-addon/aws"
   version = ">= 3.17108.0"
-  
+
   hosted_zone    = "example.domain.com"
   cert_arn     = "arn:aws:acm:us-east-1:0000000:certificate/0000000-aaaa-bbb-ccc-thisIsAnExample"
   trial_license = {
@@ -70,8 +70,11 @@ The two main components of CloudBees CI - the operations center and managed cont
 - Amazon EFS file systems are scoped to an AWS region and can be accessed from any availability zone in the region that the file system was created in. Using Amazon EFS as a storage class for the operations center and managed controllers allows pods to be rescheduled successfully onto healthy nodes in the event of an availability zone outage. Amazon EFS is more expensive than Amazon EBS, but provides greater fault tolerance.
 
 > [!IMPORTANT]  
-> - CloudBees CI High Availability (HA) (active-active) requires Amazon EFS. For more information, refer to [CloudBees CI EKS storage requirements](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/eks-pre-install-requirements-helm#_storage_requirements).
-> - For more information on pricing, refer to [Amazon EBS pricing](https://aws.amazon.com/ebs/pricing/) and [Amazon EFS pricing](https://aws.amazon.com/efs/pricing/).
+> CloudBees CI High Availability (HA) (active-active) requires Amazon EFS. For more information, refer to [CloudBees CI EKS storage requirements](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/eks-pre-install-requirements-helm#_storage_requirements).
+
+> [!NOTE]
+> - For more information on pricing and cost analysis, refer to [Amazon EBS pricing](https://aws.amazon.com/ebs/pricing/), [Amazon EFS pricing](https://aws.amazon.com/efs/pricing/), and [CloudBees CI with HA Mode Enabled: Sample cost analysis on AWS](https://www.cloudbees.com/blog/cloudbees-ci-with-ha-mode-enabled-sample-cost-analysis-on-aws).
+> - For more information on performance, refer to [Amazon EBS performance](https://docs.aws.amazon.com/ebs/latest/userguide/ebs-performance.html), [Amazon EFS performance](https://docs.aws.amazon.com/efs/latest/ug/performance.html), and [Analyzing CloudBees CI's High Availability: Performance, Bottlenecks, and Conclusions](https://www.cloudbees.com/blog/analyzing-cloudbees-ci-high-availability-performance-bottlenecks-and).
 
 ## CloudBees CI trial license
 
@@ -92,10 +95,10 @@ The CloudBees CI add-on uses `helms release` for its resources definition, makin
 | cert_arn | AWS Certificate Manager (ACM) certificate for Amazon Resource Names (ARN). | `string` | n/a | yes |
 | hosted_zone | Amazon Route 53 hosted zone name. | `string` | n/a | yes |
 | trial_license | CloudBees CI trial license details for evaluation. | `map(string)` | n/a | yes |
-| create_k8s_secrets | Create the Kubernetes secret cbci-secrets. It can be consumed by CasC. | `bool` | `false` | no |
+| create_k8s_secrets | Create the Kubernetes secret cbci-secrets. It can be consumed by CloudBees CasC. | `bool` | `false` | no |
 | helm_config | CloudBees CI Helm chart configuration. | `any` | <pre>{<br>  "values": [<br>    ""<br>  ]<br>}</pre> | no |
 | k8s_secrets_file | Secrets file .yml path containing the secrets names:values for cbci-secrets. | `string` | `"secrets-values.yml"` | no |
-| prometheus_target | Create Service Monitor to discover CloudBees CI Apps Prometheus Target dinamically. It is designed to be enabled with AWS EKS Terraform Addon Kube Prometheus Stack. | `bool` | `false` | no |
+| prometheus_target | Creates a service monitor to discover the CloudBees CI Prometheus target dynamically. It is designed to be enabled with the AWS EKS Terraform Addon Kube Prometheus Stack. | `bool` | `false` | no |
 
 ### Outputs
 
@@ -108,7 +111,7 @@ The CloudBees CI add-on uses `helms release` for its resources definition, makin
 | cbci_oc_ing | Operations center Ingress for the CloudBees CI add-on. |
 | cbci_oc_pod | Operations center pod for the CloudBees CI add-on. |
 | cbci_oc_url | Operations center URL for the CloudBees CI add-on using a subdomain and certificates. |
-| cbci_secrets | Kubernetes secrets name for CloudBees CI. Optional. |
+| cbci_secrets | Optional. Kubernetes secrets name for CloudBees CI. |
 | merged_helm_config | (merged) Helm configuration for CloudBees CI. |
 <!-- END_TF_DOCS -->
 

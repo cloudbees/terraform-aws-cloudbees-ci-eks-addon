@@ -22,14 +22,9 @@ locals {
 
   vpc_cidr = "10.0.0.0/16"
 
-  #https://docs.aws.amazon.com/eks/latest/userguide/choosing-instance-type.html
   mng = {
-    common_apps ={
-      instance_types = ["m5.8xlarge"]
-    }
     cbci_apps = {
-      instance_types = ["m7g.2xlarge"]
-      taints   = {
+      taints = {
         key    = "dedicated"
         value  = "cb-apps"
         effect = "NO_SCHEDULE"
@@ -38,12 +33,10 @@ locals {
         ci_type = "cb-apps"
       }
     }
-    agents = {
-      instance_types = ["m7g.4xlarge"]
-    }
+
   }
 
-  cbci_apps_labels_yaml   = replace(yamlencode(local.mng["cbci_apps"]["labels"]), "/\"/", "")
+  cbci_apps_labels_yaml = replace(yamlencode(local.mng["cbci_apps"]["labels"]), "/\"/", "")
 
   route53_zone_id  = data.aws_route53_zone.this.id
   route53_zone_arn = data.aws_route53_zone.this.arn
@@ -58,17 +51,20 @@ locals {
   fluentbit_s3_location = "${module.cbci_s3_bucket.s3_bucket_arn}/fluentbit"
   velero_s3_location    = "${module.cbci_s3_bucket.s3_bucket_arn}/velero"
 
-  velero_bk_demo = "team-a-pvc-bk"
+  #Velero Backups: Only for controllers using Block Storage (EBS volumes in AWS)
+  velero_controller_backup          = "team-b"
+  velero_controller_backup_selector = "tenant=${local.velero_controller_backup}"
+  velero_schedule_name              = "schedule-${local.velero_controller_backup}"
 
   epoch_millis = time_static.epoch.unix * 1000
 
   cloudwatch_logs_expiration_days = 7
   s3_objects_expiration_days      = 90
 
-  cbci_agents_ns = "cbci-agents"
+  cbci_agents_ns  = "cbci-agents"
   cbci_admin_user = "admin_cbci_a"
 
-  cbci_agent_podtemplname_validation ="maven-and-go-ondemand"
+  cbci_agent_podtemplname_validation = "maven-and-go-ondemand"
 
 }
 
@@ -92,10 +88,10 @@ module "eks_blueprints_addon_cbci" {
 
   helm_config = {
     values = [templatefile("k8s/cbci-values.yml", {
-      cbciAppsSelector = local.cbci_apps_labels_yaml
-      cbciAppsTolerationKey = local.mng["cbci_apps"]["taints"].key
+      cbciAppsSelector        = local.cbci_apps_labels_yaml
+      cbciAppsTolerationKey   = local.mng["cbci_apps"]["taints"].key
       cbciAppsTolerationValue = local.mng["cbci_apps"]["taints"].value
-      cbciAgentsNamespace = local.cbci_agents_ns
+      cbciAgentsNamespace     = local.cbci_agents_ns
     })]
   }
 
@@ -152,7 +148,9 @@ module "eks_blueprints_addons" {
     vpc-cni    = {}
     kube-proxy = {}
   }
+  #####################
   #01-getting-started
+  #####################
   enable_external_dns = true
   external_dns = {
     values = [templatefile("k8s/extdns-values.yml", {
@@ -161,7 +159,9 @@ module "eks_blueprints_addons" {
   }
   external_dns_route53_zone_arns      = [local.route53_zone_arn]
   enable_aws_load_balancer_controller = true
+  #####################
   #02-at-scale
+  #####################
   enable_aws_efs_csi_driver = true
   enable_metrics_server     = true
   enable_cluster_autoscaler = true
@@ -169,6 +169,24 @@ module "eks_blueprints_addons" {
   velero = {
     values             = [file("k8s/velero-values.yml")]
     s3_backup_location = local.velero_s3_location
+    set = [{
+      name  = "initContainers"
+      value = <<-EOT
+      - name: velero-plugin-for-aws
+        image: velero/velero-plugin-for-aws:v1.7.1
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+          - mountPath: /target
+            name: plugins
+      #https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/restart-aborted-builds#_restarting_builds_after_a_restore
+      - name: inject-metadata-velero-plugin
+        image: ghcr.io/cloudbees-oss/inject-metadata-velero-plugin:main
+        imagePullPolicy: Always
+        volumeMounts:
+          - mountPath: /target
+            name: plugins
+      EOT
+    }]
   }
   enable_kube_prometheus_stack = true
   kube_prometheus_stack = {
@@ -215,13 +233,50 @@ module "eks_blueprints_addons" {
       "${local.fluentbit_s3_location}/*"
     ]
   }
-
+  #Cert Manager - Requirement for Bottlerocket Update Operator
+  enable_cert_manager = true
+  cert_manager = {
+    wait = true
+  }
+  #Important: Update timing can be customized
+  #Bottlerocket Update Operator
+  enable_bottlerocket_update_operator = true
+  bottlerocket_update_operator = {
+    values = [file("k8s/bottlerocket-update-operator.yml")]
+  }
+  #Additional Helm Releases
   helm_releases = {
     osixia-openldap = {
       name             = "osixia-openldap"
       namespace        = "auth"
       create_namespace = true
       chart            = "k8s/osixia-openldap"
+    }
+    aws-node-termination-handler = {
+      name          = "aws-node-termination-handler"
+      namespace     = "kube-system"
+      chart         = "aws-node-termination-handler"
+      chart_version = "0.21.0"
+      repository    = "https://aws.github.io/eks-charts"
+      values = [
+        <<-EOT
+          nodeSelector:
+            ci_type: build-linux-spot
+        EOT
+      ]
+    }
+    grafana-tempo = {
+      name          = "tempo"
+      namespace     = "kube-prometheus-stack"
+      chart         = "tempo"
+      chart_version = "1.7.2"
+      repository    = "https://grafana.github.io/helm-charts"
+      values = [
+        <<-EOT
+          tempoQuery:
+            enabled: true
+        EOT
+      ]
     }
   }
 
@@ -235,7 +290,7 @@ module "eks_blueprints_addons" {
 # EKS Cluster
 
 module "eks" {
-  source = "terraform-aws-modules/eks/aws"
+  source  = "terraform-aws-modules/eks/aws"
   version = "19.17.1"
 
   cluster_name                   = local.cluster_name
@@ -245,11 +300,6 @@ module "eks" {
 
   vpc_id     = module.vpc.vpc_id
   subnet_ids = module.vpc.private_subnets
-
-  eks_managed_node_group_defaults = {
-    disk_size = 50
-    ami_type  = "AL2_ARM_64" #For Graviton
-  }
 
   # Security groups based on the best practices doc https://docs.aws.amazon.com/eks/latest/userguide/sec-group-reqs.html.
   #   So, by default the security groups are restrictive. Users needs to enable rules for specific ports required for App requirement or Add-ons
@@ -297,21 +347,44 @@ module "eks" {
     }
   }
 
-  #https://aws.amazon.com/blogs/containers/amazon-eks-cluster-multi-zone-auto-scaling-groups/
+  #https://docs.aws.amazon.com/eks/latest/userguide/choosing-instance-type.html
+  #https://docs.aws.amazon.com/eks/latest/APIReference/API_Nodegroup.html
+  eks_managed_node_group_defaults = {
+    capacity_type = "ON_DEMAND"
+    disk_size     = 50
+    #Bottlerocket configuration. All Nodes groups are Bottlerocket but common_apps
+    ami_type = "BOTTLEROCKET_ARM_64"
+    platform = "bottlerocket"
+    #BottleRocket Settings: https://bottlerocket.dev/en/os/1.19.x/api/settings/
+    enable_bootstrap_user_data = true
+    bootstrap_extra_args       = <<-EOT
+            [settings.host-containers.admin]
+            enabled = false
+            [settings.host-containers.control]
+            enabled = true
+            [settings.kernel]
+            lockdown = "integrity"
+            [settings.kubernetes.node-labels]
+            "bottlerocket.aws/updater-interface-version" = "2.0.0"
+          EOT
+  }
   eks_managed_node_groups = {
-    mg_k8sApps = {
-      node_group_name = "mg-k8s-apps"
-      instance_types  = local.mng["common_apps"]["instance_types"]
-      capacity_type   = "ON_DEMAND"
-      min_size        = 1
-      max_size        = 3
-      desired_size    = 1
-      ami_type        = "AL2_x86_64"
+    #Note: osixia/openldap is not compatible either Bottlerocket, neither Graviton.
+    common_apps = {
+      node_group_name            = "mg-common-apps"
+      instance_types             = ["m5d.xlarge"]
+      ami_type                   = "AL2023_x86_64_STANDARD"
+      platform                   = "linux"
+      min_size                   = 1
+      max_size                   = 3
+      desired_size               = 1
+      enable_bootstrap_user_data = false
+      bootstrap_extra_args       = <<-EOT
+          EOT
     }
-    mg_cbApps = {
-      node_group_name = "mng-cb-apps"
-      instance_types  = local.mng["cbci_apps"]["instance_types"]
-      capacity_type   = "ON_DEMAND"
+    cb_apps = {
+      node_group_name = "mg-cb-apps"
+      instance_types  = ["m7g.2xlarge"] #Graviton
       min_size        = 1
       max_size        = 6
       desired_size    = 1
@@ -320,10 +393,9 @@ module "eks" {
       create_iam_role = false
       iam_role_arn    = aws_iam_role.managed_ng.arn
     }
-    mg_cbAgents = {
-      node_group_name = "mng-agent"
-      instance_types  = local.mng["agents"]["instance_types"]
-      capacity_type   = "ON_DEMAND"
+    cb_agents_2x = {
+      node_group_name = "mg-agent-2x"
+      instance_types  = ["m7g.large"] #Graviton
       min_size        = 1
       max_size        = 3
       desired_size    = 1
@@ -332,14 +404,30 @@ module "eks" {
         ci_type = "build-linux"
       }
     }
-    mg_cbAgents_spot = {
-      node_group_name = "mng-agent-spot"
-      instance_types  = local.mng["agents"]["instance_types"]
-      capacity_type   = "SPOT"
-      min_size        = 1
-      max_size        = 3
-      desired_size    = 1
-      taints          = [{ key = "dedicated", value = "build-linux-spot", effect = "NO_SCHEDULE" }]
+    #https://aws.amazon.com/blogs/compute/cost-optimization-and-resilience-eks-with-spot-instances/
+    #https://www.eksworkshop.com/docs/fundamentals/managed-node-groups/spot/instance-diversification
+    cb_agents_spot_4x = {
+      node_group_name = "mng-agent-spot-4x"
+      #ec2-instance-selector --vcpus 4 --memory 16 --region us-east-1 --deny-list 't.*' --current-generation -a arm64 --gpus 0 --usage-class spot
+      instance_types = ["im4gn.xlarge", "m6g.xlarge", "m6gd.xlarge", "m7g.xlarge", "m7gd.xlarge"] #Graviton
+      capacity_type  = "SPOT"
+      min_size       = 0
+      max_size       = 3
+      desired_size   = 0
+      taints         = [{ key = "dedicated", value = "build-linux-spot", effect = "NO_SCHEDULE" }]
+      labels = {
+        ci_type = "build-linux-spot"
+      }
+    }
+    cb_agents_spot_8x = {
+      node_group_name = "mng-agent-spot-8x"
+      #ec2-instance-selector --vcpus 8 --memory 32 --region us-east-1 --deny-list 't.*' --current-generation -a arm64 --gpus 0 --usage-class spot
+      instance_types = ["im4gn.2xlarge", "m6g.2xlarge", "m6gd.2xlarge", "m7g.2xlarge", "m7gd.2xlarge"] #Graviton
+      capacity_type  = "SPOT"
+      min_size       = 0
+      max_size       = 3
+      desired_size   = 0
+      taints         = [{ key = "dedicated", value = "build-linux-spot", effect = "NO_SCHEDULE" }]
       labels = {
         ci_type = "build-linux-spot"
       }
