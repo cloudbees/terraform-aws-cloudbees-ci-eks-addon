@@ -27,7 +27,7 @@ When filing an issue:
 Contributions via pull requests (PRs) are appreciated. Before submitting a PR, please ensure that you:
 
 1. Are working against the latest source on the `main` branch.
-2. Check existing open, and recently merged, PRs to make sure someone else has not already addressed the problem.
+2. Check existing open and recently merged PRs, to ensure the problem has not already been addressed.
 3. Open an issue to discuss any significant work; we do not want your time to be wasted.
 
 To submit a PR:
@@ -69,29 +69,24 @@ The [bp-tf-ci.yaml](.cloudbees/workflows/bp-tf-ci.yaml) blueprints are orchestra
 - AWS Route 53 zone name, to create DNS records.
 
 > [!IMPORTANT]
-> CloudBees Platform currently only supports push events. Therefore, PRs are sent to the `develop` branch for integration.
+> The [CloudBees platform](https://www.cloudbees.com/products/saas-platform) currently only supports push events. Therefore, PRs are first opened on the `develop` branch for integration.
 
 ## Release
 
-The CloudBees CI add-on for Amazon EKS blueprints versions attempt to stay in sync with the [CloudBees CI releases](https://docs.cloudbees.com/docs/release-notes/latest/cloudbees-ci/).
+The CloudBees CI add-on versions attempt to stay in sync with the [CloudBees CI releases](https://docs.cloudbees.com/docs/release-notes/latest/cloudbees-ci/).
 
 Before a new CloudBees CI Helm chart is released, new features for this add-on and its companion blueprints are merged into the `develop` integration branch. When a new version of the CloudBees CI Helm chart is released, the add-on is updated to the new version using the following process:
 
 1. Test the update in the `develop` integration branch.
    - Update the `version` field if the CloudBees CI add-on for Amazon EKS blueprints needs to be updated to the new [version of the Helm chart](https://artifacthub.io/packages/helm/cloudbees/cloudbees-core/).
    - Verify that the `source` field for `eks_blueprints_addon_cbci` (in the `blueprints` folder) points to the local root of the `terraform-aws-cloudbees-ci-eks-addon` repository: `source = "../../"`, and not to the remote [terraform registry version](https://registry.terraform.io/modules/cloudbees/cloudbees-ci-eks-addon/aws/latest).
-   - Test the update locally.
-
-   > [!TIP]
-   > Use the following targets from [Makefile](Makefile): `deploy` > `validate` > `destroy`.
+   - Test the update locally using the following targets from [Makefile](Makefile): `deploy` > `validate` > `destroy`.
 
 2. Create a PR against the `main` branch, including the Helm chart update plus other updates available in the `develop` integration branch. Ensure that the `source` field for `eks_blueprints_addon_cbci` in the `blueprints` folder points to the remote [terraform registry version](https://registry.terraform.io/modules/cloudbees/cloudbees-ci-eks-addon/aws/latest) and `version >= "x.x.x"`.
 3. Once the PR is merged, verify that the `main` branch successfully passes the [Terraform CI build](#blueprint-terraform-ci-pipeline).
 4. Create a [new release](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/releases). The release version semantics follow the Helm chart convention.
 
 > [!IMPORTANT]
-> This project uses a mono-repository approach where the CasC bundles and blueprints are stored in the same repository. In the `main` branch, the CasC bundle SCM configuration should point to the `main` branch.
-
-This project uses [Release Drafter](https://github.com/release-drafter/release-drafter); PR labels should be set accordingly.
-
-Kubernetes' environment versions are managed centrally in the [blueprints/.k8.env](blueprints/.k8s.env) file.
+> - This project uses a mono-repository approach where the CasC bundles and blueprints are stored in the same repository. In the `main` branch, the CasC bundle SCM configuration should point to the `main` branch.
+> - This project uses [Release Drafter](https://github.com/release-drafter/release-drafter); PR labels should be set accordingly.
+> - Kubernetes' environment versions are managed centrally in the [blueprints/.k8.env](blueprints/.k8s.env) file.

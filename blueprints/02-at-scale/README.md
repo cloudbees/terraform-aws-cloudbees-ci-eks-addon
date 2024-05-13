@@ -280,7 +280,7 @@ Issue the following command to take an on-demand Velero backup for a specific po
 
 Grafana is used to visualize and query:
 
-- [Jenkins' metrics](https://plugins.jenkins.io/metrics/) that are stored in Prometheus.
+- [Jenkins metrics](https://plugins.jenkins.io/metrics/) that are stored in Prometheus.
 - [Jenkins tracing via OpenTelemetry](https://plugins.jenkins.io/opentelemetry/) that are stored in Grafana Tempo.
 
 1. Issue the following command to verify that the CloudBees CI targets are connected to Prometheus:
@@ -309,7 +309,7 @@ Grafana is used to visualize and query:
 
    ![CloudBees CI Dashboard](img/observability/cbci-dashboard.png)
 
-   - For tracing data, navigate to **Home > Explore > Tempo > Query Type: Search**. For the **Service name**, select **jenkins** and select the appropriate **Span Name** to run the query. The following image shows an example of the `ws-cache` pipeline build:
+   - For tracing data, navigate to **Home > Explore > Tempo > Query Type: Search**. For the **Service name**, select **jenkins**, and then select the appropriate **Span Name** to run the query. The following image shows an example of the `ws-cache` pipeline build:
 
    ![CloudBees CI Tracing Example](img/observability/cbci-tracing-example.png)
 
