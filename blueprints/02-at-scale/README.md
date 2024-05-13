@@ -94,9 +94,9 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
 | prometheus_dashboard | Provides access to Prometheus dashboards. |
 | s3_cbci_arn | CloudBees CI Amazon S3 bucket ARN. |
 | s3_cbci_name | CloudBees CI Amazon S3 bucket name. It is required by CloudBees CI for workspace caching and artifact management. |
-| velero_backup_on_demand | Takes an on-demand Velero backup from the schedule for selected controller using Block Storage. |
-| velero_backup_schedule | Creates a Velero backup schedule for selected controller using Block Storage and deletes the existing schedulle, if it exists. |
-| velero_restore | Restores selected controller using Block Storage from a backup. |
+| velero_backup_on_demand | Takes an on-demand Velero backup from the schedule for the selected controller that is using block storage. |
+| velero_backup_schedule | Creates a Velero backup schedule for the selected controller that is using block storage, and then deletes the existing schedule, if it exists. |
+| velero_restore | Restores the selected controller that is using block storage from a backup. |
 | vpc_arn | VPC ID. |
 <!-- END_TF_DOCS -->
 
