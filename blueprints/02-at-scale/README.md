@@ -16,8 +16,7 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
   | [Kube Prometheus Stack](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/kube-prometheus-stack/) | Used for metrics observability.|
   | [Metrics Server](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/metrics-server/) | This is a requirement for CloudBees CI HA/HS controllers for horizontal pod autoscaling.|
   | [Velero](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/velero/)| Backs up and restores Kubernetes resources and volume snapshots. It is only compatible with Amazon Elastic Block Store (Amazon EBS).|
-  | [Bottlerocket Update Operator](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/bottlerocket/) | Coordinates Bottlerocket updates on hosts in a cluster. It is configured for CloudBees CI Applications and Agents Node Groups at a specific time according to `scheduler_cron_expression`, when the build workload is minimal (weekend). In a case where the CI service cannot be interrupted at any time by the Update Operator, it could be excluded from planned updates by removing the [bottlerocket.aws/updater-interface-version=2.0.0](https://github.com/bottlerocket-os/bottlerocket-update-operator#label-nodes) label.|
-
+  | [Bottlerocket Update Operator](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/bottlerocket/) | Coordinates Bottlerocket updates on hosts in a cluster. It is configured for CloudBees CI applications and agents node groups at a specific time according to `scheduler_cron_expression`, when the build workload is minimal (for example, on the weekend). If the CI service cannot be interrupted at any time by the Bottlerocket Update Operator, it can be excluded from planned updates by removing the [bottlerocket.aws/updater-interface-version=2.0.0](https://github.com/bottlerocket-os/bottlerocket-update-operator#label-nodes) label. |
 - [Amazon EKS blueprints Helm Release Add-on](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/helm-release/) is used to install the following applications:
 
   | Helm Chart | Description |
@@ -95,9 +94,9 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
 | prometheus_dashboard | Provides access to Prometheus dashboards. |
 | s3_cbci_arn | CloudBees CI Amazon S3 bucket ARN. |
 | s3_cbci_name | CloudBees CI Amazon S3 bucket name. It is required by CloudBees CI for workspace caching and artifact management. |
-| velero_backup_on_demand | Takes an on-demand Velero backup from the schedule for selected controller using Block Storage. |
-| velero_backup_schedule | Creates a Velero backup schedule for selected controller using Block Storage and deletes the existing schedulle, if it exists. |
-| velero_restore | Restores selected controller using Block Storage from a backup. |
+| velero_backup_on_demand | Takes an on-demand Velero backup from the schedule for the selected controller that is using block storage. |
+| velero_backup_schedule | Creates a Velero backup schedule for the selected controller that is using block storage, and then deletes the existing schedule, if it exists. |
+| velero_restore | Restores the selected controller that is using block storage from a backup. |
 | vpc_arn | VPC ID. |
 <!-- END_TF_DOCS -->
 
@@ -225,11 +224,11 @@ Once the resources have been created, a `kubeconfig` file is created in the [/k8
 
 For backup and restore operations, you can use the [preconfigured CloudBees CI Cluster Operations job](#create-daily-backups-using-a-cloudbees-ci-cluster-operations-job) to automatically perform a daily backup, which can be used for Amazon EFS and Amazon EBS storage.
 
-[Velero](#create-a-velero-backup-schedule) is an alternative for services only for controllers using Amazon EBS. Velero commands and configuration in this blueprint follow [Using Velero back up and restore Kubernetes cluster resources](https://docs.cloudbees.com/docs/cloudbees-ci/latest/backup-restore/velero-dr).
+[Velero](#create-a-velero-backup-schedule) is an alternative for services for controllers using Amazon EBS. Velero commands and configuration in this blueprint follow [Using Velero back up and restore Kubernetes cluster resources](https://docs.cloudbees.com/docs/cloudbees-ci/latest/backup-restore/velero-dr).
 
 > [!NOTE]
-> - An installation that has been completely converted to CasC may not need traditional backups; a restore operation could consist simply of running a CasC bootstrap script. This is only an option for a customer who has translated every significant system setting and job configuration to CasC. Even then it may be desirable to perform a filesystem-level restore from backup in order to preserve transient data such as build history.
-> - There is no alternative for services using Amazon EFS storage. Although [AWS Backup](https://aws.amazon.com/backup/) includes this Amazon EFS drive as a protected resource, there is not currently a best practice to dynamically restore Amazon EFS PVCs. For more information, refer to [Issue 39](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/issues/39).
+> - An installation that has been completely converted to CasC may not need traditional backups; a restore operation could consist simply of running a CasC bootstrap script. This is only an option for customers who have translated every significant system setting and job configuration to CasC. Even then it may be desirable to perform a filesystem-level restore from a backup to preserve transient data, such as build history.
+> - There is no alternative for services using Amazon EFS storage. Although [AWS Backup](https://aws.amazon.com/backup/) includes the Amazon EFS drive as a protected resource, there is not a best practice to dynamically restore Amazon EFS PVCs. For more information, refer to [Issue 39](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/issues/39).
 
 ##### Create daily backups using a CloudBees CI Cluster Operations job
 
@@ -246,7 +245,7 @@ To view the **backup-all-controllers** job:
 
 ##### Create a Velero backup schedule
 
-Issue the following command to create a Velero backup schedule for selected controller `team-b` (this can also be applied to `team-a`):
+Issue the following command to create a Velero backup schedule for the `team-b` controller (this can also be applied to `team-a`):
 
    ```sh
    eval $(terraform output --raw velero_backup_schedule)
@@ -267,8 +266,8 @@ Issue the following command to take an on-demand Velero backup for a specific po
 
 1. Make updates on the `team-b` controller (for example, add some jobs and generate builds).
 2. [Take an on-demand Velero backup](#take-an-on-demand-velero-backup), including the updates that you made.
-3. Remove the latest update (for example, remove jobs you create and build on existing jobs).
-4. Manage `team-b` > Deprovision the controller.
+3. Remove the most recent update (for example, remove jobs you created and build on existing jobs).
+4. From the operations center dashboard, select the down arrow to the right of the `team-b` controller’s name, and then select **Manage > Deprovision** to deprovision the controller.
 5. Issue the following command to restore the controller from the last backup:
 
    ```sh
@@ -281,8 +280,8 @@ Issue the following command to take an on-demand Velero backup for a specific po
 
 Grafana is used to visualize and query:
 
-- [Jenkins Metrics](https://plugins.jenkins.io/metrics/) that are stored in Prometheus.
-- [Jenkins Tracing via OpenTelemetry](https://plugins.jenkins.io/opentelemetry/) that stored into Grafana Tempo.
+- [Jenkins metrics](https://plugins.jenkins.io/metrics/) that are stored in Prometheus.
+- [Jenkins tracing via OpenTelemetry](https://plugins.jenkins.io/opentelemetry/) that are stored in Grafana Tempo.
 
 1. Issue the following command to verify that the CloudBees CI targets are connected to Prometheus:
 
@@ -306,11 +305,11 @@ Grafana is used to visualize and query:
 
    If successful, the Grafana dashboard should be available at `http://localhost:50002`.
 
-   - For Jenkins Metrics Dashboards navigate to **Dashboards > CloudBees CI**. Then, select the controller pod to view the metrics. The following image shows metrics for team-b.
+   - For Jenkins metrics dashboards, navigate to **Dashboards > CloudBees CI**, and then select the controller pod to view the metrics. The following image shows metrics for the `team-b` controller:
 
    ![CloudBees CI Dashboard](img/observability/cbci-dashboard.png)
 
-   - For Tracing Data, navigate to **Home > Explore > Select Tempo > Select `Query Type: Search`**. Then, select the `service name: jenkins` and the desired `Span Name` to `Run Query`. The following image shows an example of the ws-cache pipeline build.
+   - For tracing data, navigate to **Home > Explore > Tempo > Query Type: Search**. For the **Service name**, select **jenkins**, and then select the appropriate **Span Name** to run the query. The following image shows an example of the `ws-cache` pipeline build:
 
    ![CloudBees CI Tracing Example](img/observability/cbci-tracing-example.png)
 
@@ -318,7 +317,7 @@ Grafana is used to visualize and query:
 
 For application logs, Fluent Bit acts as a router.
 
-- Short-term application logs live in the [Amazon CloudWatch Logs](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/WhatIsCloudWatchLogs.html) group, under `/aws/eks/<CLUSTER_NAME>/aws-fluentbit-logs` and contains log streams for all the Kubernetes services running in the cluster, including CloudBees CI applications and agents. The following image shows an example of team b controller logs.
+- Short-term application logs live in the [Amazon CloudWatch Logs](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/WhatIsCloudWatchLogs.html) group, under `/aws/eks/<CLUSTER_NAME>/aws-fluentbit-logs` and contains log streams for all the Kubernetes services running in the cluster, including CloudBees CI applications and agents. The following image shows an example of `team b` controller logs.
 
    ```sh
    eval $(terraform output --raw aws_logstreams_fluentbit) | jq '.[] '
