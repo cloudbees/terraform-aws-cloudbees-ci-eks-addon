@@ -255,16 +255,10 @@ module "eks_blueprints_addons" {
   }
   #Additional Helm Releases
   helm_releases = {
-    osixia-openldap = {
-      name             = "osixia-openldap"
-      namespace        = "auth"
-      create_namespace = true
-      chart            = "k8s/osixia-openldap"
-    }
     openldap-stack = {
       chart            = "openldap-stack-ha"
       chart_version    = "4.2.2"
-      namespace        = "auth-2"
+      namespace        = "auth"
       create_namespace = true
       repository       = "https://jp-gouin.github.io/helm-openldap/"
       values = [templatefile("k8s/openldap-stack-values.yml", {
