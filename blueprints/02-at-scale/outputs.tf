@@ -146,7 +146,7 @@ output "velero_backup_on_demand" {
 }
 
 output "velero_restore" {
-  description = "Restores selected controller using Block Storage from a backup."
+  description = "Restores the selected controller that is using block storage from a backup."
   value       = "kubectl delete all,pvc -n ${module.eks_blueprints_addon_cbci.cbci_namespace} -l ${local.velero_controller_backup_selector}; velero restore create --from-schedule ${local.velero_schedule_name} --restore-volumes=true"
 }
 
