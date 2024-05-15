@@ -57,7 +57,6 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
 |------|-------------|------|---------|:--------:|
 | hosted_zone | Amazon Route 53 hosted zone. CloudBees CI applications are configured to use subdomains in this hosted zone. | `string` | n/a | yes |
 | trial_license | CloudBees CI trial license details for evaluation. | `map(string)` | n/a | yes |
-| grafana_admin_password | Grafana admin password. | `string` | `"change.me"` | no |
 | suffix | Unique suffix to assign to all resources. When adding the suffix, changes are required in CloudBees CI for the validation phase. | `string` | `""` | no |
 | tags | Tags to apply to resources. | `map(string)` | `{}` | no |
 
@@ -86,6 +85,7 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
 | efs_access_points | Amazon EFS access points. |
 | efs_arn | Amazon EFS ARN. |
 | eks_cluster_arn | Amazon EKS cluster ARN. |
+| global_password | Random string that is used as the global password. |
 | grafana_dashboard | Provides access to Grafana dashboards. |
 | kubeconfig_add | Add kubeconfig to the local configuration to access the Kubernetes API. |
 | kubeconfig_export | Export the KUBECONFIG environment variable to access the Kubernetes API. |

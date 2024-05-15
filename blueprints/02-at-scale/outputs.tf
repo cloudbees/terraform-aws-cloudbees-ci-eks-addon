@@ -136,17 +136,17 @@ output "aws_logstreams_fluentbit" {
 }
 
 output "velero_backup_schedule" {
-  description = "Creates a Velero backup schedule for selected controller using Block Storage and deletes the existing schedulle, if it exists."
+  description = "Creates a Velero backup schedule for the selected controller that is using block storage, and then deletes the existing schedule, if it exists."
   value       = "velero schedule delete ${local.velero_schedule_name} --confirm || true; velero create schedule ${local.velero_schedule_name} --schedule='@every 30m' --ttl 2h --include-namespaces ${module.eks_blueprints_addon_cbci.cbci_namespace} --exclude-resources pods,events,events.events.k8s.io -l ${local.velero_controller_backup_selector} --snapshot-volumes=true --include-cluster-resources=true"
 }
 
 output "velero_backup_on_demand" {
-  description = "Takes an on-demand Velero backup from the schedule for selected controller using Block Storage."
+  description = "Takes an on-demand Velero backup from the schedule for the selected controller that is using block storage."
   value       = "velero backup create --from-schedule ${local.velero_schedule_name} --wait"
 }
 
 output "velero_restore" {
-  description = "Restores selected controller using Block Storage from a backup."
+  description = "Restores the selected controller that is using block storage from a backup."
   value       = "kubectl delete all,pvc -n ${module.eks_blueprints_addon_cbci.cbci_namespace} -l ${local.velero_controller_backup_selector}; velero restore create --from-schedule ${local.velero_schedule_name} --restore-volumes=true"
 }
 
@@ -166,6 +166,6 @@ output "grafana_dashboard" {
 }
 
 output "global_password" {
-  description = "Random string that is used as global password."
+  description = "Random string that is used as the global password."
   value       = local.global_password
 }
