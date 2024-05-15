@@ -166,6 +166,6 @@ output "grafana_dashboard" {
 }
 
 output "global_password" {
-  description = "Random string that is used as global password."
+  description = "Random string that is used as the global password."
   value       = local.global_password
 }
