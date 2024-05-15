@@ -136,7 +136,7 @@ output "aws_logstreams_fluentbit" {
 }
 
 output "velero_backup_schedule" {
-  description = "Creates a Velero backup schedule for selected controller using Block Storage and deletes the existing schedulle, if it exists."
+  description = "Creates a Velero backup schedule for the selected controller that is using block storage, and then deletes the existing schedule, if it exists."
   value       = "velero schedule delete ${local.velero_schedule_name} --confirm || true; velero create schedule ${local.velero_schedule_name} --schedule='@every 30m' --ttl 2h --include-namespaces ${module.eks_blueprints_addon_cbci.cbci_namespace} --exclude-resources pods,events,events.events.k8s.io -l ${local.velero_controller_backup_selector} --snapshot-volumes=true --include-cluster-resources=true"
 }
 
