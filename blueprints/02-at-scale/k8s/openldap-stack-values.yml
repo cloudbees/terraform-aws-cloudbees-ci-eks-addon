@@ -1,0 +1,117 @@
+# Copyright (c) CloudBees, Inc.
+
+#https://artifacthub.io/packages/helm/helm-openldap/openldap-stack-ha
+
+global:
+  adminUser: "admin"
+  adminPassword: ${password}
+  configUser: "admin"
+  configPassword: ${password}
+
+customLdifFiles:
+  00-root.ldif: |-
+    dn: dc=example,dc=org
+    o: Example, Inc
+    objectclass: dcObject
+    objectclass: organization
+
+  01-groups.ldif: |-
+    dn: ou=Groups,dc=example,dc=org
+    changetype: add
+    objectclass: organizationalUnit
+    ou: Groups
+
+    dn: cn=CI_Admins,ou=Groups,dc=example,dc=org
+    changetype: add
+    cn: CI_Admins
+    objectclass: groupOfUniqueNames
+    uniqueMember: cn=${admin_user_outputs},dc=example,dc=org
+    uniqueMember: cn=admin_cbci_b,dc=example,dc=org
+
+    dn: cn=Dev_Team_X,ou=Groups,dc=example,dc=org
+    changetype: add
+    cn: Dev_Team_X
+    objectclass: groupOfUniqueNames
+    uniqueMember: cn=developer_1,dc=example,dc=org
+    uniqueMember: cn=developer_2,dc=example,dc=org
+
+    dn: cn=Dev_Team_Y,ou=Groups,dc=example,dc=org
+    changetype: add
+    cn: Dev_Team_Y
+    objectclass: groupOfUniqueNames
+    uniqueMember: cn=developer_3,dc=example,dc=org
+    uniqueMember: cn=developer_4,dc=example,dc=org
+
+  02-users.ldif: |-
+    dn: cn=developer_1,dc=example,dc=org
+    changetype: add
+    objectclass: inetOrgPerson
+    cn: developer_1
+    givenname: developer_1
+    sn: Developer 1
+    displayname: Developer User 1
+    mail: developer.1@gmail.com
+    userpassword: ${password}
+
+    dn: cn=developer_2,dc=example,dc=org
+    changetype: add
+    objectclass: inetOrgPerson
+    cn: developer_2
+    givenname: developer_2
+    sn: Developer 2
+    displayname: Developer User 2
+    mail: developer.2@gmail.com
+    userpassword: ${password}
+
+    dn: cn=developer_3,dc=example,dc=org
+    changetype: add
+    objectclass: inetOrgPerson
+    cn: developer_3
+    givenname: developer_3
+    sn: Developer 3
+    displayname: Developer User 3
+    mail: developer.3@gmail.com
+    userpassword: ${password}
+
+    dn: cn=developer_4,dc=example,dc=org
+    changetype: add
+    objectclass: inetOrgPerson
+    cn: developer_4
+    givenname: developer_4
+    sn: Developer 4
+    displayname: Developer User 4
+    mail: developer.4@gmail.com
+    userpassword: ${password}
+
+    dn: cn=${admin_user_outputs},dc=example,dc=org
+    changetype: add
+    objectclass: inetOrgPerson
+    cn: ${admin_user_outputs}
+    givenname: a${admin_user_outputs}
+    sn: AdminCBCIA
+    displayname: Admin CBCI A
+    mail: admin_cbci.a@gmail.com
+    userpassword: ${password}
+
+    dn: cn=admin_cbci_b,dc=example,dc=org
+    changetype: add
+    objectclass: inetOrgPerson
+    cn: admin_cbci_b
+    givenname: admin_cbci_b
+    sn: AdminCBCIB
+    displayname: Admin CBCI B
+    mail: admin_cbci_b@gmail.com
+    userpassword: ${password}
+
+logLevel: debug
+
+replicaCount: 1
+
+replication:
+  enabled: false
+
+ltb-passwd:
+  enabled : false
+
+phpldapadmin:
+  enabled: true

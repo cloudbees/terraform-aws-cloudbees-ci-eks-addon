@@ -24,9 +24,3 @@ variable "suffix" {
     error_message = "The suffix can contain 10 characters or less."
   }
 }
-
-variable "grafana_admin_password" {
-  description = "Grafana admin password."
-  default     = "change.me"
-  type        = string
-}

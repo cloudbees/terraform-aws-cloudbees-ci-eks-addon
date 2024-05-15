@@ -164,3 +164,8 @@ output "grafana_dashboard" {
   description = "Provides access to Grafana dashboards."
   value       = "kubectl port-forward svc/kube-prometheus-stack-grafana 50002:80 -n kube-prometheus-stack"
 }
+
+output "global_password" {
+  description = "Random string that is used as global password."
+  value       = local.global_password
+}
