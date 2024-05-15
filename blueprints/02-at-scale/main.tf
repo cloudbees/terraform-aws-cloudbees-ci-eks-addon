@@ -51,7 +51,7 @@ locals {
   fluentbit_s3_location = "${module.cbci_s3_bucket.s3_bucket_arn}/fluentbit"
   velero_s3_location    = "${module.cbci_s3_bucket.s3_bucket_arn}/velero"
 
-  #Velero Backups: Only for controllers using block storage (for example, Amazon EBS volumes in AWS)
+  #Velero Backups: Only for controllers using Block Storage (EBS volumes in AWS)
   velero_controller_backup          = "team-b"
   velero_controller_backup_selector = "tenant=${local.velero_controller_backup}"
   velero_schedule_name              = "schedule-${local.velero_controller_backup}"
@@ -66,6 +66,15 @@ locals {
 
   cbci_agent_podtemplname_validation = "maven-and-go-ondemand"
 
+  global_password = random_string.global_pass_string.result
+
+}
+
+resource "random_string" "global_pass_string" {
+  length  = 16
+  special = false
+  upper   = true
+  lower   = true
 }
 
 resource "time_static" "epoch" {
@@ -194,7 +203,7 @@ module "eks_blueprints_addons" {
     set_sensitive = [
       {
         name  = "grafana.adminPassword"
-        value = var.grafana_admin_password
+        value = local.global_password
       }
     ]
   }
@@ -251,6 +260,17 @@ module "eks_blueprints_addons" {
       namespace        = "auth"
       create_namespace = true
       chart            = "k8s/osixia-openldap"
+    }
+    openldap-stack = {
+      chart            = "openldap-stack-ha"
+      chart_version    = "4.2.2"
+      namespace        = "auth-2"
+      create_namespace = true
+      repository       = "https://jp-gouin.github.io/helm-openldap/"
+      values = [templatefile("k8s/openldap-stack-values.yml", {
+        password           = local.global_password
+        admin_user_outputs = local.cbci_admin_user
+      })]
     }
     aws-node-termination-handler = {
       name          = "aws-node-termination-handler"
