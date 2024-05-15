@@ -141,7 +141,7 @@ output "velero_backup_schedule" {
 }
 
 output "velero_backup_on_demand" {
-  description = "Takes an on-demand Velero backup from the schedule for selected controller using Block Storage."
+  description = "Takes an on-demand Velero backup from the schedule for the selected controller that is using block storage."
   value       = "velero backup create --from-schedule ${local.velero_schedule_name} --wait"
 }
 
