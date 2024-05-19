@@ -7,7 +7,7 @@ jenkins:
   #       rootDN: ${ldap_RootDN}
   #       server: ${ldap_Server}
   #       userSearch: ${ldap_UserSearch}
-  authorizationStrategy: "cloudBeesRoleBasedAccessControl"
+  # authorizationStrategy: "cloudBeesRoleBasedAccessControl"
   remotingSecurity:
     enabled: true
   crumbIssuer:

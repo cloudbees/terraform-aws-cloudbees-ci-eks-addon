@@ -1,5 +1,5 @@
 jenkins:
-  systemMessage: "${message} - Test Credentials: ${ldap_password}"
+  systemMessage: ${ldap_password}
   numExecutors: 0
 unclassified:
   bundleStorageService:
