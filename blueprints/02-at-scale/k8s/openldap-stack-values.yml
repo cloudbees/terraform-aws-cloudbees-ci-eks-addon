@@ -14,7 +14,7 @@ customLdifFiles:
     o: Example, Inc
     objectclass: dcObject
     objectclass: organization
-  #CloudBees RBAC groups (in Casc) are mapped to the following LDAP groups.
+  #CloudBees RBAC groups in CasC are mapped to the following LDAP groups.
   01-groups.ldif: |-
     dn: ou=Groups,dc=example,dc=org
     changetype: add
