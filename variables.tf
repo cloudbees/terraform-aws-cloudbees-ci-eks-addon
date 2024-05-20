@@ -41,8 +41,8 @@ variable "create_k8s_secrets" {
   type        = bool
 }
 
-variable "k8s_secrets_file" {
-  description = "Secrets file .yml path containing the secrets names:values for cbci-secrets."
+variable "k8s_secrets" {
+  description = "Secrets file .yml as String containing the secrets names:values. It is required when create_k8s_secrets is enabled."
   default     = "secrets-values.yml"
   type        = string
 }
