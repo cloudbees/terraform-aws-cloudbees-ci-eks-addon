@@ -41,7 +41,7 @@ customLdifFiles:
     objectclass: groupOfUniqueNames
     uniqueMember: cn=developer_3,dc=example,dc=org
     uniqueMember: cn=developer_4,dc=example,dc=org
-  #Use these users cn and global password for logging into CloudBees CI. 
+  #Use the cn users and global password to sign in to CloudBees CI. 
   02-users.ldif: |-
     dn: cn=developer_1,dc=example,dc=org
     changetype: add
