@@ -3,7 +3,6 @@ variables:
   - scm_casc_mm_store: "https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon.git"
   - casc_branch: ldap
   - ldap_ManagerDN: "cn=admin,dc=example,dc=org"
-  - ldap_ManagerPasswordSecret: "admin"
   - ldap_RootDN: "dc=example,dc=org"
   - ldap_Server: "openldap-stack.auth.svc.cluster.local"
   - ldap_UserSearch: "cn={0}"

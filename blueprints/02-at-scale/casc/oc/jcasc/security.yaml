@@ -1,13 +1,13 @@
 jenkins:
-  # securityRealm:
-  #   ldap:
-  #     configurations:
-  #     - managerDN: ${ldap_ManagerDN}
-  #       managerPasswordSecret: ${ldap_ManagerPasswordSecret}
-  #       rootDN: ${ldap_RootDN}
-  #       server: ${ldap_Server}
-  #       userSearch: ${ldap_UserSearch}
-  # authorizationStrategy: "cloudBeesRoleBasedAccessControl"
+  securityRealm:
+    ldap:
+      configurations:
+      - managerDN: ${ldap_ManagerDN}
+        managerPasswordSecret: ${secLdapPassword}
+        rootDN: ${ldap_RootDN}
+        server: ${ldap_Server}
+        userSearch: ${ldap_UserSearch}
+  authorizationStrategy: "cloudBeesRoleBasedAccessControl"
   remotingSecurity:
     enabled: true
   crumbIssuer:
@@ -23,13 +23,6 @@ credentials:
           password: ${secGithubUser}
           scope: GLOBAL
           username: ${secGithubToken}
-          usernameSecret: true
-      - usernamePassword:
-          description: "test-credentials"
-          id: "test-credentials"
-          password: ${ldap_password}
-          scope: GLOBAL
-          username: ${ldap_password}
           usernameSecret: true
       - string:
           description: "GH-ST-token"
