@@ -83,15 +83,15 @@ items:
               - name: cbci-secrets
                 secret:
                   secretName: cbci-secrets
-                containers:
-                - name: jenkins
-                  env:
-                  - name: SECRETS
-                    value: "/var/run/secrets/cbci"
-                  volumeMounts:
-                  - name: cbci-secrets
-                    mountPath: "/var/run/secrets/cbci"
-                    readOnly: true
+              containers:
+              - name: jenkins
+                env:
+                - name: SECRETS
+                  value: "/var/run/secrets/cbci"
+                volumeMounts:
+                - name: cbci-secrets
+                  mountPath: "/var/run/secrets/cbci"
+                  readOnly: true
           ---
           apiVersion: "v1"
           kind: "Service"
