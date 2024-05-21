@@ -68,7 +68,7 @@ locals {
   cbci_agent_podtemplname_validation = "maven-and-go-ondemand"
 
   cbci_admin_user = "admin_cbci_a"
-  global_pass_jsonpath =".data.global_password"
+  global_pass_jsonpath = "'{.data.sec_globalPassword}'"
 }
 
 resource "random_string" "global_pass_string" {
