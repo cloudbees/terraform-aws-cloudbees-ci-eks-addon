@@ -11,18 +11,6 @@ items:
         cpus: 1.0
         disk: 20
         storageClassName: "gp3"
-        yaml: |-
-          ---
-          apiVersion: "apps/v1"
-          kind: "StatefulSet"
-          spec:
-            template:
-                spec:
-                  tolerations:
-                  - key: "dedicated"
-                    operator: "Equal"
-                    value: "cb-apps"
-                    effect: "NoSchedule"
   # Casc, Non-HA
   - kind: managedController
     name: team-b
@@ -32,6 +20,37 @@ items:
         cpus: 2.0
         disk: 5
         storageClassName: "gp3"
+        yaml: |-
+          ---
+          apiVersion: "apps/v1"
+          kind: "StatefulSet"
+          spec:
+            template:
+              spec:
+                tolerations:
+                - key: "dedicated"
+                  operator: "Equal"
+                  value: "cb-apps"
+                  effect: "NoSchedule"
+                volumes:
+                - name: cbci-secrets
+                  secret:
+                    secretName: cbci-secrets
+                containers:
+                - name: jenkins
+                  env:
+                  - name: SECRETS
+                    value: "/var/run/secrets/cbci"
+                  volumeMounts:
+                  - name: cbci-secrets
+                    mountPath: "/var/run/secrets/cbci"
+                    readOnly: true
+          ---
+          apiVersion: "v1"
+          kind: "Service"
+          metadata:
+            labels:
+              "cloudbees.prometheus": "true"
     properties:
       - configurationAsCode:
           bundle: "s3/none-ha"
@@ -48,6 +67,37 @@ items:
             maxReplicas: 4
             replicas: 2
             targetCPUUtilizationPercentage: 50
+        yaml: |-
+          ---
+          apiVersion: "apps/v1"
+          kind: "Deployment"
+          spec:
+            template:
+              spec:
+                tolerations:
+                - key: "dedicated"
+                  operator: "Equal"
+                  value: "cb-apps"
+                  effect: "NoSchedule"
+              volumes:
+              - name: cbci-secrets
+                secret:
+                  secretName: cbci-secrets
+                containers:
+                - name: jenkins
+                  env:
+                  - name: SECRETS
+                    value: "/var/run/secrets/cbci"
+                  volumeMounts:
+                  - name: cbci-secrets
+                    mountPath: "/var/run/secrets/cbci"
+                    readOnly: true
+          ---
+          apiVersion: "v1"
+          kind: "Service"
+          metadata:
+            labels:
+              "cloudbees.prometheus": "true"
     properties:
       - configurationAsCode:
           bundle: "s3/ha"
