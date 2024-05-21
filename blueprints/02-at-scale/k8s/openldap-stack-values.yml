@@ -88,7 +88,7 @@ customLdifFiles:
     changetype: add
     objectclass: inetOrgPerson
     cn: ${admin_user_outputs}
-    givenname: a${admin_user_outputs}
+    givenname: ${admin_user_outputs}
     sn: AdminCBCIA
     displayname: Admin CBCI A
     mail: admin_cbci.a@acme.com
@@ -114,5 +114,6 @@ replication:
 ltb-passwd:
   enabled : false
 
+# Enable the phpldapadmin web UI service for LDAP management after deployment.
 phpldapadmin:
-  enabled: true
+  enabled: false
