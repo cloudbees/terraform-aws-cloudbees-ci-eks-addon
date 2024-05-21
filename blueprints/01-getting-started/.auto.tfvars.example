@@ -1,4 +1,4 @@
-hosted_zone = "example.domain.com" # Required. Route 53 Hosted Zone to host CloudBees CI subdomains records.
+hosted_zone = "acme.domain.com" # Required. Route 53 Hosted Zone to host CloudBees CI subdomains records.
 
 trial_license = { # Required. CloudBees CI Trial license details for evaluation.
   first_name  = "Foo"
