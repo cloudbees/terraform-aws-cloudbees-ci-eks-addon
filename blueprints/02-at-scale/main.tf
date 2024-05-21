@@ -51,23 +51,24 @@ locals {
   fluentbit_s3_location = "${module.cbci_s3_bucket.s3_bucket_arn}/fluentbit"
   velero_s3_location    = "${module.cbci_s3_bucket.s3_bucket_arn}/velero"
 
+  epoch_millis = time_static.epoch.unix * 1000
+  global_password = random_string.global_pass_string.result
+
+  cloudwatch_logs_expiration_days = 7
+  s3_objects_expiration_days      = 90
+
+  # Validation Phase for Terraform Outputs
+
   #Velero Backups: Only for controllers using block storage (for example, Amazon EBS volumes in AWS)
   velero_controller_backup          = "team-b"
   velero_controller_backup_selector = "tenant=${local.velero_controller_backup}"
   velero_schedule_name              = "schedule-${local.velero_controller_backup}"
 
-  epoch_millis = time_static.epoch.unix * 1000
-
-  cloudwatch_logs_expiration_days = 7
-  s3_objects_expiration_days      = 90
-
   cbci_agents_ns  = "cbci-agents"
-  cbci_admin_user = "admin_cbci_a"
-
   cbci_agent_podtemplname_validation = "maven-and-go-ondemand"
 
-  global_password = random_string.global_pass_string.result
-
+  cbci_admin_user = "admin_cbci_a"
+  global_pass_jsonpath =".data.global_password"
 }
 
 resource "random_string" "global_pass_string" {
@@ -107,7 +108,7 @@ module "eks_blueprints_addon_cbci" {
 
   create_k8s_secrets = true
   k8s_secrets = templatefile("k8s/secrets-values.yml", {
-      ldap_password = local.global_password
+      global_password = local.global_password
     })
 
   prometheus_target = true

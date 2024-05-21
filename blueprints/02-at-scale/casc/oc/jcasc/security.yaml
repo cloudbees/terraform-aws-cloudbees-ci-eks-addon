@@ -3,7 +3,7 @@ jenkins:
     ldap:
       configurations:
       - managerDN: ${ldapManagerDN}
-        managerPasswordSecret: ${sec_ldapPassword}
+        managerPasswordSecret: ${sec_globalPassword}
         rootDN: ${ldapRootDN}
         server: ${ldapServer}
         userSearch: ${ldapUserSearch}
