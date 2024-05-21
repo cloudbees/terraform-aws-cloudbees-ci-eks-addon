@@ -8,6 +8,6 @@ items:
 plugins:
   - plugins
 rbac:
- - rbac
+  - rbac
 variables:
   - variables
