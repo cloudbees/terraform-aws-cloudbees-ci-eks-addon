@@ -30,7 +30,7 @@ unclassified:
       endpoint: ${ot_endpoint}
 aws:
   s3:
-    container: ${sec_s3bucketName}
+    container: "${sec_s3bucketName}"
     disableSessionToken: false
     prefix: "cbci/"
     useHttp: false
