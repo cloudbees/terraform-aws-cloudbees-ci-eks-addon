@@ -56,9 +56,28 @@ masterprovisioning:
       kind: "StatefulSet"
       spec:
         template:
-            spec:
-              tolerations:
-              - key: "dedicated"
-                operator: "Equal"
-                value: "cb-apps"
-                effect: "NoSchedule"
+          spec:
+            tolerations:
+            - key: "dedicated"
+              operator: "Equal"
+              value: "cb-apps"
+              effect: "NoSchedule"
+            volumes:
+            - name: cbci-secrets
+              secret:
+                secretName: cbci-secrets
+            containers:
+            - name: jenkins
+              env:
+              - name: SECRETS
+                value: "/var/run/secrets/cbci"
+              volumeMounts:
+              - name: cbci-secrets
+                mountPath: "/var/run/secrets/cbci"
+                readOnly: true
+          ---
+          apiVersion: "v1"
+          kind: "Service"
+          metadata:
+            labels:
+              "cloudbees.prometheus": "true"
