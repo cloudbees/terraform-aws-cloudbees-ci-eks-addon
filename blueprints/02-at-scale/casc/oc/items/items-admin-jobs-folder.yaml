@@ -82,9 +82,7 @@ items:
                   safeDelaySeconds: 0
                   store:
                     s3Store:
-                      #TODO: Use variables
-                      #bucketName: ${cbciS3}
-                      bucketName: "cbci-bp02-s3"
+                      bucketName: ${sec_s3bucketName}
                       bucketFolder: cbci/backup
                       region: us-east-1
               itemSource:
