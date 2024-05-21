@@ -110,47 +110,6 @@ In addition to the minimum required settings explained in [Get started - Deploy]
 > [!TIP]
 > The `deploy` phase can be orchestrated via the companion [Makefile](../../Makefile).
 
-### Create the secrets file
-
-You must create your secrets file by copying the contents of [secrets-values.yml.example](k8s/secrets-values.yml.example) to `secrets-values.yml`. The content of this file will be served as [Kubernetes secrets](https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/docs/features/secrets.adoc#kubernetes-secrets) that can be consumed by CasC.
-
-> [!IMPORTANT]
-> Do not update parametrized values in the `secrets-values.yml` file. These values are automatically replaced by Terraform during the deployment phase (e.g. `sec_ldapPassword: ${ldap_password}` ).
-
-### Update Amazon S3 bucket settings
-
-Since the optional Terraform variable `suffix` is used for this blueprint, you must update the Amazon S3 bucket name for CloudBees CI controllers and the Amazon S3 bucket for the backup controller cluster operations. To update the Amazon S3 bucket name, you have the following options:
-
- - [Option 1: Update Amazon S3 bucket name using CasC](#option-1-update-amazon-s3-bucket-name-using-casc)
- - [Option 2: Update Amazon S3 bucket name using the CloudBees CI UI](#option-2-update-amazon-s3-bucket-name-using-the-cloudbees-ci-ui)
-
-#### Option 1: Update Amazon S3 bucket name using CasC
-
->[!IMPORTANT]
-> This option can only be used before the blueprint has been deployed.
-
-1. Create a fork of the [cloudbees/terraform-aws-cloudbees-ci-eks-addon](https://github.com/cloudbees/casc-cloudbees-ci-eks-addon) GitHub repository to your GitHub organization and make any necessary edits to the controller CasC bundle.
-   - Update `cbci_s3` in the [casc/mc/parent/variables/variables.yaml](casc/mc/parent/variables/variables.yaml) file, including your custom prefix.
-   - Update `scm_casc_mc_store` in the [casc/oc/variables/variables.yaml](casc/oc/variables/variables.yaml) file and `bucketName` in the [casc/oc/items/items-admin-jobs-folder.yaml](casc/oc/items/items-admin-jobs-folder.yaml) file.
-2. Commit and push your changes to the forked repository in your organization.
-3. In the [k8s/cbci-values.yml](k8s/cbci-values.yml) Helm file, update the `OperationsCenter.CasC.Retriever.scmRepo` field based on the files in this blueprint.
-4. Save the file and issue the `terraform apply` command.
-
-#### Option 2: Update Amazon S3 bucket name using the CloudBees CI UI
-
-> [!IMPORTANT]
-> - This option can only be used after the blueprint is deployed.
-> - If using CasC, the declarative definition overrides any configuration updates that are made in the UI the next time the controller is restarted.
-
-1. Sign in to the CloudBees CI controller UI as a user with **Administer** privileges.
-2. Navigate to **Manage Jenkins > AWS > Amazon S3 Bucket Access settings**, update the **S3 Bucket Name**, and select **Save**.
-3. Sign in to the CloudBees CI operations center UI as a user with **Administer** privileges.
-   Note that access to back up jobs is restricted to admin users via role-based access control (RBAC).
-4. From the operations center dashboard, select **All** to view all folders on the operations center.  
-5. Navigate to the **admin** folder, and then select the **backup-all-controllers** Cluster Operations job.
-6. From the left pane, select **Configure**.
-7. Update the **S3 Bucket Name**, and then select **Save**.
-
 ## Validate
 
 Once the blueprint has been deployed, you can validate it.
