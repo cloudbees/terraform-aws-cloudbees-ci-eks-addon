@@ -108,7 +108,7 @@ module "eks_blueprints_addon_cbci" {
 
   create_k8s_secrets = true
   # k8s/secrets-values.yml is not included in the repository
-  # tflint-ignore: terraform_unused_declarations_with_resource
+  # tflint-ignore: all
   k8s_secrets = templatefile("k8s/secrets-values.yml", {
     global_password = local.global_password
   })
