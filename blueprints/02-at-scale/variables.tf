@@ -24,3 +24,9 @@ variable "suffix" {
     error_message = "The suffix can contain 10 characters or less."
   }
 }
+
+variable "secret_file" {
+  description = "Relative location of the Secret file to be converted into a Kubernetes Secret. secrets-values.yml is not stored in the repository but it is generated as copy from secrets-values.yml.example."
+  default     = "k8s/secrets-values.yml"
+  type        = string
+}
