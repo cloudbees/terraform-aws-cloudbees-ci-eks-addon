@@ -35,7 +35,7 @@ items:
                   volumes:
                   - name: cbci-secrets
                     secret:
-                      secretName: cbci-secret
+                      secretName: cbci-secrets
                   containers:
                   - name: jenkins
                     env:
