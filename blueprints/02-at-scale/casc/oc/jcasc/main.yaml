@@ -1,5 +1,5 @@
 jenkins:
-  systemMessage: ${message}
+  systemMessage: "Test ${sec_s3bucketName}" #Replace by ${message}
   numExecutors: 0
 unclassified:
   bundleStorageService:
