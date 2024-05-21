@@ -75,9 +75,9 @@ masterprovisioning:
               - name: cbci-secrets
                 mountPath: "/var/run/secrets/cbci"
                 readOnly: true
-          ---
-          apiVersion: "v1"
-          kind: "Service"
-          metadata:
-            labels:
-              "cloudbees.prometheus": "true"
+      ---
+      apiVersion: "v1"
+      kind: "Service"
+      metadata:
+        labels:
+          "cloudbees.prometheus": "true"
