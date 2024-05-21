@@ -15,7 +15,7 @@ customLdifFiles:
     o: Acme, Inc
     objectclass: dcObject
     objectclass: organization
-  #CloudBees RBAC groups (in Casc) are mapped to the following LDAP groups.
+  #CloudBees RBAC groups in CasC are mapped to the following LDAP groups.
   01-groups.ldif: |-
     dn: ou=Groups,dc=acme,dc=org
     changetype: add
@@ -42,7 +42,7 @@ customLdifFiles:
     objectclass: groupOfUniqueNames
     uniqueMember: cn=developer_3,dc=acme,dc=org
     uniqueMember: cn=developer_4,dc=acme,dc=org
-  #Use these users cn and global password for logging into CloudBees CI. 
+  #Use the cn users and global password to sign in to CloudBees CI.
   02-users.ldif: |-
     dn: cn=developer_1,dc=acme,dc=org
     changetype: add
