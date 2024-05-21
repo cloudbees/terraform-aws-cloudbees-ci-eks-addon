@@ -105,7 +105,13 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
 
 ## Deploy
 
-In addition to the minimum required settings explained in [Get started - Deploy](../01-getting-started/README.md#deploy), when preparing to deploy, you must [create the secrets file](#create-the-secrets-file) and [update Amazon S3 bucket settings](#update-amazon-s3-bucket-settings)
+When preparing to deploy, you must complete the following steps:
+
+1. Customize your Terraform values by copying `.auto.tfvars.example` to `.auto.tfvars`.
+2. Initialize the root module and any associated configuration for providers.
+3. Create the resources and deploy CloudBees CI to an EKS cluster. Refer to [Amazon EKS Blueprints for Terraform - Deploy](https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#deploy).
+
+For more information, refer to [The Core Terraform Workflow](https://www.terraform.io/intro/core-workflow) documentation.
 
 > [!TIP]
 > The `deploy` phase can be orchestrated via the companion [Makefile](../../Makefile).
