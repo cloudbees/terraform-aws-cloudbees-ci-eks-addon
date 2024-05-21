@@ -2,11 +2,11 @@ jenkins:
   securityRealm:
     ldap:
       configurations:
-      - managerDN: ${ldap_ManagerDN}
-        managerPasswordSecret: ${ldap_ManagerPasswordSecret}
-        rootDN: ${ldap_RootDN}
-        server: ${ldap_Server}
-        userSearch: ${ldap_UserSearch}
+      - managerDN: ${ldapManagerDN}
+        managerPasswordSecret: ${sec_globalPassword}
+        rootDN: ${ldapRootDN}
+        server: ${ldapServer}
+        userSearch: ${ldapUserSearch}
   authorizationStrategy: "cloudBeesRoleBasedAccessControl"
   remotingSecurity:
     enabled: true
@@ -20,12 +20,12 @@ credentials:
       - usernamePassword:
           description: "GH-User-token"
           id: "GH-User-token"
-          password: ${secGithubUser}
+          password: ${sec_githubUser}
           scope: GLOBAL
-          username: ${secGithubToken}
+          username: ${sec_githubToken}
           usernameSecret: true
       - string:
           description: "GH-ST-token"
           id: "GH-ST-token"
           scope: GLOBAL
-          secret: ${secGithubToken}
+          secret: ${sec_githubToken}

@@ -3,8 +3,7 @@
 locals {
   cbci_ns           = "cbci"
   cbci_secrets_name = "cbci-secrets"
-  secret_data       = fileexists(var.k8s_secrets_file) ? yamldecode(file(var.k8s_secrets_file)) : {}
-  create_secret     = alltrue([var.create_k8s_secrets, length(local.secret_data) > 0])
+  create_secret     = alltrue([var.create_k8s_secrets, length(var.k8s_secrets) > 0])
   oc_secrets_mount = [
     <<-EOT
       OperationsCenter:
@@ -57,7 +56,7 @@ resource "kubernetes_secret" "oc_secrets" {
     namespace = kubernetes_namespace.cbci[0].metadata[0].name
   }
 
-  data = yamldecode(file(var.k8s_secrets_file))
+  data = yamldecode(var.k8s_secrets)
 }
 
 resource "kubectl_manifest" "service_monitor_cb_controllers" {

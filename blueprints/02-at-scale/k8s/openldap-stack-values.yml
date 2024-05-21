@@ -3,6 +3,7 @@
 #https://artifacthub.io/packages/helm/helm-openldap/openldap-stack-ha
 
 global:
+  ldapDomain: "acme.org"
   adminUser: "admin"
   adminPassword: ${password}
   configUser: "admin"
@@ -10,97 +11,97 @@ global:
 
 customLdifFiles:
   00-root.ldif: |-
-    dn: dc=example,dc=org
-    o: Example, Inc
+    dn: dc=acme,dc=org
+    o: Acme, Inc
     objectclass: dcObject
     objectclass: organization
-
+  #CloudBees RBAC groups in CasC are mapped to the following LDAP groups.
   01-groups.ldif: |-
-    dn: ou=Groups,dc=example,dc=org
+    dn: ou=Groups,dc=acme,dc=org
     changetype: add
     objectclass: organizationalUnit
     ou: Groups
 
-    dn: cn=CI_Admins,ou=Groups,dc=example,dc=org
+    dn: cn=CI_Admins,ou=Groups,dc=acme,dc=org
     changetype: add
     cn: CI_Admins
     objectclass: groupOfUniqueNames
-    uniqueMember: cn=${admin_user_outputs},dc=example,dc=org
-    uniqueMember: cn=admin_cbci_b,dc=example,dc=org
+    uniqueMember: cn=${admin_user_outputs},dc=acme,dc=org
+    uniqueMember: cn=admin_cbci_b,dc=acme,dc=org
 
-    dn: cn=Dev_Team_X,ou=Groups,dc=example,dc=org
+    dn: cn=Dev_Team_X,ou=Groups,dc=acme,dc=org
     changetype: add
     cn: Dev_Team_X
     objectclass: groupOfUniqueNames
-    uniqueMember: cn=developer_1,dc=example,dc=org
-    uniqueMember: cn=developer_2,dc=example,dc=org
+    uniqueMember: cn=developer_1,dc=acme,dc=org
+    uniqueMember: cn=developer_2,dc=acme,dc=org
 
-    dn: cn=Dev_Team_Y,ou=Groups,dc=example,dc=org
+    dn: cn=Dev_Team_Y,ou=Groups,dc=acme,dc=org
     changetype: add
     cn: Dev_Team_Y
     objectclass: groupOfUniqueNames
-    uniqueMember: cn=developer_3,dc=example,dc=org
-    uniqueMember: cn=developer_4,dc=example,dc=org
-
+    uniqueMember: cn=developer_3,dc=acme,dc=org
+    uniqueMember: cn=developer_4,dc=acme,dc=org
+  #Use the cn users and global password to sign in to CloudBees CI.
   02-users.ldif: |-
-    dn: cn=developer_1,dc=example,dc=org
+    dn: cn=developer_1,dc=acme,dc=org
     changetype: add
     objectclass: inetOrgPerson
     cn: developer_1
     givenname: developer_1
     sn: Developer 1
     displayname: Developer User 1
-    mail: developer.1@gmail.com
+    mail: developer.1@acme.com
     userpassword: ${password}
 
-    dn: cn=developer_2,dc=example,dc=org
+    dn: cn=developer_2,dc=acme,dc=org
     changetype: add
     objectclass: inetOrgPerson
     cn: developer_2
     givenname: developer_2
     sn: Developer 2
     displayname: Developer User 2
-    mail: developer.2@gmail.com
+    mail: developer.2@acme.com
     userpassword: ${password}
 
-    dn: cn=developer_3,dc=example,dc=org
+    dn: cn=developer_3,dc=acme,dc=org
     changetype: add
     objectclass: inetOrgPerson
     cn: developer_3
     givenname: developer_3
     sn: Developer 3
     displayname: Developer User 3
-    mail: developer.3@gmail.com
+    mail: developer.3@acme.com
     userpassword: ${password}
 
-    dn: cn=developer_4,dc=example,dc=org
+    dn: cn=developer_4,dc=acme,dc=org
     changetype: add
     objectclass: inetOrgPerson
     cn: developer_4
     givenname: developer_4
     sn: Developer 4
     displayname: Developer User 4
-    mail: developer.4@gmail.com
+    mail: developer.4@acme.com
     userpassword: ${password}
 
-    dn: cn=${admin_user_outputs},dc=example,dc=org
+    dn: cn=${admin_user_outputs},dc=acme,dc=org
     changetype: add
     objectclass: inetOrgPerson
     cn: ${admin_user_outputs}
-    givenname: a${admin_user_outputs}
+    givenname: ${admin_user_outputs}
     sn: AdminCBCIA
     displayname: Admin CBCI A
-    mail: admin_cbci.a@gmail.com
+    mail: admin_cbci.a@acme.com
     userpassword: ${password}
 
-    dn: cn=admin_cbci_b,dc=example,dc=org
+    dn: cn=admin_cbci_b,dc=acme,dc=org
     changetype: add
     objectclass: inetOrgPerson
     cn: admin_cbci_b
     givenname: admin_cbci_b
     sn: AdminCBCIB
     displayname: Admin CBCI B
-    mail: admin_cbci_b@gmail.com
+    mail: admin_cbci_b@acme.com
     userpassword: ${password}
 
 logLevel: debug
@@ -113,5 +114,6 @@ replication:
 ltb-passwd:
   enabled : false
 
+# Enable the phpldapadmin web UI service for LDAP management after deployment.
 phpldapadmin:
-  enabled: true
+  enabled: false

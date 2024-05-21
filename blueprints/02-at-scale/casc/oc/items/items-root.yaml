@@ -40,7 +40,7 @@ items:
               "cloudbees.prometheus": "true"
     properties:
       - configurationAsCode:
-          bundle: "main/none-ha"
+          bundle: "ldap/none-ha"
   # Casc, HA
   - kind: managedController
     name: team-c-ha
@@ -74,4 +74,4 @@ items:
               "cloudbees.prometheus": "true"
     properties:
       - configurationAsCode:
-          bundle: "main/ha"
+          bundle: "ldap/ha"

@@ -51,23 +51,24 @@ locals {
   fluentbit_s3_location = "${module.cbci_s3_bucket.s3_bucket_arn}/fluentbit"
   velero_s3_location    = "${module.cbci_s3_bucket.s3_bucket_arn}/velero"
 
+  epoch_millis = time_static.epoch.unix * 1000
+  global_password = random_string.global_pass_string.result
+
+  cloudwatch_logs_expiration_days = 7
+  s3_objects_expiration_days      = 90
+
+  # Validation Phase for Terraform Outputs
+
   #Velero Backups: Only for controllers using block storage (for example, Amazon EBS volumes in AWS)
   velero_controller_backup          = "team-b"
   velero_controller_backup_selector = "tenant=${local.velero_controller_backup}"
   velero_schedule_name              = "schedule-${local.velero_controller_backup}"
 
-  epoch_millis = time_static.epoch.unix * 1000
-
-  cloudwatch_logs_expiration_days = 7
-  s3_objects_expiration_days      = 90
-
   cbci_agents_ns  = "cbci-agents"
-  cbci_admin_user = "admin_cbci_a"
-
   cbci_agent_podtemplname_validation = "maven-and-go-ondemand"
 
-  global_password = random_string.global_pass_string.result
-
+  cbci_admin_user = "admin_cbci_a"
+  global_pass_jsonpath = "'{.data.sec_globalPassword}'"
 }
 
 resource "random_string" "global_pass_string" {
@@ -88,8 +89,9 @@ resource "time_static" "epoch" {
 # CloudBees CI Add-ons
 
 module "eks_blueprints_addon_cbci" {
-  source  = "cloudbees/cloudbees-ci-eks-addon/aws"
-  version = ">= 3.17108.0"
+  source = "../../"
+  #source  = "cloudbees/cloudbees-ci-eks-addon/aws"
+  #version = ">= 3.17108.0"
 
   hosted_zone   = var.hosted_zone
   cert_arn      = module.acm.acm_certificate_arn
@@ -105,7 +107,9 @@ module "eks_blueprints_addon_cbci" {
   }
 
   create_k8s_secrets = true
-  k8s_secrets_file   = "k8s/secrets-values.yml"
+  k8s_secrets = templatefile("k8s/secrets-values.yml", {
+      global_password = local.global_password
+    })
 
   prometheus_target = true
 
@@ -255,16 +259,10 @@ module "eks_blueprints_addons" {
   }
   #Additional Helm Releases
   helm_releases = {
-    osixia-openldap = {
-      name             = "osixia-openldap"
-      namespace        = "auth"
-      create_namespace = true
-      chart            = "k8s/osixia-openldap"
-    }
     openldap-stack = {
       chart            = "openldap-stack-ha"
       chart_version    = "4.2.2"
-      namespace        = "auth-2"
+      namespace        = "auth"
       create_namespace = true
       repository       = "https://jp-gouin.github.io/helm-openldap/"
       values = [templatefile("k8s/openldap-stack-values.yml", {

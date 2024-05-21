@@ -97,7 +97,7 @@ The CloudBees CI add-on uses `helms release` for its resources definition, makin
 | trial_license | CloudBees CI trial license details for evaluation. | `map(string)` | n/a | yes |
 | create_k8s_secrets | Create the Kubernetes secret cbci-secrets. It can be consumed by CloudBees CasC. | `bool` | `false` | no |
 | helm_config | CloudBees CI Helm chart configuration. | `any` | <pre>{<br>  "values": [<br>    ""<br>  ]<br>}</pre> | no |
-| k8s_secrets_file | Secrets file .yml path containing the secrets names:values for cbci-secrets. | `string` | `"secrets-values.yml"` | no |
+| k8s_secrets | Secrets file .yml as a string containing the secrets names:values. It is required when create_k8s_secrets is enabled. | `string` | `"secrets-values.yml"` | no |
 | prometheus_target | Creates a service monitor to discover the CloudBees CI Prometheus target dynamically. It is designed to be enabled with the AWS EKS Terraform Addon Kube Prometheus Stack. | `bool` | `false` | no |
 
 ### Outputs
