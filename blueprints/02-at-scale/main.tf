@@ -107,8 +107,11 @@ module "eks_blueprints_addon_cbci" {
   }
 
   create_k8s_secrets = true
-  k8s_secrets = templatefile(var.secret_file, {
+  k8s_secrets = templatefile("k8s/secrets-values.yml", {
     global_password = local.global_password
+    s3bucketName    = local.bucket_name
+    githubUser      = var.gh_user
+    githubToken     = var.gh_token
   })
 
   prometheus_target = true

@@ -1,4 +1,2 @@
 variables:
   - ot_endpoint: "http://tempo.kube-prometheus-stack.svc.cluster.local:4317"
-  # You must update the variable in case a variable suffix is provided in the .tf files (for example, cbci-bp02-<YOUR-SUFFIX>-s3).
-  - cbci_s3: cbci-bp02-s3

@@ -25,8 +25,14 @@ variable "suffix" {
   }
 }
 
-variable "secret_file" {
-  description = "Relative location of the Secret file to be converted into a Kubernetes Secret. secrets-values.yml is not stored in the repository but it is generated as copy from secrets-values.yml.example."
-  default     = "k8s/secrets-values.yml"
+variable "gh_user" {
+  description = "GitHub User for CloudBees Operation Center credential GH-User-token that is created via Casc."
+  default     = "exampleUser"
+  type        = string
+}
+
+variable "gh_token" {
+  description = "GitHub Token for CloudBees Operation Center credential GH-User-token that is created via Casc."
+  default     = "ExampleToken1234"
   type        = string
 }
