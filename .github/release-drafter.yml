@@ -30,11 +30,7 @@ version-resolver:
       - "patch"
   default: patch
 template: |
-  ## Versions
-
-  ClodBees CI: [![Application](https://img.shields.io/badge/x.xx.x.x-informational?style=flat-square)](https://docs.cloudbees.com/docs/release-notes/latest/cloudbees-ci/modern-cloud-platforms/x.xx.x.x)
-
-  See [.k8s.env](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/blob/main/blueprints/.k8s.env)
+  ## CloudBees CI [![Application](https://img.shields.io/badge/x.xx.x.x-informational?style=flat-square)](https://docs.cloudbees.com/docs/release-notes/latest/cloudbees-ci/modern-cloud-platforms/x.xx.x.x)
 
   ## Changes
 
