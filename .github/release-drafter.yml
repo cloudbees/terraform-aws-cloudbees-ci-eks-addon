@@ -30,7 +30,10 @@ version-resolver:
       - "patch"
   default: patch
 template: |
-  ## CloudBees CI [![Application](https://img.shields.io/badge/x.xx.x.x-informational?style=flat-square)](https://docs.cloudbees.com/docs/release-notes/latest/cloudbees-ci/modern-cloud-platforms/x.xx.x.x)
+  ## CloudBees CI
+
+  Application: [![Application](https://img.shields.io/badge/x.xx.x.x-informational?style=flat-square)](https://docs.cloudbees.com/docs/release-notes/latest/cloudbees-ci/modern-cloud-platforms/x.xx.x.x)
+  Helm Chart: [![Application](https://img.shields.io/badge/x.xx.x.x-informational?style=flat-square)](https://artifacthub.io/packages/helm/cloudbees/cloudbees-core/xxxxxxxxxxxxxx)
 
   ## Changes
 
