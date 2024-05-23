@@ -4,7 +4,7 @@ apiVersion: automation.cloudbees.io/v1alpha1
 kind: workflow
 name: ci
 
-#TODO: Replace by pull-request when it is supported
+#TODO: Replace by pull-request with filter for tf files when it is supported
 on:
   push:
     branches:
