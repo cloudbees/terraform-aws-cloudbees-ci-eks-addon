@@ -95,7 +95,7 @@ The CloudBees CI add-on uses `helms release` for its resources definition, makin
 | cert_arn | AWS Certificate Manager (ACM) certificate for Amazon Resource Names (ARN). | `string` | n/a | yes |
 | hosted_zone | Amazon Route 53 hosted zone name. | `string` | n/a | yes |
 | trial_license | CloudBees CI trial license details for evaluation. | `map(string)` | n/a | yes |
-| create_k8s_secrets | Create the Kubernetes secret cbci-secrets. It can be consumed by CloudBees CasC at Operation Center level. | `bool` | `false` | no |
+| create_k8s_secrets | Create the Kubernetes cbci-secrets. It can be consumed by CloudBees CasC for the operations center. | `bool` | `false` | no |
 | helm_config | CloudBees CI Helm chart configuration. | `any` | <pre>{<br>  "values": [<br>    ""<br>  ]<br>}</pre> | no |
 | k8s_secrets | Secrets .yml file as a string containing the names:values secrets. It is required when create_k8s_secrets is enabled. | `string` | `"secrets-values.yml"` | no |
 | prometheus_target | Creates a service monitor to discover the CloudBees CI Prometheus target dynamically. It is designed to be enabled with the AWS EKS Terraform Addon Kube Prometheus Stack. | `bool` | `false` | no |
