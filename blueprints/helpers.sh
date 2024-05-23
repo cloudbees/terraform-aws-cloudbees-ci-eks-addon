@@ -113,11 +113,11 @@ probes () {
       INFO "Initial Admin Password: $INITIAL_PASS."
   fi
   if [ "$root" == "02-at-scale" ]; then
-    ADMIN_CBCI_A_PASS=$(eval "$(tf-output "$root" ldap_admin_password)") && \
-      if [ -n "$ADMIN_CBCI_A_PASS" ]; then
-        INFO "Password for admin_cbci_a: $ADMIN_CBCI_A_PASS."
+    GLOBAL_PASS=$(eval "$(tf-output "$root" global_password)") && \
+      if [ -n "$GLOBAL_PASS" ]; then
+        INFO "Password for admin_cbci_a: $GLOBAL_PASS."
       else
-        ERROR "Problem while getting Password for admin_cbci_a."
+        ERROR "Problem while getting Global Pass."
       fi
     until [ "$(eval "$(tf-output "$root" cbci_controllers_pods)" | awk '{ print $3 }' | grep -v STATUS | grep -v -c Running)" == 0 ]; do sleep $wait && echo "Waiting for Controllers Pod to get into Ready State..."; done ;\
       eval "$(tf-output "$root" cbci_controllers_pods)" && INFO "All Controllers Pods are Ready."
@@ -167,10 +167,15 @@ set-kube-env () {
   done
 }
 
-set-casc-branch () {
-  local branch=$1
+set-casc-location () {
+  local endpoint=$1
+  local branch=$2
+  #Endpoint
+  sed -i "s|scmRepo: .*|scmRepo: \"$endpoint\"|g" "$SCRIPTDIR/02-at-scale/k8s/cbci-values.yml"
+  sed -i "s|scmCascMmStore: .*|scmCascMmStore: \"$endpoint\"|g" "$SCRIPTDIR/02-at-scale/casc/oc/variables/variables.yaml"
+  #Branch
   sed -i "s|scmBranch: .*|scmBranch: $branch|g" "$SCRIPTDIR/02-at-scale/k8s/cbci-values.yml"
-  sed -i "s|casc_branch: .*|casc_branch: $branch|g" "$SCRIPTDIR/02-at-scale/casc/oc/variables/variables.yaml"
+  sed -i "s|cascBranch: .*|cascBranch: $branch|g" "$SCRIPTDIR/02-at-scale/casc/oc/variables/variables.yaml"
   sed -i "s|bundle: \".*/none-ha\"|bundle: \"$branch/none-ha\"|g" "$SCRIPTDIR/02-at-scale/casc/oc/items/items-root.yaml"
   sed -i "s|bundle: \".*/ha\"|bundle: \"$branch/ha\"|g" "$SCRIPTDIR/02-at-scale/casc/oc/items/items-root.yaml"
 }

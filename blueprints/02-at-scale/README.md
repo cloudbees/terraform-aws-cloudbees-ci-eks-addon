@@ -58,7 +58,8 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
 |------|-------------|------|---------|:--------:|
 | hosted_zone | Amazon Route 53 hosted zone. CloudBees CI applications are configured to use subdomains in this hosted zone. | `string` | n/a | yes |
 | trial_license | CloudBees CI trial license details for evaluation. | `map(string)` | n/a | yes |
-| grafana_admin_password | Grafana admin password. | `string` | `"change.me"` | no |
+| gh_token | GitHub token for the CloudBees operations center credential GH-User-token, that is created via CloudBees CasC. | `string` | `"ExampleToken1234"` | no |
+| gh_user | GitHub user for the CloudBees operations center credential GH-User-token, that is created via CloudBees CasC. | `string` | `"exampleUser"` | no |
 | suffix | Unique suffix to assign to all resources. When adding the suffix, changes are required in CloudBees CI for the validation phase. | `string` | `""` | no |
 | tags | Tags to apply to resources. | `map(string)` | `{}` | no |
 
@@ -87,6 +88,7 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
 | efs_access_points | Amazon EFS access points. |
 | efs_arn | Amazon EFS ARN. |
 | eks_cluster_arn | Amazon EKS cluster ARN. |
+| global_password | Random string that is used as the global password. |
 | grafana_dashboard | Provides access to Grafana dashboards. |
 | kubeconfig_add | Add kubeconfig to the local configuration to access the Kubernetes API. |
 | kubeconfig_export | Export the KUBECONFIG environment variable to access the Kubernetes API. |
@@ -95,56 +97,24 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
 | prometheus_dashboard | Provides access to Prometheus dashboards. |
 | s3_cbci_arn | CloudBees CI Amazon S3 bucket ARN. |
 | s3_cbci_name | CloudBees CI Amazon S3 bucket name. It is required by CloudBees CI for workspace caching and artifact management. |
-| velero_backup_on_demand | Takes an on-demand Velero backup from the schedule for selected controller using Block Storage. |
-| velero_backup_schedule | Creates a Velero backup schedule for selected controller using Block Storage and deletes the existing schedulle, if it exists. |
-| velero_restore | Restores selected controller using Block Storage from a backup. |
+| velero_backup_on_demand | Takes an on-demand Velero backup from the schedule for the selected controller that is using block storage. |
+| velero_backup_schedule | Creates a Velero backup schedule for the selected controller that is using block storage, and then deletes the existing schedule, if it exists. |
+| velero_restore | Restores the selected controller that is using block storage from a backup. |
 | vpc_arn | VPC ID. |
 <!-- END_TF_DOCS -->
 
 ## Deploy
 
-In addition to the minimum required settings explained in [Get started - Deploy](../01-getting-started/README.md#deploy), when preparing to deploy, you must [create the secrets file](#create-the-secrets-file) and [update Amazon S3 bucket settings](#update-amazon-s3-bucket-settings)
+When preparing to deploy, you must complete the following steps:
+
+1. Customize your Terraform values by copying `.auto.tfvars.example` to `.auto.tfvars`.
+2. Initialize the root module and any associated configuration for providers.
+3. Create the resources and deploy CloudBees CI to an EKS cluster. Refer to [Amazon EKS Blueprints for Terraform - Deploy](https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#deploy).
+
+For more information, refer to [The Core Terraform Workflow](https://www.terraform.io/intro/core-workflow) documentation.
 
 > [!TIP]
 > The `deploy` phase can be orchestrated via the companion [Makefile](../../Makefile).
-
-### Create the secrets file
-
-You must create your secrets file by copying the contents of [secrets-values.yml.example](k8s/secrets-values.yml.example) to `secrets-values.yml`. This provides [Kubernetes secrets](https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/docs/features/secrets.adoc#kubernetes-secrets) that can be consumed by CasC.
-
-### Update Amazon S3 bucket settings
-
-Since the optional Terraform variable `suffix` is used for this blueprint, you must update the Amazon S3 bucket name for CloudBees CI controllers and the Amazon S3 bucket for the backup controller cluster operations. To update the Amazon S3 bucket name, you have the following options:
-
- - [Option 1: Update Amazon S3 bucket name using CasC](#option-1-update-amazon-s3-bucket-name-using-casc)
- - [Option 2: Update Amazon S3 bucket name using the CloudBees CI UI](#option-2-update-amazon-s3-bucket-name-using-the-cloudbees-ci-ui)
-
-#### Option 1: Update Amazon S3 bucket name using CasC
-
->[!IMPORTANT]
-> This option can only be used before the blueprint has been deployed.
-
-1. Create a fork of the [cloudbees/terraform-aws-cloudbees-ci-eks-addon](https://github.com/cloudbees/casc-cloudbees-ci-eks-addon) GitHub repository to your GitHub organization and make any necessary edits to the controller CasC bundle.
-   - Update `cbci_s3` in the [casc/mc/parent/variables/variables.yaml](casc/mc/parent/variables/variables.yaml) file, including your custom prefix.
-   - Update `scm_casc_mc_store` in the [casc/oc/variables/variables.yaml](casc/oc/variables/variables.yaml) file and `bucketName` in the [casc/oc/items/items-admin-jobs-folder.yaml](casc/oc/items/items-admin-jobs-folder.yaml) file.
-2. Commit and push your changes to the forked repository in your organization.
-3. In the [k8s/cbci-values.yml](k8s/cbci-values.yml) Helm file, update the `OperationsCenter.CasC.Retriever.scmRepo` field based on the files in this blueprint.
-4. Save the file and issue the `terraform apply` command.
-
-#### Option 2: Update Amazon S3 bucket name using the CloudBees CI UI
-
-> [!IMPORTANT]
-> - This option can only be used after the blueprint is deployed.
-> - If using CasC, the declarative definition overrides any configuration updates that are made in the UI the next time the controller is restarted.
-
-1. Sign in to the CloudBees CI controller UI as a user with **Administer** privileges.
-2. Navigate to **Manage Jenkins > AWS > Amazon S3 Bucket Access settings**, update the **S3 Bucket Name**, and select **Save**.
-3. Sign in to the CloudBees CI operations center UI as a user with **Administer** privileges.
-   Note that access to back up jobs is restricted to admin users via role-based access control (RBAC).
-4. From the operations center dashboard, select **All** to view all folders on the operations center.  
-5. Navigate to the **admin** folder, and then select the **backup-all-controllers** Cluster Operations job.
-6. From the left pane, select **Configure**.
-7. Update the **S3 Bucket Name**, and then select **Save**.
 
 ## Validate
 
@@ -164,10 +134,10 @@ Once the resources have been created, a `kubeconfig` file is created in the [/k8
 
 1. Complete the steps to [validate CloudBees CI](../01-getting-started/README.md#cloudbees-ci), if you have not done so already.
 
-2. Authentication in this blueprint is based on LDAP and uses two types of personas (Admin and Developer), each with a different authorization level. Each persona uses a different username (cn); you can find the password in [.docker/ldap/data.ldif](./../../.docker/ldap/data.ldif). The authorization level defines a set of permissions configured using [RBAC](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-secure-guide/rbac). Additionally, the operations center and controller use [single sign-on (SS0)](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-secure-guide/using-sso). Issue the following command to retrieve the password of the `admin_cbci_a` user
+2. Authentication in this blueprint is based on LDAP using the `cn` user (available in [k8s/openldap-stack-values.yml](./k8s/openldap-stack-values.yml)) and the global password. The authorization level defines a set of permissions configured using [RBAC](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-secure-guide/rbac). Additionally, the operations center and controller use [single sign-on (SS0)](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-secure-guide/using-sso). Issue the following command to retrieve the global password:
 
    ```sh
-   eval $(terraform output --raw ldap_admin_password)
+   eval $(terraform output --raw global_password)
    ```
 
 3. CasC is enabled for the [operations center](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/) (`cjoc`) and [controllers](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-controller/) (`team-b` and `team-c-ha`). `team-a` is not using CasC, to illustrate the difference between the two approaches. Issue the following command to verify that all controllers are in a `Running` state:

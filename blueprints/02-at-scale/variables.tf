@@ -25,8 +25,14 @@ variable "suffix" {
   }
 }
 
-variable "grafana_admin_password" {
-  description = "Grafana admin password."
-  default     = "change.me"
+variable "gh_user" {
+  description = "GitHub user for the CloudBees operations center credential GH-User-token, that is created via CloudBees CasC."
+  default     = "exampleUser"
+  type        = string
+}
+
+variable "gh_token" {
+  description = "GitHub token for the CloudBees operations center credential GH-User-token, that is created via CloudBees CasC."
+  default     = "ExampleToken1234"
   type        = string
 }

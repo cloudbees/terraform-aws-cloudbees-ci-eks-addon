@@ -42,10 +42,6 @@ terraform.rc
 terraform*.output
 kubeconfig*.yaml
 
-# Secrets file
-*secrets*
-!secrets*example
-
 # Bankend file
 backend*.tf
 

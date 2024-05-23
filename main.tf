@@ -3,8 +3,7 @@
 locals {
   cbci_ns           = "cbci"
   cbci_secrets_name = "cbci-secrets"
-  secret_data       = fileexists(var.k8s_secrets_file) ? yamldecode(file(var.k8s_secrets_file)) : {}
-  create_secret     = alltrue([var.create_k8s_secrets, length(local.secret_data) > 0])
+  create_secret     = alltrue([var.create_k8s_secrets, length(var.k8s_secrets) > 0])
   oc_secrets_mount = [
     <<-EOT
       OperationsCenter:
@@ -57,7 +56,7 @@ resource "kubernetes_secret" "oc_secrets" {
     namespace = kubernetes_namespace.cbci[0].metadata[0].name
   }
 
-  data = yamldecode(file(var.k8s_secrets_file))
+  data = yamldecode(var.k8s_secrets)
 }
 
 resource "kubectl_manifest" "service_monitor_cb_controllers" {
@@ -109,7 +108,7 @@ resource "helm_release" "cloudbees_ci" {
   description      = try(var.helm_config.description, null)
   chart            = "cloudbees-core"
   #vCBCI_Helm#
-  version                    = try(var.helm_config.version, "3.17418.0+c259df1cac86")
+  version                    = try(var.helm_config.version, "3.17821.0+5cfcf804cfad")
   repository                 = try(var.helm_config.repository, "https://public-charts.artifacts.cloudbees.com/repository/public/")
   values                     = local.create_secret ? concat(var.helm_config.values, local.oc_secrets_mount, [templatefile("${path.module}/values.yml", local.cbci_template_values)]) : concat(var.helm_config.values, [templatefile("${path.module}/values.yml", local.cbci_template_values)])
   timeout                    = try(var.helm_config.timeout, 1200)

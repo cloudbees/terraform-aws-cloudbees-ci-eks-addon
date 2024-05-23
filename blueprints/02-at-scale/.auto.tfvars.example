@@ -1,11 +1,14 @@
-hosted_zone = "example.domain.com" # Required. Route 53 Hosted Zone to host CloudBees CI subdomains records.
+hosted_zone = "acme.domain.com" # Required. Route 53 Hosted Zone to host CloudBees CI subdomains records. Replace Default values by your own.
 
-trial_license = { # Required. CloudBees CI Trial license details for evaluation.
+trial_license = { # Required. CloudBees CI Trial license details for evaluation. Replace Default values by your own.
   first_name  = "Foo"
   last_name  = "Bar"
   email = "foo.bar@acme.com"
   company = "Acme Inc."
 }
+
+gh_user = "exampleUser" # Required. Default values can be used for demo.
+gh_token = "ExampleToken1234" # Required. Default values can be used for demo.
 
 # tags = {  # Optional. Tags for the resources created. Default set to empty. Shared among all.
 #   "cb-owner" : "team-services"

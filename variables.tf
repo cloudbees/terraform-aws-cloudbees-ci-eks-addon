@@ -36,13 +36,13 @@ variable "trial_license" {
 }
 
 variable "create_k8s_secrets" {
-  description = "Create the Kubernetes secret cbci-secrets. It can be consumed by CloudBees CasC."
+  description = "Create the Kubernetes cbci-secrets. It can be consumed by CloudBees CasC for the operations center."
   default     = false
   type        = bool
 }
 
-variable "k8s_secrets_file" {
-  description = "Secrets file .yml path containing the secrets names:values for cbci-secrets."
+variable "k8s_secrets" {
+  description = "Secrets .yml file as a string containing the names:values secrets. It is required when create_k8s_secrets is enabled."
   default     = "secrets-values.yml"
   type        = string
 }

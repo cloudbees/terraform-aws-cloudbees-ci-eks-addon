@@ -42,7 +42,7 @@ output "cbci_liveness_probe_ext" {
 
 output "ldap_admin_password" {
   description = "LDAP password for the cbci_admin_user user for the CloudBees CI add-on. Check .docker/ldap/data.ldif."
-  value       = "kubectl get secret ${module.eks_blueprints_addon_cbci.cbci_secrets} -n ${module.eks_blueprints_addon_cbci.cbci_namespace} -o jsonpath='{.data.secJenkinsPass}' | base64 -d"
+  value       = "kubectl get secret ${module.eks_blueprints_addon_cbci.cbci_secrets} -n ${module.eks_blueprints_addon_cbci.cbci_namespace} -o jsonpath=${local.global_pass_jsonpath} | base64 -d"
 }
 
 output "cbci_oc_url" {
@@ -52,12 +52,12 @@ output "cbci_oc_url" {
 
 output "cbci_oc_export_admin_crumb" {
   description = "Exports the operations center cbci_admin_user crumb, to access the REST API when CSRF is enabled."
-  value       = "export CBCI_ADMIN_CRUMB=$(curl -s '${module.eks_blueprints_addon_cbci.cbci_oc_url}/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,%22:%22,//crumb)' --cookie-jar /tmp/cookies.txt --user ${local.cbci_admin_user}:$(kubectl get secret ${module.eks_blueprints_addon_cbci.cbci_secrets} -n cbci -o jsonpath='{.data.secJenkinsPass}' | base64 -d))"
+  value       = "export CBCI_ADMIN_CRUMB=$(curl -s '${module.eks_blueprints_addon_cbci.cbci_oc_url}/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,%22:%22,//crumb)' --cookie-jar /tmp/cookies.txt --user ${local.cbci_admin_user}:$(kubectl get secret ${module.eks_blueprints_addon_cbci.cbci_secrets} -n cbci -o jsonpath=${local.global_pass_jsonpath} | base64 -d))"
 }
 
 output "cbci_oc_export_admin_api_token" {
   description = "Exports the operations center cbci_admin_user API token to access the REST API when CSRF is enabled. It expects CBCI_ADMIN_CRUMB as the environment variable."
-  value       = "export CBCI_ADMIN_TOKEN=$(curl -s '${module.eks_blueprints_addon_cbci.cbci_oc_url}/user/${local.cbci_admin_user}/descriptorByName/jenkins.security.ApiTokenProperty/generateNewToken' --user ${local.cbci_admin_user}:$(kubectl get secret ${module.eks_blueprints_addon_cbci.cbci_secrets} -n cbci -o jsonpath='{.data.secJenkinsPass}' | base64 -d)  --data 'newTokenName=kb-token' --cookie /tmp/cookies.txt -H $CBCI_ADMIN_CRUMB | jq -r .data.tokenValue)"
+  value       = "export CBCI_ADMIN_TOKEN=$(curl -s '${module.eks_blueprints_addon_cbci.cbci_oc_url}/user/${local.cbci_admin_user}/descriptorByName/jenkins.security.ApiTokenProperty/generateNewToken' --user ${local.cbci_admin_user}:$(kubectl get secret ${module.eks_blueprints_addon_cbci.cbci_secrets} -n cbci -o jsonpath=${local.global_pass_jsonpath} | base64 -d)  --data 'newTokenName=kb-token' --cookie /tmp/cookies.txt -H $CBCI_ADMIN_CRUMB | jq -r .data.tokenValue)"
 }
 
 output "cbci_oc_take_backups" {
@@ -136,17 +136,17 @@ output "aws_logstreams_fluentbit" {
 }
 
 output "velero_backup_schedule" {
-  description = "Creates a Velero backup schedule for selected controller using Block Storage and deletes the existing schedulle, if it exists."
+  description = "Creates a Velero backup schedule for the selected controller that is using block storage, and then deletes the existing schedule, if it exists."
   value       = "velero schedule delete ${local.velero_schedule_name} --confirm || true; velero create schedule ${local.velero_schedule_name} --schedule='@every 30m' --ttl 2h --include-namespaces ${module.eks_blueprints_addon_cbci.cbci_namespace} --exclude-resources pods,events,events.events.k8s.io -l ${local.velero_controller_backup_selector} --snapshot-volumes=true --include-cluster-resources=true"
 }
 
 output "velero_backup_on_demand" {
-  description = "Takes an on-demand Velero backup from the schedule for selected controller using Block Storage."
+  description = "Takes an on-demand Velero backup from the schedule for the selected controller that is using block storage."
   value       = "velero backup create --from-schedule ${local.velero_schedule_name} --wait"
 }
 
 output "velero_restore" {
-  description = "Restores selected controller using Block Storage from a backup."
+  description = "Restores the selected controller that is using block storage from a backup."
   value       = "kubectl delete all,pvc -n ${module.eks_blueprints_addon_cbci.cbci_namespace} -l ${local.velero_controller_backup_selector}; velero restore create --from-schedule ${local.velero_schedule_name} --restore-volumes=true"
 }
 
@@ -163,4 +163,9 @@ output "prometheus_active_targets" {
 output "grafana_dashboard" {
   description = "Provides access to Grafana dashboards."
   value       = "kubectl port-forward svc/kube-prometheus-stack-grafana 50002:80 -n kube-prometheus-stack"
+}
+
+output "global_password" {
+  description = "Random string that is used as the global password."
+  value       = "kubectl get secret ${module.eks_blueprints_addon_cbci.cbci_secrets} -n cbci -o jsonpath=${local.global_pass_jsonpath} | base64 -d"
 }

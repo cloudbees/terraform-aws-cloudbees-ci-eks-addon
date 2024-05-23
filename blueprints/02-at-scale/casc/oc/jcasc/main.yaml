@@ -1,22 +1,24 @@
 jenkins:
-  systemMessage: ${message}
+  systemMessage: "Test ${sec_s3bucketName}" #Replace by ${message}
   numExecutors: 0
 unclassified:
+  cascItemsConfiguration:
+      variableInterpolationEnabledForAdmin: true
   bundleStorageService:
     activated: true
     activeBundle:
       name: "casc-mm-store"
       retriever:
         SCM:
-          defaultVersion: ${casc_branch}
+          defaultVersion: ${cascBranch}
           scmSource:
             git:
               credentialsId: "GH-token"
-              remote: ${scm_casc_mm_store}
+              remote: ${scmCascMmStore}
               traits:
               - "gitBranchDiscovery"
               - headWildcardFilter:
-                  includes: ${casc_branch}
+                  includes: ${cascBranch}
               - sparseCheckoutPaths:
                   extension:
                     sparseCheckoutPaths:

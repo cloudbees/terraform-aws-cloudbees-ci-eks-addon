@@ -26,12 +26,25 @@ items:
           kind: "StatefulSet"
           spec:
             template:
-                spec:
-                  tolerations:
-                  - key: "dedicated"
-                    operator: "Equal"
-                    value: "cb-apps"
-                    effect: "NoSchedule"
+              spec:
+                tolerations:
+                - key: "dedicated"
+                  operator: "Equal"
+                  value: "cb-apps"
+                  effect: "NoSchedule"
+                volumes:
+                - name: cbci-secrets
+                  secret:
+                    secretName: cbci-secrets
+                containers:
+                - name: jenkins
+                  env:
+                  - name: SECRETS
+                    value: "/var/run/secrets/cbci"
+                  volumeMounts:
+                  - name: cbci-secrets
+                    mountPath: "/var/run/secrets/cbci"
+                    readOnly: true
           ---
           apiVersion: "v1"
           kind: "Service"
@@ -40,7 +53,7 @@ items:
               "cloudbees.prometheus": "true"
     properties:
       - configurationAsCode:
-          bundle: "main/none-ha"
+          bundle: "develop/none-ha"
   # Casc, HA
   - kind: managedController
     name: team-c-ha
@@ -60,12 +73,25 @@ items:
           kind: "Deployment"
           spec:
             template:
-                spec:
-                  tolerations:
-                  - key: "dedicated"
-                    operator: "Equal"
-                    value: "cb-apps"
-                    effect: "NoSchedule"
+              spec:
+                tolerations:
+                - key: "dedicated"
+                  operator: "Equal"
+                  value: "cb-apps"
+                  effect: "NoSchedule"
+                volumes:
+                - name: cbci-secrets
+                  secret:
+                    secretName: cbci-secrets
+                containers:
+                - name: jenkins
+                  env:
+                  - name: SECRETS
+                    value: "/var/run/secrets/cbci"
+                  volumeMounts:
+                  - name: cbci-secrets
+                    mountPath: "/var/run/secrets/cbci"
+                    readOnly: true
           ---
           apiVersion: "v1"
           kind: "Service"
@@ -74,4 +100,4 @@ items:
               "cloudbees.prometheus": "true"
     properties:
       - configurationAsCode:
-          bundle: "main/ha"
+          bundle: "develop/ha"
