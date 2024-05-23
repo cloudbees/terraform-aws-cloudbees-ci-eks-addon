@@ -90,7 +90,7 @@ CloudBees CI Terraform EKS Addon versions try to be in sync with the [CloudBees 
 
 1. Ensure that `develop` branch follows its requisites from the [Design principles](#design-principles) section.
 2. Test locally the (`develop`) for all the blueprints. Use the `test-all` target in the companion [Makefile](Makefile).
-3. Once all local tests passed successfully, create a PR against the `main` branch.
+3. Once all local tests passed successfully, create a PR against the `main` branch. **It requires to pass the COE Team validation**.
 4. Once the pull request is merged, update the `main` branch following its requisites from the [Design principles](#design-principles) section. The [Blueprint Terraform CI pipeline](#blueprint-terraform-ci-pipeline) must validate the changes.
 5. Create a [new release](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/releases). The release version semantics follow the Helm chart convention.
 
