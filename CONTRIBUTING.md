@@ -8,16 +8,16 @@ This document provides guidelines for contributing to the CloudBees CI add-on fo
 - The blueprints use a monorepo configuration; the required external repositories for the configuration are included within the same repository. For example, the [At scale blueprint](blueprints/02-at-scale) contains the repository for CasC bundles.
 - Submit pull requests against the `develop` branch and release from the `main` branch.
   - `main` branch:
-    - It is the stable branch and it is used for releases.
+    - It is the stable branch and is used for releases.
     - Before merging a pull request, the CloudBees Center of Excellence (CoE) team must validate the changes.
-    - Requisites:
-      - The field `source` in the `eks_blueprints_addon_cbci` at blueprints must point to the remote [terraform registry version](https://registry.terraform.io/modules/cloudbees/cloudbees-ci-eks-addon/aws/latest) and `version >= "x.x.x"`. It is important for the telemetry in https://registry.terraform.io/modules/cloudbees/cloudbees-ci-eks-addon/aws/latest.
-      - The CasC bundles SCM configuration must point to the repository https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon and its `main` branch.
-  - `develop`:
+    - Requirements:
+      - The `source` field in the `eks_blueprints_addon_cbci` at blueprints must point to the remote [terraform registry version](https://registry.terraform.io/modules/cloudbees/cloudbees-ci-eks-addon/aws/latest) and `version >= "x.x.x"`. It is important for the telemetry in https://registry.terraform.io/modules/cloudbees/cloudbees-ci-eks-addon/aws/latest.
+      - The CasC bundles SCM configuration must point to the https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon repository and its `main` branch.
+  - `develop` branch:
     - It is the integration branch and it is used for testing new features and updates before merging them into the `main` branch.
-    - Requisites:
-      - The field `source` in the `eks_blueprints_addon_cbci` in the blueprints folder must point to the local CloudBees CI Terraform EKS Addon root of the repository `source = "../../"`.
-      - The CasC bundles SCM configuration must point to the repository https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon and its `develop` branch.
+    - Requirements:
+      - The `source` field in the `eks_blueprints_addon_cbci` in the blueprints folder must point to the local root of the https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon repository (for example, `source = "../../"`).
+      - The CasC bundles SCM configuration must point to the https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon repository and its `develop` branch.
 
 ## Report bugs and feature requests
 
