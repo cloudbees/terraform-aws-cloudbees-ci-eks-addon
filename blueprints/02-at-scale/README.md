@@ -58,7 +58,7 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
 |------|-------------|------|---------|:--------:|
 | hosted_zone | Amazon Route 53 hosted zone. CloudBees CI applications are configured to use subdomains in this hosted zone. | `string` | n/a | yes |
 | trial_license | CloudBees CI trial license details for evaluation. | `map(string)` | n/a | yes |
-| gh_token | GitHub Token for CloudBees Operation Center credential GH-User-token that is created via Casc. | `string` | `"ExampleToken1234"` | no |
+| gh_token | GitHub token for the CloudBees operations center credential GH-User-token, that is created via CloudBees CasC. | `string` | `"ExampleToken1234"` | no |
 | gh_user | GitHub User for CloudBees Operation Center credential GH-User-token that is created via Casc. | `string` | `"exampleUser"` | no |
 | suffix | Unique suffix to assign to all resources. When adding the suffix, changes are required in CloudBees CI for the validation phase. | `string` | `""` | no |
 | tags | Tags to apply to resources. | `map(string)` | `{}` | no |
