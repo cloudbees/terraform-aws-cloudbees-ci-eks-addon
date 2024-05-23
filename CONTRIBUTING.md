@@ -5,7 +5,7 @@ This document provides guidelines for contributing to the CloudBees CI add-on fo
 ## Design principles
 
 - It follows the same approach as the [Terraform AWS EKS Blueprints for Terraform Patterns](https://aws-ia.github.io/terraform-aws-eks-blueprints/).
-- Blueprint uses a Monorepo configuration: Required external repositories for configuration are included within the same repository. For example, the at scale blueprint contains the repository for CasC bundles.
+- The blueprints use a monorepo configuration; the required external repositories for the configuration are included within the same repository. For example, the [At scale blueprint](blueprints/02-at-scale) contains the repository for CasC bundles.
 - Submit pull request against `develop` branch and release from `main` branch.
   - `main`:
     - It is the stable branch and it is used for releases.
