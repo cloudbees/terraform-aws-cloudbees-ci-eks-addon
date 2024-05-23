@@ -26,7 +26,7 @@ variable "suffix" {
 }
 
 variable "gh_user" {
-  description = "GitHub User for CloudBees Operation Center credential GH-User-token that is created via Casc."
+  description = "GitHub user for the CloudBees operations center credential GH-User-token, that is created via CloudBees CasC."
   default     = "exampleUser"
   type        = string
 }
