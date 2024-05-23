@@ -36,7 +36,7 @@ locals {
 
 module "eks_blueprints_addon_cbci" {
   source  = "cloudbees/cloudbees-ci-eks-addon/aws"
-  version = ">= v3.17821.0+5cfcf804cfad"
+  version = ">= 3.17821.0+5cfcf804cfad"
 
   hosted_zone   = var.hosted_zone
   cert_arn      = module.acm.acm_certificate_arn

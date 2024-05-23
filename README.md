@@ -29,7 +29,7 @@ Implementation examples are included in the [blueprints](https://github.com/clou
 ```terraform
 module "eks_blueprints_addon_cbci" {
   source  = "cloudbees/cloudbees-ci-eks-addon/aws"
-  version = ">= v3.17821.0+5cfcf804cfad"
+  version = ">= 3.17821.0+5cfcf804cfad"
 
   hosted_zone    = "example.domain.com"
   cert_arn     = "arn:aws:acm:us-east-1:0000000:certificate/0000000-aaaa-bbb-ccc-thisIsAnExample"
