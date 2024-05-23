@@ -167,8 +167,13 @@ set-kube-env () {
   done
 }
 
-set-casc-branch () {
-  local branch=$1
+set-casc-location () {
+  local endpoint=$1
+  local branch=$2
+  #Endpoint
+  sed -i "s|scmRepo: .*|scmRepo: \"$endpoint\"|g" "$SCRIPTDIR/02-at-scale/k8s/cbci-values.yml"
+  sed -i "s|scmCascMmStore: .*|scmCascMmStore: \"$endpoint\"|g" "$SCRIPTDIR/02-at-scale/casc/oc/variables/variables.yaml"
+  #Branch
   sed -i "s|scmBranch: .*|scmBranch: $branch|g" "$SCRIPTDIR/02-at-scale/k8s/cbci-values.yml"
   sed -i "s|cascBranch: .*|cascBranch: $branch|g" "$SCRIPTDIR/02-at-scale/casc/oc/variables/variables.yaml"
   sed -i "s|bundle: \".*/none-ha\"|bundle: \"$branch/none-ha\"|g" "$SCRIPTDIR/02-at-scale/casc/oc/items/items-root.yaml"
