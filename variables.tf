@@ -36,7 +36,7 @@ variable "trial_license" {
 }
 
 variable "create_k8s_secrets" {
-  description = "Create the Kubernetes secret cbci-secrets. It can be consumed by CloudBees CasC at Operation Center level."
+  description = "Create the Kubernetes cbci-secrets. It can be consumed by CloudBees CasC for the operations center."
   default     = false
   type        = bool
 }
