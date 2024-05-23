@@ -11,7 +11,7 @@ on:
       - 'main'
 
 env:
-  AWS_REGION: "us-west-1"
+  AWS_REGION: "us-east-1"
   BUCKET_NAME_TF_STATE: "cbci-eks-addon-tf-state"
   AWS_ROLE_TO_ASSUME: "infra-admin-ci"
   REPLAY_STR: "1"
@@ -27,7 +27,7 @@ env:
       email = "ci.user@cloudbees.io"
       company = "CloudBees Inc."
     }
-    suffix = "ci-v4"
+    suffix = "ci-v5"
 
 jobs:
   init:
