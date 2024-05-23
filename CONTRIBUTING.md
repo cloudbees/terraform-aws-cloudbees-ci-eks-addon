@@ -46,7 +46,7 @@ Contributions via pull requests are appreciated. Before submitting a pull reques
 To submit a pull request:
 
 1. Fork the repository.
-2. Create a feature branch extending from the `develop` branch.
+2. Create a feature branch based on the `develop` branch.
 3. Modify the source and focus on the specific change you are contributing. For example, if you reformat all the code, it is hard for reviewers to focus on your specific change.
 4. **Ensure that local tests pass**. Local tests can be orchestrated via the companion [Makefile](Makefile).
 5. Make commits to your fork using clear commit messages.
