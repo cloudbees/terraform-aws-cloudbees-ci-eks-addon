@@ -42,7 +42,7 @@ variable "create_k8s_secrets" {
 }
 
 variable "k8s_secrets" {
-  description = "Secrets file .yml as a string containing the secrets names:values. It is required when create_k8s_secrets is enabled."
+  description = "Secrets .yml file as a string containing the names:values secrets. It is required when create_k8s_secrets is enabled."
   default     = "secrets-values.yml"
   type        = string
 }
