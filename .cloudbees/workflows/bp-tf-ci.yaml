@@ -11,7 +11,7 @@ on:
       - 'main'
 
 env:
-  AWS_REGION: "us-east-1"
+  AWS_REGION: "us-west-1"
   BUCKET_NAME_TF_STATE: "cbci-eks-addon-tf-state"
   AWS_ROLE_TO_ASSUME: "infra-admin-ci"
   REPLAY_STR: "2"
@@ -54,7 +54,7 @@ jobs:
 
   bp01:
     env:
-      CLEAN_UP: "true"
+      CLEAN_UP: "false"
     needs:
       - init
     steps:
@@ -113,7 +113,7 @@ jobs:
 
   bp02:
     env:
-        CLEAN_UP: "true"
+        CLEAN_UP: "false"
     needs:
       - init
     steps:
