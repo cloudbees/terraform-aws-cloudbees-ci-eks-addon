@@ -60,7 +60,7 @@ If the command is successful, no output is returned.
 
 Once you can access the Kubernetes API from your terminal, complete the following steps.
 
-Take the example from dropbox:
+Take the example from Dropdown box menu:
 
 ```yaml
 podTemplate(yaml: '''
@@ -92,7 +92,7 @@ spec:
 Observations:
 
 - The first time it runs, it will take a while to start the pod because it needs to download the images. Subsequent runs will be faster.
-- Apart from the agent node itself, no other nodes are running in the Windows Node Group.
+- Apart from the agent node itself, no other nodes are running in the Windows Node Group. (Initially, I thought that `kube-proxy` and `vpc-cni` were required to run in Windows Nodes as Daemonset but they are not).
 
 ```sh
 $> kubectl get nodes -o wide
@@ -105,7 +105,6 @@ NAMESPACE   NAME                       READY   STATUS    RESTARTS   AGE   IP    
 cbci        test-5-wqkqf-h2l8n-jnncp   2/2     Running   0          19s   10.0.48.72   ip-10-0-48-153.ec2.internal   <none>           <none>
 
 ```
-
 
 Addon troubleshooting:
 
@@ -179,34 +178,9 @@ configurationSchema: '{"$ref":"#/definitions/Coredns","$schema":"http://json-sch
   coredns pod topology spread constraints","type":"array"}},"title":"Coredns","type":"object"},"Limits":{"additionalProperties":false,"properties":{"cpu":{"type":"string"},"memory":{"type":"string"}},"title":"Limits","type":"object"},"Resources":{"additionalProperties":false,"properties":{"limits":{"$ref":"#/definitions/Limits"},"requests":{"$ref":"#/definitions/Limits"}},"title":"Resources","type":"object"}}}'
 ```
 
-Based on the provided list of add-ons, here's which ones are required to be running on all worker nodes (both Linux and Windows) and which ones are not:
-
-Required on all worker nodes:
-
-- vpc-cni: The Amazon VPC CNI plugin is required on all worker nodes to provide networking capabilities to the Kubernetes pods. [1]
-
-- kube-proxy: The kube-proxy component is required on all worker nodes to manage network rules and enable network communication to pods.
-
-Not required on all worker nodes:
-
-- aws-ebs-csi-driver: The AWS EBS CSI driver is used for provisioning and managing Amazon Elastic Block Store (EBS) volumes. In the provided configuration, it is set to deploy only on nodes that need EBS storage, as specified by the nodeSelector setting.
-
-- coredns: The CoreDNS add-on provides DNS resolution for Kubernetes services and pods. While it is a required component for the cluster, it typically runs as a service rather than on all worker nodes.
-
-DaemonSets:
-
-- Running as DaemonSets: aws-ebs-csi-driver (node component), vpc-cni, and kube-proxy. These need to run on every node for their respective functionalities related to volume management, networking, and service discovery.
-
-- Not running as DaemonSets: coredns. It is deployed as a Deployment to handle DNS services within the cluster.
-
-
-
-
 ## Destroy
 
 To tear down and remove the resources created in the blueprint, complete the steps for [Amazon EKS Blueprints for Terraform - Destroy](https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#destroy).
 
 > [!TIP]
 > The `destroy` phase can be orchestrated via the companion [Makefile](../../Makefile).
-
-
