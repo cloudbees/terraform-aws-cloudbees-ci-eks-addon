@@ -60,7 +60,7 @@ If the command is successful, no output is returned.
 
 Once you can access the Kubernetes API from your terminal, complete the following steps.
 
-Take the example from Dropdown box menu:
+Take the example from the Dropdown box menu:
 
 ```yaml
 podTemplate(yaml: '''
@@ -91,7 +91,7 @@ spec:
 
 Observations:
 
-- The first time it runs, it will take a while to start the pod because it needs to download the images. Subsequent runs will be faster.
+- The first time it runs the build, the pod will take a while to be in `RUNNING STATE` because it needs to download the images (it is shown as `waiting`). Subsequent runs will be faster. (E.g. K8s events show no errors).
 - Apart from the agent node itself, no other nodes are running in the Windows Node Group. (Initially, I thought that `kube-proxy` and `vpc-cni` were required to run in Windows Nodes as Daemonset but they are not).
 
 ```sh
