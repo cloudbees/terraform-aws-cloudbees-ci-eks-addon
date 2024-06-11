@@ -1,0 +1,3 @@
+#https://artifacthub.io/packages/helm/aws/aws-load-balancer-controller
+#https://github.com/aws/eks-charts/blob/master/stable/aws-load-balancer-controller/Chart.yaml
+nodeSelector: { "kubernetes.io/os": "linux" }

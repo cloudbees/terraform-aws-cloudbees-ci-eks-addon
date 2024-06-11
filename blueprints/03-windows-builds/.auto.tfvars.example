@@ -1,0 +1,16 @@
+hosted_zone = "acme.domain.com" # Required. Route 53 Hosted Zone to host CloudBees CI subdomains records.
+
+trial_license = { # Required. CloudBees CI Trial license details for evaluation.
+  first_name  = "Foo"
+  last_name  = "Bar"
+  email = "foo.bar@acme.com"
+  company = "Acme Inc."
+}
+
+# tags = {  # Optional. Tags for the resources created. Default set to empty. Shared among all.
+#   "cb-owner" : "team-services"
+#   "cb-user" : "demo-user"
+#   "cb-purpose" : "demo-env"
+# }
+
+# suffix = my-demo #Optional
