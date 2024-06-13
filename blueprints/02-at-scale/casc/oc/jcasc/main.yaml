@@ -49,7 +49,7 @@ security:
       count: 0
 masterprovisioning:
   kubernetes:
-    nodeSelectors: "ci_type=cb-apps"
+    nodeSelectors: "role=cb-apps"
     yaml: |-
       ---
       apiVersion: "apps/v1"
