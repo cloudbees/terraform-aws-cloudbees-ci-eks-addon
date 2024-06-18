@@ -92,7 +92,6 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
 | grafana_dashboard | Provides access to Grafana dashboards. |
 | kubeconfig_add | Add kubeconfig to the local configuration to access the Kubernetes API. |
 | kubeconfig_export | Export the KUBECONFIG environment variable to access the Kubernetes API. |
-| ldap_admin_password | LDAP password for the cbci_admin_user user for the CloudBees CI add-on. Check .docker/ldap/data.ldif. |
 | prometheus_active_targets | Checks active Prometheus targets from the operations center. |
 | prometheus_dashboard | Provides access to Prometheus dashboards. |
 | s3_cbci_arn | CloudBees CI Amazon S3 bucket ARN. |
