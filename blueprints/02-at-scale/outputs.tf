@@ -40,11 +40,6 @@ output "cbci_liveness_probe_ext" {
   value       = module.eks_blueprints_addon_cbci.cbci_liveness_probe_ext
 }
 
-output "ldap_admin_password" {
-  description = "LDAP password for the cbci_admin_user user for the CloudBees CI add-on. Check .docker/ldap/data.ldif."
-  value       = "kubectl get secret ${module.eks_blueprints_addon_cbci.cbci_secrets} -n ${module.eks_blueprints_addon_cbci.cbci_namespace} -o jsonpath=${local.global_pass_jsonpath} | base64 -d"
-}
-
 output "cbci_oc_url" {
   description = "Operations center URL for the CloudBees CI add-on."
   value       = module.eks_blueprints_addon_cbci.cbci_oc_url

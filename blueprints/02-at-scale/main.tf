@@ -30,11 +30,22 @@ locals {
         effect = "NO_SCHEDULE"
       }
       labels = {
-        ci_type = "cb-apps"
+        role = "cb-apps"
       }
     }
 
   }
+
+  bottlerocket_bootstrap_extra_args  = <<-EOT
+              [settings.host-containers.admin]
+              enabled = false
+              [settings.host-containers.control]
+              enabled = true
+              [settings.kernel]
+              lockdown = "integrity"
+              [settings.kubernetes.node-labels]
+              "bottlerocket.aws/updater-interface-version" = "2.0.0"
+            EOT
 
   cbci_apps_labels_yaml = replace(yamlencode(local.mng["cbci_apps"]["labels"]), "/\"/", "")
 
@@ -149,17 +160,34 @@ module "eks_blueprints_addons" {
   eks_addons = {
     aws-ebs-csi-driver = {
       service_account_role_arn = module.ebs_csi_driver_irsa.iam_role_arn
-      # ensure any PVC created also includes the custom tags
       configuration_values = jsonencode(
         {
+          # ensure any PVC created also includes the custom tags
           controller = {
             extraVolumeTags = local.tags
+          }
+          # Just deploy on the nodes that needs EBS Storage
+          node = {
+            nodeSelector = {
+              storage = "enabled"
+            }
           }
         }
       )
     }
-    coredns    = {}
-    vpc-cni    = {}
+    coredns    = {
+      timeouts = {
+        create = "25m"
+        delete = "10m"
+      }
+    }
+    vpc-cni    = {
+      configuration_values = jsonencode(
+        {
+          enableWindowsIpam = "true"
+        }
+      )
+    }
     kube-proxy = {}
   }
   #####################
@@ -173,12 +201,24 @@ module "eks_blueprints_addons" {
   }
   external_dns_route53_zone_arns      = [local.route53_zone_arn]
   enable_aws_load_balancer_controller = true
+  aws_load_balancer_controller = {
+    values  = [file("k8s/aws-alb-controller-values.yml")]
+  }
   #####################
   #02-at-scale
   #####################
   enable_aws_efs_csi_driver = true
+  aws_efs_csi_driver = {
+    values  = [file("k8s/aws-efs-csi-driver-values.yml")]
+  }
   enable_metrics_server     = true
+  metrics_server = {
+    values  = [file("k8s/metrics-server-values.yml")]
+  }
   enable_cluster_autoscaler = true
+  cluster_autoscaler = {
+    values = [file("k8s/cluster-autoscaler-values.yml")]
+  }
   enable_velero             = true
   velero = {
     values             = [file("k8s/velero-values.yml")]
@@ -204,13 +244,9 @@ module "eks_blueprints_addons" {
   }
   enable_kube_prometheus_stack = true
   kube_prometheus_stack = {
-    values = [file("k8s/kube-prom-stack-values.yml")]
-    set_sensitive = [
-      {
-        name  = "grafana.adminPassword"
-        value = local.global_password
-      }
-    ]
+    values = [templatefile("k8s/kube-prom-stack-values.yml", {
+        password           = local.global_password
+      })]
   }
   enable_aws_for_fluentbit = true
   aws_for_fluentbit_cw_log_group = {
@@ -229,19 +265,6 @@ module "eks_blueprints_addons" {
     })]
     kubelet_monitoring = true
     chart_version      = "0.1.28"
-    set = [{
-      name  = "cloudWatchLogs.autoCreateGroup"
-      value = true
-      },
-      {
-        name  = "hostNetwork"
-        value = true
-      },
-      {
-        name  = "dnsPolicy"
-        value = "ClusterFirstWithHostNet"
-      }
-    ]
     s3_bucket_arns = [
       module.cbci_s3_bucket.s3_bucket_arn,
       "${local.fluentbit_s3_location}/*"
@@ -256,7 +279,7 @@ module "eks_blueprints_addons" {
   #Bottlerocket Update Operator
   enable_bottlerocket_update_operator = true
   bottlerocket_update_operator = {
-    values = [file("k8s/bottlerocket-update-operator.yml")]
+    values = [file("k8s/br-update-operator-values.yml")]
   }
   #Additional Helm Releases
   helm_releases = {
@@ -277,12 +300,7 @@ module "eks_blueprints_addons" {
       chart         = "aws-node-termination-handler"
       chart_version = "0.21.0"
       repository    = "https://aws.github.io/eks-charts"
-      values = [
-        <<-EOT
-          nodeSelector:
-            ci_type: build-linux-spot
-        EOT
-      ]
+      values = [file("k8s/aws-node-termination-handler.yml")]
     }
     grafana-tempo = {
       name          = "tempo"
@@ -290,12 +308,7 @@ module "eks_blueprints_addons" {
       chart         = "tempo"
       chart_version = "1.7.2"
       repository    = "https://grafana.github.io/helm-charts"
-      values = [
-        <<-EOT
-          tempoQuery:
-            enabled: true
-        EOT
-      ]
+      values = [file("k8s/grafana-tempo.yml")]
     }
   }
 
@@ -371,35 +384,21 @@ module "eks" {
   eks_managed_node_group_defaults = {
     capacity_type = "ON_DEMAND"
     disk_size     = 50
-    #Bottlerocket configuration. All Nodes groups are Bottlerocket but common_apps
-    ami_type = "BOTTLEROCKET_ARM_64"
-    platform = "bottlerocket"
-    #BottleRocket Settings: https://bottlerocket.dev/en/os/1.19.x/api/settings/
-    enable_bootstrap_user_data = true
-    bootstrap_extra_args       = <<-EOT
-            [settings.host-containers.admin]
-            enabled = false
-            [settings.host-containers.control]
-            enabled = true
-            [settings.kernel]
-            lockdown = "integrity"
-            [settings.kubernetes.node-labels]
-            "bottlerocket.aws/updater-interface-version" = "2.0.0"
-          EOT
   }
   eks_managed_node_groups = {
     #Note: osixia/openldap is not compatible either Bottlerocket, neither Graviton.
-    common_apps = {
-      node_group_name            = "mg-common-apps"
+    shared_apps = {
+      node_group_name            = "mg-shared"
       instance_types             = ["m5d.xlarge"]
       ami_type                   = "AL2023_x86_64_STANDARD"
       platform                   = "linux"
       min_size                   = 1
       max_size                   = 3
       desired_size               = 1
-      enable_bootstrap_user_data = false
-      bootstrap_extra_args       = <<-EOT
-          EOT
+      labels = {
+        role = "shared"
+        storage = "enabled"
+      }
     }
     cb_apps = {
       node_group_name = "mg-cb-apps"
@@ -408,9 +407,16 @@ module "eks" {
       max_size        = 6
       desired_size    = 1
       taints          = [local.mng["cbci_apps"]["taints"]]
-      labels          = local.mng["cbci_apps"]["labels"]
+      labels          = {
+        role = "cb-apps"
+        storage = "enabled"
+      }
       create_iam_role = false
       iam_role_arn    = aws_iam_role.managed_ng.arn
+      ami_type = "BOTTLEROCKET_ARM_64"
+      platform = "bottlerocket"
+      enable_bootstrap_user_data = true
+      bootstrap_extra_args       = local.bottlerocket_bootstrap_extra_args
     }
     cb_agents_2x = {
       node_group_name = "mg-agent-2x"
@@ -420,8 +426,12 @@ module "eks" {
       desired_size    = 1
       taints          = [{ key = "dedicated", value = "build-linux", effect = "NO_SCHEDULE" }]
       labels = {
-        ci_type = "build-linux"
+        role = "build-linux"
       }
+      ami_type = "BOTTLEROCKET_ARM_64"
+      platform = "bottlerocket"
+      enable_bootstrap_user_data = true
+      bootstrap_extra_args      = local.bottlerocket_bootstrap_extra_args
     }
     #https://aws.amazon.com/blogs/compute/cost-optimization-and-resilience-eks-with-spot-instances/
     #https://www.eksworkshop.com/docs/fundamentals/managed-node-groups/spot/instance-diversification
@@ -435,8 +445,12 @@ module "eks" {
       desired_size   = 0
       taints         = [{ key = "dedicated", value = "build-linux-spot", effect = "NO_SCHEDULE" }]
       labels = {
-        ci_type = "build-linux-spot"
+        role = "build-linux-spot"
       }
+      ami_type = "BOTTLEROCKET_ARM_64"
+      platform = "bottlerocket"
+      enable_bootstrap_user_data = true
+      bootstrap_extra_args      = local.bottlerocket_bootstrap_extra_args
     }
     cb_agents_spot_8x = {
       node_group_name = "mng-agent-spot-8x"
@@ -448,7 +462,26 @@ module "eks" {
       desired_size   = 0
       taints         = [{ key = "dedicated", value = "build-linux-spot", effect = "NO_SCHEDULE" }]
       labels = {
-        ci_type = "build-linux-spot"
+        role = "build-linux-spot"
+      }
+      ami_type = "BOTTLEROCKET_ARM_64"
+      platform = "bottlerocket"
+      enable_bootstrap_user_data = true
+      bootstrap_extra_args = local.bottlerocket_bootstrap_extra_args
+    }
+    mg_windows = {
+      min_size        = 1
+      max_size        = 3
+      desired_size    = 1
+      platform          = "windows"
+      ami_type          = "WINDOWS_CORE_2019_x86_64"
+      capacity_type     = "ON_DEMAND"
+      use_name_prefix   = true
+      instance_types    = ["m5d.xlarge", "m5ad.xlarge"]
+      //Note: Using taints prevent VPC CNI to schedule pods on Windows nodes, even including its tolerations
+      //taints            = [{ key = "dedicated", value = "build-windows", effect = "NO_SCHEDULE" }]
+      labels = {
+        role = "build-windows"
       }
     }
   }
@@ -463,7 +496,6 @@ module "eks" {
 }
 
 # AWS Instance Permissions
-
 data "aws_iam_policy_document" "managed_ng_assume_role_policy" {
   statement {
     sid = "EKSWorkerAssumeRole"

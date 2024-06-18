@@ -1,0 +1,11 @@
+# Copyright (c) CloudBees, Inc.
+
+# https://github.com/kubernetes-sigs/aws-efs-csi-driver/tree/master/charts/aws-efs-csi-driver
+
+controller:
+  nodeSelector: 
+    kubernetes.io/os: linux
+
+node:
+  nodeSelector: 
+    storage: enabled

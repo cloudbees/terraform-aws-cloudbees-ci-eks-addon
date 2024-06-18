@@ -6,6 +6,9 @@ set -euox pipefail
 
 SCRIPTDIR="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+#https://developer.hashicorp.com/terraform/internals/debugging
+export TF_LOG=DEBUG
+
 declare -a BLUEPRINTS=(
     "01-getting-started"
     "02-at-scale"
@@ -91,8 +94,8 @@ tf-destroy () {
   retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.eks_blueprints_addon_cbci -auto-approve"
   retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.eks_blueprints_addons -auto-approve"
   retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.eks -auto-approve"
-  retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -auto-approve"
-  rm -f "$SCRIPTDIR/$root/terraform.output"
+  #retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -auto-approve"
+  #rm -f "$SCRIPTDIR/$root/terraform.output"
 }
 
 probes () {
