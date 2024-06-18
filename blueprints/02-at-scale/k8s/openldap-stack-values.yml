@@ -9,6 +9,9 @@ global:
   configUser: "admin"
   configPassword: ${password}
 
+nodeSelector: 
+  kubernetes.io/os: linux
+
 customLdifFiles:
   00-root.ldif: |-
     dn: dc=acme,dc=org

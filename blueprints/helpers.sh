@@ -6,6 +6,9 @@ set -euox pipefail
 
 SCRIPTDIR="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+#https://developer.hashicorp.com/terraform/internals/debugging
+export TF_LOG=DEBUG
+
 declare -a BLUEPRINTS=(
     "01-getting-started"
     "02-at-scale"

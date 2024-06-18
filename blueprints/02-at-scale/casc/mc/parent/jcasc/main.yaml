@@ -60,7 +60,7 @@ kube:
             resourceRequestCpu: "250m"
         label: "maven-and-go-ondemand"
         name: "maven-and-go-ondemand"
-        nodeSelector: "ci_type=build-linux"
+        nodeSelector: "role=build-linux"
         nodeUsageMode: NORMAL
         yaml: |-
           apiVersion: v1
@@ -83,7 +83,7 @@ kube:
             resourceRequestCpu: "250m"
         label: "maven-spot"
         name: "maven-spot"
-        nodeSelector: "ci_type=build-linux-spot"
+        nodeSelector: "role=build-linux-spot"
         nodeUsageMode: NORMAL
         yaml: |-
           apiVersion: v1

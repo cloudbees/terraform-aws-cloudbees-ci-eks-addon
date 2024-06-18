@@ -92,7 +92,6 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
 | grafana_dashboard | Provides access to Grafana dashboards. |
 | kubeconfig_add | Add kubeconfig to the local configuration to access the Kubernetes API. |
 | kubeconfig_export | Export the KUBECONFIG environment variable to access the Kubernetes API. |
-| ldap_admin_password | LDAP password for the cbci_admin_user user for the CloudBees CI add-on. Check .docker/ldap/data.ldif. |
 | prometheus_active_targets | Checks active Prometheus targets from the operations center. |
 | prometheus_dashboard | Provides access to Prometheus dashboards. |
 | s3_cbci_arn | CloudBees CI Amazon S3 bucket ARN. |
@@ -190,6 +189,37 @@ Once the resources have been created, a `kubeconfig` file is created in the [/k8
 > - This pipeline uses [CloudBees Workspace Caching](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-cache-step). Once the second build is complete, you can find the read cache operation at the beginning of the build logs and the write cache operation at the end of the build logs.
 > - If build logs contains `Failed to upload cache`, it is likely related to a `suffix` in your Terraform variables, and the recommendations from the [Deploy](#deploy) section were not followed.
 > - Transitions to the hibernation state may happen if the defined [grace period](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#_configuring_hibernation) of inactivity (idle) has been reached.
+
+11. Test Windows builds by running a Pipeline similar to the following:
+
+```yaml
+podTemplate(yaml: '''
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+  - name: jnlp
+    image: jenkins/inbound-agent:windowsservercore-1809
+  - name: shell
+    image: mcr.microsoft.com/powershell:preview-windowsservercore-1809
+    command:
+    - powershell
+    args:
+    - Start-Sleep
+    - 999999
+  nodeSelector:
+    kubernetes.io/os: windows
+''') {
+    node(POD_LABEL) {
+        container('shell') {
+            powershell 'Get-ChildItem Env: | Sort Name'
+        }
+    }
+}
+```
+
+> [!NOTE]
+> The first build for a new windows image container takes up to 10 min to run. Subsequent builds will take seconds.
 
 #### Back up and restore
 

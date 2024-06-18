@@ -1,7 +1,12 @@
 # Copyright (c) CloudBees, Inc.
 
 #https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack
+#https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-prometheus-stack/Chart.yaml
 
+alertmanager:
+  alertmanagerSpec:
+    nodeSelector:
+      kubernetes.io/os: linux
 prometheus:
   prometheusSpec:
     # Not Used since OC uses ServiceMonitor
@@ -14,6 +19,18 @@ prometheus:
       # Note: For all Service Monitors, use a common label
       matchLabels:
         release: kube-prometheus-stack
+    nodeSelector: 
+      kubernetes.io/os: linux
+prometheusOperator:
+  nodeSelector: 
+    kubernetes.io/os: linux
+  admissionWebhooks:
+    patch:
+      nodeSelector:
+        kubernetes.io/os: linux
+    deployment:
+      nodeSelector:
+          kubernetes.io/os: linux
 additionalPrometheusRulesMap:
   rule-name:
     groups:
@@ -95,7 +112,13 @@ additionalPrometheusRulesMap:
             annotations:
               summary: "{{ $labels.pod }} too many jobs queued"
               description: "{{ $labels.pod }} has {{ $value }} jobs stuck in queue"
+kube-state-metrics:
+  nodeSelector:
+    kubernetes.io/os: linux
 grafana:
+  nodeSelector:
+    kubernetes.io/os: linux
+  adminPassword: ${password}
   datasources:
     datasources.yaml:
       apiVersion: 1
@@ -105,7 +128,6 @@ grafana:
           url: http://tempo.kube-prometheus-stack.svc.cluster.local:3100
           access: proxy
           isDefault: false
-
   dashboardProviders:
     dashboardproviders.yaml:
       apiVersion: 1

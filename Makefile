@@ -7,9 +7,6 @@ MKFILEDIR 			:= $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 CASC_ENDPOINT		?= https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon.git
 CASC_BRANCH			?= main
 
-#https://developer.hashicorp.com/terraform/internals/debugging
-export TF_LOG=INFO
-
 define helpers
 	source blueprints/helpers.sh && $(1)
 endef
