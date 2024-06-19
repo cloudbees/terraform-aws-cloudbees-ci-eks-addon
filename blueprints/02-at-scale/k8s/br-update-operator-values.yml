@@ -21,9 +21,9 @@ placement:
     #TODO: Add selector for bottle rockets nodes
 
     controller:
-      nodeSelector: 
+      nodeSelector:
         kubernetes.io/os: linux
 
     apiserver:
-      nodeSelector: 
+      nodeSelector:
         kubernetes.io/os: linux

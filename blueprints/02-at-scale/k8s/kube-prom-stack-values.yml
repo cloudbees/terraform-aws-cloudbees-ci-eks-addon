@@ -19,10 +19,10 @@ prometheus:
       # Note: For all Service Monitors, use a common label
       matchLabels:
         release: kube-prometheus-stack
-    nodeSelector: 
+    nodeSelector:
       kubernetes.io/os: linux
 prometheusOperator:
-  nodeSelector: 
+  nodeSelector:
     kubernetes.io/os: linux
   admissionWebhooks:
     patch:
