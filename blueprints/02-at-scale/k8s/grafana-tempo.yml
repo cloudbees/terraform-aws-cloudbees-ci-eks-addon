@@ -3,5 +3,5 @@
 tempoQuery:
   enabled: true
 
-nodeSelector: 
+nodeSelector:
   kubernetes.io/os: linux

@@ -7,5 +7,5 @@ provider: "aws"
 domainFilters: [ "${zoneDNS}" ]
 policy: "sync"
 logLevel: "debug"
-nodeSelector: 
+nodeSelector:
   kubernetes.io/os: linux

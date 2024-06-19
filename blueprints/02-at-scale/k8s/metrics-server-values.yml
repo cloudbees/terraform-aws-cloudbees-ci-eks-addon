@@ -2,5 +2,5 @@
 
 # https://github.com/kubernetes-sigs/metrics-server/blob/master/charts/metrics-server/Chart.yaml
 
-nodeSelector: 
+nodeSelector:
   kubernetes.io/os: linux

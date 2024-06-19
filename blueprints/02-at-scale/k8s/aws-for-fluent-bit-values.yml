@@ -3,7 +3,7 @@
 #https://artifacthub.io/packages/helm/aws/aws-for-fluent-bit
 #https://github.com/aws/eks-charts/blob/master/stable/aws-for-fluent-bit/Chart.yaml
 
-nodeSelector: 
+nodeSelector:
   kubernetes.io/os: linux
 
 cloudWatchLogs:
