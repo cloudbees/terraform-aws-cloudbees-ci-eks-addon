@@ -2,9 +2,7 @@
 
 #https://github.com/aws/eks-charts/blob/master/stable/aws-load-balancer-controller/values.yaml
 
-nodeSelector: 
+nodeSelector:
   kubernetes.io/os: linux
 
 enableServiceMutatorWebhook: false
-
-

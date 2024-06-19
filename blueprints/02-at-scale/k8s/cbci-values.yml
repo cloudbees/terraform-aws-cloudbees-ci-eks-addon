@@ -8,7 +8,7 @@ OperationsCenter:
     Annotations:
       alb.ingress.kubernetes.io/target-group-attributes: stickiness.enabled=true
   NodeSelector:
-    ${cbciAppsSelector}
+    role: ${cbciAppsNodeRole}
   Tolerations:
     - key: ${cbciAppsTolerationKey}
       operator: Equal
@@ -27,7 +27,7 @@ Persistence:
 Hibernation:
   Enabled: true
   NodeSelector:
-    ${cbciAppsSelector}
+    role: ${cbciAppsNodeRole}
   Tolerations:
     - key: ${cbciAppsTolerationKey}
       operator: Equal

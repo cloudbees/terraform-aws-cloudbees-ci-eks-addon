@@ -3,9 +3,9 @@
 # https://github.com/kubernetes-sigs/aws-efs-csi-driver/tree/master/charts/aws-efs-csi-driver
 
 controller:
-  nodeSelector: 
+  nodeSelector:
     kubernetes.io/os: linux
 
 node:
-  nodeSelector: 
+  nodeSelector:
     storage: enabled
