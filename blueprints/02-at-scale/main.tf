@@ -474,8 +474,9 @@ module "eks" {
       ami_type        = "WINDOWS_CORE_2019_x86_64"
       use_name_prefix = true
       instance_types  = ["m5d.xlarge", "m5ad.xlarge"]
-      //Note: Using taints prevent VPC CNI to schedule pods on Windows nodes, even including its tolerations
-      //taints            = [{ key = "dedicated", value = "build-windows", effect = "NO_SCHEDULE" }]
+      /* Note: Using taints prevent VPC CNI to schedule pods on Windows nodes, even including its tolerations to the VPC addon
+      taints            = [{ key = "dedicated", value = "build-windows", effect = "NO_SCHEDULE" }]
+      */
       labels = {
         role = "build-windows"
       }
