@@ -116,6 +116,7 @@ module "eks_blueprints_addon_cbci" {
   k8s_secrets = templatefile("k8s/secrets-values.yml", {
     global_password = local.global_password
     s3bucketName    = local.bucket_name
+    adminMail       = var.trial_license["email"]
     githubUser      = var.gh_user
     githubToken     = var.gh_token
   })
