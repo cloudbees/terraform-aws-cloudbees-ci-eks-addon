@@ -38,7 +38,7 @@ unclassified:
     endpoint: ${ot_endpoint}
     observabilityBackends:
     - grafana:
-        grafanaBaseUrl: ${sec_grafanaHostName}
+        grafanaBaseUrl: ${sec_grafanaUrl}
         tempoDataSourceIdentifier: "Tempo"
 aws:
   s3:
