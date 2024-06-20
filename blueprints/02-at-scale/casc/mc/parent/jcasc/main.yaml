@@ -35,7 +35,11 @@ unclassified:
     enabled: true
     gracePeriod: 3600
   openTelemetry:
-      endpoint: ${ot_endpoint}
+    endpoint: ${ot_endpoint}
+    observabilityBackends:
+    - grafana:
+        grafanaBaseUrl: ${sec_grafanaHostName}
+        tempoDataSourceIdentifier: "Tempo"
 aws:
   s3:
     container: "${sec_s3bucketName}"
