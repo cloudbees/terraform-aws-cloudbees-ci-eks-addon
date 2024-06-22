@@ -118,7 +118,7 @@ kube-state-metrics:
 grafana:
   nodeSelector:
     kubernetes.io/os: linux
-  adminPassword: ${password}
+  adminPassword: ${grafana_password}
   datasources:
     datasources.yaml:
       apiVersion: 1

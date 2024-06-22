@@ -36,12 +36,14 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
 
 ## Architecture
 
+- The CloudBees CI node groups use the following specifications:
+  - Instance type: [AWS Graviton Processor](https://aws.amazon.com/ec2/graviton/)
+  - Amazon Machine Image (AMI) type: [Bottlerocket OS](https://aws.amazon.com/bottlerocket/)
+  - The Spot agents node groups follow the principles described in [Building for Cost optimization and Resilience for EKS with Spot Instances](https://aws.amazon.com/blogs/compute/cost-optimization-and-resilience-eks-with-spot-instances/).
+- Currently, Amazon S3 storage permissions are based on an [instance profile](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2_instance-profiles.html). However, the recommended options are explained in [#56](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/issues/56).
+
 > [!NOTE]
-> - The CloudBees CI node groups use the following specifications:
->    - Instance type: [AWS Graviton Processor](https://aws.amazon.com/ec2/graviton/)
->    - Amazon Machine Image (AMI) type: [Bottlerocket OS](https://aws.amazon.com/bottlerocket/)
->    - The Spot agents node groups follow the principles described in [Building for Cost optimization and Resilience for EKS with Spot Instances](https://aws.amazon.com/blogs/compute/cost-optimization-and-resilience-eks-with-spot-instances/).
-> - Amazon S3 storage permissions are based on an [instance profile](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2_instance-profiles.html), rather than creating a user with an AWS identity and IAM permissions. It is expected that the credentials validation from CloudBees CI will fail.
+> When not using a user with an AWS identity and IAM permissions. It is expected that the credentials validation from CloudBees CI UI fails.
 
 ![Architecture](img/at-scale.architect.drawio.svg)
 
@@ -313,6 +315,9 @@ Grafana is used to visualize and query:
    - For Tracing Data, navigate to **Home > Explore > Select Tempo > Select `Query Type: Search`**. Then, select the `service name: jenkins` and the desired `Span Name` to `Run Query`. The following image shows an example of the ws-cache pipeline build.
 
    ![CloudBees CI Tracing Example](img/observability/cbci-tracing-example.png)
+
+> [!NOTE]
+> Grafana ingress can be enabled as explained on Issue [#165](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/issues/165) but currently is incompatible with terrafrom destroy.
 
 #### Logs
 
