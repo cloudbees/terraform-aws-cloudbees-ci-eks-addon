@@ -66,7 +66,7 @@ items:
             }
         }
 - kind: pipeline
-  name: windows-builds
+  name: windows-builds-nodes
   concurrentBuild: false
   description: 'It validates the windows nodes builds.'
   definition:
