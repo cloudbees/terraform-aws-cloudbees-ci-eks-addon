@@ -127,7 +127,7 @@ probes () {
     until eval "$(tf-output "$root" cbci_controller_c_hpa)"; do sleep $wait && echo "Waiting for Team C HPA to get Ready..."; done ;\
       INFO "Team C HPA is Ready."
     until { eval "$(tf-output "$root" cbci_oc_export_admin_crumb)" && eval "$(tf-output "$root" cbci_oc_export_admin_api_token)" && [ -n "$CBCI_ADMIN_TOKEN" ]; }; do sleep $wait && echo "Waiting for Admin Token..."; done && INFO "Admin Token: $CBCI_ADMIN_TOKEN"
-    eval "$(tf-output "$root" cbci_controller_b_hibernation_post_queue_ws_cache)" > /tmp/ws-cache-build-trigger && \
+    eval "$(tf-output "$root" cbci_controller_b_ws_cache_build)" > /tmp/ws-cache-build-trigger && \
       grep "HTTP/2 201" /tmp/ws-cache-build-trigger && \
       INFO "Hibernation Post Queue WS Cache is working."
     until [ "$(eval "$(tf-output "$root" cbci_agents_events_stopping)" | wc -l)" -ge 3 ]; do sleep $wait && echo "Waiting for Agent Pod to complete to run a job"; done ;\
