@@ -78,8 +78,9 @@ This blueprint divides scalable Node Groups for different types of workloads:
 | aws_logstreams_fluentbit | AWS CloudWatch log streams from Fluent Bit. |
 | cbci_agents_events_stopping | Retrieves a list of agent pods running in the agents namespace. |
 | cbci_agents_pods | Retrieves a list of agent pods running in the agents namespace. |
-| cbci_controller_b_hibernation_post_queue_ws_cache | team-b hibernation monitor endpoint to the build workspace cache. It expects CBCI_ADMIN_TOKEN as the environment variable. |
+| cbci_controller_b_ws_cache_build | team-b hibernation monitor endpoint to the build workspace cache. It expects CBCI_ADMIN_TOKEN as the environment variable. |
 | cbci_controller_c_hpa | team-c horizontal pod autoscaling. |
+| cbci_controller_c_windows_node_build | team-c hibernation monitor endpoint to the windows build nodes. It expects CBCI_ADMIN_TOKEN as the environment variable. |
 | cbci_controllers_pods | Operations center pod for the CloudBees CI add-on. |
 | cbci_helm | Helm configuration for the CloudBees CI add-on. It is accessible via state files only. |
 | cbci_liveness_probe_ext | Operations center service external liveness probe for the CloudBees CI add-on. |
