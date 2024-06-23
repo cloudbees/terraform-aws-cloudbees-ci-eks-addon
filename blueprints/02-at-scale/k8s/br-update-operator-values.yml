@@ -12,11 +12,15 @@ placement:
     tolerations:
     - key: dedicated
       operator: Equal
-      value: build-linux #TODO: Use Templates
+      value: build-linux
       effect: NoSchedule
     - key: dedicated
       operator: Equal
-      value: cb-apps #TODO: Use Templates
+      value: build-linux-spot
+      effect: NoSchedule
+    - key: dedicated
+      operator: Equal
+      value: cb-apps
       effect: NoSchedule
     #TODO: Add selector for bottle rockets nodes
 
