@@ -7,6 +7,10 @@ beekeeper:
   upgrades:
     autoDowngradePlugins: false
     autoUpgradePlugins: true
+appearance:
+  consoleUrlProvider:
+    providers:
+    - "cloudbeesPipelineExplorer"
 unclassified:
   timestamper:
     allPipelines: true
@@ -24,10 +28,14 @@ unclassified:
   workspaceCache:
     cacheManager: "s3"
   hibernationConfiguration:
+    activities:
+    - "build"
+    - web:
+        ignored: "/prometheus/|/metrics/.+|.+/api/.+|/managed-master-hibernation/verifyToken|.*/ajax.*|/login|/[$]stapler/bound/.+|.+/wfapi/.+|/sse-gateway/listen/.+|/tcpSlaveAgentListener/|.+/progressiveHtml|.+/log/"
     enabled: true
     gracePeriod: 3600
   openTelemetry:
-      endpoint: ${ot_endpoint}
+    endpoint: ${ot_endpoint}
 aws:
   s3:
     container: "${sec_s3bucketName}"

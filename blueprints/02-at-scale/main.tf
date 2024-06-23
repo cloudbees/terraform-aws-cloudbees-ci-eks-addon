@@ -99,6 +99,8 @@ resource "time_static" "epoch" {
 module "eks_blueprints_addon_cbci" {
   source = "../../"
 
+  depends_on = [module.eks_blueprints_addons]
+
   hosted_zone   = var.hosted_zone
   cert_arn      = module.acm.acm_certificate_arn
   trial_license = var.trial_license
@@ -116,6 +118,7 @@ module "eks_blueprints_addon_cbci" {
   k8s_secrets = templatefile("k8s/secrets-values.yml", {
     global_password = local.global_password
     s3bucketName    = local.bucket_name
+    adminMail       = var.trial_license["email"]
     githubUser      = var.gh_user
     githubToken     = var.gh_token
   })
@@ -142,6 +145,16 @@ module "ebs_csi_driver_irsa" {
   }
 
   tags = var.tags
+}
+
+# It is required to be separted to purge correctly the kube_prometheus_stack
+resource "kubernetes_namespace" "kube_prometheus_stack" {
+
+  depends_on = [module.eks]
+  metadata {
+    name = "kube-prometheus-stack"
+  }
+
 }
 
 module "eks_blueprints_addons" {
@@ -241,8 +254,10 @@ module "eks_blueprints_addons" {
   }
   enable_kube_prometheus_stack = true
   kube_prometheus_stack = {
+    namespace        = kubernetes_namespace.kube_prometheus_stack.metadata[0].name
+    create_namespace = false
     values = [templatefile("k8s/kube-prom-stack-values.yml", {
-      password = local.global_password
+      grafana_password = local.global_password
     })]
   }
   enable_aws_for_fluentbit = true
@@ -300,12 +315,13 @@ module "eks_blueprints_addons" {
       values        = [file("k8s/aws-node-term-handler-values.yml")]
     }
     grafana-tempo = {
-      name          = "tempo"
-      namespace     = "kube-prometheus-stack"
-      chart         = "tempo"
-      chart_version = "1.7.2"
-      repository    = "https://grafana.github.io/helm-charts"
-      values        = [file("k8s/grafana-tempo.yml")]
+      name             = "tempo"
+      namespace        = kubernetes_namespace.kube_prometheus_stack.metadata[0].name
+      create_namespace = false
+      chart            = "tempo"
+      chart_version    = "1.7.2"
+      repository       = "https://grafana.github.io/helm-charts"
+      values           = [file("k8s/grafana-tempo.yml")]
     }
   }
 
