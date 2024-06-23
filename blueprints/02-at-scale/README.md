@@ -4,7 +4,7 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
 
 - An [Amazon Elastic File System (Amazon EFS) drive](https://aws.amazon.com/efs/) that is required by CloudBees CI High Availability/Horizontal Scalability (HA/HS) controllers and is optional for non-HA/HS controllers.
 - An [Amazon Simple Storage Service (Amazon S3) bucket](https://aws.amazon.com/s3/) to store assets from applications like CloudBees CI, Velero, and Fluent Bit.
-- [Amazon Elastic Kubernetes Service (Amazon EKS) managed node groups](https://docs.aws.amazon.com/eks/latest/userguide/managed-node-groups.html) for different workloads: CI applications, CI on-demand agents, CI spot agents, and Kubernetes applications.
+- [Amazon Elastic Kubernetes Service (Amazon EKS) managed node groups](https://docs.aws.amazon.com/eks/latest/userguide/managed-node-groups.html) for different workloads: Shared Services, CI applications, CI Linux on-demand agents, CI Linux spot agents and CI Windows on-demand agents.
 - [Amazon CloudWatch Logs](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/WhatIsCloudWatchLogs.html) to explode control plane logs and Fluent Bit logs.
 - The following [Amazon EKS blueprints add-ons](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/):
 
@@ -78,8 +78,9 @@ This blueprint divides scalable Node Groups for different types of workloads:
 | aws_logstreams_fluentbit | AWS CloudWatch log streams from Fluent Bit. |
 | cbci_agents_events_stopping | Retrieves a list of agent pods running in the agents namespace. |
 | cbci_agents_pods | Retrieves a list of agent pods running in the agents namespace. |
-| cbci_controller_b_hibernation_post_queue_ws_cache | team-b hibernation monitor endpoint to the build workspace cache. It expects CBCI_ADMIN_TOKEN as the environment variable. |
+| cbci_controller_b_ws_cache_build | team-b hibernation monitor endpoint to the build workspace cache. It expects CBCI_ADMIN_TOKEN as the environment variable. |
 | cbci_controller_c_hpa | team-c horizontal pod autoscaling. |
+| cbci_controller_c_windows_node_build | team-c hibernation monitor endpoint to the windows build nodes. It expects CBCI_ADMIN_TOKEN as the environment variable. |
 | cbci_controllers_pods | Operations center pod for the CloudBees CI add-on. |
 | cbci_helm | Helm configuration for the CloudBees CI add-on. It is accessible via state files only. |
 | cbci_liveness_probe_ext | Operations center service external liveness probe for the CloudBees CI add-on. |
@@ -145,6 +146,9 @@ Once the resources have been created, a `kubeconfig` file is created in the [/k8
    eval $(terraform output --raw global_password)
    ```
 
+> [!NOTE]
+> See the CloudBees CI permissions differences when login as admin vs develop users.
+
 3. CasC is enabled for the [operations center](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/) (`cjoc`) and [controllers](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-controller/) (`team-b` and `team-c-ha`). `team-a` is not using CasC, to illustrate the difference between the two approaches. Issue the following command to verify that all controllers are in a `Running` state:
 
    ```sh
@@ -167,65 +171,37 @@ Once the resources have been created, a `kubeconfig` file is created in the [/k8
    printenv | grep CBCI_ADMIN_TOKEN
    ```
 
-   If the command is not successful, issue the following command to validate that DNS propagation has completed:
+   If the command is not successful, issue the following command to validate that DNS propagation has been completed:
 
    ```sh
    eval $(terraform output --raw cbci_liveness_probe_ext)
    ```
 
-6. Once you have retrieved the API token, issue the following command to remotely trigger the `ws-cache` pipeline from `team-b` using the [POST queue for hibernation API endpoint](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#_post_queue_for_hibernation):
+6. Once you have retrieved the API token, issue the following commands to remotely trigger builds using the [POST queue for hibernation API endpoint](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#_post_queue_for_hibernation). If successful, an `HTTP/2 201` response is returned, indicating the REST API call has been correctly received by the CloudBees CI controller.
+
+- `ws-cache` pipeline from `team-b` using Linux Nodes Pools:
 
    ```sh
-   eval $(terraform output --raw cbci_controller_b_hibernation_post_queue_ws_cache)
+   eval $(terraform output --raw cbci_controller_b_ws_cache_build)
    ```
 
-   If successful, an `HTTP/2 201` response is returned, indicating the REST API call has been correctly received by the CloudBees CI controller.
+This pipeline uses [CloudBees Workspace Caching](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-cache-step). Once the second build is complete, you can find the read cache operation at the beginning of the build logs and the write cache operation at the end of the build logs.
 
-7. Right after triggering the build, issue the following to validate pod agent provisioning to build the pipeline code:
+- `windows-build-nodes` pipeline from `team-c-ha` using Windows Nodes Pools:
+
+   ```sh
+   eval $(terraform output --raw cbci_controller_c_windows_node_build)
+   ```
+
+The first build for a new windows image container takes up to 10 min to run. Subsequent builds will take seconds.
+
+7. Right after triggering the builds, issue the following to validate pod agent provisioning to build the pipeline code:
 
    ```sh
    eval $(terraform output --raw cbci_agents_pods)
    ```
 
-8. In the CloudBees CI UI, sign in to the `team-b` controller.
-9. Navigate to the `ws-cache` pipeline and select the first build, indicated by the `#1` build number.
-10. Select [CloudBees Pipeline Explorer](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-pipeline-explorer-plugin) and examine the build logs.
-
-> [!NOTE]
-> - This pipeline uses [CloudBees Workspace Caching](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-cache-step). Once the second build is complete, you can find the read cache operation at the beginning of the build logs and the write cache operation at the end of the build logs.
-> - If build logs contains `Failed to upload cache`, it is likely related to a `suffix` in your Terraform variables, and the recommendations from the [Deploy](#deploy) section were not followed.
-> - Transitions to the hibernation state may happen if the defined [grace period](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#_configuring_hibernation) of inactivity (idle) has been reached.
-
-11. Test Windows builds by running a Pipeline similar to the following:
-
-```yaml
-podTemplate(yaml: '''
-apiVersion: v1
-kind: Pod
-spec:
-  containers:
-  - name: jnlp
-    image: jenkins/inbound-agent:windowsservercore-1809
-  - name: shell
-    image: mcr.microsoft.com/powershell:preview-windowsservercore-1809
-    command:
-    - powershell
-    args:
-    - Start-Sleep
-    - 999999
-  nodeSelector:
-    kubernetes.io/os: windows
-''') {
-    node(POD_LABEL) {
-        container('shell') {
-            powershell 'Get-ChildItem Env: | Sort Name'
-        }
-    }
-}
-```
-
-> [!NOTE]
-> The first build for a new windows image container takes up to 10 min to run. Subsequent builds will take seconds.
+8. Check build logs by signing in to the `team-b` and `team-c-ha` controllers respectively. Navigate to the pipeline jobs and select the first build, indicated by the `#1` build number. Select [CloudBees Pipeline Explorer](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-pipeline-explorer-plugin) and examine the build logs.
 
 #### Back up and restore
 
@@ -246,9 +222,6 @@ To view the **backup-all-controllers** job:
 1. Sign in to the CloudBees CI operations center UI as a user with **Administer** privileges. Note that access to back up jobs is restricted to admin users via RBAC.
 2. From the operations center dashboard, select **All** to view all folders on the operations center.
 3. Navigate to the **admin** folder, and then select the **backup-all-controllers** Cluster Operations job.
-
-> [!NOTE]
-> If a build fails, it is likely related to a `suffix` that is included in your Terraform variables, and the recommendations from the [Deploy](#deploy) section were not followed.
 
 ##### Create a Velero backup schedule
 

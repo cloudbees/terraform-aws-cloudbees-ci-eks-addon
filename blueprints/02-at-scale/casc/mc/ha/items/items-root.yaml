@@ -4,6 +4,7 @@ removeStrategy:
 items:
 - kind: pipeline
   name: mockLoad
+  description: 'It emulates workload in a controller see https://plugins.jenkins.io/mock-load-builder/'
   definition:
     cpsFlowDefinition:
       sandbox: true
@@ -31,7 +32,8 @@ items:
         }
         build job: JOB_NAME, wait: false
 - kind: pipeline
-  name: checkpointed
+  name: build-agents-talks
+  description: 'It validates archives/unarchive s3 artifacts from different pods agents in the same build.'
   definition:
     cpsFlowDefinition:
       sandbox: true
@@ -62,4 +64,45 @@ items:
                   }
               }
             }
+        }
+- kind: pipeline
+  name: windows-builds-nodes
+  concurrentBuild: false
+  description: 'It validates the windows nodes builds.'
+  definition:
+    cpsFlowDefinition:
+      sandbox: true
+      script: |
+        pipeline {
+          agent {
+            kubernetes {
+              yaml '''
+                apiVersion: v1
+                kind: Pod
+                spec:
+                  containers:
+                  - name: jnlp
+                    image: jenkins/inbound-agent:windowsservercore-1809
+                  - name: shell
+                    image: mcr.microsoft.com/powershell:preview-windowsservercore-1809
+                    command:
+                    - powershell
+                    args:
+                    - Start-Sleep
+                    - 999999
+                  nodeSelector:
+                    kubernetes.io/os: windows
+                '''
+              retries 2
+            }
+          }
+          stages {
+            stage('Test') {
+              steps {
+                container('shell') {
+                    powershell 'Get-ChildItem Env: | Sort Name'
+                }
+              }
+            }
+          }
         }
