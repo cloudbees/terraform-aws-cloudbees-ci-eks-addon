@@ -53,7 +53,7 @@ items:
               "cloudbees.prometheus": "true"
     properties:
       - configurationAsCode:
-          bundle: "casc/none-ha"
+          bundle: "windows-builds/none-ha"
   # Casc, HA
   - kind: managedController
     name: team-c-ha
@@ -100,4 +100,4 @@ items:
               "cloudbees.prometheus": "true"
     properties:
       - configurationAsCode:
-          bundle: "casc/ha"
+          bundle: "windows-builds/ha"
