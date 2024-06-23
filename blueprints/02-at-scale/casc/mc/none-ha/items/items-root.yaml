@@ -4,7 +4,7 @@ removeStrategy:
 items:
 - kind: pipeline
   name: downstream-artifact
-  concurrentBuild: true
+  description: 'It validates archives/unarchive s3 artifacts (https://plugins.jenkins.io/artifact-manager-s3/) from different pods agents in different build. It uses artifacts from upstream build.'
   definition:
     cpsFlowDefinition:
       sandbox: true
@@ -45,13 +45,12 @@ items:
                 }
             }
         }
-  description: 'This pipeline demonstrates the usage of https://plugins.jenkins.io/artifact-manager-s3/ across pipelines.'
   disabled: false
   displayName: downstream-artifact
   resumeBlocked: false
 - kind: pipeline
   name: upstream-artifact
-  concurrentBuild: true
+  description: 'It validates archives/unarchive s3 artifacts (https://plugins.jenkins.io/artifact-manager-s3/) from different pods agents in different build. It creates artifacts for downstream build.'
   definition:
     cpsFlowDefinition:
       sandbox: true
@@ -127,10 +126,9 @@ items:
             }
         }
   disabled: false
-  description: 'This pipeline demonstrates the usage of https://plugins.jenkins.io/artifact-manager-s3/ in the same pipeline.'
 - kind: pipeline
   name: ws-cache
-  concurrentBuild: true
+  description: 'This pipeline demonstrates the usage of https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-cache-step.'
   definition:
     cpsFlowDefinition:
       sandbox: true
@@ -175,5 +173,4 @@ items:
                 }
             }
         }
-  description: 'This pipeline demonstrates the usage of https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-cache-step.'
-  disabled: false
+
