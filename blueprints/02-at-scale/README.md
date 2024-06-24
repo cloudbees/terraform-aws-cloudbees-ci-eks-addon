@@ -64,6 +64,7 @@ This blueprint divides scalable Node Groups for different types of workloads:
 |------|-------------|------|---------|:--------:|
 | hosted_zone | Amazon Route 53 hosted zone. CloudBees CI applications are configured to use subdomains in this hosted zone. | `string` | n/a | yes |
 | trial_license | CloudBees CI trial license details for evaluation. | `map(string)` | n/a | yes |
+| ci | Running in a CI Service vs locally. False when running locally, true when running in a CI service, | `bool` | `false` | no |
 | gh_token | GitHub token for the CloudBees operations center credential GH-User-token, that is created via CloudBees CasC. | `string` | `"ExampleToken1234"` | no |
 | gh_user | GitHub user for the CloudBees operations center credential GH-User-token, that is created via CloudBees CasC. | `string` | `"exampleUser"` | no |
 | suffix | Unique suffix to assign to all resources. When adding the suffix, changes are required in CloudBees CI for the validation phase. | `string` | `""` | no |
