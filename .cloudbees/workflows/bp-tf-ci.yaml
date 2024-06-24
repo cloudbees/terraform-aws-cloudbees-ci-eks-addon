@@ -28,6 +28,7 @@ env:
       company = "CloudBees Inc."
     }
     suffix = "ci-v4"
+    ci = true
 
 jobs:
   init:
