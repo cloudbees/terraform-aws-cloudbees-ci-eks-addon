@@ -24,3 +24,9 @@ variable "suffix" {
     error_message = "The suffix cannot contain more than 10 characters."
   }
 }
+
+variable "ci" {
+  description = "Running in a CI Service vs locally. False when running locally, true when running in a CI service"
+  default     = false
+  type        = bool
+}

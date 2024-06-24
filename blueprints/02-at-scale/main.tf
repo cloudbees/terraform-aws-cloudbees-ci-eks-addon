@@ -643,14 +643,11 @@ resource "kubernetes_storage_class_v1" "efs" {
 }
 
 # Kubeconfig
-
-resource "null_resource" "create_kubeconfig" {
-
+resource "terraform_data" "create_kubeconfig" {
   depends_on = [module.eks]
 
-  triggers = {
-    always_run = timestamp()
-  }
+  triggers_replace = var.ci ? [timestamp()] : []
+
   provisioner "local-exec" {
     command = "aws eks update-kubeconfig --name ${module.eks.cluster_name} --region ${local.region} --kubeconfig ${local.kubeconfig_file_path}"
   }
