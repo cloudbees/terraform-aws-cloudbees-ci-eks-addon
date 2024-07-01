@@ -1,5 +1,5 @@
 jenkins:
-  systemMessage: "Test ${sec_s3bucketName}" #Replace by ${message}
+  systemMessage: "${message}"
   numExecutors: 0
 unclassified:
   cascItemsConfiguration:

@@ -1,0 +1,305 @@
+removeStrategy:
+  rbac: SYNC
+  items: NONE
+items:
+- kind: folder
+  name: admin
+  description: ''
+  displayName: admin
+  items:
+  - kind: pipeline
+    name: loadTest
+    concurrentBuild: true
+    definition:
+      cpsFlowDefinition:
+        sandbox: true
+        script: |-
+          timeout(time: 1, unit: 'HOURS'){
+              parallel([0, 1].collectEntries {b -> ["branch-$b", {
+                podTemplate  (inheritFrom: 'maven-and-go-ondemand') {
+                  node(POD_LABEL) {
+                      retry (3) {
+                        stage('prep') {
+                          sh 'curl https://ipinfo.io/'
+                        }
+                        stage('build') {
+                          mockLoad 180
+                        }
+                        stage('publish') {
+                          archiveArtifacts allowEmptyArchive: true, artifacts: 'mock-artifact-*.txt'
+                          fingerprint 'mock-artifact-*.txt'
+                          junit 'mock-junit.xml'
+                        }
+                      }
+                  }
+                }
+              }]})
+          }
+          build job: JOB_NAME, wait: false
+    description: It emulates workload in a controller see https://plugins.jenkins.io/mock-load-builder/
+    disabled: false
+    displayName: loadTest
+    resumeBlocked: false
+  - kind: folder
+    name: validations
+    description: ''
+    displayName: validations
+    items:
+    - kind: pipeline
+      name: build-agents-talks
+      concurrentBuild: true
+      definition:
+        cpsFlowDefinition:
+          sandbox: true
+          script: |-
+            timeout(time: 1, unit: 'HOURS'){
+                podTemplate (inheritFrom: 'maven-and-go-ondemand') {
+                  retry (3) {
+                      node(POD_LABEL) {
+                        stage('beginning') {
+                          sh 'sleep 30'
+                          sh 'date > date.txt'
+                          archiveArtifacts artifacts: 'date', fingerprint: true
+                        }
+                    }
+                  }
+                }
+                checkpoint 'middle'
+                podTemplate (inheritFrom: 'maven-spot') {
+                  retry (3) {
+                      node(POD_LABEL) {
+                        stage('end') {
+                          dir ('unarchive'){
+                            unarchive mapping: [date: 'date.txt']
+                            sh 'cat date.txt'
+                            sh 'sleep 1h'
+                          }
+                        }
+                      }
+                  }
+                }
+            }
+      description: It validates archives/unarchive s3 artifacts from different pods
+        agents in the same build.
+      disabled: false
+      displayName: build-agents-talks
+      resumeBlocked: false
+    - kind: pipeline
+      name: downstream-artifact
+      concurrentBuild: true
+      definition:
+        cpsFlowDefinition:
+          sandbox: true
+          script: |-
+            pipeline {
+                agent{
+                    label 'maven-spot'
+                }
+                options {
+                    retry(3)
+                    timeout(time: 1, unit: 'HOURS')
+                }
+                environment {
+                    ARTIFACT_SOURCE_JOB = 'upstream-artifact'
+                }
+                stages {
+                    stage('Build Upstream') {
+                        steps {
+                            build 'upstream-artifact'
+                        }
+                    }
+                    stage('Copy Artifacts') {
+                        steps {
+                            sh 'ls -la'
+                            copyArtifacts fingerprintArtifacts: true, projectName: env.ARTIFACT_SOURCE_JOB, selector: lastSuccessful()
+                        }
+                    }
+                    stage('Read Artifacts') {
+                        steps {
+                            sh 'ls -la'
+                            sh 'cat f_2'
+                        }
+                    }
+                }
+                post {
+                    failure {
+                        echo "Check Manage Jenkins > AWS > Amazon S3 Bucket Access settings matches with your s3 name terraform output!"
+                    }
+                }
+            }
+      description: It validates archives/unarchive s3 artifacts (https://plugins.jenkins.io/artifact-manager-s3/)
+        from different pods agents in different build. It uses artifacts from upstream
+        build.
+      disabled: false
+      displayName: downstream-artifact
+      resumeBlocked: false
+    - kind: pipeline
+      name: upstream-artifact
+      concurrentBuild: true
+      definition:
+        cpsFlowDefinition:
+          sandbox: true
+          script: |-
+            pipeline {
+                options {
+                    retry(3)
+                    timeout(time: 1, unit: 'HOURS')
+                }
+                agent{
+                    label 'maven-and-go-ondemand'
+                }
+                stages {
+                    stage('Golang') {
+                        stages {
+                            stage ('Build'){
+                                steps {
+                                    container('go') {
+                                        sh '''
+                                            echo "Build number ^${BUILD_NUMBER}" >> f_1
+                                            go version >> f_1
+                                        '''
+                                    }
+                                }
+                            }
+                            stage ('Archive f_1'){
+                                steps {
+                                    container('go') {
+                                        archiveArtifacts artifacts: 'f_1', fingerprint: true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    stage('Busybox') {
+                        stages {
+                            stage ("Unarchive"){
+                                steps {
+                                    container('maven') {
+                                        dir ('unarchive'){
+                                            sh 'ls -la'
+                                            unarchive mapping: [f_1: 'f_1']
+                                            sh 'ls -la; cat f_1; mv f_1 f_2'
+                                        }
+                                    }
+                                }
+                            }
+                            stage ('Build'){
+                                steps {
+                                    container('maven') {
+                                        dir ('unarchive'){
+                                            sh 'mvn -version >> f_2'
+                                        }
+                                    }
+                                }
+                            }
+                            stage ('Archive f_2'){
+                                steps {
+                                    container('maven') {
+                                        dir ('unarchive'){
+                                            archiveArtifacts artifacts: 'f_2', fingerprint: true
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                post {
+                    failure {
+                        echo "Check Manage Jenkins > AWS > Amazon S3 Bucket Access settings matches with your s3 name terraform output!"
+                    }
+                }
+            }
+      description: It validates archives/unarchive s3 artifacts (https://plugins.jenkins.io/artifact-manager-s3/)
+        from different pods agents in different build. It creates artifacts for downstream
+        build.
+      disabled: false
+      displayName: upstream-artifact
+      resumeBlocked: false
+    - kind: pipeline
+      name: windows-builds-nodes
+      concurrentBuild: false
+      definition:
+        cpsFlowDefinition:
+          sandbox: true
+          script: |
+            pipeline {
+              agent {
+                  label {
+                    label 'windows-powershell'
+                    retries 2
+                  }
+              }
+              stages {
+                stage('Test') {
+                  steps {
+                    container('shell') {
+                        powershell 'Get-ChildItem Env: | Sort Name'
+                    }
+                  }
+                }
+              }
+            }
+      description: It validates the windows nodes builds.
+      disabled: false
+      displayName: windows-builds-nodes
+      resumeBlocked: false
+    - kind: pipeline
+      name: ws-cache
+      concurrentBuild: true
+      definition:
+        cpsFlowDefinition:
+          sandbox: true
+          script: |-
+            pipeline {
+                options {
+                    retry(3)
+                    timeout(time: 1, unit: 'HOURS')
+                }
+                agent{
+                    label 'maven-and-go-ondemand'
+                }
+                environment {
+                    MAVEN_PROJECT = 'https://github.com/jglick/simple-maven-project-with-tests'
+                    CACHE = 'ws-cache-maven'
+                }
+                stages {
+                    stage('Checkout') {
+                        steps {
+                            git env.MAVEN_PROJECT
+                        }
+                    }
+                    stage('Read') {
+                        steps {
+                            readCache name: env.CACHE
+                        }
+                    }
+                    stage('Build') {
+                        steps {
+                            container('maven') {
+                                sh 'mvn clean package -DskipTests -Dmaven.repo.local=./maven-repo'
+                            }
+                        }
+                    }
+                }
+                post {
+                    success {
+                        writeCache name: env.CACHE, includes: 'maven-repo/**'
+                    }
+                    failure {
+                        echo "Check Manage Jenkins > AWS > Amazon S3 Bucket Access settings matches with your s3 name terraform output!"
+                    }
+                }
+            }
+      description: This pipeline demonstrates the usage of https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-cache-step.
+      disabled: false
+      displayName: ws-cache
+      resumeBlocked: false
+    properties:
+    - envVars: {}
+    - itemRestrictions:
+        filter: false
+  properties:
+  - envVars: {}
+  - itemRestrictions:
+      filter: false

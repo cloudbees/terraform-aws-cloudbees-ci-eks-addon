@@ -7,5 +7,4 @@ allowCapExceptions: true
 jcascMergeStrategy: "errorOnConflict"
 jcasc:
   - jcasc
-items:
-  - items
+

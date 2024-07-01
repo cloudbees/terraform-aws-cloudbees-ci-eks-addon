@@ -8,3 +8,5 @@ plugins:
   - plugins
 variables:
   - variables
+items:
+  - items
