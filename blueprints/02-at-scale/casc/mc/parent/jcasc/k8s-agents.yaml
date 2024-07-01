@@ -1,70 +1,90 @@
 kube:
   podTemplatesConfiguration:
     templates:
-      - containers:
-          - args: "99d"
-            command: "sleep"
+    - label: "maven-and-go-ondemand"
+      name: "maven-and-go-ondemand"
+      nodeUsageMode: "NORMAL"
+      yaml: |-
+        apiVersion: "v1"
+        kind: "Pod"
+        spec:
+          containers:
+          - args:
+            - "99d"
+            command:
+            - "sleep"
             image: "maven:3.9.6-amazoncorretto-8"
             name: "maven"
-            ttyEnabled: true
-            workingDir: "/home/jenkins/agent"
-            resourceRequestMemory: "500Mi"
-            resourceLimitMemory: "1Gi"
-            resourceRequestCpu: "250m"
-          - args: "99d"
-            command: "sleep"
+            resources:
+              limits:
+                memory: "1Gi"
+              requests:
+                memory: "500Mi"
+                cpu: "250m"
+          - args:
+            - "99d"
+            command:
+            - "sleep"
             image: "golang:alpine3.19"
             name: "go"
-            ttyEnabled: true
-            workingDir: "/home/jenkins/agent"
-            resourceRequestMemory: "500Mi"
-            resourceLimitMemory: "1Gi"
-            resourceRequestCpu: "250m"
-        label: "maven-and-go-ondemand"
-        name: "maven-and-go-ondemand"
-        nodeSelector: "role=build-linux"
-        nodeUsageMode: NORMAL
-        yaml: |-
-          apiVersion: v1
-          kind: Pod
-          spec:
-            tolerations:
-              - key: "dedicated"
-                operator: "Equal"
-                value: "build-linux"
-                effect: "NoSchedule"
-      - containers:
-          - args: "99d"
-            command: "sleep"
+            resources:
+              limits:
+                memory: "1Gi"
+              requests:
+                memory: "500Mi"
+                cpu: "250m"
+          nodeSelector:
+            role: "build-linux"
+          tolerations:
+          - effect: "NoSchedule"
+            key: "dedicated"
+            operator: "Equal"
+            value: "build-linux"
+      yamlMergeStrategy: "override"
+    - label: "windows-powershell"
+      name: "windows-powershell"
+      yaml: |-
+        apiVersion: v1
+        kind: Pod
+        spec:
+          containers:
+          - name: jnlp
+            image: jenkins/inbound-agent:windowsservercore-1809
+          - name: shell
+            image: mcr.microsoft.com/powershell:preview-windowsservercore-1809
+            command:
+            - powershell
+            args:
+            - Start-Sleep
+            - 999999
+          nodeSelector:
+            kubernetes.io/os: windows
+      yamlMergeStrategy: "override"
+    - label: "maven-spot"
+      name: "maven-spot"
+      nodeUsageMode: "NORMAL"
+      yaml: |-
+        apiVersion: "v1"
+        kind: "Pod"
+        spec:
+          containers:
+          - args:
+            - "99d"
+            command:
+            - "sleep"
             image: "maven:3.9.6-amazoncorretto-8"
             name: "maven"
-            ttyEnabled: true
-            workingDir: "/home/jenkins/agent"
-            resourceRequestMemory: "500Mi"
-            resourceLimitMemory: "1Gi"
-            resourceRequestCpu: "250m"
-        label: "maven-spot"
-        name: "maven-spot"
-        nodeSelector: "role=build-linux-spot"
-        nodeUsageMode: NORMAL
-        yaml: |-
-          apiVersion: v1
-          kind: Pod
-          spec:
-            tolerations:
-              - key: "dedicated"
-                operator: "Equal"
-                value: "build-linux-spot"
-                effect: "NoSchedule"
-      - containers:
-        - image: "jenkins/inbound-agent:windowsservercore-1809"
-          name: "jnlp"
-          workingDir: "/home/jenkins/agent"
-        - args: "Start-Sleep 999999"
-          command: "powershell"
-          image: "mcr.microsoft.com/powershell:preview-windowsservercore-1809"
-          name: "shell"
-          workingDir: "/home/jenkins/agent"
-        label: "windows-powershell"
-        name: "windows-powershell"
-        nodeSelector: "role=build-windows"
+            resources:
+              limits:
+                memory: "1Gi"
+              requests:
+                memory: "500Mi"
+                cpu: "250m"
+          nodeSelector:
+            role: "build-linux-spot"
+          tolerations:
+          - effect: "NoSchedule"
+            key: "dedicated"
+            operator: "Equal"
+            value: "build-linux-spot"
+      yamlMergeStrategy: "override"
