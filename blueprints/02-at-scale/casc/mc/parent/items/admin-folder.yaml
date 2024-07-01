@@ -224,11 +224,12 @@ items:
           sandbox: true
           script: |
             pipeline {
+              options {
+                retry(3)
+                timeout(time: 1, unit: 'HOURS')
+              }
               agent {
-                  label {
-                    label 'windows-powershell'
-                    retries 2
-                  }
+                  label 'windows-powershell'
               }
               stages {
                 stage('Test') {
