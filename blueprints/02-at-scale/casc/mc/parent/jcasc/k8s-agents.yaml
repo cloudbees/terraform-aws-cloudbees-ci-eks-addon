@@ -1,8 +1,8 @@
 kube:
   podTemplatesConfiguration:
     templates:
-    - label: "maven-and-go-ondemand"
-      name: "maven-and-go-ondemand"
+    - name: "linux-mavenAndGo"
+      label: "linux-mavenAndGo"
       nodeUsageMode: "NORMAL"
       yaml: |-
         apiVersion: "v1"
@@ -40,28 +40,8 @@ kube:
             key: "dedicated"
             operator: "Equal"
             value: "build-linux"
-      yamlMergeStrategy: "override"
-    - label: "windows-powershell"
-      name: "windows-powershell"
-      yaml: |-
-        apiVersion: v1
-        kind: Pod
-        spec:
-          containers:
-          - name: jnlp
-            image: jenkins/inbound-agent:windowsservercore-1809
-          - name: shell
-            image: mcr.microsoft.com/powershell:preview-windowsservercore-1809
-            command:
-            - powershell
-            args:
-            - Start-Sleep
-            - 999999
-          nodeSelector:
-            kubernetes.io/os: windows
-      yamlMergeStrategy: "override"
-    - label: "maven-spot"
-      name: "maven-spot"
+    - name: "linux-maven-spot"
+      label: "linux-maven-spot"
       nodeUsageMode: "NORMAL"
       yaml: |-
         apiVersion: "v1"
@@ -87,4 +67,21 @@ kube:
             key: "dedicated"
             operator: "Equal"
             value: "build-linux-spot"
-      yamlMergeStrategy: "override"
+    - name: "windows-powershell"
+      label: "windows-powershell"
+      yaml: |-
+        apiVersion: v1
+        kind: Pod
+        spec:
+          containers:
+          - name: jnlp
+            image: jenkins/inbound-agent:windowsservercore-1809
+          - name: shell
+            image: mcr.microsoft.com/powershell:preview-windowsservercore-1809
+            command:
+            - powershell
+            args:
+            - Start-Sleep
+            - 999999
+          nodeSelector:
+            kubernetes.io/os: windows

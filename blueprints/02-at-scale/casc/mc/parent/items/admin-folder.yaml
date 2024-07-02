@@ -16,7 +16,7 @@ items:
         script: |-
           timeout(time: 1, unit: 'HOURS'){
               parallel([0, 1].collectEntries {b -> ["branch-$b", {
-                podTemplate  (inheritFrom: 'maven-and-go-ondemand') {
+                podTemplate  (inheritFrom: 'linux-mavenAndGo') {
                   node(POD_LABEL) {
                       retry (3) {
                         stage('prep') {
@@ -37,12 +37,10 @@ items:
           }
           build job: JOB_NAME, wait: false
     description: It emulates workload in a controller see https://plugins.jenkins.io/mock-load-builder/
-    disabled: false
     displayName: loadTest
-    resumeBlocked: false
   - kind: folder
     name: validations
-    description: ''
+    description: 'It contains validations for integrations tests.'
     displayName: validations
     items:
     - kind: pipeline
@@ -53,7 +51,7 @@ items:
           sandbox: true
           script: |-
             timeout(time: 1, unit: 'HOURS'){
-                podTemplate (inheritFrom: 'maven-and-go-ondemand') {
+                podTemplate (inheritFrom: 'linux-mavenAndGo') {
                   retry (3) {
                       node(POD_LABEL) {
                         stage('beginning') {
@@ -65,7 +63,7 @@ items:
                   }
                 }
                 checkpoint 'middle'
-                podTemplate (inheritFrom: 'maven-spot') {
+                podTemplate (inheritFrom: 'linux-maven-spot') {
                   retry (3) {
                       node(POD_LABEL) {
                         stage('end') {
@@ -81,9 +79,7 @@ items:
             }
       description: It validates archives/unarchive s3 artifacts from different pods
         agents in the same build.
-      disabled: false
       displayName: build-agents-talks
-      resumeBlocked: false
     - kind: pipeline
       name: downstream-artifact
       concurrentBuild: true
@@ -93,7 +89,7 @@ items:
           script: |-
             pipeline {
                 agent{
-                    label 'maven-spot'
+                    label 'linux-maven-spot'
                 }
                 options {
                     retry(3)
@@ -130,9 +126,7 @@ items:
       description: It validates archives/unarchive s3 artifacts (https://plugins.jenkins.io/artifact-manager-s3/)
         from different pods agents in different build. It uses artifacts from upstream
         build.
-      disabled: false
       displayName: downstream-artifact
-      resumeBlocked: false
     - kind: pipeline
       name: upstream-artifact
       concurrentBuild: true
@@ -146,7 +140,7 @@ items:
                     timeout(time: 1, unit: 'HOURS')
                 }
                 agent{
-                    label 'maven-and-go-ondemand'
+                    label 'linux-mavenAndGo'
                 }
                 stages {
                     stage('Golang') {
@@ -213,9 +207,7 @@ items:
       description: It validates archives/unarchive s3 artifacts (https://plugins.jenkins.io/artifact-manager-s3/)
         from different pods agents in different build. It creates artifacts for downstream
         build.
-      disabled: false
       displayName: upstream-artifact
-      resumeBlocked: false
     - kind: pipeline
       name: windows-builds-nodes
       concurrentBuild: false
@@ -242,9 +234,7 @@ items:
               }
             }
       description: It validates the windows nodes builds.
-      disabled: false
       displayName: windows-builds-nodes
-      resumeBlocked: false
     - kind: pipeline
       name: ws-cache
       concurrentBuild: true
@@ -258,7 +248,7 @@ items:
                     timeout(time: 1, unit: 'HOURS')
                 }
                 agent{
-                    label 'maven-and-go-ondemand'
+                    label 'linux-mavenAndGo'
                 }
                 environment {
                     MAVEN_PROJECT = 'https://github.com/jglick/simple-maven-project-with-tests'
@@ -293,9 +283,6 @@ items:
                 }
             }
       description: This pipeline demonstrates the usage of https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-cache-step.
-      disabled: false
-      displayName: ws-cache
-      resumeBlocked: false
     properties:
     - envVars: {}
     - itemRestrictions:
