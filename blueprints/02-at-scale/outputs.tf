@@ -86,12 +86,12 @@ output "cbci_agents_pods" {
 }
 
 output "cbci_agent_linuxTempl_events" {
-  description = "Retrieves a list of agent pods running in the agents namespace."
+  description = "Retrieves a list of events related to Linux template agents."
   value       = "kubectl get events -n ${local.cbci_agents_ns} | grep -i pod/${local.cbci_agent_linuxTempl}"
 }
 
 output "cbci_agent_windowsTempl_events" {
-  description = "Retrieves a list of agent pods running in the agents namespace."
+  description = "Retrieves a list of events related to Windows template agents."
   value       = "kubectl get events -n ${local.cbci_agents_ns} | grep -i pod/${local.cbci_agent_windowsTempl}"
 }
 
