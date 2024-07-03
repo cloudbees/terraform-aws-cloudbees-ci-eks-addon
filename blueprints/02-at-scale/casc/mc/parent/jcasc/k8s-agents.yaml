@@ -85,3 +85,9 @@ kube:
             - 999999
           nodeSelector:
             kubernetes.io/os: windows
+            role: "build-windows"
+          tolerations:
+          - effect: "NoSchedule"
+            key: "dedicated"
+            operator: "Equal"
+            value: "build-windows"
