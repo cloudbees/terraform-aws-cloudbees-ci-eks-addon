@@ -72,10 +72,10 @@ locals {
   velero_controller_backup_selector = "tenant=${local.velero_controller_backup}"
   velero_schedule_name              = "schedule-${local.velero_controller_backup}"
 
-  cbci_agents_ns                     = "cbci-agents"
-  #K8s Agent Templates name from Casc Bundle 
-  cbci_agent_linuxTempl = "linux-mavenAndGo"
-  cbci_agent_windowsTempl = "windows-powershell"
+  cbci_agents_ns = "cbci-agents"
+  #K8s Agent Templates name from Casc Bundle
+  cbci_agent_linuxtempl   = "linux-mavenAndGo"
+  cbci_agent_windowstempl = "windows-powershell"
 
   cbci_admin_user      = "admin_cbci_a"
   global_pass_jsonpath = "'{.data.sec_globalPassword}'"
@@ -492,7 +492,7 @@ module "eks" {
       ami_type        = "WINDOWS_CORE_2019_x86_64"
       use_name_prefix = true
       instance_types  = ["m5d.xlarge", "m5ad.xlarge"]
-      taints            = [{ key = "dedicated", value = "build-windows", effect = "NO_SCHEDULE" }]
+      taints          = [{ key = "dedicated", value = "build-windows", effect = "NO_SCHEDULE" }]
       labels = {
         role = "build-windows"
       }

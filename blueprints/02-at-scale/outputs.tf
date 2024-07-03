@@ -85,14 +85,14 @@ output "cbci_agents_pods" {
   value       = "kubectl get pods -n ${local.cbci_agents_ns} -l jenkins=slave"
 }
 
-output "cbci_agent_linuxTempl_events" {
+output "cbci_agent_linuxtempl_events" {
   description = "Retrieves a list of events related to Linux template agents."
-  value       = "kubectl get events -n ${local.cbci_agents_ns} | grep -i pod/${local.cbci_agent_linuxTempl}"
+  value       = "kubectl get events -n ${local.cbci_agents_ns} | grep -i pod/${local.cbci_agent_linuxtempl}"
 }
 
-output "cbci_agent_windowsTempl_events" {
+output "cbci_agent_windowstempl_events" {
   description = "Retrieves a list of events related to Windows template agents."
-  value       = "kubectl get events -n ${local.cbci_agents_ns} | grep -i pod/${local.cbci_agent_windowsTempl}"
+  value       = "kubectl get events -n ${local.cbci_agents_ns} | grep -i pod/${local.cbci_agent_windowstempl}"
 }
 
 output "acm_certificate_arn" {

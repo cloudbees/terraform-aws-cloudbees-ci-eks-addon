@@ -56,7 +56,7 @@ items:
                       node(POD_LABEL) {
                         stage('beginning') {
                           sh 'date > date.txt'
-                          archiveArtifacts artifacts: 'date.txt', fingerprint: true 
+                          archiveArtifacts artifacts: 'date.txt', fingerprint: true
                         }
                     }
                   }
