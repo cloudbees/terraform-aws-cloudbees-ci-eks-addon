@@ -77,8 +77,8 @@ This blueprint divides scalable Node Groups for different types of workloads:
 | acm_certificate_arn | AWS Certificate Manager (ACM) certificate for Amazon Resource Names (ARN). |
 | aws_backup_efs_protected_resource | AWS description for the Amazon EFS drive that is used to back up protected resources. |
 | aws_logstreams_fluentbit | AWS CloudWatch log streams from Fluent Bit. |
-| cbci_agent_linuxtempl_events | Retrieves a list of events related to Linux template agents. |
-| cbci_agent_windowstempl_events | Retrieves a list of events related to Windows template agents. |
+| cbci_agent_linuxTempl_events | Retrieves a list of agent pods running in the agents namespace. |
+| cbci_agent_windowsTempl_events | Retrieves a list of agent pods running in the agents namespace. |
 | cbci_agents_pods | Retrieves a list of agent pods running in the agents namespace. |
 | cbci_controller_b_ws_cache_build | team-b hibernation monitor endpoint to the build workspace cache. It expects CBCI_ADMIN_TOKEN as the environment variable. |
 | cbci_controller_c_hpa | team-c horizontal pod autoscaling. |
