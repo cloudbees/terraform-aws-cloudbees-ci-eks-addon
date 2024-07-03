@@ -55,9 +55,8 @@ items:
                   retry (3) {
                       node(POD_LABEL) {
                         stage('beginning') {
-                          sh 'sleep 30'
                           sh 'date > date.txt'
-                          archiveArtifacts artifacts: 'date', fingerprint: true
+                          archiveArtifacts artifacts: 'date.txt', fingerprint: true 
                         }
                     }
                   }
@@ -68,9 +67,8 @@ items:
                       node(POD_LABEL) {
                         stage('end') {
                           dir ('unarchive'){
-                            unarchive mapping: [date: 'date.txt']
-                            sh 'cat date.txt'
-                            sh 'sleep 1h'
+                            unarchive mapping: ['date.txt': 'my-date.txt']
+                            sh 'cat my-date.txt'
                           }
                         }
                       }
