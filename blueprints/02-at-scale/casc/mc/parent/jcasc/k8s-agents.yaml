@@ -1,0 +1,93 @@
+kube:
+  podTemplatesConfiguration:
+    templates:
+    - name: "linux-mavenAndGo"
+      label: "linux-mavenAndGo"
+      nodeUsageMode: "NORMAL"
+      yaml: |-
+        apiVersion: "v1"
+        kind: "Pod"
+        spec:
+          containers:
+          - args:
+            - "99d"
+            command:
+            - "sleep"
+            image: "maven:3.9.6-amazoncorretto-8"
+            name: "maven"
+            resources:
+              limits:
+                memory: "1Gi"
+              requests:
+                memory: "500Mi"
+                cpu: "250m"
+          - args:
+            - "99d"
+            command:
+            - "sleep"
+            image: "golang:alpine3.19"
+            name: "go"
+            resources:
+              limits:
+                memory: "1Gi"
+              requests:
+                memory: "500Mi"
+                cpu: "250m"
+          nodeSelector:
+            role: "build-linux"
+          tolerations:
+          - effect: "NoSchedule"
+            key: "dedicated"
+            operator: "Equal"
+            value: "build-linux"
+    - name: "linux-maven-spot"
+      label: "linux-maven-spot"
+      nodeUsageMode: "NORMAL"
+      yaml: |-
+        apiVersion: "v1"
+        kind: "Pod"
+        spec:
+          containers:
+          - args:
+            - "99d"
+            command:
+            - "sleep"
+            image: "maven:3.9.6-amazoncorretto-8"
+            name: "maven"
+            resources:
+              limits:
+                memory: "1Gi"
+              requests:
+                memory: "500Mi"
+                cpu: "250m"
+          nodeSelector:
+            role: "build-linux-spot"
+          tolerations:
+          - effect: "NoSchedule"
+            key: "dedicated"
+            operator: "Equal"
+            value: "build-linux-spot"
+    - name: "windows-powershell"
+      label: "windows-powershell"
+      yaml: |-
+        apiVersion: v1
+        kind: Pod
+        spec:
+          containers:
+          - name: jnlp
+            image: jenkins/inbound-agent:windowsservercore-1809
+          - name: shell
+            image: mcr.microsoft.com/powershell:preview-windowsservercore-1809
+            command:
+            - powershell
+            args:
+            - Start-Sleep
+            - 999999
+          nodeSelector:
+            kubernetes.io/os: windows
+            role: "build-windows"
+          tolerations:
+          - effect: "NoSchedule"
+            key: "dedicated"
+            operator: "Equal"
+            value: "build-windows"

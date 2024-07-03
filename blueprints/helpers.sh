@@ -116,25 +116,39 @@ probes () {
       INFO "Initial Admin Password: $INITIAL_PASS."
   fi
   if [ "$root" == "02-at-scale" ]; then
+    until [ "$(eval "$(tf-output "$root" cbci_controllers_pods)" | awk '{ print $3 }' | grep -v STATUS | grep -v -c Running)" == 0 ]; do sleep $wait && echo "Waiting for Controllers Pod to get into Ready State..."; done ;\
+      eval "$(tf-output "$root" cbci_controllers_pods)" && INFO "All Controllers Pods are Ready."
     GLOBAL_PASS=$(eval "$(tf-output "$root" global_password)") && \
       if [ -n "$GLOBAL_PASS" ]; then
         INFO "Password for admin_cbci_a: $GLOBAL_PASS."
       else
         ERROR "Problem while getting Global Pass."
       fi
-    until [ "$(eval "$(tf-output "$root" cbci_controllers_pods)" | awk '{ print $3 }' | grep -v STATUS | grep -v -c Running)" == 0 ]; do sleep $wait && echo "Waiting for Controllers Pod to get into Ready State..."; done ;\
-      eval "$(tf-output "$root" cbci_controllers_pods)" && INFO "All Controllers Pods are Ready."
+    until { eval "$(tf-output "$root" cbci_oc_export_admin_crumb)" && eval "$(tf-output "$root" cbci_oc_export_admin_api_token)" && [ -n "$CBCI_ADMIN_TOKEN" ]; }; do sleep $wait && echo "Waiting for Admin Token..."; done && INFO "Admin Token: $CBCI_ADMIN_TOKEN"
+    eval "$(tf-output "$root" cbci_controller_b_ws_cache_build)" > /tmp/controller-b-hibernation &&
+      if grep "201\|202" /tmp/controller-b-hibernation; then
+        INFO "Hibernation Post Queue Controller B OK."
+      else
+        ERROR "Hibernation Post Queue Controller B KO."
+      fi
+    eval "$(tf-output "$root" cbci_controller_c_windows_node_build)" > /tmp/controller-c-hibernation &&
+      if grep "201\|202" /tmp/controller-c-hibernation; then
+        INFO "Hibernation Post Queue Controller C OK."
+      else
+        ERROR "Hibernation Post Queue Controller C KO."
+      fi
     until eval "$(tf-output "$root" cbci_controller_c_hpa)"; do sleep $wait && echo "Waiting for Team C HPA to get Ready..."; done ;\
       INFO "Team C HPA is Ready."
-    until { eval "$(tf-output "$root" cbci_oc_export_admin_crumb)" && eval "$(tf-output "$root" cbci_oc_export_admin_api_token)" && [ -n "$CBCI_ADMIN_TOKEN" ]; }; do sleep $wait && echo "Waiting for Admin Token..."; done && INFO "Admin Token: $CBCI_ADMIN_TOKEN"
-    eval "$(tf-output "$root" cbci_controller_b_ws_cache_build)" > /tmp/ws-cache-build-trigger && \
-      grep "HTTP/2 201" /tmp/ws-cache-build-trigger && \
-      INFO "Hibernation Post Queue WS Cache is working."
-    until [ "$(eval "$(tf-output "$root" cbci_agents_events_stopping)" | wc -l)" -ge 3 ]; do sleep $wait && echo "Waiting for Agent Pod to complete to run a job"; done ;\
-      eval "$(tf-output "$root" cbci_agents_events_stopping)" && INFO "Agent Pods are Ready."
-    eval "$(tf-output "$root" velero_backup_schedule)" && eval "$(tf-output "$root" velero_backup_on_demand)" > "/tmp/backup.txt" && \
-      grep "Backup completed with status: Completed" "/tmp/backup.txt" && \
-      INFO "Velero backups are working"
+    until [ "$(eval "$(tf-output "$root" cbci_agent_windowstempl_events)" | grep -c 'Allocated Resource vpc.amazonaws.com')" -ge 1 ]; do sleep $wait && echo "Waiting for Windows Template Pod to allocate resource vpc.amazonaws.com"; done ;\
+      eval "$(tf-output "$root" cbci_agent_windowstempl_events)" && INFO "Windows Template Example is OK."
+    until [ "$(eval "$(tf-output "$root" cbci_agent_linuxtempl_events)" | grep -c 'Created container maven')" -ge 1 ]; do sleep $wait && echo "Waiting for Linux Template Pod to create maven container"; done ;\
+      eval "$(tf-output "$root" cbci_agent_linuxtempl_events)" && INFO "Linux Template Example is OK."
+    eval "$(tf-output "$root" velero_backup_schedule)" && eval "$(tf-output "$root" velero_backup_on_demand)" > /tmp/velero-backup.txt && \
+      if grep 'Backup completed with status: Completed' /tmp/velero-backup.txt; then
+        INFO "Velero Backups are OK."
+      else
+        ERROR "Velero Backups are K0."
+      fi
     until eval "$(tf-output "$root" prometheus_active_targets)" | jq '.data.activeTargets[] | select(.labels.container=="jenkins") | {job: .labels.job, instance: .labels.instance, status: .health}'; do sleep $wait && echo "Waiting for CloudBees CI Prometheus Targets..."; done ;\
       INFO "CloudBees CI Targets are loaded in Prometheus."
     until eval "$(tf-output "$root" aws_logstreams_fluentbit)" | jq '.[] '; do sleep $wait && echo "Waiting for CloudBees CI Log streams in CloudWatch..."; done ;\
@@ -179,6 +193,6 @@ set-casc-location () {
   #Branch
   sed -i "s|scmBranch: .*|scmBranch: $branch|g" "$SCRIPTDIR/02-at-scale/k8s/cbci-values.yml"
   sed -i "s|cascBranch: .*|cascBranch: $branch|g" "$SCRIPTDIR/02-at-scale/casc/oc/variables/variables.yaml"
-  sed -i "s|bundle: \".*/none-ha\"|bundle: \"$branch/none-ha\"|g" "$SCRIPTDIR/02-at-scale/casc/oc/items/items-root.yaml"
-  sed -i "s|bundle: \".*/ha\"|bundle: \"$branch/ha\"|g" "$SCRIPTDIR/02-at-scale/casc/oc/items/items-root.yaml"
+  sed -i "s|bundle: \".*/none-ha\"|bundle: \"$branch/none-ha\"|g" "$SCRIPTDIR/02-at-scale/casc/oc/items/root.yaml"
+  sed -i "s|bundle: \".*/ha\"|bundle: \"$branch/ha\"|g" "$SCRIPTDIR/02-at-scale/casc/oc/items/root.yaml"
 }

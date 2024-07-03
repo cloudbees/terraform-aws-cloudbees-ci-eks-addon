@@ -112,4 +112,5 @@ groups:
   roles:
   - name: develop
     grantedAt: current
+    propagates: false
   name: Developers
