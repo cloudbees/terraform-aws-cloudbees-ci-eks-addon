@@ -1,6 +1,6 @@
 
 beekeeper:
-  enabled: true
+  enabled: false
   securityWarnings:
     enabledForCore: true
     enabledForPlugins: true
