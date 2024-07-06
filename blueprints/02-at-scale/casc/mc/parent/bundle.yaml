@@ -10,3 +10,5 @@ variables:
   - variables
 items:
   - items
+rbac:
+  - rbac
