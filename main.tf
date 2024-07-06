@@ -46,6 +46,19 @@ resource "kubernetes_namespace" "cbci" {
 
 }
 
+# Need to wait a few seconds when removing the cbci resource to give helm
+# time to finish cleaning up.
+#
+# Otherwise, after `terraform destroy`:
+# │ Error: uninstallation completed with 1 error(s): uninstall: Failed to purge
+#   the release: release: not found
+
+resource "time_sleep" "wait_30_seconds" {
+  depends_on = [kubernetes_namespace.cbci]
+
+  destroy_duration = "30s"
+}
+
 # Kubernetes Secrets to be passed to Casc
 # https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/docs/features/secrets.adoc#kubernetes-secrets
 resource "kubernetes_secret" "oc_secrets" {
@@ -59,6 +72,7 @@ resource "kubernetes_secret" "oc_secrets" {
   data = yamldecode(var.k8s_secrets)
 }
 
+# Service Monitors for Prometheus
 resource "kubectl_manifest" "service_monitor_cb_controllers" {
   count = var.prometheus_target ? 1 : 0
 
@@ -100,6 +114,8 @@ resource "kubernetes_labels" "oc_sm_label" {
 
   labels = local.prometheus_sm_labels
 }
+
+# Deployment
 
 resource "helm_release" "cloudbees_ci" {
   name             = try(var.helm_config.name, "cloudbees-ci")
@@ -167,17 +183,4 @@ resource "helm_release" "cloudbees_ci" {
 
   depends_on = [time_sleep.wait_30_seconds]
 
-}
-
-# Need to wait a few seconds when removing the cbci resource to give helm
-# time to finish cleaning up.
-#
-# Otherwise, after `terraform destroy`:
-# │ Error: uninstallation completed with 1 error(s): uninstall: Failed to purge
-#   the release: release: not found
-
-resource "time_sleep" "wait_30_seconds" {
-  depends_on = [kubernetes_namespace.cbci]
-
-  destroy_duration = "30s"
 }
