@@ -110,7 +110,7 @@ groups:
     - Dev_Team_X
     - Dev_Team_Y
   roles:
-  - name: develop
+  - name: browse
     grantedAt: current
     propagates: false
   name: Developers
