@@ -117,7 +117,7 @@ probes () {
   fi
   if [ "$root" == "02-at-scale" ]; then
     until [ "$(eval "$(tf-output "$root" cbci_controllers_pods)" | awk '{ print $3 }' | grep -v STATUS | grep -v -c Running)" == 0 ]; do sleep $wait && echo "Waiting for Controllers Pod to get into Ready State..."; done ;\
-      eval "$(tf-output "$root" cbci_controllers_pods)" && INFO "All Controllers Pods are Ready."
+      eval "$(tf-output "$root" cbci_controllers_pods)" && INFO "All Non-Hibernated Controllers Pods are Ready."
     GLOBAL_PASS=$(eval "$(tf-output "$root" global_password)") && \
       if [ -n "$GLOBAL_PASS" ]; then
         INFO "Password for admin_cbci_a: $GLOBAL_PASS."
