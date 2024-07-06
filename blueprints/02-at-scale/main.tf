@@ -201,6 +201,7 @@ module "eks_blueprints_addons" {
       )
     }
     kube-proxy = {}
+    eks-pod-identity-agent = {}
   }
   #####################
   #01-getting-started
@@ -426,8 +427,6 @@ module "eks" {
         role    = local.mng["cbci_apps"]["labels"].role
         storage = "enabled"
       }
-      create_iam_role            = false
-      iam_role_arn               = aws_iam_role.managed_ng.arn
       ami_type                   = "BOTTLEROCKET_ARM_64"
       platform                   = "bottlerocket"
       enable_bootstrap_user_data = true
@@ -508,35 +507,27 @@ module "eks" {
   tags = local.tags
 }
 
-# AWS Instance Permissions
-data "aws_iam_policy_document" "managed_ng_assume_role_policy" {
+# AWS Pod Identity
+
+data "aws_iam_policy_document" "assume_role" {
   statement {
-    sid = "EKSWorkerAssumeRole"
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["pods.eks.amazonaws.com"]
+    }
 
     actions = [
       "sts:AssumeRole",
+      "sts:TagSession"
     ]
-    principals {
-      type        = "Service"
-      identifiers = ["ec2.amazonaws.com"]
-    }
   }
 }
 
-resource "aws_iam_role" "managed_ng" {
-  name                  = local.cbci_iam_role
-  description           = "EKS Managed Node group IAM Role"
-  assume_role_policy    = data.aws_iam_policy_document.managed_ng_assume_role_policy.json
-  path                  = "/"
-  force_detach_policies = true
-  # Mandatory for EKS Managed Node Group
-  managed_policy_arns = [
-    "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy",
-    "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy",
-    "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly",
-    "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-  ]
-  # Additional Permissions for for EKS Managed Node Group per https://docs.aws.amazon.com/eks/latest/userguide/create-node-role.html
+resource "aws_iam_role" "s3" {
+  name               = "eks-pod-identity-s3-role"
+  assume_role_policy = data.aws_iam_policy_document.assume_role.json
   inline_policy {
     name = "${local.name}-iam_inline_policy"
     policy = jsonencode(
@@ -569,19 +560,38 @@ resource "aws_iam_role" "managed_ng" {
       }
     )
   }
-  tags = var.tags
 }
 
-resource "aws_iam_instance_profile" "managed_ng" {
-  name = local.cbci_instance_profile
-  role = aws_iam_role.managed_ng.name
-  path = "/"
+resource "aws_eks_pod_identity_association" "cjoc" {
+  cluster_name    = module.eks.cluster_name
+  namespace       = module.eks_blueprints_addon_cbci.cbci_namespace
+  service_account = "cjoc"
+  role_arn        = aws_iam_role.s3.arn
+}
 
-  lifecycle {
-    create_before_destroy = true
-  }
+resource "aws_eks_pod_identity_association" "controllers" {
+  cluster_name    = module.eks.cluster_name
+  namespace       = module.eks_blueprints_addon_cbci.cbci_namespace
+  service_account = "jenkins"
+  role_arn        = aws_iam_role.s3.arn
+}
 
-  tags = var.tags
+
+resource "kubectl_manifest" "test_association" {
+
+  yaml_body = <<YAML
+apiVersion: v1
+kind: Pod
+metadata:
+  name: aws-cli
+  namespace: cbci
+spec:
+  serviceAccount: cjoc
+  containers:
+    - name: aws-cli
+      image: amazon/aws-cli:latest
+      command: ["sleep", "infinity"]
+YAML
 }
 
 # Storage Classes
