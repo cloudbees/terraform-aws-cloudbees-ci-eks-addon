@@ -34,6 +34,7 @@ kube:
                 memory: "500Mi"
                 cpu: "250m"
           nodeSelector:
+            kubernetes.io/os: linux
             role: "build-linux"
           tolerations:
           - effect: "NoSchedule"
@@ -61,6 +62,7 @@ kube:
                 memory: "500Mi"
                 cpu: "250m"
           nodeSelector:
+            kubernetes.io/os: linux
             role: "build-linux-spot"
           tolerations:
           - effect: "NoSchedule"
