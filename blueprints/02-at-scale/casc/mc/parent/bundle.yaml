@@ -8,7 +8,7 @@ items:
   - items
 plugins:
   - plugins
-rbac:
-  - rbac
+# rbac:
+#   - rbac
 variables:
   - variables
