@@ -149,9 +149,9 @@ Once the resources have been created, a `kubeconfig` file is created in the [/k8
    ```
 
 > [!NOTE]
-> See the CloudBees CI permissions differences when login as admin vs develop users.
+> See differences on CloudBees CI permissions and folder restrictions when login as user from Admin vs Developement group. For example, only Admin users can access to the agent validation jobs.
 
-3. CasC is enabled for the [operations center](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/) (`cjoc`) and [controllers](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-controller/) (`team-b` and `team-c-ha`). `team-a` is not using CasC, to illustrate the difference between the two approaches. Issue the following command to verify that all controllers are in a `Running` state:
+1. CasC is enabled for the [operations center](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/) (`cjoc`) and [controllers](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-controller/) (`team-b` and `team-c-ha`). `team-a` is not using CasC, to illustrate the difference between the two approaches. Issue the following command to verify that all controllers are in a `Running` state:
 
    ```sh
    eval $(terraform output --raw cbci_controllers_pods)
@@ -159,13 +159,13 @@ Once the resources have been created, a `kubeconfig` file is created in the [/k8
 
    If successful, it should indicate that 2 replicas are running for `team-c-ha` since [CloudBees CI HA/HS](https://docs.cloudbees.com/docs/cloudbees-ci/latest/ha-install-guide/) is enabled on this controller.
 
-4. Issue the following command to verify that horizontal pod autoscaling is enabled for `team-c-ha`:
+2. Issue the following command to verify that horizontal pod autoscaling is enabled for `team-c-ha`:
 
    ```sh
    eval $(terraform output --raw cbci_controller_c_hpa)
    ```
 
-5. Issue the following command to retrieve an [API token](https://docs.cloudbees.com/docs/cloudbees-ci-api/latest/api-authentication) for the `admin_cbci_a` user with the correct permissions for the required actions:
+3. Issue the following command to retrieve an [API token](https://docs.cloudbees.com/docs/cloudbees-ci-api/latest/api-authentication) for the `admin_cbci_a` user with the correct permissions for the required actions:
 
    ```sh
    eval $(terraform output --raw cbci_oc_export_admin_crumb) && \
@@ -179,7 +179,7 @@ Once the resources have been created, a `kubeconfig` file is created in the [/k8
    eval $(terraform output --raw cbci_liveness_probe_ext)
    ```
 
-6. Once you have retrieved the API token, issue the following commands to remotely trigger builds using the [POST queue for hibernation API endpoint](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#_post_queue_for_hibernation). If successful, an `HTTP/2 201` response is returned, indicating the REST API call has been correctly received by the CloudBees CI controller.
+4. Once you have retrieved the API token, issue the following commands to remotely trigger builds using the [POST queue for hibernation API endpoint](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#_post_queue_for_hibernation). If successful, an `HTTP/2 201` response is returned, indicating the REST API call has been correctly received by the CloudBees CI controller.
 
 - `ws-cache` pipeline from `team-b` using Linux Nodes Pools:
 
@@ -203,7 +203,7 @@ The first build for a new windows image container takes up to 10 min to run. Sub
    eval $(terraform output --raw cbci_agents_pods)
    ```
 
-8. Check build logs by signing in to the `team-b` and `team-c-ha` controllers respectively. Navigate to the pipeline jobs and select the first build, indicated by the `#1` build number. Select [CloudBees Pipeline Explorer](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-pipeline-explorer-plugin) and examine the build logs.
+8. Check build logs by signing in to the `team-b` and `team-c-ha` controllers respectively. Navigate to the pipeline jobs and select the first build, indicated by the `#1` build number. [CloudBees Pipeline Explorer](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-pipeline-explorer-plugin) is enabled as a default.
 
 #### Back up and restore
 
@@ -224,6 +224,8 @@ To view the **backup-all-controllers** job:
 1. Sign in to the CloudBees CI operations center UI as a user with **Administer** privileges. Note that access to back up jobs is restricted to admin users via RBAC.
 2. From the operations center dashboard, select **All** to view all folders on the operations center.
 3. Navigate to the **admin** folder, and then select the **backup-all-controllers** Cluster Operations job.
+
+Restore operation can be done on demand at the controller level from the preconfigured restore job.
 
 ##### Create a Velero backup schedule
 
@@ -246,11 +248,7 @@ Issue the following command to take an on-demand Velero backup for a specific po
 
 ##### Restore from a Velero on-demand backup
 
-1. Make updates on the `team-b` controller (for example, add some jobs and generate builds).
-2. [Take an on-demand Velero backup](#take-an-on-demand-velero-backup), including the updates that you made.
-3. Remove the latest update (for example, remove jobs you create and build on existing jobs).
-4. Manage `team-b` > Deprovision the controller.
-5. Issue the following command to restore the controller from the last backup:
+Issue the following command to restore the controller from the last backup:
 
    ```sh
    eval $(terraform output --raw velero_restore)
@@ -279,7 +277,7 @@ Grafana is used to visualize and query:
 
    If successful, the Prometheus dashboard should be available at `http://localhost:50001` and you can view the configured alerts for CloudBees CI.
 
-3. Issue the following command to access Grafana dashboards at `localhost:50002`. For the username, use `admin` and set the password using the `grafana_admin_password` terraform variable:
+3. Issue the following command to access Grafana dashboards at `localhost:50002`. For the username, use `admin` and set the password using the `global_password` terraform variable:
 
    ```sh
    eval $(terraform output --raw grafana_dashboard)
