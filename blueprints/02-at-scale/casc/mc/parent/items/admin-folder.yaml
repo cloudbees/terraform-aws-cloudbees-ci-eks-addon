@@ -38,6 +38,21 @@ items:
           build job: JOB_NAME, wait: false
     description: It emulates workload in a controller see https://plugins.jenkins.io/mock-load-builder/
     displayName: loadTest
+  - kind: backupAndRestore
+    name: restore
+    buildersList:
+    - restoreBuilder:
+        ignoreConfirmationFile: true
+        preserveJenkinsHome: false
+        ignoreDigestCheck: false
+        store:
+          s3Store:
+            bucketName: "${sec_s3bucketName}"
+            sse: true
+            bucketFolder: cbci/backup
+            region: us-east-1
+    description: 'It validates the restore functionality of the backup plugin.'
+    displayName: restore
   - kind: folder
     name: validations
     description: 'It contains validations for integrations tests.'
