@@ -1,3 +1,7 @@
+removeStrategy:
+  rbac: SYNC
+  items: NONE
+items:
 - kind: folder
   name: Squad_Y
   displayName: Squad_Y
