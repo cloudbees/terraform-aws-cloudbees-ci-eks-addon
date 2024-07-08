@@ -105,6 +105,7 @@ This blueprint divides scalable Node Groups for different types of workloads:
 | prometheus_dashboard | Provides access to Prometheus dashboards. |
 | s3_cbci_arn | CloudBees CI Amazon S3 bucket ARN. |
 | s3_cbci_name | CloudBees CI Amazon S3 bucket name. It is required by CloudBees CI for workspace caching and artifact management. |
+| s3_list_objects | List all objects recursiverly stored into s3 Bucket. |
 | velero_backup_on_demand | Takes an on-demand Velero backup from the schedule for the selected controller that is using block storage. |
 | velero_backup_schedule | Creates a Velero backup schedule for the selected controller that is using block storage, and then deletes the existing schedule, if it exists. |
 | velero_restore | Restores the selected controller that is using block storage from a backup. |
