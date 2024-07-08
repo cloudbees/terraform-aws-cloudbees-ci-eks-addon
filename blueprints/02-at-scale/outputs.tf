@@ -120,6 +120,11 @@ output "s3_cbci_name" {
   value       = local.bucket_name
 }
 
+output "s3_list_objects" {
+  description = "List all objects recursiverly stored into s3 Bucket."
+  value       = "aws s3 ls s3://${local.bucket_name}/ --recursive"
+}
+
 output "efs_arn" {
   description = "Amazon EFS ARN."
   value       = module.efs.arn
