@@ -401,7 +401,7 @@ module "eks" {
     disk_size     = 50
   }
   eks_managed_node_groups = {
-    #Note: Openldap is not compatible either Bottlerocket, neither Graviton.
+    #Note: Openldap is not compatible with Bottlerocket or Graviton.
     shared_apps = {
       node_group_name = "mg-shared"
       instance_types  = ["m5d.xlarge"]
