@@ -32,7 +32,7 @@ This blueprint presents the minimum setup to run CloudBees CI on Amazon EKS: One
 |------|-------------|------|---------|:--------:|
 | hosted_zone | Amazon Route 53 hosted zone. CloudBees CI applications are configured to use subdomains in this hosted zone. | `string` | n/a | yes |
 | trial_license | CloudBees CI trial license details for evaluation. | `map(string)` | n/a | yes |
-| ci | Running in a CI Service vs locally. False when running locally, true when running in a CI service | `bool` | `false` | no |
+| ci | Running in a CI service versus running locally. False when running locally, true when running in a CI service. | `bool` | `false` | no |
 | suffix | Unique suffix to assign to all resources. | `string` | `""` | no |
 | tags | Tags to apply to resources. | `map(string)` | `{}` | no |
 
