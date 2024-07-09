@@ -36,7 +36,7 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
 
 ## Architecture
 
-This blueprint divides scalable Node Groups for different types of workloads:
+This blueprint divides scalable node groups for different types of workloads:
 
 - Shared node group services: For common/shared workloads using [Amazon EKS-Optimized Amazon Linux 2023](https://aws.amazon.com/blogs/containers/amazon-eks-optimized-amazon-linux-2023-amis-now-available/) Amazon Machine Image (AMI) type.
 - CloudBees CI Node Groups
