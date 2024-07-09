@@ -26,7 +26,7 @@ env:
       email = "ci.user@cloudbees.io"
       company = "CloudBees Inc."
     }
-    suffix = "ci-v4"
+    suffix = "ci-v2.0"
     ci = true
 
 jobs:
@@ -54,7 +54,7 @@ jobs:
 
   bp01:
     env:
-      CLEAN_UP: "true"
+      CLEAN_UP: "false"
     needs:
       - init
     steps:
@@ -113,7 +113,7 @@ jobs:
 
   bp02:
     env:
-        CLEAN_UP: "true"
+        CLEAN_UP: "false"
     needs:
       - init
     steps:
