@@ -295,7 +295,7 @@ items:
                     }
                 }
             }
-      description: This pipeline demonstrates the usage of https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-cache-step.
+      description: Pipeline that demonstrates the usage of CloudBees Workspace Caching: https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-cache-step.
     properties:
     - envVars: {}
     - itemRestrictions:
