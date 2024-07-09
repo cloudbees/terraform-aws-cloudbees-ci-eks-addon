@@ -143,8 +143,8 @@ probes () {
       eval "$(tf-output "$root" cbci_agent_windowstempl_events)" && INFO "Windows Template Example is OK."
     until [ "$(eval "$(tf-output "$root" cbci_agent_linuxtempl_events)" | grep -c 'Created container maven')" -ge 1 ]; do sleep $wait && echo "Waiting for Linux Template Pod to create maven container"; done ;\
       eval "$(tf-output "$root" cbci_agent_linuxtempl_events)" && INFO "Linux Template Example is OK."
-    until [ "$(eval "$(tf-output "$root" s3_list_objects)" | grep -c 'cbci/cache')" -ge 1 ]; do sleep $wait && echo "Waiting for WS Cache to be uploaded into s3 cbci"; done ;\
-      eval "$(tf-output "$root" s3_list_objects)" && INFO "s3 Permissions are configured correctly."
+    until [ "$(eval "$(tf-output "$root" s3_list_objects)" | grep -c 'cbci/')" -ge 1 ]; do sleep $wait && echo "Waiting for WS Cache to be uploaded into s3 cbci"; done ;\
+      eval "$(tf-output "$root" s3_list_objects)" | grep 'cbci/' && INFO "CBCI s3 Permissions are configured correctly."
     eval "$(tf-output "$root" velero_backup_schedule)" && eval "$(tf-output "$root" velero_backup_on_demand)" > /tmp/velero-backup.txt && \
       if grep 'Backup completed with status: Completed' /tmp/velero-backup.txt; then
         INFO "Velero Backups are OK."
