@@ -55,7 +55,7 @@ jobs:
 
   bp01:
     env:
-      CLEAN_UP: "true"
+      CLEAN_UP: "false"
     needs:
       - init
     steps:
@@ -114,7 +114,7 @@ jobs:
 
   bp02:
     env:
-        CLEAN_UP: "true"
+        CLEAN_UP: "false"
     needs:
       - init
     steps:
