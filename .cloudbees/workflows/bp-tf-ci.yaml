@@ -26,7 +26,7 @@ env:
       email = "ci.user@cloudbees.io"
       company = "CloudBees Inc."
     }
-    suffix = "ci-v2.0"
+    suffix = "ci-v10"
     ci = true
 
 jobs:
