@@ -295,7 +295,7 @@ Grafana is used to visualize and query:
    ![CloudBees CI Tracing Example](img/observability/cbci-tracing-example.png)
 
 > [!NOTE]
-> Grafana ingress can be enabled as explained on Issue [#165](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/issues/165) but currently is incompatible with terrafrom destroy.
+> Grafana Ingress can be enabled as explained in Issue [#165](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/issues/165), but currently is incompatible with `terrafrom destroy`.
 
 #### Logs
 
