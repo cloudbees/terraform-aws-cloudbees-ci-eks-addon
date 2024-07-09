@@ -38,7 +38,7 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
 
 This blueprint divides scalable Node Groups for different types of workloads:
 
-- Shared Node Group Services: For common/shared workloads using [Amazon EKS-Optimized Amazon Linux 2023](https://aws.amazon.com/blogs/containers/amazon-eks-optimized-amazon-linux-2023-amis-now-available/) AMI Type.
+- Shared node group services: For common/shared workloads using [Amazon EKS-Optimized Amazon Linux 2023](https://aws.amazon.com/blogs/containers/amazon-eks-optimized-amazon-linux-2023-amis-now-available/) Amazon Machine Image (AMI) type.
 - CloudBees CI Node Groups
   - Services: Instance Type: [AWS Graviton Processor](https://aws.amazon.com/ec2/graviton/) and [Bottlerocket OS](https://aws.amazon.com/bottlerocket/) AMI Type.
     - It uses an [instance profile](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2_instance-profiles.html) for operating with AWS Services. However, the recommended options are explained in [#56](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/issues/56).
