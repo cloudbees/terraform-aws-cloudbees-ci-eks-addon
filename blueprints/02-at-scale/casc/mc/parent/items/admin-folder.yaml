@@ -36,7 +36,7 @@ items:
               }]})
           }
           build job: JOB_NAME, wait: false
-    description: It emulates workload in a controller see https://plugins.jenkins.io/mock-load-builder/
+    description: 'It emulates workload in a controller see https://plugins.jenkins.io/mock-load-builder/.'
     displayName: loadTest
   - kind: backupAndRestore
     name: restore
@@ -90,8 +90,7 @@ items:
                   }
                 }
             }
-      description: It validates archives/unarchive s3 artifacts from different pods
-        agents in the same build.
+      description: 'It validates archives/unarchive s3 artifacts from different pods agents in the same build.'
       displayName: build-agents-talks
     - kind: pipeline
       name: downstream-artifact
@@ -136,9 +135,7 @@ items:
                     }
                 }
             }
-      description: It validates archives/unarchive s3 artifacts (https://plugins.jenkins.io/artifact-manager-s3/)
-        from different pods agents in different build. It uses artifacts from upstream
-        build.
+      description: 'It validates archives/unarchive s3 artifacts (https://plugins.jenkins.io/artifact-manager-s3/) from different pods agents in different build. It uses artifacts from upstream build.'
       displayName: downstream-artifact
     - kind: pipeline
       name: upstream-artifact
@@ -217,9 +214,7 @@ items:
                     }
                 }
             }
-      description: It validates archives/unarchive s3 artifacts (https://plugins.jenkins.io/artifact-manager-s3/)
-        from different pods agents in different build. It creates artifacts for downstream
-        build.
+      description: 'It validates archives/unarchive s3 artifacts (https://plugins.jenkins.io/artifact-manager-s3/) from different pods agents in different build. It creates artifacts for downstream build.'
       displayName: upstream-artifact
     - kind: pipeline
       name: windows-builds-nodes
@@ -246,7 +241,7 @@ items:
                 }
               }
             }
-      description: It validates the windows nodes builds.
+      description: 'It validates the windows nodes builds.'
       displayName: windows-builds-nodes
     - kind: pipeline
       name: ws-cache
@@ -295,7 +290,7 @@ items:
                     }
                 }
             }
-      description: Pipeline that demonstrates the usage of CloudBees Workspace Caching: https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-cache-step.
+      description: 'Pipeline that demonstrates the usage of CloudBees Workspace Caching: https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-cache-step.'
     properties:
     - envVars: {}
     - itemRestrictions:
