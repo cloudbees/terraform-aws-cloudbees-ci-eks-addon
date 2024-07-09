@@ -149,7 +149,7 @@ module "ebs_csi_driver_irsa" {
   tags = var.tags
 }
 
-# It is required to be separted to purge correctly the kube_prometheus_stack
+# It must be separate to correctly purge the kube_prometheus_stack
 resource "kubernetes_namespace" "kube_prometheus_stack" {
 
   depends_on = [module.eks]
