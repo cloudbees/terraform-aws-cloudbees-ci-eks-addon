@@ -73,7 +73,7 @@ locals {
   velero_schedule_name              = "schedule-${local.velero_controller_backup}"
 
   cbci_agents_ns = "cbci-agents"
-  #K8s Agent Templates name from Casc Bundle
+  #K8S agent template name from the CasC bundle
   cbci_agent_linuxtempl   = "linux-mavenAndGo"
   cbci_agent_windowstempl = "windows-powershell"
 
