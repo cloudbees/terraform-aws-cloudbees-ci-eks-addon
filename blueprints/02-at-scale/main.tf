@@ -178,7 +178,7 @@ module "eks_blueprints_addons" {
           controller = {
             extraVolumeTags = local.tags
           }
-          # Just deploy on the nodes that needs EBS Storage
+          # Deploy on the nodes that need Amazon EBS storage
           node = {
             nodeSelector = {
               storage = "enabled"
