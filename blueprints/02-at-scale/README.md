@@ -226,7 +226,7 @@ To view the **backup-all-controllers** job:
 2. From the operations center dashboard, select **All** to view all folders on the operations center.
 3. Navigate to the **admin** folder, and then select the **backup-all-controllers** Cluster Operations job.
 
-Restore operation can be done on demand at the controller level from the preconfigured restore job.
+Restore operations can be done on-demand at the controller level from the preconfigured restore job.
 
 ##### Create a Velero backup schedule
 
