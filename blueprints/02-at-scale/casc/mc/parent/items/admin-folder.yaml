@@ -51,11 +51,11 @@ items:
             sse: true
             bucketFolder: cbci/backup
             region: us-east-1
-    description: 'It validates the restore functionality of the backup plugin.'
+    description: 'Validates the restore functionality of the CloudBees Backup plugin.'
     displayName: restore
   - kind: folder
     name: validations
-    description: 'It contains validations for integrations tests.'
+    description: 'Contains validations for integrations tests.'
     displayName: validations
     items:
     - kind: pipeline

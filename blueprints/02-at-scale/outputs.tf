@@ -76,7 +76,7 @@ output "cbci_controller_b_ws_cache_build" {
 }
 
 output "cbci_controller_c_windows_node_build" {
-  description = "team-c hibernation monitor endpoint to the windows build nodes. It expects CBCI_ADMIN_TOKEN as the environment variable."
+  description = "team-c hibernation monitor endpoint to the Windows build nodes. It expects CBCI_ADMIN_TOKEN as the environment variable."
   value       = "curl -i -XPOST -u ${local.cbci_admin_user}:$CBCI_ADMIN_TOKEN ${local.hibernation_monitor_url}/hibernation/queue/team-c-ha/job/admin/job/validations/job/windows-builds-nodes/build"
 }
 
@@ -121,7 +121,7 @@ output "s3_cbci_name" {
 }
 
 output "s3_list_objects" {
-  description = "List all objects recursiverly stored into s3 Bucket."
+  description = "Recursively lists all objects stored in the Amazon S3 bucket."
   value       = "aws s3 ls s3://${local.bucket_name}/ --recursive"
 }
 
