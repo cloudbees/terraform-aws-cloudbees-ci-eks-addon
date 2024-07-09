@@ -47,7 +47,7 @@ This blueprint divides scalable node groups for different types of workloads:
     - Windows: Windows 2019 AMI type.
 
 > [!NOTE]
-> When not using a user with an AWS identity and IAM permissions. It is expected that the credentials validation from CloudBees CI UI fails.
+> If your user credentials do not include an AWS identity and IAM permissions, the credentials validation from the CloudBees CI UI will fail.
 
 ![Architecture](img/at-scale.architect.drawio.svg)
 
