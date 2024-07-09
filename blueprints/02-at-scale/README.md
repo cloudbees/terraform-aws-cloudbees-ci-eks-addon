@@ -4,7 +4,7 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
 
 - An [Amazon Elastic File System (Amazon EFS) drive](https://aws.amazon.com/efs/) that is required by CloudBees CI High Availability/Horizontal Scalability (HA/HS) controllers and is optional for non-HA/HS controllers.
 - An [Amazon Simple Storage Service (Amazon S3) bucket](https://aws.amazon.com/s3/) to store assets from applications like CloudBees CI, Velero, and Fluent Bit.
-- [Amazon Elastic Kubernetes Service (Amazon EKS) managed node groups](https://docs.aws.amazon.com/eks/latest/userguide/managed-node-groups.html) for different workloads: Shared Services, CI applications, CI Linux on-demand agents, CI Linux spot agents and CI Windows on-demand agents.
+- [Amazon Elastic Kubernetes Service (Amazon EKS) managed node groups](https://docs.aws.amazon.com/eks/latest/userguide/managed-node-groups.html) for different workloads: shared services, CI applications, CI Linux on-demand agents, CI Linux spot agents, and CI Microsoft Windows on-demand agents.
 - [Amazon CloudWatch Logs](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/WhatIsCloudWatchLogs.html) to explode control plane logs and Fluent Bit logs.
 - The following [Amazon EKS blueprints add-ons](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/):
 
@@ -36,9 +36,9 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
 
 ## Architecture
 
-This blueprint divides scalable Node Groups for different types of workloads:
+This blueprint divides scalable node groups for different types of workloads:
 
-- Shared Node Group Services: For common/shared workloads using [Amazon EKS-Optimized Amazon Linux 2023](https://aws.amazon.com/blogs/containers/amazon-eks-optimized-amazon-linux-2023-amis-now-available/) AMI Type.
+- Shared node group services: For common/shared workloads using [Amazon EKS-Optimized Amazon Linux 2023](https://aws.amazon.com/blogs/containers/amazon-eks-optimized-amazon-linux-2023-amis-now-available/) Amazon Machine Image (AMI) type.
 - CloudBees CI Node Groups
   - Services: Instance Type: [AWS Graviton Processor](https://aws.amazon.com/ec2/graviton/) and [Bottlerocket OS](https://aws.amazon.com/bottlerocket/) AMI Type.
     - It uses an [instance profile](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2_instance-profiles.html) for operating with AWS Services. However, the recommended options are explained in [#56](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/issues/56).

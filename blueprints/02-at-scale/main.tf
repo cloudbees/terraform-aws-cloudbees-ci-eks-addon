@@ -73,7 +73,7 @@ locals {
   velero_schedule_name              = "schedule-${local.velero_controller_backup}"
 
   cbci_agents_ns = "cbci-agents"
-  #K8s Agent Templates name from Casc Bundle
+  #K8S agent template name from the CasC bundle
   cbci_agent_linuxtempl   = "linux-mavenAndGo"
   cbci_agent_windowstempl = "windows-powershell"
 
@@ -149,7 +149,7 @@ module "ebs_csi_driver_irsa" {
   tags = var.tags
 }
 
-# It is required to be separted to purge correctly the kube_prometheus_stack
+# It must be separate to correctly purge the kube_prometheus_stack
 resource "kubernetes_namespace" "kube_prometheus_stack" {
 
   depends_on = [module.eks]
@@ -178,7 +178,7 @@ module "eks_blueprints_addons" {
           controller = {
             extraVolumeTags = local.tags
           }
-          # Just deploy on the nodes that needs EBS Storage
+          # Deploy on the nodes that need Amazon EBS storage
           node = {
             nodeSelector = {
               storage = "enabled"
@@ -401,7 +401,7 @@ module "eks" {
     disk_size     = 50
   }
   eks_managed_node_groups = {
-    #Note: Openldap is not compatible either Bottlerocket, neither Graviton.
+    #Note: Openldap is not compatible with Bottlerocket or Graviton.
     shared_apps = {
       node_group_name = "mg-shared"
       instance_types  = ["m5d.xlarge"]
