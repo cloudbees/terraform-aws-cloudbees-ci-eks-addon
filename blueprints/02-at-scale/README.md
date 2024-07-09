@@ -204,7 +204,7 @@ The first build for a new Windows image container takes up to 10 minutes to run;
    eval $(terraform output --raw cbci_agents_pods)
    ```
 
-8. Check build logs by signing in to the `team-b` and `team-c-ha` controllers respectively. Navigate to the pipeline jobs and select the first build, indicated by the `#1` build number. [CloudBees Pipeline Explorer](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-pipeline-explorer-plugin) is enabled as a default.
+8. Check build logs by signing in to the `team-b` and `team-c-ha` controllers, respectively. Navigate to the pipeline jobs and select the first build, indicated by the `#1` build number. [CloudBees Pipeline Explorer](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-pipeline-explorer-plugin) is enabled as a default.
 
 #### Back up and restore
 
