@@ -196,7 +196,7 @@ This pipeline uses [CloudBees Workspace Caching](https://docs.cloudbees.com/docs
    eval $(terraform output --raw cbci_controller_c_windows_node_build)
    ```
 
-The first build for a new windows image container takes up to 10 min to run. Subsequent builds will take seconds.
+The first build for a new Windows image container takes up to 10 minutes to run; subsequent builds should take seconds to run.
 
 7. Right after triggering the builds, issue the following to validate pod agent provisioning to build the pipeline code:
 
