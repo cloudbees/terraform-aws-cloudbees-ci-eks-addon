@@ -5,9 +5,10 @@ kind: workflow
 name: ci
 
 on:
-  pull_request:
-    branches:
-      - 'main'
+  # Enable once Issue #83 is solved
+  # pull_request:
+  #   branches:
+  #     - 'main'
   workflow_dispatch:
 
 env:
