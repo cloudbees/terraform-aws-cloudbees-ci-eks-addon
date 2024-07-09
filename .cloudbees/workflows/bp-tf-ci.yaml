@@ -4,17 +4,16 @@ apiVersion: automation.cloudbees.io/v1alpha1
 kind: workflow
 name: ci
 
-#TODO: Replace by pull-request with filter for tf files when it is supported
 on:
-  push:
+  pull_request:
     branches:
       - 'main'
+  workflow_dispatch:
 
 env:
   AWS_REGION: "us-east-1"
   BUCKET_NAME_TF_STATE: "cbci-eks-addon-tf-state"
   AWS_ROLE_TO_ASSUME: "infra-admin-ci"
-  REPLAY_STR: "3"
   TF_AUTO_VARS_FILE: |
     tags = {
       "cb-owner" : "professional-services"
