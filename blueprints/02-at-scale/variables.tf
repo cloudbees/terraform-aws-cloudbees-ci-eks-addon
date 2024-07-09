@@ -38,7 +38,7 @@ variable "gh_token" {
 }
 
 variable "ci" {
-  description = "Running in a CI Service vs locally. False when running locally, true when running in a CI service,"
+  description = "Running in a CI service versus running locally. False when running locally, true when running in a CI service."
   default     = false
   type        = bool
 }

@@ -64,7 +64,7 @@ This blueprint divides scalable node groups for different types of workloads:
 |------|-------------|------|---------|:--------:|
 | hosted_zone | Amazon Route 53 hosted zone. CloudBees CI applications are configured to use subdomains in this hosted zone. | `string` | n/a | yes |
 | trial_license | CloudBees CI trial license details for evaluation. | `map(string)` | n/a | yes |
-| ci | Running in a CI Service vs locally. False when running locally, true when running in a CI service, | `bool` | `false` | no |
+| ci | Running in a CI service versus running locally. False when running locally, true when running in a CI service. | `bool` | `false` | no |
 | gh_token | GitHub token for the CloudBees operations center credential GH-User-token, that is created via CloudBees CasC. | `string` | `"ExampleToken1234"` | no |
 | gh_user | GitHub user for the CloudBees operations center credential GH-User-token, that is created via CloudBees CasC. | `string` | `"exampleUser"` | no |
 | suffix | Unique suffix to assign to all resources. When adding the suffix, changes are required in CloudBees CI for the validation phase. | `string` | `""` | no |
@@ -82,7 +82,7 @@ This blueprint divides scalable node groups for different types of workloads:
 | cbci_agents_pods | Retrieves a list of agent pods running in the agents namespace. |
 | cbci_controller_b_ws_cache_build | team-b hibernation monitor endpoint to the build workspace cache. It expects CBCI_ADMIN_TOKEN as the environment variable. |
 | cbci_controller_c_hpa | team-c horizontal pod autoscaling. |
-| cbci_controller_c_windows_node_build | team-c hibernation monitor endpoint to the windows build nodes. It expects CBCI_ADMIN_TOKEN as the environment variable. |
+| cbci_controller_c_windows_node_build | team-c hibernation monitor endpoint to the Windows build nodes. It expects CBCI_ADMIN_TOKEN as the environment variable. |
 | cbci_controllers_pods | Operations center pod for the CloudBees CI add-on. |
 | cbci_helm | Helm configuration for the CloudBees CI add-on. It is accessible via state files only. |
 | cbci_liveness_probe_ext | Operations center service external liveness probe for the CloudBees CI add-on. |
@@ -105,7 +105,7 @@ This blueprint divides scalable node groups for different types of workloads:
 | prometheus_dashboard | Provides access to Prometheus dashboards. |
 | s3_cbci_arn | CloudBees CI Amazon S3 bucket ARN. |
 | s3_cbci_name | CloudBees CI Amazon S3 bucket name. It is required by CloudBees CI for workspace caching and artifact management. |
-| s3_list_objects | List all objects recursiverly stored into s3 Bucket. |
+| s3_list_objects | Recursively lists all objects stored in the Amazon S3 bucket. |
 | velero_backup_on_demand | Takes an on-demand Velero backup from the schedule for the selected controller that is using block storage. |
 | velero_backup_schedule | Creates a Velero backup schedule for the selected controller that is using block storage, and then deletes the existing schedule, if it exists. |
 | velero_restore | Restores the selected controller that is using block storage from a backup. |
@@ -295,7 +295,7 @@ Grafana is used to visualize and query:
    ![CloudBees CI Tracing Example](img/observability/cbci-tracing-example.png)
 
 > [!NOTE]
-> Grafana ingress can be enabled as explained on Issue [#165](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/issues/165) but currently is incompatible with terrafrom destroy.
+> Grafana Ingress can be enabled as explained in Issue [#165](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/issues/165), but currently is incompatible with `terrafrom destroy`.
 
 #### Logs
 
