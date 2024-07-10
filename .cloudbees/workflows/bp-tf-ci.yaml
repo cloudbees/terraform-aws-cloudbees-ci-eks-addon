@@ -12,7 +12,7 @@ on:
   workflow_dispatch:
 
 env:
-  AWS_REGION: "us-east-1"
+  AWS_REGION: "us-west-2"
   BUCKET_NAME_TF_STATE: "cbci-eks-addon-tf-state"
   AWS_ROLE_TO_ASSUME: "infra-admin-ci"
   TF_AUTO_VARS_FILE: |
@@ -27,7 +27,7 @@ env:
       email = "ci.user@cloudbees.io"
       company = "CloudBees Inc."
     }
-    suffix = "ci-v10"
+    suffix = "ci-v11"
     ci = true
 
 jobs:

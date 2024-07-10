@@ -5,21 +5,17 @@ data "aws_route53_zone" "this" {
 data "aws_availability_zones" "available" {}
 
 locals {
-  name   = var.suffix == "" ? "cbci-bp01" : "cbci-bp01-${var.suffix}"
-  region = "us-east-1"
-
+  name                 = var.suffix == "" ? "cbci-bp01" : "cbci-bp01-${var.suffix}"
   vpc_name             = "${local.name}-vpc"
   cluster_name         = "${local.name}-eks"
   resource_group_name  = "${local.name}-rg"
   kubeconfig_file      = "kubeconfig_${local.name}.yaml"
   kubeconfig_file_path = abspath("k8s/${local.kubeconfig_file}")
 
-  vpc_cidr = "10.0.0.0/16"
-
+  vpc_cidr         = "10.0.0.0/16"
   route53_zone_id  = data.aws_route53_zone.this.id
   route53_zone_arn = data.aws_route53_zone.this.arn
-  #Number of AZs per region https://docs.aws.amazon.com/ram/latest/userguide/working-with-az-ids.html
-  azs = slice(data.aws_availability_zones.available.names, 0, 2)
+  azs              = slice(data.aws_availability_zones.available.names, 0, 2)
 
   tags = merge(var.tags, {
     "tf-blueprint"  = local.name
@@ -233,7 +229,7 @@ resource "terraform_data" "create_kubeconfig" {
   triggers_replace = var.ci ? [timestamp()] : []
 
   provisioner "local-exec" {
-    command = "aws eks update-kubeconfig --name ${module.eks.cluster_name} --region ${local.region} --kubeconfig ${local.kubeconfig_file_path}"
+    command = "aws eks update-kubeconfig --name ${module.eks.cluster_name} --region ${var.aws_region} --kubeconfig ${local.kubeconfig_file_path}"
   }
 }
 
