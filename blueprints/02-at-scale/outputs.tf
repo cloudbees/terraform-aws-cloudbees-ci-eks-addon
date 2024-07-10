@@ -6,7 +6,7 @@ output "kubeconfig_export" {
 
 output "kubeconfig_add" {
   description = "Add kubeconfig to the local configuration to access the Kubernetes API."
-  value       = "aws eks update-kubeconfig --region ${local.region} --name ${local.cluster_name}"
+  value       = "aws eks update-kubeconfig --region ${var.aws_region} --name ${local.cluster_name}"
 }
 
 output "cbci_helm" {
@@ -40,11 +40,6 @@ output "cbci_liveness_probe_ext" {
   value       = module.eks_blueprints_addon_cbci.cbci_liveness_probe_ext
 }
 
-output "ldap_admin_password" {
-  description = "LDAP password for the cbci_admin_user user for the CloudBees CI add-on. Check .docker/ldap/data.ldif."
-  value       = "kubectl get secret ${module.eks_blueprints_addon_cbci.cbci_secrets} -n ${module.eks_blueprints_addon_cbci.cbci_namespace} -o jsonpath=${local.global_pass_jsonpath} | base64 -d"
-}
-
 output "cbci_oc_url" {
   description = "Operations center URL for the CloudBees CI add-on."
   value       = module.eks_blueprints_addon_cbci.cbci_oc_url
@@ -75,9 +70,14 @@ output "cbci_controller_c_hpa" {
   value       = "kubectl get hpa team-c-ha -n ${module.eks_blueprints_addon_cbci.cbci_namespace}"
 }
 
-output "cbci_controller_b_hibernation_post_queue_ws_cache" {
+output "cbci_controller_b_ws_cache_build" {
   description = "team-b hibernation monitor endpoint to the build workspace cache. It expects CBCI_ADMIN_TOKEN as the environment variable."
-  value       = "curl -i -XPOST -u ${local.cbci_admin_user}:$CBCI_ADMIN_TOKEN ${local.hibernation_monitor_url}/hibernation/queue/team-b/job/ws-cache/build"
+  value       = "curl -i -XPOST -u ${local.cbci_admin_user}:$CBCI_ADMIN_TOKEN ${local.hibernation_monitor_url}/hibernation/queue/team-b/job/admin/job/validations/job/ws-cache/build"
+}
+
+output "cbci_controller_c_windows_node_build" {
+  description = "team-c hibernation monitor endpoint to the Windows build nodes. It expects CBCI_ADMIN_TOKEN as the environment variable."
+  value       = "curl -i -XPOST -u ${local.cbci_admin_user}:$CBCI_ADMIN_TOKEN ${local.hibernation_monitor_url}/hibernation/queue/team-c-ha/job/admin/job/validations/job/windows-builds-nodes/build"
 }
 
 output "cbci_agents_pods" {
@@ -85,9 +85,14 @@ output "cbci_agents_pods" {
   value       = "kubectl get pods -n ${local.cbci_agents_ns} -l jenkins=slave"
 }
 
-output "cbci_agents_events_stopping" {
-  description = "Retrieves a list of agent pods running in the agents namespace."
-  value       = "kubectl get events -n ${local.cbci_agents_ns} | grep -e 'pod/${local.cbci_agent_podtemplname_validation}' | grep 'Normal' | grep 'Stopping container'"
+output "cbci_agent_linuxtempl_events" {
+  description = "Retrieves a list of events related to Linux template agents."
+  value       = "kubectl get events -n ${local.cbci_agents_ns} | grep -i pod/${local.cbci_agent_linuxtempl}"
+}
+
+output "cbci_agent_windowstempl_events" {
+  description = "Retrieves a list of events related to Windows template agents."
+  value       = "kubectl get events -n ${local.cbci_agents_ns} | grep -i pod/${local.cbci_agent_windowstempl}"
 }
 
 output "acm_certificate_arn" {
@@ -115,6 +120,11 @@ output "s3_cbci_name" {
   value       = local.bucket_name
 }
 
+output "s3_list_objects" {
+  description = "Recursively lists all objects stored in the Amazon S3 bucket."
+  value       = "aws s3 ls s3://${local.bucket_name}/ --recursive"
+}
+
 output "efs_arn" {
   description = "Amazon EFS ARN."
   value       = module.efs.arn
@@ -122,17 +132,17 @@ output "efs_arn" {
 
 output "efs_access_points" {
   description = "Amazon EFS access points."
-  value       = "aws efs describe-access-points --file-system-id ${module.efs.id} --region ${local.region}"
+  value       = "aws efs describe-access-points --file-system-id ${module.efs.id} --region ${var.aws_region}"
 }
 
 output "aws_backup_efs_protected_resource" {
   description = "AWS description for the Amazon EFS drive that is used to back up protected resources."
-  value       = "aws backup describe-protected-resource --resource-arn ${module.efs.arn} --region ${local.region}"
+  value       = "aws backup describe-protected-resource --resource-arn ${module.efs.arn} --region ${var.aws_region}"
 }
 
 output "aws_logstreams_fluentbit" {
   description = "AWS CloudWatch log streams from Fluent Bit."
-  value       = "aws logs describe-log-streams --log-group-name /aws/eks/${local.cluster_name}/aws-fluentbit-logs --order-by LastEventTime --no-descending --query 'logStreams[?creationTime > `${local.epoch_millis}` ]' --region ${local.region}"
+  value       = "aws logs describe-log-streams --log-group-name /aws/eks/${local.cluster_name}/aws-fluentbit-logs --order-by LastEventTime --no-descending --query 'logStreams[?creationTime > `${local.epoch_millis}` ]' --region ${var.aws_region}"
 }
 
 output "velero_backup_schedule" {

@@ -3,37 +3,26 @@ removeStrategy:
 roles:
 - name: authenticated
 - permissions:
-  - com.cloudbees.opscenter.server.model.SharedCloud.Disconnect
   - hudson.model.Computer.Connect
+  - com.cloudbees.jenkins.plugins.casc.permissions.CascPermission.Item
   - hudson.model.Hudson.UploadPlugins
   - jenkins.metrics.api.Metrics.View
-  - com.cloudbees.opscenter.server.model.SharedSlave.Configure
-  - com.cloudbees.opscenter.server.model.ClientMaster.Lifecycle
-  - com.cloudbees.opscenter.server.model.SharedCloud.Connect
-  - com.cloudbees.plugins.updatecenter.UpdateCenter.Upload
-  - com.cloudbees.opscenter.server.model.SharedCloud.Configure
   - hudson.model.Hudson.ConfigureUpdateCenter
   - nectar.plugins.rbac.groups.Group.Manage
   - hudson.model.Hudson.Administer
   - hudson.model.Item.Cancel
-  - com.cloudbees.opscenter.server.model.SharedSlave.Disconnect
   - com.cloudbees.plugins.credentials.CredentialsProvider.View
-  - com.cloudbees.jenkins.plugin.metrics.views.Alerter.View
   - hudson.model.Computer.Delete
   - hudson.model.Item.Build
   - hudson.model.Item.Move
   - com.cloudbees.plugins.credentials.CredentialsProvider.Update
   - hudson.model.Item.Create
-  - com.cloudbees.jenkins.plugin.metrics.views.Alerter.Mute
   - com.cloudbees.plugins.credentials.CredentialsProvider.Delete
-  - com.cloudbees.opscenter.server.model.SharedCloud.ForceRelease
+  - hudson.model.Run.Replay
   - jenkins.metrics.api.Metrics.ThreadDump
-  - com.cloudbees.opscenter.server.model.SharedSlave.ForceRelease
-  - com.cloudbees.opscenter.server.model.ClientMaster.Configure
   - hudson.model.Hudson.RunScripts
   - hudson.model.View.Create
   - hudson.model.Computer.Secure
-  - com.cloudbees.opscenter.server.model.SharedSlave.Connect
   - hudson.model.Computer.Configure
   - nectar.plugins.rbac.roles.Role.Filter
   - hudson.model.Run.Update
@@ -52,11 +41,9 @@ roles:
   - hudson.scm.SCM.Tag
   - hudson.model.Item.Discover
   - hudson.model.Hudson.Read
-  - com.cloudbees.plugins.updatecenter.UpdateCenter.Configure
   - nectar.plugins.rbac.roles.Role.View
   - hudson.model.Item.Workspace
   - hudson.model.Computer.Provision
-  - com.cloudbees.plugins.updatecenter.UpdateCenter.Store
   - nectar.plugins.rbac.groups.Group.Configure
   - nectar.plugins.rbac.groups.Group.Delete
   - hudson.model.View.Read
@@ -65,7 +52,6 @@ roles:
   - hudson.model.Computer.Disconnect
   - hudson.model.Item.Request
   - nectar.plugins.rbac.groups.Group.View
-  - com.cloudbees.plugins.updatecenter.UpdateCenter.Promote
   name: administer
 - name: anonymous
 - filterable: true
@@ -74,6 +60,7 @@ roles:
   - hudson.model.Item.Build
   - hudson.model.Item.Move
   - hudson.model.Item.Create
+  - hudson.model.Run.Replay
   - hudson.model.View.Create
   - hudson.model.Run.Update
   - hudson.model.View.Delete
@@ -113,4 +100,4 @@ groups:
   - name: browse
     grantedAt: current
     propagates: false
-  name: Developers
+  name: Browsers

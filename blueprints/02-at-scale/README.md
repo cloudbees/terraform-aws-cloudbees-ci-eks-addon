@@ -4,7 +4,7 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
 
 - An [Amazon Elastic File System (Amazon EFS) drive](https://aws.amazon.com/efs/) that is required by CloudBees CI High Availability/Horizontal Scalability (HA/HS) controllers and is optional for non-HA/HS controllers.
 - An [Amazon Simple Storage Service (Amazon S3) bucket](https://aws.amazon.com/s3/) to store assets from applications like CloudBees CI, Velero, and Fluent Bit.
-- [Amazon Elastic Kubernetes Service (Amazon EKS) managed node groups](https://docs.aws.amazon.com/eks/latest/userguide/managed-node-groups.html) for different workloads: CI applications, CI on-demand agents, CI spot agents, and Kubernetes applications.
+- [Amazon Elastic Kubernetes Service (Amazon EKS) managed node groups](https://docs.aws.amazon.com/eks/latest/userguide/managed-node-groups.html) for different workloads: shared services, CI applications, CI Linux on-demand agents, CI Linux spot agents, and CI Microsoft Windows on-demand agents.
 - [Amazon CloudWatch Logs](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/WhatIsCloudWatchLogs.html) to explode control plane logs and Fluent Bit logs.
 - The following [Amazon EKS blueprints add-ons](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/):
 
@@ -22,9 +22,9 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
 
   | Helm Chart | Description |
   |-------------------------------|-------------|
-  | [Osixia Openldap](https://github.com/osixia/docker-openldap) | LDAP server. |
+  | [Helm Openldap](https://github.com/jp-gouin/helm-openldap/tree/master) | LDAP server for Kubernetes. |
   | [AWS Node Termination Handler](https://github.com/aws/aws-node-termination-handler) | Gracefully handles EC2 instance shutdown within Kubernetes. Note that this add-on is not compatible with managed instance groups. For more information, refer to [issue #23](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/issues/23). |
-  | [Grafana Tempo](https://github.com/osixia/docker-openldap) | Provides backend tracing for [Jenkins OpenTelemetry](https://plugins.jenkins.io/opentelemetry/). |
+  | [Grafana Tempo](https://grafana.com/oss/tempo/) | Provides backend tracing for [Jenkins OpenTelemetry](https://plugins.jenkins.io/opentelemetry/). |
 
 - Cloudbees CI uses [Configuration as Code (CasC)](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/casc-intro) (refer to the [casc](casc) folder) to enable [exciting new features for streamlined DevOps](https://www.cloudbees.com/blog/cloudbees-ci-exciting-new-features-for-streamlined-devops) and other enterprise features, such as [CloudBees CI hibernation](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#_hibernation_in_managed_masters).
   - The operations center is using the [CasC Bundle Retriever](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/bundle-retrieval-scm).
@@ -36,18 +36,24 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
 
 ## Architecture
 
+This blueprint divides scalable node groups for different types of workloads:
+
+- Shared node group services: For common/shared workloads using [Amazon EKS-Optimized Amazon Linux 2023](https://aws.amazon.com/blogs/containers/amazon-eks-optimized-amazon-linux-2023-amis-now-available/) Amazon Machine Image (AMI) type.
+- CloudBees CI node groups:
+  - Services instance type: [AWS Graviton Processor](https://aws.amazon.com/ec2/graviton/) and [Bottlerocket OS](https://aws.amazon.com/bottlerocket/) AMI type.
+    - It uses an [instance profile](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2_instance-profiles.html) for operating with AWS Services. However, the recommended options are explained in [#56](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/issues/56).
+  - Ephemeral agents:
+    - Linux: [AWS Graviton Processor](https://aws.amazon.com/ec2/graviton/) and [Bottlerocket OS](https://aws.amazon.com/bottlerocket/) AMI type and includes on-demand and Spot capacity types. The Spot agent node groups follow the principles described in [Building for Cost Optimization and Resilience for EKS with Spot Instances](https://aws.amazon.com/blogs/compute/cost-optimization-and-resilience-eks-with-spot-instances/).
+    - Windows: Windows 2019 AMI type.
+
 > [!NOTE]
-> - The CloudBees CI node groups use the following specifications:
->    - Instance type: [AWS Graviton Processor](https://aws.amazon.com/ec2/graviton/)
->    - Amazon Machine Image (AMI) type: [Bottlerocket OS](https://aws.amazon.com/bottlerocket/)
->    - The Spot agents node groups follow the principles described in [Building for Cost optimization and Resilience for EKS with Spot Instances](https://aws.amazon.com/blogs/compute/cost-optimization-and-resilience-eks-with-spot-instances/).
-> - Amazon S3 storage permissions are based on an [instance profile](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2_instance-profiles.html), rather than creating a user with an AWS identity and IAM permissions. It is expected that the credentials validation from CloudBees CI will fail.
+> If your user credentials do not include an AWS identity and IAM permissions, the credentials validation from the CloudBees CI UI will fail.
 
 ![Architecture](img/at-scale.architect.drawio.svg)
 
 ### Kubernetes cluster
 
-![Architecture](img/at-scale.k8s.drawio.svg)
+![K8sApps](img/at-scale.k8s.drawio.svg)
 
 ## Terraform Docs
 
@@ -58,6 +64,8 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
 |------|-------------|------|---------|:--------:|
 | hosted_zone | Amazon Route 53 hosted zone. CloudBees CI applications are configured to use subdomains in this hosted zone. | `string` | n/a | yes |
 | trial_license | CloudBees CI trial license details for evaluation. | `map(string)` | n/a | yes |
+| aws_region | AWS region to deploy resources to. It requires at minimun 3 AZs. | `string` | `"us-west-2"` | no |
+| ci | Running in a CI service versus running locally. False when running locally, true when running in a CI service. | `bool` | `false` | no |
 | gh_token | GitHub token for the CloudBees operations center credential GH-User-token, that is created via CloudBees CasC. | `string` | `"ExampleToken1234"` | no |
 | gh_user | GitHub user for the CloudBees operations center credential GH-User-token, that is created via CloudBees CasC. | `string` | `"exampleUser"` | no |
 | suffix | Unique suffix to assign to all resources. When adding the suffix, changes are required in CloudBees CI for the validation phase. | `string` | `""` | no |
@@ -70,10 +78,12 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
 | acm_certificate_arn | AWS Certificate Manager (ACM) certificate for Amazon Resource Names (ARN). |
 | aws_backup_efs_protected_resource | AWS description for the Amazon EFS drive that is used to back up protected resources. |
 | aws_logstreams_fluentbit | AWS CloudWatch log streams from Fluent Bit. |
-| cbci_agents_events_stopping | Retrieves a list of agent pods running in the agents namespace. |
+| cbci_agent_linuxtempl_events | Retrieves a list of events related to Linux template agents. |
+| cbci_agent_windowstempl_events | Retrieves a list of events related to Windows template agents. |
 | cbci_agents_pods | Retrieves a list of agent pods running in the agents namespace. |
-| cbci_controller_b_hibernation_post_queue_ws_cache | team-b hibernation monitor endpoint to the build workspace cache. It expects CBCI_ADMIN_TOKEN as the environment variable. |
+| cbci_controller_b_ws_cache_build | team-b hibernation monitor endpoint to the build workspace cache. It expects CBCI_ADMIN_TOKEN as the environment variable. |
 | cbci_controller_c_hpa | team-c horizontal pod autoscaling. |
+| cbci_controller_c_windows_node_build | team-c hibernation monitor endpoint to the Windows build nodes. It expects CBCI_ADMIN_TOKEN as the environment variable. |
 | cbci_controllers_pods | Operations center pod for the CloudBees CI add-on. |
 | cbci_helm | Helm configuration for the CloudBees CI add-on. It is accessible via state files only. |
 | cbci_liveness_probe_ext | Operations center service external liveness probe for the CloudBees CI add-on. |
@@ -92,11 +102,11 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
 | grafana_dashboard | Provides access to Grafana dashboards. |
 | kubeconfig_add | Add kubeconfig to the local configuration to access the Kubernetes API. |
 | kubeconfig_export | Export the KUBECONFIG environment variable to access the Kubernetes API. |
-| ldap_admin_password | LDAP password for the cbci_admin_user user for the CloudBees CI add-on. Check .docker/ldap/data.ldif. |
 | prometheus_active_targets | Checks active Prometheus targets from the operations center. |
 | prometheus_dashboard | Provides access to Prometheus dashboards. |
 | s3_cbci_arn | CloudBees CI Amazon S3 bucket ARN. |
 | s3_cbci_name | CloudBees CI Amazon S3 bucket name. It is required by CloudBees CI for workspace caching and artifact management. |
+| s3_list_objects | Recursively lists all objects stored in the Amazon S3 bucket. |
 | velero_backup_on_demand | Takes an on-demand Velero backup from the schedule for the selected controller that is using block storage. |
 | velero_backup_schedule | Creates a Velero backup schedule for the selected controller that is using block storage, and then deletes the existing schedule, if it exists. |
 | velero_restore | Restores the selected controller that is using block storage from a backup. |
@@ -140,7 +150,10 @@ Once the resources have been created, a `kubeconfig` file is created in the [/k8
    eval $(terraform output --raw global_password)
    ```
 
-3. CasC is enabled for the [operations center](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/) (`cjoc`) and [controllers](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-controller/) (`team-b` and `team-c-ha`). `team-a` is not using CasC, to illustrate the difference between the two approaches. Issue the following command to verify that all controllers are in a `Running` state:
+> [!NOTE]
+> There are differences in CloudBees CI permissions and folder restrictions when signed in as a user of the Admin group versus the Development group. For example, only Admin users have access to the agent validation jobs.
+
+1. CasC is enabled for the [operations center](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/) (`cjoc`) and [controllers](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-controller/) (`team-b` and `team-c-ha`). `team-a` is not using CasC, to illustrate the difference between the two approaches. Issue the following command to verify that all controllers are in a `Running` state:
 
    ```sh
    eval $(terraform output --raw cbci_controllers_pods)
@@ -148,13 +161,13 @@ Once the resources have been created, a `kubeconfig` file is created in the [/k8
 
    If successful, it should indicate that 2 replicas are running for `team-c-ha` since [CloudBees CI HA/HS](https://docs.cloudbees.com/docs/cloudbees-ci/latest/ha-install-guide/) is enabled on this controller.
 
-4. Issue the following command to verify that horizontal pod autoscaling is enabled for `team-c-ha`:
+2. Issue the following command to verify that horizontal pod autoscaling is enabled for `team-c-ha`:
 
    ```sh
    eval $(terraform output --raw cbci_controller_c_hpa)
    ```
 
-5. Issue the following command to retrieve an [API token](https://docs.cloudbees.com/docs/cloudbees-ci-api/latest/api-authentication) for the `admin_cbci_a` user with the correct permissions for the required actions:
+3. Issue the following command to retrieve an [API token](https://docs.cloudbees.com/docs/cloudbees-ci-api/latest/api-authentication) for the `admin_cbci_a` user with the correct permissions for the required actions:
 
    ```sh
    eval $(terraform output --raw cbci_oc_export_admin_crumb) && \
@@ -162,34 +175,37 @@ Once the resources have been created, a `kubeconfig` file is created in the [/k8
    printenv | grep CBCI_ADMIN_TOKEN
    ```
 
-   If the command is not successful, issue the following command to validate that DNS propagation has completed:
+   If the command is not successful, issue the following command to validate that DNS propagation has been completed:
 
    ```sh
    eval $(terraform output --raw cbci_liveness_probe_ext)
    ```
 
-6. Once you have retrieved the API token, issue the following command to remotely trigger the `ws-cache` pipeline from `team-b` using the [POST queue for hibernation API endpoint](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#_post_queue_for_hibernation):
+4. Once you have retrieved the API token, issue the following commands to remotely trigger builds using the [POST queue for hibernation API endpoint](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#_post_queue_for_hibernation). If successful, an `HTTP/2 201` response is returned, indicating the REST API call has been correctly received by the CloudBees CI controller.
+
+- `ws-cache` pipeline from `team-b` using Linux Nodes Pools:
 
    ```sh
-   eval $(terraform output --raw cbci_controller_b_hibernation_post_queue_ws_cache)
+   eval $(terraform output --raw cbci_controller_b_ws_cache_build)
    ```
 
-   If successful, an `HTTP/2 201` response is returned, indicating the REST API call has been correctly received by the CloudBees CI controller.
+This pipeline uses [CloudBees Workspace Caching](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-cache-step). Once the second build is complete, you can find the read cache operation at the beginning of the build logs and the write cache operation at the end of the build logs.
 
-7. Right after triggering the build, issue the following to validate pod agent provisioning to build the pipeline code:
+- `windows-build-nodes` pipeline from `team-c-ha` using Windows Nodes Pools:
+
+   ```sh
+   eval $(terraform output --raw cbci_controller_c_windows_node_build)
+   ```
+
+The first build for a new Windows image container takes up to 10 minutes to run; subsequent builds should take seconds to run.
+
+7. Right after triggering the builds, issue the following to validate pod agent provisioning to build the pipeline code:
 
    ```sh
    eval $(terraform output --raw cbci_agents_pods)
    ```
 
-8. In the CloudBees CI UI, sign in to the `team-b` controller.
-9. Navigate to the `ws-cache` pipeline and select the first build, indicated by the `#1` build number.
-10. Select [CloudBees Pipeline Explorer](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-pipeline-explorer-plugin) and examine the build logs.
-
-> [!NOTE]
-> - This pipeline uses [CloudBees Workspace Caching](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-cache-step). Once the second build is complete, you can find the read cache operation at the beginning of the build logs and the write cache operation at the end of the build logs.
-> - If build logs contains `Failed to upload cache`, it is likely related to a `suffix` in your Terraform variables, and the recommendations from the [Deploy](#deploy) section were not followed.
-> - Transitions to the hibernation state may happen if the defined [grace period](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#_configuring_hibernation) of inactivity (idle) has been reached.
+8. Check build logs by signing in to the `team-b` and `team-c-ha` controllers, respectively. Navigate to the pipeline jobs and select the first build, indicated by the `#1` build number. [CloudBees Pipeline Explorer](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-pipeline-explorer-plugin) is enabled as a default.
 
 #### Back up and restore
 
@@ -211,8 +227,7 @@ To view the **backup-all-controllers** job:
 2. From the operations center dashboard, select **All** to view all folders on the operations center.
 3. Navigate to the **admin** folder, and then select the **backup-all-controllers** Cluster Operations job.
 
-> [!NOTE]
-> If a build fails, it is likely related to a `suffix` that is included in your Terraform variables, and the recommendations from the [Deploy](#deploy) section were not followed.
+Restore operations can be done on-demand at the controller level from the preconfigured restore job.
 
 ##### Create a Velero backup schedule
 
@@ -235,11 +250,7 @@ Issue the following command to take an on-demand Velero backup for a specific po
 
 ##### Restore from a Velero on-demand backup
 
-1. Make updates on the `team-b` controller (for example, add some jobs and generate builds).
-2. [Take an on-demand Velero backup](#take-an-on-demand-velero-backup), including the updates that you made.
-3. Remove the latest update (for example, remove jobs you create and build on existing jobs).
-4. Manage `team-b` > Deprovision the controller.
-5. Issue the following command to restore the controller from the last backup:
+Issue the following command to restore the controller from the last backup:
 
    ```sh
    eval $(terraform output --raw velero_restore)
@@ -268,7 +279,7 @@ Grafana is used to visualize and query:
 
    If successful, the Prometheus dashboard should be available at `http://localhost:50001` and you can view the configured alerts for CloudBees CI.
 
-3. Issue the following command to access Grafana dashboards at `localhost:50002`. For the username, use `admin` and set the password using the `grafana_admin_password` terraform variable:
+3. Issue the following command to access Grafana dashboards at `localhost:50002`. For the username, use `admin` and set the password using the `global_password` terraform variable:
 
    ```sh
    eval $(terraform output --raw grafana_dashboard)
@@ -283,6 +294,9 @@ Grafana is used to visualize and query:
    - For Tracing Data, navigate to **Home > Explore > Select Tempo > Select `Query Type: Search`**. Then, select the `service name: jenkins` and the desired `Span Name` to `Run Query`. The following image shows an example of the ws-cache pipeline build.
 
    ![CloudBees CI Tracing Example](img/observability/cbci-tracing-example.png)
+
+> [!NOTE]
+> Grafana Ingress can be enabled as explained in Issue [#165](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/issues/165), but currently is incompatible with `terrafrom destroy`.
 
 #### Logs
 

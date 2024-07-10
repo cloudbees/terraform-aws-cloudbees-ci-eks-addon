@@ -4,17 +4,17 @@ apiVersion: automation.cloudbees.io/v1alpha1
 kind: workflow
 name: ci
 
-#TODO: Replace by pull-request with filter for tf files when it is supported
 on:
-  push:
-    branches:
-      - 'main'
+  # Enable once Issue #83 is solved
+  # pull_request:
+  #   branches:
+  #     - 'main'
+  workflow_dispatch:
 
 env:
   AWS_REGION: "us-east-1"
-  BUCKET_NAME_TF_STATE: "cbci-eks-addon-tf-state"
+  BUCKET_NAME_TF_STATE: "cbci-eks-addon-tf-state-v2"
   AWS_ROLE_TO_ASSUME: "infra-admin-ci"
-  REPLAY_STR: "3"
   TF_AUTO_VARS_FILE: |
     tags = {
       "cb-owner" : "professional-services"
@@ -27,7 +27,8 @@ env:
       email = "ci.user@cloudbees.io"
       company = "CloudBees Inc."
     }
-    suffix = "ci-v5"
+    suffix = "ci-v11"
+    ci = true
 
 jobs:
   init:
@@ -140,6 +141,8 @@ jobs:
       run : |
         cat <<EOT >> blueprints/${{ env.ROOT }}/.auto.tfvars
         ${{ env.TF_AUTO_VARS_FILE }}
+        gh_user = "exampleUser"
+        gh_token = "ExampleToken1234"
         EOT
         cat <<EOT >> blueprints/${{ env.ROOT }}/backend.tf
         terraform {
@@ -149,11 +152,6 @@ jobs:
             region = "${{ env.AWS_REGION }}"
           }
         }
-        EOT
-        cat <<EOT >> blueprints/${{ env.ROOT }}/k8s/secrets-values.yml
-        secJenkinsPass: "admin_pass" # Required. Do not update!
-        secGithubUser: "exampleUser"
-        secGithubToken: "ExampleToken"
         EOT
         [ "${{ env.CLEAN_UP }}" = "true" ] && echo "Skipping... Clean up mode." || CI=true make deploy
 

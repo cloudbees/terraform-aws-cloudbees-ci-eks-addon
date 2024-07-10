@@ -1,0 +1,18 @@
+# Copyright (c) CloudBees, Inc.
+
+# https://github.com/cert-manager/cert-manager/blob/master/deploy/charts/cert-manager/Chart.template.yaml
+
+nodeSelector:
+  kubernetes.io/os: linux
+
+webhook:
+  nodeSelector:
+    kubernetes.io/os: linux
+
+cainjector:
+  nodeSelector:
+    kubernetes.io/os: linux
+
+startupapicheck:
+  nodeSelector:
+    kubernetes.io/os: linux

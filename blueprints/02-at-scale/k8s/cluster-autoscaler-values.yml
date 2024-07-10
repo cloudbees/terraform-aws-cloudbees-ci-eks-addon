@@ -1,0 +1,6 @@
+# Copyright (c) CloudBees, Inc.
+
+# https://github.com/kubernetes/autoscaler/blob/master/charts/cluster-autoscaler/Chart.yaml
+
+nodeSelector:
+  kubernetes.io/os: linux

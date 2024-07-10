@@ -4,7 +4,11 @@ description: "Parent CasC bundle. It is tested for the CloudBees CI blueprint ad
 version: "1"
 jcasc:
   - jcasc
+items:
+  - items
 plugins:
   - plugins
+rbac:
+  - rbac
 variables:
   - variables

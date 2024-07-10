@@ -1,6 +1,0 @@
-# Copyright (c) CloudBees, Inc.
-
-#https://github.com/bottlerocket-os/bottlerocket-update-operator/blob/develop/README.md#configuration
-
-#Planned Update: checks every Saturday at 23H / 11PM
-scheduler_cron_expression: "0 0 23 * * Sat *"

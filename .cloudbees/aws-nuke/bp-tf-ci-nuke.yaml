@@ -1,0 +1,141 @@
+regions:
+- us-east-1
+- us-west-2
+- global
+
+account-blocklist:
+- "999999999999" # production
+
+# aws-nuke resource-types ==> to list supported resource types
+resource-types:
+  targets:
+  - ACMCertificate
+  - CloudWatchLogsLogGroup
+  - DynamoDBTable
+  - EC2Instance
+  - EC2InternetGateway
+  - EC2LaunchTemplate
+  - EC2NATGateway
+  - EC2NetworkACL
+  - EC2RouteTable
+  - EC2SecurityGroup
+  - EC2Snapshot
+  - EC2Subnet
+  - EC2Volume
+  - ELBv2
+  - ELBv2TargetGroup
+  - KMSKey
+  - KMSAlias
+  - RDSSnapshot
+  - S3Bucket
+  - SecretsManagerSecret
+  # - IAMPolicy
+  # - IAMInstanceProfile
+
+accounts:
+  324005994172:
+    filters:
+      ACMCertificate:
+      - property: 'tag:cb-user'
+        type: exact
+        value: "cb-platform"
+        invert: true
+      CloudWatchLogsLogGroup:
+      - property: 'tag:cb-user'
+        type: exact
+        value: "cb-platform"
+        invert: true
+      DynamoDBTable:
+      - property: 'tag:cb-user'
+        type: exact
+        value: "cb-platform"
+        invert: true
+      EC2Instance:
+      - property: 'tag:cb-user'
+        type: exact
+        value: "cb-platform"
+        invert: true
+      EC2InternetGateway:
+      - property: 'tag:cb-user'
+        type: exact
+        value: "cb-platform"
+        invert: true
+      EC2LaunchTemplate:
+      - property: 'tag:cb-user'
+        type: exact
+        value: "cb-platform"
+        invert: true
+      EC2NATGateway:
+      - property: 'tag:cb-user'
+        type: exact
+        value: "cb-platform"
+        invert: true
+      EC2NetworkACL:
+      - property: 'tag:cb-user'
+        type: exact
+        value: "cb-platform"
+        invert: true
+      EC2RouteTable:
+      - property: 'tag:cb-user'
+        type: exact
+        value: "cb-platform"
+        invert: true
+      EC2SecurityGroup:
+      - property: 'tag:cb-user'
+        type: exact
+        value: "cb-platform"
+        invert: true
+      EC2Snapshot:
+      - property: 'tag:cb-user'
+        type: exact
+        value: "cb-platform"
+        invert: true
+      EC2Subnet:
+      - property: 'tag:cb-user'
+        type: exact
+        value: "cb-platform"
+        invert: true
+      EC2Volume:
+      - property: 'tag:cb-user'
+        type: exact
+        value: "cb-platform"
+        invert: true
+      ELBv2:
+      - property: 'tag:cb-user'
+        type: exact
+        value: "cb-platform"
+        invert: true
+      ELBv2TargetGroup:
+      - property: 'tag:cb-user'
+        type: exact
+        value: "cb-platform"
+        invert: true
+      KMSKey:
+      - property: 'tag:cb-user'
+        type: exact
+        value: "cb-platform"
+        invert: true
+      KMSAlias:
+      # - property: 'tag:cb-user'
+      #   type: exact
+      #   value: "cb-platform"
+      #   invert: true
+      - property: 'Name'
+        type: contains
+        value: "-ci-"
+        invert: true
+      RDSSnapshot:
+      - property: 'tag:cb-user'
+        type: exact
+        value: "cb-platform"
+        invert: true
+      S3Bucket:
+      - property: 'tag:cb-user'
+        type: exact
+        value: "cb-platform"
+        invert: true
+      SecretsManagerSecret:
+      - property: 'tag:cb-user'
+        type: exact
+        value: "cb-platform"
+        invert: true

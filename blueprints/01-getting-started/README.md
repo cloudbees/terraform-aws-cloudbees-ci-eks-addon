@@ -15,13 +15,13 @@ Get started with the [CloudBees CI on modern platforms in Amazon Elastic Kuberne
 
 ![Architecture](img/getting-started.architect.drawio.svg)
 
-- Node groups specification:
-  - Instance Type: [Graviton Processor](https://aws.amazon.com/ec2/graviton/) family
-  - AMI Type: [Amazon EKS-Optimized Amazon Linux 2023](https://aws.amazon.com/blogs/containers/amazon-eks-optimized-amazon-linux-2023-amis-now-available/)
+This blueprint presents the minimum setup to run CloudBees CI on Amazon EKS; one node group for all Kubernetes workloads.
+  - Instance type: [Graviton Processor](https://aws.amazon.com/ec2/graviton/) family.
+  - Amazon Machine Image (AMI) type: [Amazon EKS-Optimized Amazon Linux 2023](https://aws.amazon.com/blogs/containers/amazon-eks-optimized-amazon-linux-2023-amis-now-available/)
 
 ### Kubernetes cluster
 
-![Architecture](img/getting-started.k8s.drawio.svg)
+![K8sApps](img/getting-started.k8s.drawio.svg)
 
 ## Terraform documentation
 
@@ -32,6 +32,8 @@ Get started with the [CloudBees CI on modern platforms in Amazon Elastic Kuberne
 |------|-------------|------|---------|:--------:|
 | hosted_zone | Amazon Route 53 hosted zone. CloudBees CI applications are configured to use subdomains in this hosted zone. | `string` | n/a | yes |
 | trial_license | CloudBees CI trial license details for evaluation. | `map(string)` | n/a | yes |
+| aws_region | AWS region to deploy resources to. It requires at minimun 2 AZs. | `string` | `"us-west-2"` | no |
+| ci | Running in a CI service versus running locally. False when running locally, true when running in a CI service. | `bool` | `false` | no |
 | suffix | Unique suffix to assign to all resources. | `string` | `""` | no |
 | tags | Tags to apply to resources. | `map(string)` | `{}` | no |
 

@@ -1,0 +1,7 @@
+#https://github.com/grafana/helm-charts/blob/main/charts/tempo/values.yaml
+
+tempoQuery:
+  enabled: true
+
+nodeSelector:
+  kubernetes.io/os: linux

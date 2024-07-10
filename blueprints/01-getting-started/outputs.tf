@@ -6,7 +6,7 @@ output "kubeconfig_export" {
 
 output "kubeconfig_add" {
   description = "Add kubeconfig to your local configuration to access the Kubernetes API."
-  value       = "aws eks update-kubeconfig --region ${local.region} --name ${local.cluster_name}"
+  value       = "aws eks update-kubeconfig --region ${var.aws_region} --name ${local.cluster_name}"
 }
 
 output "cbci_helm" {

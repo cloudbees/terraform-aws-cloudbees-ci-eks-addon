@@ -1,18 +1,19 @@
 # Copyright (c) CloudBees, Inc.
 
 #https://artifacthub.io/packages/helm/aws/aws-for-fluent-bit
+#https://github.com/aws/eks-charts/blob/master/stable/aws-for-fluent-bit/Chart.yaml
 
-tolerations:
-  - key: dedicated
-    operator: Equal
-    value: cb-apps
-    effect: NoSchedule
-
+nodeSelector:
+  kubernetes.io/os: linux
 
 cloudWatchLogs:
   enabled: true
   region: "${region}"
   logRetentionDays : ${log_retention_days}
+  autoCreateGroup: true
+
+hostNetwork: true
+dnsPolicy: "ClusterFirstWithHostNet"
 
 s3:
   enabled: true

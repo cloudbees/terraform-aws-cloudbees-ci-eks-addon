@@ -1,5 +1,5 @@
 terraform {
-  required_version = ">= 1.0.0"
+  required_version = ">= 1.4.0"
 
   required_providers {
     aws = {
@@ -24,11 +24,6 @@ terraform {
       version = ">= 0.7.1"
     }
 
-    null = {
-      source  = "hashicorp/null"
-      version = ">= 3.1.0"
-    }
-
     random = {
       source  = "hashicorp/random"
       version = ">= 3.6.1"
@@ -38,7 +33,7 @@ terraform {
 }
 
 provider "aws" {
-  region = local.region
+  region = var.aws_region
 }
 
 provider "kubernetes" {

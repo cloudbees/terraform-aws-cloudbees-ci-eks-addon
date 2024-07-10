@@ -6,9 +6,7 @@ BP_AGENT_USER       := bp-agent
 MKFILEDIR 			:= $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 CASC_ENDPOINT		?= https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon.git
 CASC_BRANCH			?= main
-
-#https://developer.hashicorp.com/terraform/internals/debugging
-export TF_LOG=INFO
+NUKE_DRY_RUN		?= true
 
 define helpers
 	source blueprints/helpers.sh && $(1)
@@ -103,6 +101,15 @@ set-casc-location: ## Update Casc bundle location to the endpoint and branch pas
 set-casc-location: agentCheck guard-CASC_ENDPOINT guard-CASC_BRANCH
 	@$(call helpers,set-casc-location $(CASC_ENDPOINT) $(CASC_BRANCH))
 	@$(call helpers,INFO "Setting new Casc location to $(CASC_ENDPOINT) $(CASC_BRANCH) finished succesfully.")
+
+.PHONY: run-aws-nuke
+run-aws-nuke: ## Run aws nuke by https://github.com/rebuy-de/aws-nuke. Example: NUKE_DRY_RUN=true make run-aws-nuke
+run-aws-nuke: guard-NUKE_DRY_RUN
+ifeq ($(NUKE_DRY_RUN),false)
+	@$(call helpers,ask-confirmation "Running AWS Nuke to destroy selected resources.")
+endif
+	@$(call helpers,run-aws-nuke $(NUKE_DRY_RUN))
+	@$(call helpers,INFO "AWS nuke finished successfully with DRY_RUN=$(NUKE_DRY_RUN).")
 
 ##########################
 # Global

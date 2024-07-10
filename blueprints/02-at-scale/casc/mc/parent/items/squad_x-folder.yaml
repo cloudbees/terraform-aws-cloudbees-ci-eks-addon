@@ -1,0 +1,15 @@
+removeStrategy:
+  rbac: SYNC
+  items: NONE
+items:
+- kind: folder
+  name: Squad_X
+  displayName: Squad_X
+  groups:
+  - members:
+      external_groups:
+      - Dev_Team_X
+    roles:
+    - name: develop
+      grantedAt: current
+    name: Squad_X
