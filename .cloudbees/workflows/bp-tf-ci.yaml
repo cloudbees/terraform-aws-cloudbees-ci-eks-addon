@@ -12,7 +12,7 @@ on:
   workflow_dispatch:
 
 env:
-  AWS_REGION: "us-west-2"
+  AWS_REGION: "us-east-1"
   BUCKET_NAME_TF_STATE: "cbci-eks-addon-tf-state-v2"
   AWS_ROLE_TO_ASSUME: "infra-admin-ci"
   TF_AUTO_VARS_FILE: |
