@@ -269,6 +269,7 @@ module "eks_blueprints_addons" {
     create          = true
     use_name_prefix = true # Set this to true to enable name prefix
     name_prefix     = "eks-cluster-logs-"
+    retention       = local.cloudwatch_logs_expiration_days
   }
   aws_for_fluentbit = {
     #Enable Container Insights just for troubleshooting
