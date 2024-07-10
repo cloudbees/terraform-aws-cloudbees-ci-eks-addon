@@ -141,6 +141,8 @@ jobs:
       run : |
         cat <<EOT >> blueprints/${{ env.ROOT }}/.auto.tfvars
         ${{ env.TF_AUTO_VARS_FILE }}
+        gh_user = "exampleUser"
+        gh_token = "ExampleToken1234"
         EOT
         cat <<EOT >> blueprints/${{ env.ROOT }}/backend.tf
         terraform {
@@ -150,11 +152,6 @@ jobs:
             region = "${{ env.AWS_REGION }}"
           }
         }
-        EOT
-        cat <<EOT >> blueprints/${{ env.ROOT }}/k8s/secrets-values.yml
-        secJenkinsPass: "admin_pass" # Required. Do not update!
-        secGithubUser: "exampleUser"
-        secGithubToken: "ExampleToken"
         EOT
         [ "${{ env.CLEAN_UP }}" = "true" ] && echo "Skipping... Clean up mode." || CI=true make deploy
 
