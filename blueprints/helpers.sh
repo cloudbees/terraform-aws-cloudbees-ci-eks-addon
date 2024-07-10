@@ -40,7 +40,7 @@ bpAgent-dRun (){
 }
 
 ask-confirmation () {
-  local msg=$1
+  local msg="$1"
   INFO "Asking for your confirmation to $msg. [yes/No]"
 	read -r ans && [ "$ans" = "yes" ]
 }
@@ -72,14 +72,14 @@ retry () {
 }
 
 tf-output () {
-  local root=$1
-  local output=$2
+  local root="$1"
+  local output="$2"
   terraform -chdir="$SCRIPTDIR/$root" output -raw "$output" 2> /dev/null
 }
 
 #https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#deploy
 tf-apply () {
-  local root=$1
+  local root="$1"
   export TF_LOG_PATH="$SCRIPTDIR/$root/terraform.log"
   retry 3 "terraform -chdir=$SCRIPTDIR/$root apply -target=module.vpc -auto-approve"
   retry 3 "terraform -chdir=$SCRIPTDIR/$root apply -target=module.eks -auto-approve"
@@ -89,7 +89,7 @@ tf-apply () {
 
 #https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#destroy
 tf-destroy () {
-  local root=$1
+  local root="$1"
   export TF_LOG_PATH="$SCRIPTDIR/$root/terraform.log"
   retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.eks_blueprints_addon_cbci -auto-approve"
   retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.eks_blueprints_addons -auto-approve"
@@ -99,7 +99,7 @@ tf-destroy () {
 }
 
 probes () {
-  local root=$1
+  local root="$1"
   local wait=5
   eval "$(tf-output "$root" kubeconfig_export)"
   until [ "$(eval "$(tf-output "$root" cbci_oc_pod)" | awk '{ print $3 }' | grep -v STATUS | grep -v -c Running)" == 0 ]; do sleep 10 && echo "Waiting for Operation Center Pod to get ready..."; done ;\
@@ -167,7 +167,7 @@ test-all () {
 }
 
 clean() {
-  local root=$1
+  local root="$1"
   cd "$SCRIPTDIR/$root" && \
     rm -rf ".terraform" && \
 	  rm -f ".terraform.lock.hcl" "k8s/kubeconfig_*.yaml"  "terraform.output" "terraform.log" "tfplan.txt"
@@ -187,8 +187,8 @@ set-kube-env () {
 }
 
 set-casc-location () {
-  local endpoint=$1
-  local branch=$2
+  local endpoint="$1"
+  local branch="$2"
   #Endpoint
   sed -i "s|scmRepo: .*|scmRepo: \"$endpoint\"|g" "$SCRIPTDIR/02-at-scale/k8s/cbci-values.yml"
   sed -i "s|scmCascMmStore: .*|scmCascMmStore: \"$endpoint\"|g" "$SCRIPTDIR/02-at-scale/casc/oc/variables/variables.yaml"
@@ -197,4 +197,20 @@ set-casc-location () {
   sed -i "s|cascBranch: .*|cascBranch: $branch|g" "$SCRIPTDIR/02-at-scale/casc/oc/variables/variables.yaml"
   sed -i "s|bundle: \".*/none-ha\"|bundle: \"$branch/none-ha\"|g" "$SCRIPTDIR/02-at-scale/casc/oc/items/root.yaml"
   sed -i "s|bundle: \".*/ha\"|bundle: \"$branch/ha\"|g" "$SCRIPTDIR/02-at-scale/casc/oc/items/root.yaml"
+}
+
+run-aws-nuke () {
+  local dry_run="$1"
+  local aws_nuke_file="$SCRIPTDIR/../.cloudbees/aws-nuke/bp-tf-ci-nuke.yaml"
+  local aws_nuke_file_log="$SCRIPTDIR/../.cloudbees/aws-nuke/aws-nuke.log"
+  if [ "$dry_run" == "true" ]; then
+    INFO "Running AWS Nuke in Dry Run Mode..."
+    rm "$aws_nuke_file_log" || INFO "No log file to remove."
+    aws-nuke -c "$aws_nuke_file" | tee "$aws_nuke_file_log"
+    INFO "Listing candidated resources to be deleted by using $aws_nuke_file"
+    grep "remove" "$aws_nuke_file_log" ||  INFO "No candidates to delete."
+  else
+    WARN "Running AWS Nuke in Not Dry Run Mode..."
+    aws-nuke -c "$aws_nuke_file" --no-dry-run
+  fi
 }
