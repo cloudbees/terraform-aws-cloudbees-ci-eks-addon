@@ -100,7 +100,8 @@ resource "time_static" "epoch" {
 # CloudBees CI Add-ons
 
 module "eks_blueprints_addon_cbci" {
-  source = "../../"
+  source  = "cloudbees/cloudbees-ci-eks-addon/aws"
+  version = ">= 3.18072.0"
 
   depends_on = [module.eks_blueprints_addons]
 
