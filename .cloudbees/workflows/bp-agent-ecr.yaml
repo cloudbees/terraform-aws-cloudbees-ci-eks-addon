@@ -4,17 +4,18 @@ apiVersion: automation.cloudbees.io/v1alpha1
 kind: workflow
 name: agent
 
-#TODO: Replace by pull-request when it is supported
 on:
-  push:
-    branches:
-      - 'main'
+  # Enable once Issue #83 is solved
+  # pull_request:
+  #   branches:
+  #     - 'main'
+  workflow_dispatch:
 
 env:
   REGISTRY: public.ecr.aws/r1n1q0e5
   RESPOSITORY: cloudbees-labs/tf-aws-cb-ci-eks-addon-agent
   VERSION: latest
-  AWS_REGION: us-east-1
+  AWS_REGION: us-west-2
   DOCKERFILE: .docker/agent/agent.root.Dockerfile
 
 jobs:

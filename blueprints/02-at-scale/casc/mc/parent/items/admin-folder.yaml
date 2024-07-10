@@ -50,7 +50,7 @@ items:
             bucketName: "${sec_s3bucketName}"
             sse: true
             bucketFolder: cbci/backup
-            region: us-east-1
+            region: "${sec_awsRegion}"
     description: 'Validates the restore functionality of the CloudBees Backup plugin.'
     displayName: restore
   - kind: folder

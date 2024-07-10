@@ -42,3 +42,10 @@ variable "ci" {
   default     = false
   type        = bool
 }
+
+#Check number of AZ: aws ec2 describe-availability-zones --region var.aws_region
+variable "aws_region" {
+  description = "AWS region to deploy resources to. It requires at minimun 3 AZs."
+  type        = string
+  default     = "us-west-2"
+}

@@ -2,11 +2,11 @@ data "aws_route53_zone" "this" {
   name = var.hosted_zone
 }
 
+data "aws_availability_zones" "available" {}
+
 locals {
-  name   = var.suffix == "" ? "cbci-bp02" : "cbci-bp02-${var.suffix}"
-  region = "us-east-1"
-  #Number of AZs per region https://docs.aws.amazon.com/ram/latest/userguide/working-with-az-ids.html
-  azs = ["${local.region}a", "${local.region}b", "${local.region}c"]
+  name = var.suffix == "" ? "cbci-bp02" : "cbci-bp02-${var.suffix}"
+
 
   vpc_name              = "${local.name}-vpc"
   cluster_name          = "${local.name}-eks"
@@ -21,6 +21,7 @@ locals {
   hibernation_monitor_url = "https://hibernation-${module.eks_blueprints_addon_cbci.cbci_namespace}.${module.eks_blueprints_addon_cbci.cbci_domain_name}"
 
   vpc_cidr = "10.0.0.0/16"
+  azs      = slice(data.aws_availability_zones.available.names, 0, 3)
 
   mng = {
     cbci_apps = {
@@ -120,6 +121,7 @@ module "eks_blueprints_addon_cbci" {
   k8s_secrets = templatefile("k8s/secrets-values.yml", {
     global_password = local.global_password
     s3bucketName    = local.bucket_name
+    awsRegion       = var.aws_region
     adminMail       = var.trial_license["email"]
     githubUser      = var.gh_user
     githubToken     = var.gh_token
@@ -267,13 +269,14 @@ module "eks_blueprints_addons" {
     create          = true
     use_name_prefix = true # Set this to true to enable name prefix
     name_prefix     = "eks-cluster-logs-"
+    retention       = local.cloudwatch_logs_expiration_days
   }
   aws_for_fluentbit = {
     #Enable Container Insights just for troubleshooting
     #https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/ContainerInsights.html
     enable_containerinsights = false
     values = [templatefile("k8s/aws-for-fluent-bit-values.yml", {
-      region             = local.region
+      region             = var.aws_region
       bucketName         = module.cbci_s3_bucket.s3_bucket_id
       log_retention_days = local.cloudwatch_logs_expiration_days
     })]
@@ -649,7 +652,7 @@ resource "terraform_data" "create_kubeconfig" {
   triggers_replace = var.ci ? [timestamp()] : []
 
   provisioner "local-exec" {
-    command = "aws eks update-kubeconfig --name ${module.eks.cluster_name} --region ${local.region} --kubeconfig ${local.kubeconfig_file_path}"
+    command = "aws eks update-kubeconfig --name ${module.eks.cluster_name} --region ${var.aws_region} --kubeconfig ${local.kubeconfig_file_path}"
   }
 }
 

@@ -6,7 +6,7 @@ output "kubeconfig_export" {
 
 output "kubeconfig_add" {
   description = "Add kubeconfig to the local configuration to access the Kubernetes API."
-  value       = "aws eks update-kubeconfig --region ${local.region} --name ${local.cluster_name}"
+  value       = "aws eks update-kubeconfig --region ${var.aws_region} --name ${local.cluster_name}"
 }
 
 output "cbci_helm" {
@@ -132,17 +132,17 @@ output "efs_arn" {
 
 output "efs_access_points" {
   description = "Amazon EFS access points."
-  value       = "aws efs describe-access-points --file-system-id ${module.efs.id} --region ${local.region}"
+  value       = "aws efs describe-access-points --file-system-id ${module.efs.id} --region ${var.aws_region}"
 }
 
 output "aws_backup_efs_protected_resource" {
   description = "AWS description for the Amazon EFS drive that is used to back up protected resources."
-  value       = "aws backup describe-protected-resource --resource-arn ${module.efs.arn} --region ${local.region}"
+  value       = "aws backup describe-protected-resource --resource-arn ${module.efs.arn} --region ${var.aws_region}"
 }
 
 output "aws_logstreams_fluentbit" {
   description = "AWS CloudWatch log streams from Fluent Bit."
-  value       = "aws logs describe-log-streams --log-group-name /aws/eks/${local.cluster_name}/aws-fluentbit-logs --order-by LastEventTime --no-descending --query 'logStreams[?creationTime > `${local.epoch_millis}` ]' --region ${local.region}"
+  value       = "aws logs describe-log-streams --log-group-name /aws/eks/${local.cluster_name}/aws-fluentbit-logs --order-by LastEventTime --no-descending --query 'logStreams[?creationTime > `${local.epoch_millis}` ]' --region ${var.aws_region}"
 }
 
 output "velero_backup_schedule" {

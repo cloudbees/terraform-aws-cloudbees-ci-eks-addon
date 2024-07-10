@@ -17,3 +17,5 @@ gh_token = "ExampleToken1234" # Required. Default values can be used for demo.
 # }
 
 # suffix = my-demo #Optional
+
+# aws_region = "us-west-2" #Optional

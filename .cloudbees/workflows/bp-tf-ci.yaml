@@ -13,7 +13,7 @@ on:
 
 env:
   AWS_REGION: "us-east-1"
-  BUCKET_NAME_TF_STATE: "cbci-eks-addon-tf-state"
+  BUCKET_NAME_TF_STATE: "cbci-eks-addon-tf-state-v2"
   AWS_ROLE_TO_ASSUME: "infra-admin-ci"
   TF_AUTO_VARS_FILE: |
     tags = {
@@ -27,7 +27,7 @@ env:
       email = "ci.user@cloudbees.io"
       company = "CloudBees Inc."
     }
-    suffix = "ci-v10"
+    suffix = "ci-v11"
     ci = true
 
 jobs:
@@ -55,7 +55,7 @@ jobs:
 
   bp01:
     env:
-      CLEAN_UP: "true"
+      CLEAN_UP: "false"
     needs:
       - init
     steps:
@@ -114,7 +114,7 @@ jobs:
 
   bp02:
     env:
-        CLEAN_UP: "true"
+        CLEAN_UP: "false"
     needs:
       - init
     steps:
@@ -141,6 +141,8 @@ jobs:
       run : |
         cat <<EOT >> blueprints/${{ env.ROOT }}/.auto.tfvars
         ${{ env.TF_AUTO_VARS_FILE }}
+        gh_user = "exampleUser"
+        gh_token = "ExampleToken1234"
         EOT
         cat <<EOT >> blueprints/${{ env.ROOT }}/backend.tf
         terraform {
@@ -150,11 +152,6 @@ jobs:
             region = "${{ env.AWS_REGION }}"
           }
         }
-        EOT
-        cat <<EOT >> blueprints/${{ env.ROOT }}/k8s/secrets-values.yml
-        secJenkinsPass: "admin_pass" # Required. Do not update!
-        secGithubUser: "exampleUser"
-        secGithubToken: "ExampleToken"
         EOT
         [ "${{ env.CLEAN_UP }}" = "true" ] && echo "Skipping... Clean up mode." || CI=true make deploy
 

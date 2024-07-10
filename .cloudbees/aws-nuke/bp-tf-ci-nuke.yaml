@@ -1,5 +1,6 @@
 regions:
 - us-east-1
+- us-west-2
 - global
 
 account-blocklist:
@@ -122,7 +123,7 @@ accounts:
       - property: 'Name'
         type: contains
         value: "-ci-"
-        invert: true  
+        invert: true
       RDSSnapshot:
       - property: 'tag:cb-user'
         type: exact
