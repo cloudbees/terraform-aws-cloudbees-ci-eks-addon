@@ -1,0 +1,20 @@
+apiVersion: automation.cloudbees.io/v1alpha1
+kind: workflow
+name: My workflow
+
+on:
+  push:
+    branches:
+      - '**'
+
+jobs:
+  stage:
+    steps:
+      - name: Dump GitHub context
+        uses: docker://cgr.dev/chainguard/wolfi-base:latest
+        env:
+          CLOUDBEES_CONTEXT: ${{ toJSON(cloudbees) }}
+        run: |
+          echo "----- CONTEXT ------"
+          echo "cloudbees.scm.sha: ${{ cloudbees.scm.sha }}"
+          echo "$CLOUDBEES_CONTEXT"
