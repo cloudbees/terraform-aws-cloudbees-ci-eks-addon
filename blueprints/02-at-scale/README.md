@@ -38,16 +38,17 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
 
 This blueprint divides scalable node groups for different types of workloads:
 
-- Shared node group services: For common/shared workloads using [Amazon EKS-Optimized Amazon Linux 2023](https://aws.amazon.com/blogs/containers/amazon-eks-optimized-amazon-linux-2023-amis-now-available/) Amazon Machine Image (AMI) type.
+- Shared node group services (role: `shared`): For common/shared workloads using [Amazon EKS-Optimized Amazon Linux 2023](https://aws.amazon.com/blogs/containers/amazon-eks-optimized-amazon-linux-2023-amis-now-available/) Amazon Machine Image (AMI) type.
 - CloudBees CI node groups:
-  - Services instance type: [AWS Graviton Processor](https://aws.amazon.com/ec2/graviton/) and [Bottlerocket OS](https://aws.amazon.com/bottlerocket/) AMI type.
-    - It uses an [instance profile](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2_instance-profiles.html) for operating with AWS Services. However, the recommended options are explained in [#56](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/issues/56).
-  - Ephemeral agents:
-    - Linux: [AWS Graviton Processor](https://aws.amazon.com/ec2/graviton/) and [Bottlerocket OS](https://aws.amazon.com/bottlerocket/) AMI type and includes on-demand and Spot capacity types. The Spot agent node groups follow the principles described in [Building for Cost Optimization and Resilience for EKS with Spot Instances](https://aws.amazon.com/blogs/compute/cost-optimization-and-resilience-eks-with-spot-instances/).
-    - Windows: Windows 2019 AMI type.
+  - CI Services (role: `cb-apps`)
+    - Services instance type: [AWS Graviton Processor](https://aws.amazon.com/ec2/graviton/) and [Bottlerocket OS](https://aws.amazon.com/bottlerocket/) AMI type.
+    - It uses an [instance profile](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2_instance-profiles.html) for operating with AWS Services permissions (eg. s3 Buckets). However, the recommended options are explained in [Issue 56](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/issues/56).
+  - CI Agents (Ephemeral):
+    - Linux: [AWS Graviton Processor](https://aws.amazon.com/ec2/graviton/) and [Bottlerocket OS](https://aws.amazon.com/bottlerocket/) AMI type and includes on-demand (role: `build-linux`) and Spot (role: `build-linux-spot`) capacity types. The Spot agent node groups follow the principles described in [Building for Cost Optimization and Resilience for EKS with Spot Instances](https://aws.amazon.com/blogs/compute/cost-optimization-and-resilience-eks-with-spot-instances/).
+    - Windows (role: `build-windows`): Windows 2019 AMI type.
 
-> [!NOTE]
-> If your user credentials do not include an AWS identity and IAM permissions, the credentials validation from the CloudBees CI UI will fail.
+> [!IMPORTANT]
+> It is known that Linux container lunch time are faster than Windows container. That reality can be improved by using a cache container image strategy (see [Speeding up Windows container launch times with EC2 Image builder and image cache strategy](https://aws.amazon.com/blogs/containers/speeding-up-windows-container-launch-times-with-ec2-image-builder-and-image-cache-strategy/) and more about [Windows Container Best Practices](https://aws.github.io/aws-eks-best-practices/windows/docs/ami/)). Alternatively to Windows Containes, it is possible to use Windows VMs using [Shared Agent](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/shared-agents).
 
 ![Architecture](img/at-scale.architect.drawio.svg)
 
@@ -153,7 +154,7 @@ Once the resources have been created, a `kubeconfig` file is created in the [/k8
 > [!NOTE]
 > There are differences in CloudBees CI permissions and folder restrictions when signed in as a user of the Admin group versus the Development group. For example, only Admin users have access to the agent validation jobs.
 
-1. CasC is enabled for the [operations center](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/) (`cjoc`) and [controllers](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-controller/) (`team-b` and `team-c-ha`). `team-a` is not using CasC, to illustrate the difference between the two approaches. Issue the following command to verify that all controllers are in a `Running` state:
+3. CasC is enabled for the [operations center](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/) (`cjoc`) and [controllers](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-controller/) (`team-b` and `team-c-ha`). `team-a` is not using CasC, to illustrate the difference between the two approaches. Issue the following command to verify that all controllers are in a `Running` state:
 
    ```sh
    eval $(terraform output --raw cbci_controllers_pods)
@@ -161,13 +162,15 @@ Once the resources have been created, a `kubeconfig` file is created in the [/k8
 
    If successful, it should indicate that 2 replicas are running for `team-c-ha` since [CloudBees CI HA/HS](https://docs.cloudbees.com/docs/cloudbees-ci/latest/ha-install-guide/) is enabled on this controller.
 
-2. Issue the following command to verify that horizontal pod autoscaling is enabled for `team-c-ha`:
+4. Issue the following command to verify that horizontal pod autoscaling is enabled for `team-c-ha`:
 
    ```sh
    eval $(terraform output --raw cbci_controller_c_hpa)
    ```
 
-3. Issue the following command to retrieve an [API token](https://docs.cloudbees.com/docs/cloudbees-ci-api/latest/api-authentication) for the `admin_cbci_a` user with the correct permissions for the required actions:
+#### Builds
+
+1. For the following validations, builds will be triggered remotely. Start by issuing the following command to retrieve an [API token](https://docs.cloudbees.com/docs/cloudbees-ci-api/latest/api-authentication) for the `admin_cbci_a` user with the correct permissions for the required actions:
 
    ```sh
    eval $(terraform output --raw cbci_oc_export_admin_crumb) && \
@@ -181,31 +184,35 @@ Once the resources have been created, a `kubeconfig` file is created in the [/k8
    eval $(terraform output --raw cbci_liveness_probe_ext)
    ```
 
-4. Once you have retrieved the API token, issue the following commands to remotely trigger builds using the [POST queue for hibernation API endpoint](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#_post_queue_for_hibernation). If successful, an `HTTP/2 201` response is returned, indicating the REST API call has been correctly received by the CloudBees CI controller.
+2. Once you have retrieved the API token, issue the following commands to trigger builds using the [POST queue for hibernation API endpoint](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#_post_queue_for_hibernation). If successful, an `HTTP/2 201` response is returned, indicating the REST API call has been correctly received by the CloudBees CI controller.
 
-- `ws-cache` pipeline from `team-b` using Linux Nodes Pools:
+- For Linux node pools use:
 
    ```sh
    eval $(terraform output --raw cbci_controller_b_ws_cache_build)
    ```
 
-This pipeline uses [CloudBees Workspace Caching](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-cache-step). Once the second build is complete, you can find the read cache operation at the beginning of the build logs and the write cache operation at the end of the build logs.
+   It triggers `ws-cache` pipeline from `team-b` controller. This pipeline uses [CloudBees Workspace Caching](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-cache-step). Once the second build is complete, you can find the read cache operation at the beginning of the build logs and the write cache operation at the end of the build logs.
 
-- `windows-build-nodes` pipeline from `team-c-ha` using Windows Nodes Pools:
+   Note that this pipeline uses the On-Demand Linux Node Pool but there is also Spot Linux Node Pool available.
 
+- For Windows node pool use:
+  
    ```sh
    eval $(terraform output --raw cbci_controller_c_windows_node_build)
    ```
 
-The first build for a new Windows image container takes up to 10 minutes to run; subsequent builds should take seconds to run.
+   It triggers `windows-build-nodes` pipeline from `team-c-ha` controller.
 
-7. Right after triggering the builds, issue the following to validate pod agent provisioning to build the pipeline code:
+   Note that the first build for a new Windows image container can take up to 10 minutes to run; subsequent builds should take seconds to run. This behavior can be improved as explained in the section [Architecture](#architecture).
+
+3. Right after triggering the builds, issue the following to validate pod agent provisioning to build the pipeline code:
 
    ```sh
    eval $(terraform output --raw cbci_agents_pods)
    ```
 
-8. Check build logs by signing in to the `team-b` and `team-c-ha` controllers, respectively. Navigate to the pipeline jobs and select the first build, indicated by the `#1` build number. [CloudBees Pipeline Explorer](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-pipeline-explorer-plugin) is enabled as a default.
+4. Check build logs by signing in to the `team-b` and `team-c-ha` controllers, respectively. Navigate to the pipeline jobs and select the first build, indicated by the `#1` build number. [CloudBees Pipeline Explorer](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-pipeline-explorer-plugin) is enabled as a default.
 
 #### Back up and restore
 
