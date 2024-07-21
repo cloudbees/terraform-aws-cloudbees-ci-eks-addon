@@ -6,3 +6,4 @@ variables:
   - ldapRootDN: "dc=acme,dc=org"
   - ldapServer: "openldap-stack.auth.svc.cluster.local"
   - ldapUserSearch: "cn={0}"
+  - vault_url: "http://vault.vault.svc.cluster.local:8200"
