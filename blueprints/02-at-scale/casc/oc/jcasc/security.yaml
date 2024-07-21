@@ -13,17 +13,15 @@ jenkins:
   crumbIssuer:
     standard:
       excludeClientIPFromCrumb: true
-# globalCredentialsConfiguration:
-#   vaultGlobalConfiguration:
-#     authentications:
-#     - appRoleAuthentication:
-#         id: "cloudbees"
-#         roleId: "REPLACE_ME"
-#         secretId: "REPLACE_ME"
-#     clusterConsistency:
-#       mode: RETRY
-#     skipSslVerification: true
-#     url: "${vault_url}"
+globalCredentialsConfiguration:
+  vaultGlobalConfiguration:
+    authentications:
+    - appRoleAuthentication:
+        id: "cloudbees"
+        roleId: "REPLACE_ME"
+        secretId: "REPLACE_ME"
+    skipSslVerification: true
+    url: "${vault_url}"
 credentials:
   system:
     domainCredentials:
