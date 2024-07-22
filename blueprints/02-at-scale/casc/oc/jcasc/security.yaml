@@ -17,7 +17,7 @@ globalCredentialsConfiguration:
   vaultGlobalConfiguration:
     authentications:
     - appRoleAuthentication:
-        id: "cloudbees"
+        id: "cbci-oc"
         roleId: "REPLACE_ME"
         secretId: "REPLACE_ME"
     skipSslVerification: true
