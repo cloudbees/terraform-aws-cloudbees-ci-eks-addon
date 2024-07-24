@@ -16,7 +16,7 @@ approle="cbci-oc"
 kubectl exec -it vault-0 -n "$vault_ns" -- vault operator init | tee "$HERE/vault-init.log" || echo "Vault already initialized"
 ## Useal the vault
 for i in {1..3}; do
-  read -r -p "INFO: Enter Unseal Key number $i: [press Enter]" key
+  read -r -p "INFO: Enter Unseal Key number $i [press Enter]: " key
   if [ -z "$key" ]; then
     echo "ERROR: Empty key is not allowed" && exit 1
   fi
