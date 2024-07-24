@@ -109,6 +109,8 @@ This blueprint divides scalable node groups for different types of workloads:
 | s3_cbci_arn | CloudBees CI Amazon S3 bucket ARN. |
 | s3_cbci_name | CloudBees CI Amazon S3 bucket name. It is required by CloudBees CI for workspace caching and artifact management. |
 | s3_list_objects | Recursively lists all objects stored in the Amazon S3 bucket. |
+| vault_configure | Provides access to Hashicorp Vault dashboard. It requires the root token from the vault_init output. |
+| vault_dashboard | Provides access to Hashicorp Vault dashboard. It requires the root token from the vault_init output. |
 | velero_backup_on_demand | Takes an on-demand Velero backup from the schedule for the selected controller that is using block storage. |
 | velero_backup_schedule | Creates a Velero backup schedule for the selected controller that is using block storage, and then deletes the existing schedule, if it exists. |
 | velero_restore | Restores the selected controller that is using block storage from a backup. |
