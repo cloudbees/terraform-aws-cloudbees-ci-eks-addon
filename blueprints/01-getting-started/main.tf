@@ -28,7 +28,7 @@ locals {
 # EKS: Add-ons
 ################################################################################
 
-# CloudBees CI Add-ons
+# CloudBees CI Add-on
 
 module "eks_blueprints_addon_cbci" {
   source  = "cloudbees/cloudbees-ci-eks-addon/aws"

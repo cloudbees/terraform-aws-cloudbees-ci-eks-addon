@@ -25,6 +25,7 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
   | [Helm Openldap](https://github.com/jp-gouin/helm-openldap/tree/master) | LDAP server for Kubernetes. |
   | [AWS Node Termination Handler](https://github.com/aws/aws-node-termination-handler) | Gracefully handles EC2 instance shutdown within Kubernetes. Note that this add-on is not compatible with managed instance groups. For more information, refer to [issue #23](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/issues/23). |
   | [Grafana Tempo](https://grafana.com/oss/tempo/) | Provides backend tracing for [Jenkins OpenTelemetry](https://plugins.jenkins.io/opentelemetry/). |
+  | [Hashicorp Vault](https://github.com/hashicorp/vault-helm) | Secrets management system that is integrated via [CloudBees HashiCorp Vault Plugin](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-secure-guide/hashicorp-vault-plugin). |
 
 - Cloudbees CI uses [Configuration as Code (CasC)](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/casc-intro) (refer to the [casc](casc) folder) to enable [exciting new features for streamlined DevOps](https://www.cloudbees.com/blog/cloudbees-ci-exciting-new-features-for-streamlined-devops) and other enterprise features, such as [CloudBees CI hibernation](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#_hibernation_in_managed_masters).
   - The operations center is using the [CasC Bundle Retriever](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/bundle-retrieval-scm).
@@ -151,10 +152,10 @@ Once the resources have been created, a `kubeconfig` file is created in the [/k8
    eval $(terraform output --raw global_password)
    ```
 
-> [!NOTE]
-> There are differences in CloudBees CI permissions and folder restrictions when signed in as a user of the Admin group versus the Development group. For example, only Admin users have access to the agent validation jobs.
+   > [!NOTE]
+   > There are differences in CloudBees CI permissions and folder restrictions when signed in as a user of the Admin group versus the Development group. For example, only Admin users have access to the agent validation jobs.
 
-3. CasC is enabled for the [operations center](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/) (`cjoc`) and [controllers](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-controller/) (`team-b` and `team-c-ha`). `team-a` is not using CasC, to illustrate the difference between the two approaches. Issue the following command to verify that all controllers are in a `Running` state:
+3. CasC is enabled for the [operations center](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/) (`cjoc`) and [controllers](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-controller/) (`team-b` and `team-c-ha`). `team-a` is not using CasC, to illustrate the difference between the two approaches. Issue the following command to verify that all controllers are Running:
 
    ```sh
    eval $(terraform output --raw cbci_controllers_pods)
@@ -167,6 +168,36 @@ Once the resources have been created, a `kubeconfig` file is created in the [/k8
    ```sh
    eval $(terraform output --raw cbci_controller_c_hpa)
    ```
+
+#### Secrets Management
+
+##### Kubernetes Secret
+
+The secrets key/value file defined in [k8s/secrets-values.yml](k8s/secrets-values.yml) is converted into a Kubernetes secret (`cbci-secrets`) and mounted into /run/secrets/ for Operation Center and Controllers to be consumed via CloudBees Casc. See [Configuration as Code - Handling Secrets - Kubernetes Secrets](https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/docs/features/secrets.adoc#kubernetes-secrets) for more information. Beyond the CloudBees CI Addon, Kubernetes secrets can be also created via [External Secret Operators](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/external-secrets/).
+
+> [!NOTE]
+> Kubernetes secrets can be also be retrived as Jenkins Credentials via using the [Kubernetes Credentials Provider plugin](https://jenkinsci.github.io/kubernetes-credentials-provider-plugin/).
+
+##### HashiCorp Vault
+
+HashiCorp Vault is used as a credential provider for CloudBees CI Pipelines in this blueprint.
+
+1. Run the configure Hashicorp Vault script. Keep in a safe place Admin Token and Unseal Keys (saved in `k8s/vault-init.log`) as well as Role ID and Secret ID for `cbci-oc` App Role.
+
+   ```sh
+   eval $(terraform output --raw vault_configure)
+   ```
+
+2. Access the HashiCorp Vault UI by issuing the following command. Enter the root token to log in from the _step 1_.
+
+   ```sh
+   eval $(terraform output --raw vault_dashboard)
+   ```
+
+3. Access with admin role to CloudBees CI Operation Center and complete the configuration for the CloudBees CI Vault Plugin by entering the Role ID and Secret ID for `cbci-oc` App Role from _step 1_ in _Manage Jenkins_ > _Credentials Providers_ > _HashiCorp Vault Credentials Provider_. Click on `Test Connection` to verify the inputs are right. Finally, move to `team-b` or `team-c-ha` to run the pipeline _admin_ > _validations_ > _vault-credentials_ and validate that credentials are fetched correctly from Hashicorp Vault.
+
+> [!NOTE]
+> Hashicorp Vault can be also be configured to be used for [Configuration as Code - Handling Secrets - Vault](https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/docs/features/secrets.adoc#hashicorp-vault-secret-source).
 
 #### Builds
 
