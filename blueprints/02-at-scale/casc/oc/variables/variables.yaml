@@ -1,7 +1,7 @@
 variables:
   - message: "Welcome to the CloudBees CI blueprint add-on: At scale!"
   - scmCascMmStore: "https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon.git"
-  - cascBranch: vault
+  - cascBranch: develop
   - ldapManagerDN: "cn=admin,dc=acme,dc=org"
   - ldapRootDN: "dc=acme,dc=org"
   - ldapServer: "openldap-stack.auth.svc.cluster.local"
