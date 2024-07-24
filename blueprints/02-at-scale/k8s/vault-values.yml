@@ -1,0 +1,43 @@
+# Copyright (c) CloudBees, Inc.
+
+#https://github.com/hashicorp/vault-helm/blob/main/values.yaml
+#https://artifacthub.io/packages/helm/hashicorp/vault
+
+global:
+  enabled: true
+injector:
+  enabled: true
+  metrics:
+    enabled: true
+  nodeSelector:
+    kubernetes.io/os: linux
+csi:
+  pod:
+    nodeSelector:
+      kubernetes.io/os: linux
+server:
+  auditStorage:
+    enabled: true
+  dataStorage:
+    enabled: true
+  nodeSelector:
+    kubernetes.io/os: linux
+  ha:
+    enabled: true
+    replicas: 1
+    raft:
+      enabled: true
+      config: |
+        ui = true
+
+        listener "tcp" {
+          tls_disable = 1
+          address = "[::]:8200"
+          cluster_address = "[::]:8201"
+        }
+
+        storage "raft" {
+          path = "/vault/data"
+        }
+
+        service_registration "kubernetes" {}

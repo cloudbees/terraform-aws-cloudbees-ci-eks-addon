@@ -1,2 +1,3 @@
 variables:
   - ot_endpoint: "http://tempo.kube-prometheus-stack.svc.cluster.local:4317"
+  - s3bucketPreffix: "cbci/"

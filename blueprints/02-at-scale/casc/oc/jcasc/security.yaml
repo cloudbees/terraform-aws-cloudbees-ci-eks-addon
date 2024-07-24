@@ -13,6 +13,15 @@ jenkins:
   crumbIssuer:
     standard:
       excludeClientIPFromCrumb: true
+globalCredentialsConfiguration:
+  vaultGlobalConfiguration:
+    authentications:
+    - appRoleAuthentication:
+        id: "cbci-oc"
+        roleId: "REPLACE_ME"
+        secretId: "REPLACE_ME"
+    skipSslVerification: true
+    url: "${vault_url}"
 credentials:
   system:
     domainCredentials:
@@ -29,3 +38,25 @@ credentials:
           id: "GH-ST-token"
           scope: GLOBAL
           secret: ${sec_githubToken}
+  cloudbeesHashicorpVault:
+    domainCredentials:
+    - credentials:
+      - vaultUsernamePassword:
+          description: "cbci-oc/secret-a"
+          id: "cbci-oc_secret-a"
+          passwordKey: "password"
+          usernameKey: "username"
+          vaultSecretEngine:
+            genericKV2SecretEngine:
+              authenticationId: "cbci-oc"
+              mountPath: "secret-v2"
+              path: "cbci-oc/secret-a"
+      - vaultSecretText:
+          description: "cbci-oc/secret-b"
+          id: "cbci-oc_secret-b"
+          secretKey: "secret"
+          vaultSecretEngine:
+            genericKV2SecretEngine:
+              authenticationId: "cbci-oc"
+              mountPath: "secret-v2"
+              path: "cbci-oc/secret-b"

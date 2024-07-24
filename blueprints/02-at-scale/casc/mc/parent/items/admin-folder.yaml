@@ -291,6 +291,32 @@ items:
                 }
             }
       description: 'Pipeline that demonstrates the usage of CloudBees Workspace Caching: https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-cache-step.'
+    - kind: pipeline
+      name: vault-credentials
+      concurrentBuild: true
+      definition:
+        cpsFlowDefinition:
+          sandbox: true
+          script: |
+            pipeline {
+                agent any
+                environment {
+                    U1=credentials('cbci-oc-secret-a')
+                    S1=credentials('cbci-oc_secret-b')
+                }
+                stages {
+                    stage('Print credentials') {
+                        steps {
+                            sh '''
+                                echo 'Printing credentials from Vault'
+                                echo $U1
+                                echo $S1
+                            '''
+                        }
+                    }
+                }
+            }
+      description: ''
     properties:
     - envVars: {}
     - itemRestrictions:
