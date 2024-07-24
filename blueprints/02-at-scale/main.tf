@@ -10,7 +10,7 @@ locals {
   # Infra
   ############
 
-  name = var.suffix == "" ? "cbci-bp02" : "cbci-bp02-${var.suffix}"
+  name                  = var.suffix == "" ? "cbci-bp02" : "cbci-bp02-${var.suffix}"
   vpc_name              = "${local.name}-vpc"
   cluster_name          = "${local.name}-eks"
   efs_name              = "${local.name}-efs"
@@ -22,8 +22,8 @@ locals {
   kubeconfig_file       = "kubeconfig_${local.name}.yaml"
   kubeconfig_file_path  = abspath("k8s/${local.kubeconfig_file}")
 
-  vpc_cidr = "10.0.0.0/16"
-  azs      = slice(data.aws_availability_zones.available.names, 0, 3)
+  vpc_cidr         = "10.0.0.0/16"
+  azs              = slice(data.aws_availability_zones.available.names, 0, 3)
   route53_zone_id  = data.aws_route53_zone.this.id
   route53_zone_arn = data.aws_route53_zone.this.arn
 
@@ -45,7 +45,7 @@ locals {
   fluentbit_s3_location = "${module.cbci_s3_bucket.s3_bucket_arn}/fluentbit"
   velero_s3_location    = "${module.cbci_s3_bucket.s3_bucket_arn}/velero"
 
-  epoch_millis = time_static.epoch.unix * 1000
+  epoch_millis                    = time_static.epoch.unix * 1000
   cloudwatch_logs_expiration_days = 7
   s3_objects_expiration_days      = 90
 
@@ -58,7 +58,7 @@ locals {
   # K8s Apps
   ############
 
-  global_password = random_string.global_pass_string.result
+  global_password      = random_string.global_pass_string.result
   global_pass_jsonpath = "'{.data.sec_globalPassword}'"
 
   bottlerocket_bootstrap_extra_args = <<-EOT
@@ -78,14 +78,14 @@ locals {
   velero_schedule_name              = "schedule-${local.velero_controller_backup}"
 
   hibernation_monitor_url = "https://hibernation-${module.eks_blueprints_addon_cbci.cbci_namespace}.${module.eks_blueprints_addon_cbci.cbci_domain_name}"
-  cbci_admin_user      = "admin_cbci_a"
-  cbci_agents_ns = "cbci-agents"
+  cbci_admin_user         = "admin_cbci_a"
+  cbci_agents_ns          = "cbci-agents"
   #K8S agent template name from the CasC bundle
   cbci_agent_linuxtempl   = "linux-mavenAndGo"
   cbci_agent_windowstempl = "windows-powershell"
-  
-  vault_ns = "vault"
-  vault_config_file_path  = abspath("k8s/vault-config.sh")
+
+  vault_ns               = "vault"
+  vault_config_file_path = abspath("k8s/vault-config.sh")
 }
 
 resource "random_string" "global_pass_string" {
@@ -321,13 +321,13 @@ module "eks_blueprints_addons" {
       })]
     }
     aws-node-termination-handler = {
-      name          = "aws-node-termination-handler"
-      namespace     = "kube-system"
+      name             = "aws-node-termination-handler"
+      namespace        = "kube-system"
       create_namespace = false
-      chart         = "aws-node-termination-handler"
-      chart_version = "0.21.0"
-      repository    = "https://aws.github.io/eks-charts"
-      values        = [file("k8s/aws-node-term-handler-values.yml")]
+      chart            = "aws-node-termination-handler"
+      chart_version    = "0.21.0"
+      repository       = "https://aws.github.io/eks-charts"
+      values           = [file("k8s/aws-node-term-handler-values.yml")]
     }
     grafana-tempo = {
       name             = "tempo"

@@ -230,7 +230,7 @@ HashiCorp Vault is used as a credential provider for CloudBees CI Pipelines in t
    Note that this pipeline uses the On-Demand Linux Node Pool but there is also Spot Linux Node Pool available.
 
 - For Windows node pool use:
-  
+
    ```sh
    eval $(terraform output --raw cbci_controller_c_windows_node_build)
    ```
