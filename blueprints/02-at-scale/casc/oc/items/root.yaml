@@ -35,7 +35,7 @@ items:
                 volumes:
                 - name: cbci-secrets
                   secret:
-                    secretName: cbci-secrets
+                    secretName: ${cascSecretsName}
                 containers:
                 - name: jenkins
                   env:
@@ -53,7 +53,7 @@ items:
               "cloudbees.prometheus": "true"
     properties:
       - configurationAsCode:
-          bundle: "develop/none-ha"
+          bundle: "cbci-agents-sec-docker/none-ha"
   # Casc, HA
   - kind: managedController
     name: team-c-ha
@@ -82,7 +82,7 @@ items:
                 volumes:
                 - name: cbci-secrets
                   secret:
-                    secretName: cbci-secrets
+                    secretName: ${cascSecretsName}
                 containers:
                 - name: jenkins
                   env:
@@ -100,4 +100,4 @@ items:
               "cloudbees.prometheus": "true"
     properties:
       - configurationAsCode:
-          bundle: "develop/ha"
+          bundle: "cbci-agents-sec-docker/ha"
