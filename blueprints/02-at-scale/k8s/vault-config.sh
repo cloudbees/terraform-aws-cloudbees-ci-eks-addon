@@ -25,7 +25,7 @@ done
 # https://developer.hashicorp.com/vault/tutorials/auth-methods/approle
 ## Login as admin using token
 kubectl exec -it vault-0 -n "$vault_ns" -- vault login
-## Create the secrets to be mapped from CloudBees CI
+## Create example secrets to be mapped from CloudBees CI
 kubectl exec -it vault-0 -n "$vault_ns" -- vault secrets enable --version=2 --path=secret-v2 kv || echo "Path is already enabled"
 kubectl exec -it vault-0 -n "$vault_ns" -- vault kv put "secret-v2/$approle/secret-a" username="userVaultExample" password="passw0rdVaultExample"
 kubectl exec -it vault-0 -n "$vault_ns" -- vault kv put "secret-v2/$approle/secret-b" secret="secretVaultExample"

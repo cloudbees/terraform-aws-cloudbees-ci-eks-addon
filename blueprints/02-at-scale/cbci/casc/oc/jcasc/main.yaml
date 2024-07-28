@@ -22,7 +22,7 @@ unclassified:
               - sparseCheckoutPaths:
                   extension:
                     sparseCheckoutPaths:
-                    - path: "/blueprints/02-at-scale/casc/mc/"
+                    - path: "/blueprints/02-at-scale/cbci/casc/mc/"
   cascAutoControllerProvisioning:
     provisionControllerOnCreation: true
   buildDiscarders:
