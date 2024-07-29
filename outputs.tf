@@ -40,7 +40,12 @@ output "cbci_liveness_probe_ext" {
   value       = "curl -sSf https://cjoc.${var.hosted_zone}/whoAmI/api/json?tree=authenticated > /dev/null"
 }
 
-output "cbci_secrets" {
-  description = "Optional. Kubernetes secrets name for CloudBees CI."
-  value       = local.create_secret ? kubernetes_secret.oc_secrets[0].metadata[0].name : "No secrets created"
+output "cbci_sec_casc" {
+  description = "Optional. Kubernetes secrets name for CloudBees CI Casc."
+  value       = local.create_secret_casc ? kubernetes_secret.cbci_sec_casc[0].metadata[0].name : "No secrets created"
+}
+
+output "cbci_sec_registry" {
+  description = "Optional. Kubernetes secrets name for CloudBees CI agents to autheticate to registry."
+  value       = local.create_secret_reg ? kubernetes_secret.cbci_sec_reg[0].metadata[0].name : "No secrets created"
 }
