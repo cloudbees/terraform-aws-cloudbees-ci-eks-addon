@@ -38,7 +38,6 @@ unclassified:
     endpoint: ${ot_endpoint}
   cascItemsConfiguration:
     variableInterpolationEnabledForAdmin: true
-    variableInterpolationEnabledForNonAdmin: true
 aws:
   s3:
     container: "${sec_s3bucketName}"
