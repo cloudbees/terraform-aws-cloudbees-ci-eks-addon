@@ -16,8 +16,8 @@ OperationsCenter:
     Retriever:
       Enabled: true
       scmRepo: "https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon.git"
-      scmBranch: develop
-      scmBundlePath: blueprints/02-at-scale/casc/oc
+      scmBranch: cbci-agents-sec-docker
+      scmBundlePath: blueprints/02-at-scale/cbci/casc/oc
       scmPollingInterval: PT20M
 Persistence:
   StorageClass: efs
