@@ -53,7 +53,7 @@ This blueprint divides scalable node groups for different types of workloads:
 
 ![Architecture](img/at-scale.architect.drawio.svg)
 
-### Kubernetes cluster
+### Workloads
 
 ![K8sApps](img/at-scale.k8s.drawio.svg)
 
@@ -81,6 +81,7 @@ This blueprint divides scalable node groups for different types of workloads:
 | aws_backup_efs_protected_resource | AWS description for the Amazon EFS drive that is used to back up protected resources. |
 | aws_logstreams_fluentbit | AWS CloudWatch log streams from Fluent Bit. |
 | cbci_agent_linuxtempl_events | Retrieves a list of events related to Linux template agents. |
+| cbci_agent_sec_reg | Retrieves the container registry secret deployed in the agents namespace. |
 | cbci_agent_windowstempl_events | Retrieves a list of events related to Windows template agents. |
 | cbci_agents_pods | Retrieves a list of agent pods running in the agents namespace. |
 | cbci_controller_b_ws_cache_build | team-b hibernation monitor endpoint to the build workspace cache. It expects CBCI_ADMIN_TOKEN as the environment variable. |
@@ -117,6 +118,13 @@ This blueprint divides scalable node groups for different types of workloads:
 | vpc_arn | VPC ID. |
 <!-- END_TF_DOCS -->
 
+## Prerequisites
+
+This blueprint uses [DockerHub](https://hub.docker.com/) as a Container Registry Service. Then, an existing DockerHub account is required (username, password and email).
+
+> [!TIP]
+> Use `docker login` to validate username and password.
+
 ## Deploy
 
 When preparing to deploy, you must complete the following steps:
@@ -148,14 +156,13 @@ Once the resources have been created, a `kubeconfig` file is created in the [/k8
 
 1. Complete the steps to [validate CloudBees CI](../01-getting-started/README.md#cloudbees-ci), if you have not done so already.
 
-2. Authentication in this blueprint is based on LDAP using the `cn` user (available in [k8s/openldap-stack-values.yml](./k8s/openldap-stack-values.yml)) and the global password. The authorization level defines a set of permissions configured using [RBAC](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-secure-guide/rbac). Additionally, the operations center and controller use [single sign-on (SS0)](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-secure-guide/using-sso). Issue the following command to retrieve the global password:
+2. Authentication in this blueprint is based on LDAP using the `cn` user (available in [k8s/openldap-stack-values.yml](./k8s/openldap-stack-values.yml)) and the global password. The authorization level defines a set of permissions configured using [RBAC](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-secure-guide/rbac). Additionally, the operations center and controller use [single sign-on (SS0)](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-secure-guide/using-sso), including a [fallback mechanism](https://docs.cloudbees.com/docs/cloudbees-ci-kb/latest/operations-center/how-ldap-plugin-works-on-cjoc-sso-context) that is enabled by default. Issue the following command to retrieve the global password (valid for all users):
 
    ```sh
    eval $(terraform output --raw global_password)
    ```
 
-   > [!NOTE]
-   > There are differences in CloudBees CI permissions and folder restrictions when signed in as a user of the Admin group versus the Development group. For example, only Admin users have access to the agent validation jobs.
+   There are differences in CloudBees CI permissions and folder restrictions when signed in as a user of the Admin group versus the Development group. For example, only Admin users have access to the agent validation jobs.
 
 3. CasC is enabled for the [operations center](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/) (`cjoc`) and [controllers](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-controller/) (`team-b` and `team-c-ha`). `team-a` is not using CasC, to illustrate the difference between the two approaches. Issue the following command to verify that all controllers are Running:
 
@@ -175,10 +182,26 @@ Once the resources have been created, a `kubeconfig` file is created in the [/k8
 
 ##### Kubernetes Secret
 
-The secrets key/value file defined in [k8s/secrets-values.yml](k8s/secrets-values.yml) is converted into a Kubernetes secret (`cbci-secrets`) and mounted into /run/secrets/ for Operation Center and Controllers to be consumed via CloudBees Casc. See [Configuration as Code - Handling Secrets - Kubernetes Secrets](https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/docs/features/secrets.adoc#kubernetes-secrets) for more information. Beyond the CloudBees CI Addon, Kubernetes secrets can be also created via [External Secret Operators](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/external-secrets/).
+Beyond the CloudBees CI Addon for demo purposes, Kubernetes secrets can be managed via [External Secret Operators](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/external-secrets/).
 
 > [!NOTE]
-> Kubernetes secrets can be also be retrived as Jenkins Credentials via using the [Kubernetes Credentials Provider plugin](https://jenkinsci.github.io/kubernetes-credentials-provider-plugin/).
+> Kubernetes secrets could be also be retrived as Jenkins Credentials via using the [Kubernetes Credentials Provider plugin](https://jenkinsci.github.io/kubernetes-credentials-provider-plugin/).
+
+###### Casc Secrets
+
+The secrets key/value file defined in [k8s/secrets-values.yml](k8s/secrets-values.yml) is converted into a Kubernetes secret (`cbci-sec-casc`) and mounted into /run/secrets/ for Operation Center and Controllers to be consumed via CloudBees Casc. See [Configuration as Code - Handling Secrets - Kubernetes Secrets](https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/docs/features/secrets.adoc#kubernetes-secrets) for more information.
+
+###### Container Registry Secrets
+
+DockerHub authentication is stored as Kubernetes secrets (`cbci-agent-sec-reg`) and mounted to [Kaniko agent containers](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/using-kaniko) to build and push images to the target container registry.
+
+```sh
+   eval $(terraform output --raw cbci_agent_sec_reg)
+```
+
+> [!NOTE]
+> - This blueprint uses DockerHub as an example but different container registries services can be used.
+> - Besides Kaniko, there are [other alternitives tools](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/using-kaniko#_alternatives).
 
 ##### HashiCorp Vault
 

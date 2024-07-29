@@ -7,8 +7,11 @@ trial_license = { # Required. CloudBees CI Trial license details for evaluation.
   company = "Acme Inc."
 }
 
-gh_user = "exampleUser" # Required. Default values can be used for demo.
-gh_token = "ExampleToken1234" # Required. Default values can be used for demo.
+dh_reg_secret_auth = { # Required.
+  username = "foo"
+  password = "d0ckerPass12"
+  email    = "foo.bar@acme.com"
+}
 
 # tags = {  # Optional. Tags for the resources created. Default set to empty. Shared among all.
 #   "cb-owner" : "team-services"

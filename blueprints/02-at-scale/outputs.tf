@@ -47,12 +47,12 @@ output "cbci_oc_url" {
 
 output "cbci_oc_export_admin_crumb" {
   description = "Exports the operations center cbci_admin_user crumb, to access the REST API when CSRF is enabled."
-  value       = "export CBCI_ADMIN_CRUMB=$(curl -s '${module.eks_blueprints_addon_cbci.cbci_oc_url}/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,%22:%22,//crumb)' --cookie-jar /tmp/cookies.txt --user ${local.cbci_admin_user}:$(kubectl get secret ${module.eks_blueprints_addon_cbci.cbci_secrets} -n ${module.eks_blueprints_addon_cbci.cbci_namespace} -o jsonpath=${local.global_pass_jsonpath} | base64 -d))"
+  value       = "export CBCI_ADMIN_CRUMB=$(curl -s '${module.eks_blueprints_addon_cbci.cbci_oc_url}/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,%22:%22,//crumb)' --cookie-jar /tmp/cookies.txt --user ${local.cbci_admin_user}:$(kubectl get secret ${module.eks_blueprints_addon_cbci.cbci_sec_casc} -n ${module.eks_blueprints_addon_cbci.cbci_namespace} -o jsonpath=${local.global_pass_jsonpath} | base64 -d))"
 }
 
 output "cbci_oc_export_admin_api_token" {
   description = "Exports the operations center cbci_admin_user API token to access the REST API when CSRF is enabled. It expects CBCI_ADMIN_CRUMB as the environment variable."
-  value       = "export CBCI_ADMIN_TOKEN=$(curl -s '${module.eks_blueprints_addon_cbci.cbci_oc_url}/user/${local.cbci_admin_user}/descriptorByName/jenkins.security.ApiTokenProperty/generateNewToken' --user ${local.cbci_admin_user}:$(kubectl get secret ${module.eks_blueprints_addon_cbci.cbci_secrets} -n ${module.eks_blueprints_addon_cbci.cbci_namespace} -o jsonpath=${local.global_pass_jsonpath} | base64 -d)  --data 'newTokenName=kb-token' --cookie /tmp/cookies.txt -H $CBCI_ADMIN_CRUMB | jq -r .data.tokenValue)"
+  value       = "export CBCI_ADMIN_TOKEN=$(curl -s '${module.eks_blueprints_addon_cbci.cbci_oc_url}/user/${local.cbci_admin_user}/descriptorByName/jenkins.security.ApiTokenProperty/generateNewToken' --user ${local.cbci_admin_user}:$(kubectl get secret ${module.eks_blueprints_addon_cbci.cbci_sec_casc} -n ${module.eks_blueprints_addon_cbci.cbci_namespace} -o jsonpath=${local.global_pass_jsonpath} | base64 -d)  --data 'newTokenName=kb-token' --cookie /tmp/cookies.txt -H $CBCI_ADMIN_CRUMB | jq -r .data.tokenValue)"
 }
 
 output "cbci_oc_take_backups" {
@@ -93,6 +93,11 @@ output "cbci_agent_linuxtempl_events" {
 output "cbci_agent_windowstempl_events" {
   description = "Retrieves a list of events related to Windows template agents."
   value       = "kubectl get events -n ${local.cbci_agents_ns} | grep -i pod/${local.cbci_agent_windowstempl}"
+}
+
+output "cbci_agent_sec_reg" {
+  description = "Retrieves the container registry secret deployed in the agents namespace."
+  value       = "kubectl get secret ${module.eks_blueprints_addon_cbci.cbci_sec_registry} -n ${local.cbci_agents_ns} -o jsonpath='{.data.*}' | base64 -d"
 }
 
 output "acm_certificate_arn" {
@@ -177,7 +182,7 @@ output "grafana_dashboard" {
 
 output "global_password" {
   description = "Random string that is used as the global password."
-  value       = "kubectl get secret ${module.eks_blueprints_addon_cbci.cbci_secrets} -n ${module.eks_blueprints_addon_cbci.cbci_namespace} -o jsonpath=${local.global_pass_jsonpath} | base64 -d"
+  value       = "kubectl get secret ${module.eks_blueprints_addon_cbci.cbci_sec_casc} -n ${module.eks_blueprints_addon_cbci.cbci_namespace} -o jsonpath=${local.global_pass_jsonpath} | base64 -d"
 }
 
 output "vault_configure" {

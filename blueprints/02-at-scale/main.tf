@@ -81,7 +81,7 @@ locals {
   cbci_admin_user         = "admin_cbci_a"
   cbci_agents_ns          = "cbci-agents"
   #K8S agent template name from the CasC bundle
-  cbci_agent_linuxtempl   = "linux-mavenAndGo"
+  cbci_agent_linuxtempl   = "linux-mavenAndKaniko-1G"
   cbci_agent_windowstempl = "windows-powershell"
 
   vault_ns               = "vault"
@@ -106,8 +106,9 @@ resource "time_static" "epoch" {
 # CloudBees CI Add-on
 
 module "eks_blueprints_addon_cbci" {
-  source  = "cloudbees/cloudbees-ci-eks-addon/aws"
-  version = ">= 3.18072.0"
+  # source  = "cloudbees/cloudbees-ci-eks-addon/aws"
+  # version = ">= 3.18072.0"
+  source = "../../"
 
   depends_on = [module.eks_blueprints_addons]
 
@@ -124,15 +125,23 @@ module "eks_blueprints_addon_cbci" {
     })]
   }
 
-  create_k8s_secrets = true
-  k8s_secrets = templatefile("k8s/secrets-values.yml", {
+  create_casc_secrets = true
+  casc_secrets_file = templatefile("k8s/secrets-values.yml", {
     global_password = local.global_password
     s3bucketName    = local.bucket_name
     awsRegion       = var.aws_region
     adminMail       = var.trial_license["email"]
-    githubUser      = var.gh_user
-    githubToken     = var.gh_token
   })
+
+  create_reg_secret = true
+  reg_secret_ns     = local.cbci_agents_ns
+  #Note: This blueprint tests DockerHub as container registry but different registries can be used.
+  reg_secret_auth = {
+    server   = "https://index.docker.io/v1/"
+    username = var.dh_reg_secret_auth["username"]
+    password = var.dh_reg_secret_auth["password"]
+    email    = var.dh_reg_secret_auth["email"]
+  }
 
   prometheus_target = true
 
