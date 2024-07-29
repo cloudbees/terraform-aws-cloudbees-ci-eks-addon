@@ -1,8 +1,8 @@
 kube:
   podTemplatesConfiguration:
     templates:
-    - name: "linux-mavenAndKaniko"
-      label: "linux-mavenAndKaniko"
+    - name: "linux-mavenAndKaniko-L"
+      label: "linux-mavenAndKaniko-L"
       nodeUsageMode: "NORMAL"
       yaml: |-
         apiVersion: "v1"
@@ -54,8 +54,8 @@ kube:
             key: "dedicated"
             operator: "Equal"
             value: "build-linux"
-    - name: "linux-mavenAndKaniko-max"
-      label: "linux-mavenAndKaniko-max"
+    - name: "linux-mavenAndKaniko-XL"
+      label: "linux-mavenAndKaniko-XL"
       nodeUsageMode: "NORMAL"
       yaml: |-
         apiVersion: "v1"

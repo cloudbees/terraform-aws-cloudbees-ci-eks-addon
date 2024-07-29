@@ -16,7 +16,7 @@ items:
         script: |-
           timeout(time: 1, unit: 'HOURS'){
               parallel([0, 1].collectEntries {b -> ["branch-$b", {
-                podTemplate  (inheritFrom: 'linux-mavenAndGo') {
+                podTemplate  (inheritFrom: 'linux-mavenAndKaniko-L') {
                   node(POD_LABEL) {
                       retry (3) {
                         stage('prep') {
@@ -101,7 +101,7 @@ items:
           script: |-
             pipeline {
                 agent{
-                    label 'linux-maven-spot'
+                    label 'linux-mavenAndKaniko-XL'
                 }
                 options {
                     retry(3)
@@ -129,11 +129,6 @@ items:
                         }
                     }
                 }
-                post {
-                    failure {
-                        echo "Check Manage Jenkins > AWS > Amazon S3 Bucket Access settings matches with your s3 name terraform output!"
-                    }
-                }
             }
       description: 'It validates archives/unarchive s3 artifacts (https://plugins.jenkins.io/artifact-manager-s3/) from different pods agents in different build. It uses artifacts from upstream build.'
       displayName: downstream-artifact
@@ -150,14 +145,14 @@ items:
                     timeout(time: 1, unit: 'HOURS')
                 }
                 agent{
-                    label 'linux-mavenAndGo'
+                    label 'linux-mavenAndKaniko-L'
                 }
                 stages {
                     stage('Golang') {
                         stages {
                             stage ('Build'){
                                 steps {
-                                    container('go') {
+                                    container('kaniko') {
                                         sh '''
                                             echo "Build number ^${BUILD_NUMBER}" >> f_1
                                             go version >> f_1
@@ -167,7 +162,7 @@ items:
                             }
                             stage ('Archive f_1'){
                                 steps {
-                                    container('go') {
+                                    container('kaniko') {
                                         archiveArtifacts artifacts: 'f_1', fingerprint: true
                                     }
                                 }
@@ -206,11 +201,6 @@ items:
                                 }
                             }
                         }
-                    }
-                }
-                post {
-                    failure {
-                        echo "Check Manage Jenkins > AWS > Amazon S3 Bucket Access settings matches with your s3 name terraform output!"
                     }
                 }
             }
@@ -256,7 +246,7 @@ items:
                     timeout(time: 1, unit: 'HOURS')
                 }
                 agent{
-                    label 'linux-mavenAndGo'
+                    label 'linux-mavenAndKaniko-L'
                 }
                 environment {
                     MAVEN_PROJECT = 'https://github.com/jglick/simple-maven-project-with-tests'
@@ -284,9 +274,6 @@ items:
                 post {
                     success {
                         writeCache name: env.CACHE, includes: 'maven-repo/**'
-                    }
-                    failure {
-                        echo "Check Manage Jenkins > AWS > Amazon S3 Bucket Access settings matches with your s3 name terraform output!"
                     }
                 }
             }
