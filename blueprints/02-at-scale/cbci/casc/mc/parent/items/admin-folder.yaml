@@ -66,7 +66,7 @@ items:
           sandbox: true
           script: |-
             timeout(time: 1, unit: 'HOURS'){
-                podTemplate (inheritFrom: 'linux-mavenAndGo') {
+                podTemplate (inheritFrom: 'linux-mavenAndKaniko-L') {
                   retry (3) {
                       node(POD_LABEL) {
                         stage('beginning') {
@@ -77,7 +77,7 @@ items:
                   }
                 }
                 checkpoint 'middle'
-                podTemplate (inheritFrom: 'linux-maven-spot') {
+                podTemplate (inheritFrom: 'linux-mavenAndKaniko-XL') {
                   retry (3) {
                       node(POD_LABEL) {
                         stage('end') {
@@ -148,14 +148,14 @@ items:
                     label 'linux-mavenAndKaniko-L'
                 }
                 stages {
-                    stage('Golang') {
+                    stage('Maven') {
                         stages {
                             stage ('Build'){
                                 steps {
-                                    container('kaniko') {
+                                    container('maven') {
                                         sh '''
-                                            echo "Build number ^${BUILD_NUMBER}" >> f_1
-                                            go version >> f_1
+                                            echo "Build number ^^${BUILD_NUMBER}" >> f_1
+                                            mvn -version >> f_1
                                         '''
                                     }
                                 }
@@ -169,7 +169,7 @@ items:
                             }
                         }
                     }
-                    stage('Busybox') {
+                    stage('Kaniko') {
                         stages {
                             stage ("Unarchive"){
                                 steps {
@@ -184,9 +184,9 @@ items:
                             }
                             stage ('Build'){
                                 steps {
-                                    container('maven') {
+                                    container('kaniko') {
                                         dir ('unarchive'){
-                                            sh 'mvn -version >> f_2'
+                                            sh 'ls /kaniko/executor >> f_2'
                                         }
                                     }
                                 }
