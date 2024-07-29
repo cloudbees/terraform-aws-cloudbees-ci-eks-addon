@@ -36,6 +36,9 @@ unclassified:
     gracePeriod: 3600
   openTelemetry:
     endpoint: ${ot_endpoint}
+  cascItemsConfiguration:
+    variableInterpolationEnabledForAdmin: true
+    variableInterpolationEnabledForNonAdmin: true
 aws:
   s3:
     container: "${sec_s3bucketName}"
