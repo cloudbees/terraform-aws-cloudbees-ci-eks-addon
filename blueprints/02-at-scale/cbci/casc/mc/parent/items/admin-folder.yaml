@@ -303,12 +303,40 @@ items:
                     }
                 }
             }
-      description: ''
-    properties:
-    - envVars: {}
-    - itemRestrictions:
-        filter: false
-  properties:
-  - envVars: {}
-  - itemRestrictions:
-      filter: false
+      description: 'It validates that credentials from Vault are fetched correctly.'
+    - kind: pipeline
+      name: kaniko
+      concurrentBuild: true
+      definition:
+        cpsFlowDefinition:
+          sandbox: true
+          script: |
+            pipeline {
+              agent {
+                label 'linux-mavenAndKaniko-XL'
+              }
+              parameters {
+                string(name: 'TARGET_DH_ORG', description: 'DockerHub Organization to Push the image')
+              }
+              stages {
+                stage('Build with Kaniko') {
+                  steps {
+                    container(name: 'kaniko', shell: '/busybox/sh') {
+                      sh '''#!/busybox/sh
+                        echo "FROM jenkins/inbound-agent:latest" > Dockerfile
+                        /kaniko/executor --context `pwd` --destination $TARGET_DH_ORG/hello-kaniko:latest 
+                      '''
+                    }
+                  }
+                }
+              }
+            }
+      properties:
+      - parameters:
+          parameterDefinitions:
+          - string:
+              trim: false
+              name: TARGET_DH_ORG
+              description: DockerHub Organization to Push the image
+      resumeBlocked: false
+      description: 'It validates that Authentication for DockerHub and Kaniko is working fine.'
