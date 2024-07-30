@@ -250,7 +250,7 @@ HashiCorp Vault is used as a credential provider for CloudBees CI Pipelines in t
 
    It triggers `ws-cache` pipeline from `team-b` controller. This pipeline uses [CloudBees Workspace Caching](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-cache-step). Once the second build is complete, you can find the read cache operation at the beginning of the build logs and the write cache operation at the end of the build logs.
 
-   Note that this pipeline uses the On-Demand Linux Node Pool but there is also Spot Linux Node Pool available.
+   Note that this pipeline uses `linux-mavenAndKaniko-L` agent template deployed over On-demand Linux Nodes that have smaller instance types. On the other hand, `linux-mavenAndKaniko-XL` is deployed over Spot Linux Nodes that have larger instance types.
 
 - For Windows node pool use:
 
