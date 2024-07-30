@@ -45,7 +45,7 @@ kube:
                   name: ${regSecretsName}
                   items:
                     - key: .dockerconfigjson
-                      path: config.json
+                      path: config.json          
           nodeSelector:
             kubernetes.io/os: linux
             role: "build-linux"
@@ -103,11 +103,6 @@ kube:
               requests:
                 memory: "500Mi"
                 cpu: "250m"
-            env:
-            - name: AWS_SDK_LOAD_CONFIG
-              value: true
-            - name: AWS_EC2_METADATA_DISABLED
-              value: true
           volumes:
           - name: jenkins-docker-cfg
             projected:
