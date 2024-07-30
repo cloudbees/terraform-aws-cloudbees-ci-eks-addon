@@ -90,6 +90,24 @@ kube:
             volumeMounts:
             - name: jenkins-docker-cfg
               mountPath: /kaniko/.docker
+          - args:
+            - "99d"
+            command:
+            - "sleep"
+            image: "gcr.io/kaniko-project/executor:latest"
+            imagePullPolicy: Always
+            name: "kaniko-ecr"
+            resources:
+              limits:
+                memory: "2Gi"
+              requests:
+                memory: "500Mi"
+                cpu: "250m"
+            env:
+            - name: AWS_SDK_LOAD_CONFIG
+              value: true
+            - name: AWS_EC2_METADATA_DISABLED
+              value: true
           volumes:
           - name: jenkins-docker-cfg
             projected:
