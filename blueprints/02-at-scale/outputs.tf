@@ -70,9 +70,9 @@ output "cbci_controller_c_hpa" {
   value       = "kubectl get hpa team-c-ha -n ${module.eks_blueprints_addon_cbci.cbci_namespace}"
 }
 
-output "cbci_controller_b_ws_cache_build" {
-  description = "team-b hibernation monitor endpoint to the build workspace cache. It expects CBCI_ADMIN_TOKEN as the environment variable."
-  value       = "curl -i -XPOST -u ${local.cbci_admin_user}:$CBCI_ADMIN_TOKEN ${local.hibernation_monitor_url}/hibernation/queue/team-b/job/admin/job/validations/job/ws-cache/build"
+output "cbci_controller_b_s3_build" {
+  description = "team-b hibernation monitor endpoint to the build s3-WScacheAndArtifacts. It expects CBCI_ADMIN_TOKEN as the environment variable."
+  value       = "curl -i -XPOST -u ${local.cbci_admin_user}:$CBCI_ADMIN_TOKEN ${local.hibernation_monitor_url}/hibernation/queue/team-b/job/admin/job/validations/job/s3-WScacheAndArtifacts/build"
 }
 
 output "cbci_controller_c_windows_node_build" {
