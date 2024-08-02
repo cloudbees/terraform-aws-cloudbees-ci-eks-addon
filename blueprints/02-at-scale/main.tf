@@ -84,7 +84,7 @@ locals {
   cbci_admin_user         = "admin_cbci_a"
   cbci_agents_ns          = "cbci-agents"
   #K8S agent template name from the CasC bundle
-  cbci_agent_linuxtempl   = "linux-mavenAndKaniko-L"
+  cbci_agent_linuxtempl   = "linux-mavenAndKaniko-"
   cbci_agent_windowstempl = "windows-powershell"
 
   vault_ns               = "vault"
