@@ -83,7 +83,7 @@ This blueprint divides scalable node groups for different types of workloads:
 | cbci_agent_sec_reg | Retrieves the container registry secret deployed in the agents namespace. |
 | cbci_agent_windowstempl_events | Retrieves a list of events related to Windows template agents. |
 | cbci_agents_pods | Retrieves a list of agent pods running in the agents namespace. |
-| cbci_controller_b_ws_cache_build | team-b hibernation monitor endpoint to the build workspace cache. It expects CBCI_ADMIN_TOKEN as the environment variable. |
+| cbci_controller_b_s3_build | team-b hibernation monitor endpoint to the build s3-WScacheAndArtifacts. It expects CBCI_ADMIN_TOKEN as the environment variable. |
 | cbci_controller_c_hpa | team-c horizontal pod autoscaling. |
 | cbci_controller_c_windows_node_build | team-c hibernation monitor endpoint to the Windows build nodes. It expects CBCI_ADMIN_TOKEN as the environment variable. |
 | cbci_controllers_pods | Operations center pod for the CloudBees CI add-on. |
