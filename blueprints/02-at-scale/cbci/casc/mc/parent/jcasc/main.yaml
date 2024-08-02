@@ -42,7 +42,7 @@ aws:
   s3:
     container: "${sec_s3bucketName}"
     disableSessionToken: false
-    prefix: "${s3bucketPreffix}"
+    prefix: "${s3bucketPreffix}/"
     useHttp: false
     usePathStyleUrl: false
     useTransferAcceleration: false
