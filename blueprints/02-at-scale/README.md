@@ -68,8 +68,7 @@ This blueprint divides scalable node groups for different types of workloads:
 | trial_license | CloudBees CI trial license details for evaluation. | `map(string)` | n/a | yes |
 | aws_region | AWS region to deploy resources to. It requires at minimun 3 AZs. | `string` | `"us-west-2"` | no |
 | ci | Running in a CI service versus running locally. False when running locally, true when running in a CI service. | `bool` | `false` | no |
-| gh_token | GitHub token for the CloudBees operations center credential GH-User-token, that is created via CloudBees CasC. | `string` | `"ExampleToken1234"` | no |
-| gh_user | GitHub user for the CloudBees operations center credential GH-User-token, that is created via CloudBees CasC. | `string` | `"exampleUser"` | no |
+| dh_reg_secret_auth | Docker Hub Registry server authentication details for cbci-sec-reg secret. | `map(string)` | <pre>{<br>  "email": "foo.bar@acme.com",<br>  "password": "changeme1234",<br>  "username": "foo"<br>}</pre> | no |
 | suffix | Unique suffix to assign to all resources. When adding the suffix, changes are required in CloudBees CI for the validation phase. | `string` | `""` | no |
 | tags | Tags to apply to resources. | `map(string)` | `{}` | no |
 
@@ -182,10 +181,11 @@ Once the resources have been created, a `kubeconfig` file is created in the [/k8
 
 ##### Kubernetes Secret
 
-Beyond the CloudBees CI Addon for demo purposes, Kubernetes secrets can be managed via [External Secret Operators](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/external-secrets/).
+This blueprint uses a couple of Kubernetes secrets for different purposes.
 
 > [!NOTE]
-> Kubernetes secrets could be also be retrived as Jenkins Credentials via using the [Kubernetes Credentials Provider plugin](https://jenkinsci.github.io/kubernetes-credentials-provider-plugin/).
+> - Beyond the CloudBees CI Addon (for demo purposes), Kubernetes secrets can be managed via [External Secret Operators](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/external-secrets/).
+> - Kubernetes secrets could be also be retrived as Jenkins Credentials via using the [Kubernetes Credentials Provider plugin](https://jenkinsci.github.io/kubernetes-credentials-provider-plugin/).
 
 ###### Casc Secrets
 
@@ -193,15 +193,14 @@ The secrets key/value file defined in [k8s/secrets-values.yml](k8s/secrets-value
 
 ###### Container Registry Secrets
 
-DockerHub authentication is stored as Kubernetes secrets (`cbci-agent-sec-reg`) and mounted to [Kaniko agent containers](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/using-kaniko) to build and push images to the target container registry.
+DockerHub authentication is stored as Kubernetes secrets (`cbci-agent-sec-reg`) and mounted to [Kaniko agent containers](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/using-kaniko) to build and push images to this registry. The secret is created using the `dh_reg_secret_auth` variable.
 
 ```sh
    eval $(terraform output --raw cbci_agent_sec_reg)
 ```
 
 > [!NOTE]
-> - This blueprint uses DockerHub as an example but different container registries services can be used.
-> - Besides Kaniko, there are [other alternitives tools](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/using-kaniko#_alternatives).
+> ECR authentication is done via instance profile connected to `build-linux-spot` Node pools.
 
 ##### HashiCorp Vault
 
@@ -226,6 +225,8 @@ HashiCorp Vault is used as a credential provider for CloudBees CI Pipelines in t
 
 #### Builds
 
+##### Build Node Pools
+
 1. For the following validations, builds will be triggered remotely. Start by issuing the following command to retrieve an [API token](https://docs.cloudbees.com/docs/cloudbees-ci-api/latest/api-authentication) for the `admin_cbci_a` user with the correct permissions for the required actions:
 
    ```sh
@@ -242,25 +243,27 @@ HashiCorp Vault is used as a credential provider for CloudBees CI Pipelines in t
 
 2. Once you have retrieved the API token, issue the following commands to trigger builds using the [POST queue for hibernation API endpoint](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#_post_queue_for_hibernation). If successful, an `HTTP/2 201` response is returned, indicating the REST API call has been correctly received by the CloudBees CI controller.
 
-- For Linux node pools use:
+   - For Linux node pools use:
 
-   ```sh
-   eval $(terraform output --raw cbci_controller_b_ws_cache_build)
-   ```
+      ```sh
+      eval $(terraform output --raw cbci_controller_b_s3_build)
+      ```
 
-   It triggers `ws-cache` pipeline from `team-b` controller. This pipeline uses [CloudBees Workspace Caching](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-cache-step). Once the second build is complete, you can find the read cache operation at the beginning of the build logs and the write cache operation at the end of the build logs.
+      It triggers `s3-WScacheAndArtifacts` pipeline from `team-b` controller. This pipeline validates a couple of s3 integrations in parallel: one for [CloudBees Workspace Caching](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-cache-step) (using `linux-mavenAndKaniko-L`) and another for [s3 Artifact Manager](https://plugins.jenkins.io/artifact-manager-s3/) (using `linux-mavenAndKaniko-XL`).
 
-   Note that this pipeline uses `linux-mavenAndKaniko-L` agent template deployed over On-demand Linux Nodes that have smaller instance types. On the other hand, `linux-mavenAndKaniko-XL` is deployed over Spot Linux Nodes that have larger instance types.
+      Once the second build is complete, you can find the read cache operation at the beginning of the build logs and the write cache operation at the end of the build logs.
 
-- For Windows node pool use:
+      The `linux-mavenAndKaniko-L` agent template is deployed over On-demand Linux Nodes that have smaller instance types vs the `linux-mavenAndKaniko-XL` template that is deployed over Spot Linux Nodes that have defined larger instance types.
 
-   ```sh
-   eval $(terraform output --raw cbci_controller_c_windows_node_build)
-   ```
+   - For Windows node pool use:
 
-   It triggers `windows-build-nodes` pipeline from `team-c-ha` controller.
+      ```sh
+      eval $(terraform output --raw cbci_controller_c_windows_node_build)
+      ```
 
-   Note that the first build for a new Windows image container can take up to 10 minutes to run; subsequent builds should take seconds to run. This behavior can be improved as explained in the section [Architecture](#architecture).
+      It triggers `windows-build-nodes` pipeline from `team-c-ha` controller.
+
+      Note that the first build for a new Windows image container can take up to 10 minutes to run; subsequent builds should take seconds to run. This behavior can be improved as explained in the section [Architecture](#architecture).
 
 3. Right after triggering the builds, issue the following to validate pod agent provisioning to build the pipeline code:
 
@@ -269,6 +272,21 @@ HashiCorp Vault is used as a credential provider for CloudBees CI Pipelines in t
    ```
 
 4. Check build logs by signing in to the `team-b` and `team-c-ha` controllers, respectively. Navigate to the pipeline jobs and select the first build, indicated by the `#1` build number. [CloudBees Pipeline Explorer](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-pipeline-explorer-plugin) is enabled as a default.
+
+##### Container Registry
+
+This blueprints uses a couple of container registries for different purposes.
+
+- The Public Registry uses DockerHub (It requires an existing DockerHub Organization).
+- The Private Registry uses AWS ECR (It requires an existing ECR Repository).
+
+> [!NOTE]
+> Other Container Registry services can be used for the same purporses.
+
+Access with admin role to CloudBees CI to `team-b` or `team-c-ha` to run the pipeline _admin_ > _validations_ > _kaniko_ enter as parameters an existing DockerHub Organization and an existing AWS ECR Repository to test that Build and Push towards every repository works fine.
+
+> [!NOTE]
+> Besides Kaniko, there are [other alternitives tools](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/using-kaniko#_alternatives).
 
 #### Back up and restore
 
