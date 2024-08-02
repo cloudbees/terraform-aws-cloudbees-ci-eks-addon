@@ -45,7 +45,7 @@ kube:
                   name: ${regSecretsName}
                   items:
                     - key: .dockerconfigjson
-                      path: config.json          
+                      path: config.json
           nodeSelector:
             kubernetes.io/os: linux
             role: "build-linux"
