@@ -24,20 +24,6 @@ globalCredentialsConfiguration:
     url: "${vault_url}"
 credentials:
   system:
-    domainCredentials:
-    - credentials:
-      - usernamePassword:
-          description: "GH-User-token"
-          id: "GH-User-token"
-          password: ${sec_githubUser}
-          scope: GLOBAL
-          username: ${sec_githubToken}
-          usernameSecret: true
-      - string:
-          description: "GH-ST-token"
-          id: "GH-ST-token"
-          scope: GLOBAL
-          secret: ${sec_githubToken}
   cloudbeesHashicorpVault:
     domainCredentials:
     - credentials:

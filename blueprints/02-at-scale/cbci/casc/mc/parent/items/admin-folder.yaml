@@ -1,0 +1,285 @@
+removeStrategy:
+  rbac: SYNC
+  items: NONE
+items:
+- kind: folder
+  name: admin
+  description: ''
+  displayName: admin
+  items:
+  - kind: pipeline
+    name: loadTest
+    concurrentBuild: true
+    definition:
+      cpsFlowDefinition:
+        sandbox: true
+        script: |-
+          timeout(time: 1, unit: 'HOURS'){
+              parallel([0, 1].collectEntries {b -> ["branch-$b", {
+                podTemplate  (inheritFrom: 'linux-mavenAndKaniko-L') {
+                  node(POD_LABEL) {
+                      retry (3) {
+                        stage('prep') {
+                          sh 'curl https://ipinfo.io/'
+                        }
+                        stage('build') {
+                          mockLoad 180
+                        }
+                        stage('publish') {
+                          archiveArtifacts allowEmptyArchive: true, artifacts: 'mock-artifact-*.txt'
+                          fingerprint 'mock-artifact-*.txt'
+                          junit 'mock-junit.xml'
+                        }
+                      }
+                  }
+                }
+              }]})
+          }
+          build job: JOB_NAME, wait: false
+    description: 'It emulates workload in a controller see https://plugins.jenkins.io/mock-load-builder/.'
+    displayName: loadTest
+  - kind: backupAndRestore
+    name: restore
+    label: linux-mavenAndKaniko-XL
+    buildersList:
+    - restoreBuilder:
+        ignoreConfirmationFile: true
+        preserveJenkinsHome: false
+        ignoreDigestCheck: false
+        store:
+          s3Store:
+            bucketName: "${sec_s3bucketName}"
+            sse: true
+            bucketFolder: "${s3bucketPreffix}/backup"
+            region: "${sec_awsRegion}"
+    description: 'Validates the restore functionality of the CloudBees Backup plugin.'
+    displayName: restore
+  - kind: folder
+    name: validations
+    description: 'Contains validations for integrations tests.'
+    displayName: validations
+    items:
+    - kind: pipeline
+      name: s3-WScacheAndArtifacts
+      concurrentBuild: true
+      definition:
+        cpsFlowDefinition:
+          sandbox: true
+          script: |-
+            pipeline {
+                agent none
+                options {
+                    retry(3)
+                    timeout(time: 1, unit: 'HOURS')
+                }
+                stages {
+                    stage ("s3"){
+                        parallel {
+                            stage('Workspace Cache') {
+                                agent {
+                                    label "linux-mavenAndKaniko-L"
+                                }
+                                environment {
+                                    MAVEN_PROJECT = 'https://github.com/jglick/simple-maven-project-with-tests'
+                                    CACHE = 'ws-cache-maven'
+                                }
+                                stages {
+                                    stage('Checkout') {
+                                        steps {
+                                            git env.MAVEN_PROJECT
+                                        }
+                                    }
+                                    stage('Read') {
+                                        steps {
+                                            readCache name: env.CACHE
+                                        }
+                                    }
+                                    stage('Build') {
+                                        steps {
+                                            container('maven') {
+                                                sh 'mvn clean package -DskipTests -Dmaven.repo.local=./maven-repo'
+                                            }
+                                        }
+                                    }
+                                }
+                                post {
+                                    success {
+                                        writeCache name: env.CACHE, includes: 'maven-repo/**'
+                                    }
+                                }
+                            }
+                            stage('Artifacts') {
+                                agent {
+                                    label "linux-mavenAndKaniko-XL"
+                                }
+                                stages {
+                                    stage('Maven') {
+                                        stages {
+                                            stage ('Build'){
+                                                steps {
+                                                    container('maven') {
+                                                        sh '''
+                                                            echo "Build number ^${BUILD_NUMBER}" >> f_1
+                                                            mvn -version >> f_1
+                                                        '''
+                                                    }
+                                                }
+                                            }
+                                            stage ('Archive f_1'){
+                                                steps {
+                                                    container('kaniko') {
+                                                        archiveArtifacts artifacts: 'f_1', fingerprint: true
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    stage('Kaniko') {
+                                        stages {
+                                            stage ("Unarchive"){
+                                                steps {
+                                                    container('maven') {
+                                                        dir ('unarchive'){
+                                                            sh 'ls -la'
+                                                            unarchive mapping: [f_1: 'f_1']
+                                                            sh 'ls -la; cat f_1; mv f_1 f_2'
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            stage ('Build'){
+                                                steps {
+                                                    container('kaniko') {
+                                                        dir ('unarchive'){
+                                                            sh "ls -la /kaniko/executor >> f_2"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            stage ('Archive f_2'){
+                                                steps {
+                                                    container('maven') {
+                                                        dir ('unarchive'){
+                                                            archiveArtifacts artifacts: 'f_2', fingerprint: true
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+      description: 'Pipeline that demonstrates the s3 integrations for CloudBees Workspace
+        Caching (https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-cache-step)
+        and s3 Artifact (https://plugins.jenkins.io/artifact-manager-s3/) are working'
+      disabled: false
+      resumeBlocked: false
+    - kind: pipeline
+      name: windows-builds-nodes
+      concurrentBuild: false
+      definition:
+        cpsFlowDefinition:
+          sandbox: true
+          script: |
+            pipeline {
+              options {
+                retry(3)
+                timeout(time: 1, unit: 'HOURS')
+              }
+              agent {
+                  label 'windows-powershell'
+              }
+              stages {
+                stage('Test') {
+                  steps {
+                    container('shell') {
+                        powershell 'Get-ChildItem Env: | Sort Name'
+                    }
+                  }
+                }
+              }
+            }
+      description: 'It validates the windows nodes builds.'
+      displayName: windows-builds-nodes
+    - kind: pipeline
+      name: vault-credentials
+      concurrentBuild: true
+      definition:
+        cpsFlowDefinition:
+          sandbox: true
+          script: |
+            pipeline {
+                agent any
+                environment {
+                    U1=credentials('cbci-oc-secret-a')
+                    S1=credentials('cbci-oc_secret-b')
+                }
+                stages {
+                    stage('Print credentials') {
+                        steps {
+                            sh '''
+                                echo 'Printing credentials from Vault'
+                                echo $U1
+                                echo $S1
+                            '''
+                        }
+                    }
+                }
+            }
+      description: 'It validates that credentials from Vault are fetched correctly.'
+    - kind: pipeline
+      name: kaniko
+      concurrentBuild: true
+      definition:
+        cpsFlowDefinition:
+          sandbox: true
+          script: |
+            pipeline {
+              agent {
+                label 'linux-mavenAndKaniko-XL'
+              }
+              parameters {
+                string(name: 'TARGET_DH_ORG', description: 'DockerHub Organization to Push the image', defaultValue: 'example-org', )
+                string(name: 'TARGET_ECR_URI', description: 'ECR URI', defaultValue: '99999999999.dkr.ecr.us-east-1.amazonaws.com/test-private-example', )
+              }
+              stages {
+                stage('Public Registry') {
+                  steps {
+                    container(name: 'kaniko', shell: '/busybox/sh') {
+                      sh '''#!/busybox/sh
+                        echo "FROM jenkins/inbound-agent:latest" > Dockerfile
+                        /kaniko/executor --context `pwd` --destination ${TARGET_DH_ORG}/cbci-bp02-kaniko:${BUILD_ID}
+                      '''
+                    }
+                  }
+                }  
+                stage('Private Registry') {
+                  steps {
+                    container(name: 'kaniko-ecr', shell: '/busybox/sh') {
+                      sh '''#!/busybox/sh
+                        echo "FROM jenkins/inbound-agent:latest" > Dockerfile
+                        /kaniko/executor --context `pwd` --destination=${TARGET_ECR_URI}:${BUILD_ID}
+                      '''
+                        }
+                    }
+                }
+              }
+            }
+      properties:
+      - parameters:
+          parameterDefinitions:
+          - string:
+              trim: false
+              defaultValue: example-org
+              name: TARGET_DH_ORG
+              description: DockerHub Organization to Push the image
+          - string:
+              trim: false
+              defaultValue: 99999999999.dkr.ecr.us-east-1.amazonaws.com/test-private-example
+              name: TARGET_ECR_URI
+              description: ECR URI
+      description: 'It validates Authentication to Push images to DockerHub and ECR.'

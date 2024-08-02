@@ -19,7 +19,7 @@ This blueprint presents the minimum setup to run CloudBees CI on Amazon EKS; one
   - Instance type: [Graviton Processor](https://aws.amazon.com/ec2/graviton/) family.
   - Amazon Machine Image (AMI) type: [Amazon EKS-Optimized Amazon Linux 2023](https://aws.amazon.com/blogs/containers/amazon-eks-optimized-amazon-linux-2023-amis-now-available/)
 
-### Kubernetes cluster
+### Workloads
 
 ![K8sApps](img/getting-started.k8s.drawio.svg)
 

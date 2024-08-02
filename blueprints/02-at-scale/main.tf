@@ -10,17 +10,20 @@ locals {
   # Infra
   ############
 
-  name                  = var.suffix == "" ? "cbci-bp02" : "cbci-bp02-${var.suffix}"
-  vpc_name              = "${local.name}-vpc"
-  cluster_name          = "${local.name}-eks"
-  efs_name              = "${local.name}-efs"
-  resource_group_name   = "${local.name}-rg"
-  bucket_name           = "${local.name}-s3"
-  cbci_instance_profile = "${local.name}-instance_profile"
-  cbci_iam_role         = "${local.name}-iam_role_mn"
-  cbci_inline_policy    = "${local.name}-iam_inline_policy"
-  kubeconfig_file       = "kubeconfig_${local.name}.yaml"
-  kubeconfig_file_path  = abspath("k8s/${local.kubeconfig_file}")
+  name                      = var.suffix == "" ? "cbci-bp02" : "cbci-bp02-${var.suffix}"
+  vpc_name                  = "${local.name}-vpc"
+  cluster_name              = "${local.name}-eks"
+  efs_name                  = "${local.name}-efs"
+  resource_group_name       = "${local.name}-rg"
+  bucket_name               = "${local.name}-s3"
+  cbci_instance_profile_s3  = "${local.name}-instance_profile_s3"
+  cbci_iam_role_s3          = "${local.name}-iam_role_s3"
+  cbci_inline_policy_s3     = "${local.name}-iam_inline_policy_s3"
+  cbci_instance_profile_ecr = "${local.name}-instance_profile_ecr"
+  cbci_iam_role_ecr         = "${local.name}-iam_role_ecr"
+  cbci_inline_policy_ecr    = "${local.name}-iam_inline_policy_ecr"
+  kubeconfig_file           = "kubeconfig_${local.name}.yaml"
+  kubeconfig_file_path      = abspath("k8s/${local.kubeconfig_file}")
 
   vpc_cidr         = "10.0.0.0/16"
   azs              = slice(data.aws_availability_zones.available.names, 0, 3)
@@ -81,7 +84,7 @@ locals {
   cbci_admin_user         = "admin_cbci_a"
   cbci_agents_ns          = "cbci-agents"
   #K8S agent template name from the CasC bundle
-  cbci_agent_linuxtempl   = "linux-mavenAndGo"
+  cbci_agent_linuxtempl   = "linux-mavenAndKaniko-"
   cbci_agent_windowstempl = "windows-powershell"
 
   vault_ns               = "vault"
@@ -106,8 +109,9 @@ resource "time_static" "epoch" {
 # CloudBees CI Add-on
 
 module "eks_blueprints_addon_cbci" {
-  source  = "cloudbees/cloudbees-ci-eks-addon/aws"
-  version = ">= 3.18072.0"
+  # source  = "cloudbees/cloudbees-ci-eks-addon/aws"
+  # version = ">= 3.18072.0"
+  source = "../../"
 
   depends_on = [module.eks_blueprints_addons]
 
@@ -124,15 +128,23 @@ module "eks_blueprints_addon_cbci" {
     })]
   }
 
-  create_k8s_secrets = true
-  k8s_secrets = templatefile("k8s/secrets-values.yml", {
+  create_casc_secrets = true
+  casc_secrets_file = templatefile("k8s/secrets-values.yml", {
     global_password = local.global_password
     s3bucketName    = local.bucket_name
     awsRegion       = var.aws_region
     adminMail       = var.trial_license["email"]
-    githubUser      = var.gh_user
-    githubToken     = var.gh_token
   })
+
+  create_reg_secret = true
+  reg_secret_ns     = local.cbci_agents_ns
+  #Note: This blueprint tests DockerHub as container registry but different registries can be used.
+  reg_secret_auth = {
+    server   = "https://index.docker.io/v1/"
+    username = var.dh_reg_secret_auth["username"]
+    password = var.dh_reg_secret_auth["password"]
+    email    = var.dh_reg_secret_auth["email"]
+  }
 
   prometheus_target = true
 
@@ -450,7 +462,7 @@ module "eks" {
         storage = "enabled"
       }
       create_iam_role            = false
-      iam_role_arn               = aws_iam_role.managed_ng.arn
+      iam_role_arn               = aws_iam_role.managed_ng_s3.arn
       ami_type                   = "BOTTLEROCKET_ARM_64"
       platform                   = "bottlerocket"
       enable_bootstrap_user_data = true
@@ -466,6 +478,8 @@ module "eks" {
       labels = {
         role = "build-linux"
       }
+      create_iam_role            = false
+      iam_role_arn               = aws_iam_role.managed_ng_ecr.arn
       ami_type                   = "BOTTLEROCKET_ARM_64"
       platform                   = "bottlerocket"
       enable_bootstrap_user_data = true
@@ -485,6 +499,8 @@ module "eks" {
       labels = {
         role = "build-linux-spot"
       }
+      create_iam_role            = false
+      iam_role_arn               = aws_iam_role.managed_ng_ecr.arn
       ami_type                   = "BOTTLEROCKET_ARM_64"
       platform                   = "bottlerocket"
       enable_bootstrap_user_data = true
@@ -502,6 +518,8 @@ module "eks" {
       labels = {
         role = "build-linux-spot"
       }
+      create_iam_role            = false
+      iam_role_arn               = aws_iam_role.managed_ng_ecr.arn
       ami_type                   = "BOTTLEROCKET_ARM_64"
       platform                   = "bottlerocket"
       enable_bootstrap_user_data = true
@@ -546,9 +564,9 @@ data "aws_iam_policy_document" "managed_ng_assume_role_policy" {
   }
 }
 
-resource "aws_iam_role" "managed_ng" {
-  name                  = local.cbci_iam_role
-  description           = "EKS Managed Node group IAM Role"
+resource "aws_iam_role" "managed_ng_s3" {
+  name                  = local.cbci_iam_role_s3
+  description           = "EKS Managed Node group IAM Role s3"
   assume_role_policy    = data.aws_iam_policy_document.managed_ng_assume_role_policy.json
   path                  = "/"
   force_detach_policies = true
@@ -561,7 +579,7 @@ resource "aws_iam_role" "managed_ng" {
   ]
   # Additional Permissions for for EKS Managed Node Group per https://docs.aws.amazon.com/eks/latest/userguide/create-node-role.html
   inline_policy {
-    name = local.cbci_inline_policy
+    name = local.cbci_inline_policy_s3
     policy = jsonencode(
       {
         "Version" : "2012-10-17",
@@ -587,7 +605,7 @@ resource "aws_iam_role" "managed_ng" {
                 "s3:prefix" : "${local.cbci_s3_prefix}/*"
               }
             }
-          },
+          }
         ]
       }
     )
@@ -595,9 +613,62 @@ resource "aws_iam_role" "managed_ng" {
   tags = var.tags
 }
 
-resource "aws_iam_instance_profile" "managed_ng" {
-  name = local.cbci_instance_profile
-  role = aws_iam_role.managed_ng.name
+resource "aws_iam_instance_profile" "managed_ng_s3" {
+  name = local.cbci_instance_profile_s3
+  role = aws_iam_role.managed_ng_s3.name
+  path = "/"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  tags = var.tags
+}
+
+resource "aws_iam_role" "managed_ng_ecr" {
+  name                  = local.cbci_iam_role_ecr
+  description           = "EKS Managed Node group IAM Role ECR"
+  assume_role_policy    = data.aws_iam_policy_document.managed_ng_assume_role_policy.json
+  path                  = "/"
+  force_detach_policies = true
+  # Mandatory for EKS Managed Node Group
+  managed_policy_arns = [
+    "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy",
+    "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy",
+    "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+  ]
+  # Additional Permissions for for EKS Managed Node Group per https://docs.aws.amazon.com/eks/latest/userguide/create-node-role.html
+  inline_policy {
+    name = local.cbci_inline_policy_ecr
+    policy = jsonencode(
+      {
+        "Version" : "2012-10-17",
+        "Statement" : [
+          {
+            "Sid" : "ecrKaniko",
+            "Effect" : "Allow",
+            "Action" : [
+              "ecr:GetDownloadUrlForLayer",
+              "ecr:GetAuthorizationToken",
+              "ecr:InitiateLayerUpload",
+              "ecr:UploadLayerPart",
+              "ecr:CompleteLayerUpload",
+              "ecr:PutImage",
+              "ecr:BatchGetImage",
+              "ecr:BatchCheckLayerAvailability"
+            ],
+            "Resource" : "*"
+          }
+        ]
+      }
+    )
+  }
+  tags = var.tags
+}
+
+resource "aws_iam_instance_profile" "managed_ng_ecr" {
+  name = local.cbci_instance_profile_ecr
+  role = aws_iam_role.managed_ng_ecr.name
   path = "/"
 
   lifecycle {
