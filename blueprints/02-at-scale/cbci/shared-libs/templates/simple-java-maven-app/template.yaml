@@ -1,0 +1,17 @@
+version: 1
+type: pipeline-template
+
+name: Java Maven App Pipeline Job
+description: Simple Java App With Maven
+parameters:
+  - name: k8_agent
+    displayName: "Kubernetes Agent yaml"
+    allowedValues: ["linux-mavenAndKaniko-L", "linux-mavenAndKaniko-XL"]
+    type: string
+  - name: git_repo
+    displayName: "Git Repository URL"
+    type: string
+  - name: git_creds
+    displayName: "Git SCM Credentials"
+    type: credentials
+    defaultValue: git-creds-example
