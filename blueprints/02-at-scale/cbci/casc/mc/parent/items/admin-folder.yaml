@@ -60,47 +60,7 @@ items:
     displayName: validations
     items:
     - kind: pipeline
-      name: downstream-artifact
-      concurrentBuild: true
-      definition:
-        cpsFlowDefinition:
-          sandbox: true
-          script: |-
-            pipeline {
-                agent{
-                    label 'linux-mavenAndKaniko-XL'
-                }
-                options {
-                    retry(3)
-                    timeout(time: 1, unit: 'HOURS')
-                }
-                environment {
-                    ARTIFACT_SOURCE_JOB = 'upstream-artifact'
-                }
-                stages {
-                    stage('Build Upstream') {
-                        steps {
-                            build 'upstream-artifact'
-                        }
-                    }
-                    stage('Copy Artifacts') {
-                        steps {
-                            sh 'ls -la'
-                            copyArtifacts fingerprintArtifacts: true, projectName: env.ARTIFACT_SOURCE_JOB, selector: lastSuccessful()
-                        }
-                    }
-                    stage('Read Artifacts') {
-                        steps {
-                            sh 'ls -la'
-                            sh 'cat f_2'
-                        }
-                    }
-                }
-            }
-      description: 'It validates archives/unarchive s3 artifacts (https://plugins.jenkins.io/artifact-manager-s3/) from different pods agents in different build. It uses artifacts from upstream build.'
-      displayName: downstream-artifact
-    - kind: pipeline
-      name: ws-cache
+      name: s3-WScacheAndArtifacts
       concurrentBuild: true
       definition:
         cpsFlowDefinition:
@@ -217,7 +177,6 @@ items:
         Caching (https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-cache-step)
         and s3 Artifact (https://plugins.jenkins.io/artifact-manager-s3/) are working'
       disabled: false
-      displayName: ws-cache
       resumeBlocked: false
     - kind: pipeline
       name: windows-builds-nodes
