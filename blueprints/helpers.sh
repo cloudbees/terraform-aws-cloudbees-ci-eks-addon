@@ -125,7 +125,7 @@ probes () {
         ERROR "Problem while getting Global Pass."
       fi
     until { eval "$(tf-output "$root" cbci_oc_export_admin_crumb)" && eval "$(tf-output "$root" cbci_oc_export_admin_api_token)" && [ -n "$CBCI_ADMIN_TOKEN" ]; }; do sleep $wait && echo "Waiting for Admin Token..."; done && INFO "Admin Token: $CBCI_ADMIN_TOKEN"
-    eval "$(tf-output "$root" cbci_controller_b_ws_cache_build)" > /tmp/controller-b-hibernation &&
+    eval "$(tf-output "$root" cbci_controller_b_s3_build)" > /tmp/controller-b-hibernation &&
       if grep "201\|202" /tmp/controller-b-hibernation; then
         INFO "Hibernation Post Queue Controller B OK."
       else
@@ -141,9 +141,9 @@ probes () {
       INFO "Team C HPA is Ready."
     until [ "$(eval "$(tf-output "$root" cbci_agent_windowstempl_events)" | grep -c 'Allocated Resource vpc.amazonaws.com')" -ge 1 ]; do sleep $wait && echo "Waiting for Windows Template Pod to allocate resource vpc.amazonaws.com"; done ;\
       eval "$(tf-output "$root" cbci_agent_windowstempl_events)" && INFO "Windows Template Example is OK."
-    until [ "$(eval "$(tf-output "$root" cbci_agent_linuxtempl_events)" | grep -c 'Created container maven')" -ge 1 ]; do sleep $wait && echo "Waiting for Linux Template Pod to create maven container"; done ;\
+    until [ "$(eval "$(tf-output "$root" cbci_agent_linuxtempl_events)" | grep -c 'Created container maven')" -ge 2 ]; do sleep $wait && echo "Waiting for both Linux Template Pods (On demand and Spot) to create maven container"; done ;\
       eval "$(tf-output "$root" cbci_agent_linuxtempl_events)" && INFO "Linux Template Example is OK."
-    until [ "$(eval "$(tf-output "$root" s3_list_objects)" | grep -c 'cbci/')" -ge 1 ]; do sleep $wait && echo "Waiting for WS Cache to be uploaded into s3 cbci"; done ;\
+    until [ "$(eval "$(tf-output "$root" s3_list_objects)" | grep -c 'cbci/')" -ge 2 ]; do sleep $wait && echo "Waiting for WS Cache and Artifacts to be uploaded into s3 cbci"; done ;\
       eval "$(tf-output "$root" s3_list_objects)" | grep 'cbci/' && INFO "CBCI s3 Permissions are configured correctly."
     eval "$(tf-output "$root" velero_backup_schedule)" && eval "$(tf-output "$root" velero_backup_on_demand)" > /tmp/velero-backup.txt && \
       if grep 'Backup completed with status: Completed' /tmp/velero-backup.txt; then
