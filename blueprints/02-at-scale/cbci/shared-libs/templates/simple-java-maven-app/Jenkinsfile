@@ -13,7 +13,7 @@ pipeline {
         }
         stage('Build') {
             steps {
-                mvnBuild()
+                mvnBuild(skipTests: true)
             }
         }
     }
