@@ -226,8 +226,8 @@ items:
                         steps {
                             sh '''
                                 echo 'Printing credentials from Vault'
-                                echo $U1
-                                echo $S1
+                                echo ^$U1
+                                echo ^$S1
                             '''
                         }
                     }
@@ -241,6 +241,8 @@ items:
         cpsFlowDefinition:
           sandbox: true
           script: |
+            @Library('common') _
+
             pipeline {
               agent {
                 label 'linux-mavenAndKaniko-XL'
@@ -253,9 +255,9 @@ items:
                 stage('Public Registry') {
                   steps {
                     container(name: 'kaniko', shell: '/busybox/sh') {
+                      getDockerfile("HelloWorld.Dockerfile")  
                       sh '''#!/busybox/sh
-                        echo "FROM jenkins/inbound-agent:latest" > Dockerfile
-                        /kaniko/executor --context `pwd` --destination ${TARGET_DH_ORG}/cbci-bp02-kaniko:${BUILD_ID}
+                        /kaniko/executor --context `pwd` --destination ^${TARGET_DH_ORG}/cbci-bp02-kaniko:^${BUILD_ID}
                       '''
                     }
                   }
@@ -263,9 +265,9 @@ items:
                 stage('Private Registry') {
                   steps {
                     container(name: 'kaniko-ecr', shell: '/busybox/sh') {
+                      getDockerfile("HelloWorld.Dockerfile")
                       sh '''#!/busybox/sh
-                        echo "FROM jenkins/inbound-agent:latest" > Dockerfile
-                        /kaniko/executor --context `pwd` --destination=${TARGET_ECR_URI}:${BUILD_ID}
+                        /kaniko/executor --context `pwd` --destination=^${TARGET_ECR_URI}:^${BUILD_ID}
                       '''
                         }
                     }
