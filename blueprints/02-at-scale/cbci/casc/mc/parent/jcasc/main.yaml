@@ -40,7 +40,7 @@ unclassified:
     variableInterpolationEnabledForAdmin: true
   globalLibraries:
     libraries:
-    - defaultVersion: ${sharedLibVersion}
+    - defaultVersion: ${sharedLibBranch}
       name: "common"
       retriever:
         modernSCM:
