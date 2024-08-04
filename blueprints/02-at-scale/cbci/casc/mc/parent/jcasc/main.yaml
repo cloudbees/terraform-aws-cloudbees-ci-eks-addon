@@ -38,6 +38,21 @@ unclassified:
     endpoint: ${ot_endpoint}
   cascItemsConfiguration:
     variableInterpolationEnabledForAdmin: true
+  globalLibraries:
+    libraries:
+    - defaultVersion: ${sharedLibBranch}
+      name: "cbci-bp02"
+      retriever:
+        modernSCM:
+          scm:
+            git:
+              remote: ${sharedLibRepo}
+              traits:
+              - "gitBranchDiscovery"
+              - sparseCheckoutPaths:
+                  extension:
+                    sparseCheckoutPaths:
+                    - path: ${sharedLibPath}
 aws:
   s3:
     container: "${sec_s3bucketName}"

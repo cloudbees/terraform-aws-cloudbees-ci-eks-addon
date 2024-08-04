@@ -14,7 +14,7 @@ unclassified:
           scmSource:
             git:
               credentialsId: "GH-token"
-              remote: ${scmCascMmStore}
+              remote: ${cascRepo}
               traits:
               - "gitBranchDiscovery"
               - headWildcardFilter:
@@ -22,7 +22,7 @@ unclassified:
               - sparseCheckoutPaths:
                   extension:
                     sparseCheckoutPaths:
-                    - path: ${cascControllerLocation}
+                    - path: ${cascPathController}
   cascAutoControllerProvisioning:
     provisionControllerOnCreation: true
   buildDiscarders:
