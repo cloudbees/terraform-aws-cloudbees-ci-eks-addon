@@ -40,19 +40,14 @@ unclassified:
     variableInterpolationEnabledForAdmin: true
   globalLibraries:
     libraries:
-    - defaultVersion: ${sharedLibBranch}
-      name: "cbci-bp02"
+    - defaultVersion: ${sharedLibVersion}
+      name: "common"
       retriever:
         modernSCM:
+          libraryPath: ${sharedLibPath}
           scm:
             git:
               remote: ${sharedLibRepo}
-              traits:
-              - "gitBranchDiscovery"
-              - sparseCheckoutPaths:
-                  extension:
-                    sparseCheckoutPaths:
-                    - path: ${sharedLibPath}
 aws:
   s3:
     container: "${sec_s3bucketName}"

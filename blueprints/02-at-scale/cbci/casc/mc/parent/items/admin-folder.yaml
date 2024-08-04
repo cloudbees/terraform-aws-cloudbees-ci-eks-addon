@@ -66,6 +66,8 @@ items:
         cpsFlowDefinition:
           sandbox: true
           script: |-
+            @Library('common') _
+
             pipeline {
                 agent none
                 options {
@@ -97,7 +99,7 @@ items:
                                     stage('Build') {
                                         steps {
                                             container('maven') {
-                                                sh 'mvn clean package -DskipTests -Dmaven.repo.local=./maven-repo'
+                                                mvnBuild (true)
                                             }
                                         }
                                     }
@@ -173,10 +175,11 @@ items:
                     }
                 }
             }
-      description: 'Pipeline that demonstrates the s3 integrations for CloudBees Workspace
+      description: Pipeline that demonstrates the s3 integrations for CloudBees Workspace
         Caching (https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-cache-step)
-        and s3 Artifact (https://plugins.jenkins.io/artifact-manager-s3/) are working'
+        and s3 Artifact (https://plugins.jenkins.io/artifact-manager-s3/) are working
       disabled: false
+      displayName: s3-WScacheAndArtifacts
       resumeBlocked: false
     - kind: pipeline
       name: windows-builds-nodes
