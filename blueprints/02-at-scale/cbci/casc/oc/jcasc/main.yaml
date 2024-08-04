@@ -13,7 +13,6 @@ unclassified:
           defaultVersion: ${cascBranch}
           scmSource:
             git:
-              credentialsId: "GH-token"
               remote: ${cascRepo}
               traits:
               - "gitBranchDiscovery"
