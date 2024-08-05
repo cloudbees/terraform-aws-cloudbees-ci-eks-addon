@@ -55,6 +55,8 @@ jobs:
 
   bp01:
     env:
+      ROOT: 01-getting-started
+      TF_VAR_hosted_zone: bp01.aws.ps.beescloud.com
       # Add the stages to execute in the pipeline: deploy,validate,destroy,wipeout
       STAGES: "wipeout"
     needs:
@@ -74,12 +76,26 @@ jobs:
     - name: Checkout code
       uses: cloudbees-io/checkout@v1
 
+    - name: 01-getting-started - Set
+      uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
+      shell: bash
+      run : |
+        cat <<EOT >> blueprints/${{ env.ROOT }}/.auto.tfvars
+        ${{ env.TF_AUTO_VARS_FILE }}
+        EOT
+        cat <<EOT >> blueprints/${{ env.ROOT }}/backend.tf
+        terraform {
+          backend "s3" {
+            bucket = "${{ env.BUCKET_NAME_TF_STATE }}"
+            key    = "${{ env.ROOT }}/ci.terraform.tfstate"
+            region = "${{ env.AWS_REGION }}"
+          }
+        }
+        EOT
+
     - name: 01-getting-started - Deploy
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
       if: contains(env.STAGES, 'deploy')
-      env:
-        ROOT: 01-getting-started
-        TF_VAR_hosted_zone: bp01.aws.ps.beescloud.com
       shell: bash
       run : |
         cat <<EOT >> blueprints/${{ env.ROOT }}/.auto.tfvars
@@ -104,8 +120,6 @@ jobs:
     - name: 01-getting-started - Validate
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
       if: contains(env.STAGES, 'validate')
-      env:
-        ROOT: 01-getting-started
       shell: bash
       run : |
         echo "validate"
@@ -113,9 +127,6 @@ jobs:
     - name: 01-getting-started - Destroy
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
       if: contains(env.STAGES, 'destroy')
-      env:
-        ROOT: 01-getting-started
-        TF_VAR_hosted_zone: bp01.aws.ps.beescloud.com
       shell: bash
       run : |
         CI=true make destroy
@@ -123,15 +134,14 @@ jobs:
     - name: 01-getting-started - Wipeout Failed Deployment
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
       if: contains(env.STAGES, 'wipeout')
-      env:
-        ROOT: 01-getting-started
-        TF_VAR_hosted_zone: bp01.aws.ps.beescloud.com
       shell: bash
       run : |
         terraform -chdir=blueprints/${{ env.ROOT }} init -reconfigure && CI=true make destroy
 
   bp02:
     env:
+      ROOT: 02-at-scale
+      TF_VAR_hosted_zone: bp02.aws.ps.beescloud.com
       # Add the stages to execute in the pipeline: deploy,validate,destroy,wipeout
       STAGES: "wipeout"
     needs:
@@ -151,12 +161,8 @@ jobs:
     - name: Checkout code
       uses: cloudbees-io/checkout@v1
 
-    - name: 02-at-scale - Deploy
+    - name: 02-at-scale - Set
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
-      if: contains(env.STAGES, 'deploy')
-      env:
-        ROOT: 02-at-scale
-        TF_VAR_hosted_zone: bp02.aws.ps.beescloud.com
       shell: bash
       run : |
         cat <<EOT >> blueprints/${{ env.ROOT }}/.auto.tfvars
@@ -176,6 +182,12 @@ jobs:
           }
         }
         EOT
+
+    - name: 02-at-scale - Deploy
+      uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
+      if: contains(env.STAGES, 'deploy')
+      shell: bash
+      run : |
         CI=true make deploy
         aws s3api put-object \
             --bucket ${{ env.BUCKET_NAME_TF_STATE }} \
@@ -186,18 +198,13 @@ jobs:
     - name: 02-at-scale - Validate
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
       if: contains(env.STAGES, 'validate')
-      env:
-        ROOT: 02-at-scale
       shell: bash
       run : |
-        echo "validate"
+        CI=true make validate
 
     - name: 02-at-scale - Destroy
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
       if: contains(env.STAGES, 'destroy')
-      env:
-        ROOT: 02-at-scale
-        TF_VAR_hosted_zone: bp02.aws.ps.beescloud.com
       shell: bash
       run : |
         CI=true make destroy
@@ -205,9 +212,6 @@ jobs:
     - name: 02-at-scale - Wipeout Failed Deployment
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
       if: contains(env.STAGES, 'wipeout')
-      env:
-        ROOT: 02-at-scale
-        TF_VAR_hosted_zone: bp02.aws.ps.beescloud.com
       shell: bash
       run : |
         terraform -chdir=blueprints/${{ env.ROOT }} init -reconfigure && CI=true make destroy
