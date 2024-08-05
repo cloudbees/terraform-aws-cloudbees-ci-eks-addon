@@ -79,7 +79,7 @@ variable "reg_secret_ns" {
   type        = string
   validation {
     condition     = length(trimspace(var.reg_secret_ns)) > 0
-    error_message = "Agent Namespace must not be an empty string."
+    error_message = "Agent namespace must not be an empty string."
   }
 }
 
