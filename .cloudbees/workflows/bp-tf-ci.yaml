@@ -55,8 +55,8 @@ jobs:
 
   bp01:
     env:
-      # Add the stages to execute in the pipeline: deploy,validate,destroy,reconfigure-destroy
-      STAGES: "reconfigure-destroy"
+      # Add the stages to execute in the pipeline: deploy,validate,destroy,wipeout
+      STAGES: "wipeout"
     needs:
       - init
     steps:
@@ -120,10 +120,9 @@ jobs:
       run : |
         CI=true make destroy
 
-    # Use this to clean up failed deployments
-    - name: 01-getting-started - Reconfigure and Destroy
+    - name: 01-getting-started - Wipeout Failed Deployment
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
-      if: contains(env.STAGES, 'reconfigure-destroy')
+      if: contains(env.STAGES, 'wipeout')
       env:
         ROOT: 01-getting-started
         TF_VAR_hosted_zone: bp01.aws.ps.beescloud.com
@@ -133,8 +132,8 @@ jobs:
 
   bp02:
     env:
-      # Add the stages to execute in the pipeline: deploy,validate,destroy,reconfigure-destroy
-      STAGES: "reconfigure-destroy"
+      # Add the stages to execute in the pipeline: deploy,validate,destroy,wipeout
+      STAGES: "wipeout"
     needs:
       - init
     steps:
@@ -203,10 +202,9 @@ jobs:
       run : |
         CI=true make destroy
     
-    # Use this to clean up failed deployments
-    - name: 02-at-scale - Reconfigure and Destroy
+    - name: 02-at-scale - Wipeout Failed Deployment
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
-      if: contains(env.STAGES, 'reconfigure-destroy')
+      if: contains(env.STAGES, 'wipeout')
       env:
         ROOT: 02-at-scale
         TF_VAR_hosted_zone: bp02.aws.ps.beescloud.com
