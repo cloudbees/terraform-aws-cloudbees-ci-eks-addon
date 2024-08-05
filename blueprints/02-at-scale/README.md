@@ -218,7 +218,13 @@ HashiCorp Vault is used as a credential provider for CloudBees CI Pipelines in t
    eval $(terraform output --raw vault_dashboard)
    ```
 
-3. Access with admin role to CloudBees CI Operation Center and complete the configuration for the CloudBees CI Vault Plugin by entering the Role ID and Secret ID for `cbci-oc` App Role from _step 1_ in _Manage Jenkins_ > _Credentials Providers_ > _HashiCorp Vault Credentials Provider_. Click on `Test Connection` to verify the inputs are right. Finally, move to `team-b` or `team-c-ha` to run the pipeline _admin_ > _validations_ > _vault-credentials_ and validate that credentials are fetched correctly from Hashicorp Vault.
+3. Sign in to the CloudBees CI operations center as a user with the admin role. 
+
+4. Navigate to **Manage Jenkins > Credentials Providers > HashiCorp Vault Credentials Provider** and complete the configuration for the CloudBees CI Vault Plugin by entering the role ID and secret ID for the `cbci-oc` application role from _step 1_.
+
+5. Select **Test Connection** to verify the inputs are correct.
+
+6. Move to `team-b` or `team-c-ha` to run the Pipeline (**admin > validations > vault-credentials**) and validate that credentials are fetched correctly from the Hashicorp Vault.
 
 > [!NOTE]
 > Hashicorp Vault can be also be configured to be used for [Configuration as Code - Handling Secrets - Vault](https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/docs/features/secrets.adoc#hashicorp-vault-secret-source).
