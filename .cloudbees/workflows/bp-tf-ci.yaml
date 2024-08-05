@@ -82,13 +82,24 @@ jobs:
         TF_VAR_hosted_zone: bp01.aws.ps.beescloud.com
       shell: bash
       run : |
-        echo "deploy"
-        echo "hello" > hello.txt
+        cat <<EOT >> blueprints/${{ env.ROOT }}/.auto.tfvars
+        ${{ env.TF_AUTO_VARS_FILE }}
+        EOT
+        cat <<EOT >> blueprints/${{ env.ROOT }}/backend.tf
+        terraform {
+          backend "s3" {
+            bucket = "${{ env.BUCKET_NAME_TF_STATE }}"
+            key    = "${{ env.ROOT }}/ci.terraform.tfstate"
+            region = "${{ env.AWS_REGION }}"
+          }
+        }
+        EOT
+        CI=true make deploy
         aws s3api put-object \
             --bucket ${{ env.BUCKET_NAME_TF_STATE }} \
             --region ${{ env.AWS_REGION }} \
-            --key bp01/hello.txt \
-            --body hello.txt
+            --key ${{ env.ROOT }}/${{ env.ROOT }}.kubeconfig.yaml \
+            --body ${{ cd blueprints/${{ env.ROOT }} && terraform output --raw kubeconfig_file }}
 
     - name: 01-getting-started - Validate
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
@@ -138,7 +149,28 @@ jobs:
         TF_VAR_hosted_zone: bp02.aws.ps.beescloud.com
       shell: bash
       run : |
-        echo "deploy"
+        cat <<EOT >> blueprints/${{ env.ROOT }}/.auto.tfvars
+        ${{ env.TF_AUTO_VARS_FILE }}
+        dh_reg_secret_auth = {
+          username = "foo"
+          password = "d0ckerPass12"
+        }
+        EOT
+        cat <<EOT >> blueprints/${{ env.ROOT }}/backend.tf
+        terraform {
+          backend "s3" {
+            bucket = "${{ env.BUCKET_NAME_TF_STATE }}"
+            key    = "${{ env.ROOT }}/ci.terraform.tfstate"
+            region = "${{ env.AWS_REGION }}"
+          }
+        }
+        EOT
+        CI=true make deploy
+        aws s3api put-object \
+            --bucket ${{ env.BUCKET_NAME_TF_STATE }} \
+            --region ${{ env.AWS_REGION }} \
+            --key ${{ env.ROOT }}/${{ env.ROOT }}.kubeconfig.yaml \
+            --body ${{ cd blueprints/${{ env.ROOT }} && terraform output --raw kubeconfig_file }}
 
     - name: 02-at-scale - Validate
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
