@@ -4,4 +4,4 @@ variables:
   - regSecretsName: "cbci-sec-reg"
   - sharedLibRepo: "https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon.git"
   - sharedLibBranch: shared-lib
-  - sharedLibPath: "/blueprints/02-at-scale/cbci/shared-lib"
+  - sharedLibPath: "blueprints/02-at-scale/cbci/shared-lib"
