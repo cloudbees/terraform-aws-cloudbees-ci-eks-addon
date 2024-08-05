@@ -94,7 +94,7 @@ variable "reg_secret_auth" {
   }
   validation {
     condition     = contains(keys(var.reg_secret_auth), "server") && contains(keys(var.reg_secret_auth), "username") && contains(keys(var.reg_secret_auth), "password") && contains(keys(var.reg_secret_auth), "email")
-    error_message = "The reg_secret_auth must contain the following keys: server, username, password and email."
+    error_message = "The reg_secret_auth must contain the following keys: server, username, password, and email."
   }
   validation {
     condition     = length(var.reg_secret_auth) == 4
