@@ -87,8 +87,8 @@ jobs:
         aws s3api put-object \
             --bucket ${{ env.BUCKET_NAME_TF_STATE }} \
             --region ${{ env.AWS_REGION }} \
-            --key hello.txt \
-            --body kubeconf/hello.txt
+            --key bp01/hello.txt \
+            --body hello.txt
 
     - name: 01-getting-started - Validate
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
