@@ -49,6 +49,7 @@ jobs:
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
       shell: bash
       run: |
+        set -x
         aws s3api create-bucket \
           --bucket ${{ env.BUCKET_NAME_TF_STATE }} \
           --region ${{ env.AWS_REGION }} || echo "Bucket ${{ env.BUCKET_NAME_TF_STATE }} already exists"
@@ -58,7 +59,7 @@ jobs:
       ROOT: 01-getting-started
       TF_VAR_hosted_zone: bp01.aws.ps.beescloud.com
       # Add the stages to execute in the pipeline: deploy,validate,destroy,wipeout
-      STAGES: "deploy"
+      STAGES: ""
     needs:
       - init
     steps:
@@ -177,6 +178,7 @@ jobs:
       shell: bash
       run : |
         CI=true make deploy
+        set -x
         aws s3api put-object \
             --bucket ${{ env.BUCKET_NAME_TF_STATE }} \
             --region ${{ env.AWS_REGION }} \
