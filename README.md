@@ -19,7 +19,7 @@
 
 The CloudBees CI [AWS partner add-on](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/aws-partner-addons/) streamlines the adoption and experimentation of CloudBees CI enterprise features by:
 
-- Encapsulating the deployment of [CloudBees CI on modern platforms in AWS EKS](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/installing-eks-using-helm#_configuring_your_environment) and additional k8s resources into a Terraform module.
+- Encapsulating the deployment of [CloudBees CI on modern platforms in AWS EKS](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/installing-eks-using-helm#_configuring_your_environment) and additional Kubernetes resources into a Terraform module.
 - Providing a series of opinionated [blueprints](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/tree/main/blueprints) that implement the CloudBees CI add-on module for use with [Amazon EKS blueprints for Terraform](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/), which are aligned with the [EKS Best Practices Guides](https://aws.github.io/aws-eks-best-practices/).
 
 ## Usage
