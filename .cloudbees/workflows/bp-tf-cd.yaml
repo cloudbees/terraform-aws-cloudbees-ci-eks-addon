@@ -103,6 +103,7 @@ jobs:
       run : |
         set -x
         aws kms delete-alias --alias-name alias/eks/cbci-bp01-${{ env.TF_VAR_suffix }}-eks --region ${{ env.TF_VAR_aws_region }} || echo "Alias alias/eks/cbci-bp01-${{ env.TF_VAR_suffix }}-eks does not exist"
+        aws kms delete-alias --alias-name alias/eks/cbci-bp01-${{ env.TF_VAR_suffix }} --region ${{ env.TF_VAR_aws_region }} || echo "Alias alias/eks/cbci-bp01-${{ env.TF_VAR_suffix }} does not exist"
         CI=true make deploy
         aws s3api put-object \
             --bucket ${{ env.BUCKET_NAME_TF_STATE }} \
@@ -184,6 +185,7 @@ jobs:
       run : |
         set -x
         aws kms delete-alias --alias-name alias/eks/cbci-bp02-${{ env.TF_VAR_suffix }}-eks --region ${{ env.TF_VAR_aws_region }} || echo "Alias alias/eks/cbci-bp02-${{ env.TF_VAR_suffix }}-eks does not exist"
+        aws kms delete-alias --alias-name alias/eks/cbci-bp02-${{ env.TF_VAR_suffix }} --region ${{ env.TF_VAR_aws_region }} || echo "Alias alias/eks/cbci-bp02-${{ env.TF_VAR_suffix }} does not exist"
         CI=true make deploy
         aws s3api put-object \
             --bucket ${{ env.BUCKET_NAME_TF_STATE }} \
