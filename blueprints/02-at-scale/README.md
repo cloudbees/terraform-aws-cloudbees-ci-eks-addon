@@ -259,7 +259,7 @@ HashiCorp Vault is used as a credential provider for CloudBees CI Pipelines in t
 
       Once the second build is complete, you can find the read cache operation at the beginning of the build logs and the write cache operation at the end of the build logs.
 
-      The `linux-mavenAndKaniko-L` agent template is deployed over On-demand Linux Nodes that have smaller instance types vs the `linux-mavenAndKaniko-XL` template that is deployed over Spot Linux Nodes that have defined larger instance types.
+      The `linux-mavenAndKaniko-L` agent template is deployed over on-demand Linux nodes that have smaller instance types versus the `linux-mavenAndKaniko-XL` template that is deployed over Spot Linux nodes that have defined larger instance types.
 
    - For Windows node pool use:
 
