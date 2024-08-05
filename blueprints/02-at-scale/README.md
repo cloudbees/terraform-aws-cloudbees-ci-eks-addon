@@ -191,7 +191,7 @@ This blueprint Kubernetes secrets for different purposes.
 
 The secrets key/value file defined in [k8s/secrets-values.yml](k8s/secrets-values.yml) is converted into a Kubernetes secret (`cbci-sec-casc`) and mounted into `/run/secrets/` for the operations center and controllers to be consumed via CloudBees CasC. Refer to [Configuration as Code - Handling Secrets - Kubernetes Secrets](https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/docs/features/secrets.adoc#kubernetes-secrets) for more information.
 
-###### Container Registry Secrets
+###### Container registry secrets
 
 DockerHub authentication is stored as Kubernetes secrets (`cbci-agent-sec-reg`) and mounted to [Kaniko agent containers](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/using-kaniko) to build and push images to this registry. The secret is created using the `dh_reg_secret_auth` variable.
 
