@@ -99,7 +99,7 @@ items:
                                     stage('Build') {
                                         steps {
                                             container('maven') {
-                                                mvnBuild (true)
+                                                mvnBuild(skipTests: true)
                                             }
                                         }
                                     }
