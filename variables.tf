@@ -68,7 +68,7 @@ variable "casc_secrets_file" {
 }
 
 variable "create_reg_secret" {
-  description = "Create a Kubernetes dockerconfigjson secret for Container Registry authentication (cbci-sec-reg) for CI builds agents."
+  description = "Create a Kubernetes dockerconfigjson secret for container registry authentication (cbci-sec-reg) for CI builds agents."
   default     = false
   type        = bool
 }
