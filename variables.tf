@@ -58,7 +58,7 @@ variable "create_casc_secrets" {
 }
 
 variable "casc_secrets_file" {
-  description = "Secrets .yml file path containing the names:values secrets. It is required when create_casc_secrets is enabled."
+  description = "Secrets .yml file path containing the names: values secrets. It is required when create_casc_secrets is enabled."
   default     = "secrets-values.yml"
   type        = string
   validation {
