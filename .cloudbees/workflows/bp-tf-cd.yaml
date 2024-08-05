@@ -139,7 +139,7 @@ jobs:
       shell: bash
       run : |
         cd blueprints/${{ env.ROOT }} && eval $(terraform output --raw kubeconfig_export)
-        kubectl edit configmap aws-auth -n kube-system
+        kubectl get configmap aws-auth -n kube-system
 
   bp02:
     env:
