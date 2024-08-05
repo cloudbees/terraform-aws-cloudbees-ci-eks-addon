@@ -60,7 +60,7 @@ jobs:
       ROOT: 01-getting-started
       TF_VAR_hosted_zone: bp01.aws.ps.beescloud.com
       # Add the stages to execute in the pipeline: deploy,validate,destroy,wipeout
-      STAGES: "deploy,validate,destroy"
+      STAGES: "deploy,users"
     needs:
       - init
     steps:
@@ -132,13 +132,21 @@ jobs:
       shell: bash
       run : |
         terraform -chdir=blueprints/${{ env.ROOT }} init -reconfigure && CI=true make destroy
+    
+    - name: 01-getting-started - Add users
+      uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
+      if: contains(env.STAGES, 'users')
+      shell: bash
+      run : |
+        cd blueprints/${{ env.ROOT }} && eval $(terraform output --raw kubeconfig_export)
+        kubectl edit configmap aws-auth -n kube-system
 
   bp02:
     env:
       ROOT: 02-at-scale
       TF_VAR_hosted_zone: bp02.aws.ps.beescloud.com
       # Add the stages to execute in the pipeline: deploy,validate,destroy,wipeout
-      STAGES: "deploy,validate,destroy"
+      STAGES: ""
     needs:
       - init
     steps:
