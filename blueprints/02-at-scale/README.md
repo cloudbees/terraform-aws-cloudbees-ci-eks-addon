@@ -206,7 +206,7 @@ DockerHub authentication is stored as Kubernetes secrets (`cbci-agent-sec-reg`) 
 
 HashiCorp Vault is used as a credential provider for CloudBees CI Pipelines in this blueprint.
 
-1. Run the configure Hashicorp Vault script. Keep in a safe place Admin Token and Unseal Keys (saved in `k8s/vault-init.log`) as well as Role ID and Secret ID for `cbci-oc` App Role.
+1. Run the configure Hashicorp Vault script. Store the admin token and unseal keys (saved in `k8s/vault-init.log`) and role ID and secret ID for the `cbci-oc` application role in a safe place.
 
    ```sh
    eval $(terraform output --raw vault_configure)
