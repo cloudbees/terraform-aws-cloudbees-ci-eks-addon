@@ -1,3 +1,7 @@
+output "kubeconfig_file" {
+  description = "Kubeconfig file path to access the Kubernetes API."
+  value       = local.kubeconfig_file_path
+}
 
 output "kubeconfig_export" {
   description = "Export the KUBECONFIG environment variable to access the Kubernetes API."
