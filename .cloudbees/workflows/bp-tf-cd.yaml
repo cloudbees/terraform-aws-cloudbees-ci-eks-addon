@@ -82,6 +82,7 @@ jobs:
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
       shell: bash
       run : |
+        set -x
         cat <<EOT >> blueprints/${{ env.ROOT }}/.auto.tfvars
         ${{ env.TF_AUTO_VARS_FILE }}
         EOT
@@ -157,6 +158,7 @@ jobs:
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
       shell: bash
       run : |
+        set -x
         cat <<EOT >> blueprints/${{ env.ROOT }}/.auto.tfvars
         ${{ env.TF_AUTO_VARS_FILE }}
         dh_reg_secret_auth = {
