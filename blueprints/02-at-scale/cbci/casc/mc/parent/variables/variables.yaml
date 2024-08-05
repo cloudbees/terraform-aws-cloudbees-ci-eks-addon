@@ -3,5 +3,5 @@ variables:
   - s3bucketPreffix: "cbci"
   - regSecretsName: "cbci-sec-reg"
   - sharedLibRepo: "https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon.git"
-  - sharedLibBranch: shared-lib
+  - sharedLibBranch: develop
   - sharedLibPath: "blueprints/02-at-scale/cbci/shared-lib"
