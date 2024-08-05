@@ -177,9 +177,9 @@ Once the resources have been created, a `kubeconfig` file is created in the [/k8
    eval $(terraform output --raw cbci_controller_c_hpa)
    ```
 
-#### Secrets Management
+#### Secrets management
 
-##### Kubernetes Secret
+##### Kubernetes secret
 
 This blueprint uses a couple of Kubernetes secrets for different purposes.
 
