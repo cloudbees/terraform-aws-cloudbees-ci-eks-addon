@@ -181,7 +181,7 @@ Once the resources have been created, a `kubeconfig` file is created in the [/k8
 
 ##### Kubernetes secret
 
-This blueprint uses a couple of Kubernetes secrets for different purposes.
+This blueprint Kubernetes secrets for different purposes.
 
 > [!NOTE]
 > - Beyond the CloudBees CI Addon (for demo purposes), Kubernetes secrets can be managed via [External Secret Operators](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/external-secrets/).
