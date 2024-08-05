@@ -287,7 +287,7 @@ This blueprints use a couple of container registries for different purposes.
 - The private registry uses AWS ECR.
 
 > [!NOTE]
-> Other Container Registry services can be used for the same purporses.
+> Other Container Registry services can be used for the same purposes.
 
 Access with admin role to CloudBees CI to `team-b` or `team-c-ha` to run the pipeline _admin_ > _validations_ > _kaniko_ enter as parameters an existing DockerHub Organization and an existing AWS ECR Repository to test that Build and Push towards every repository works fine.
 
