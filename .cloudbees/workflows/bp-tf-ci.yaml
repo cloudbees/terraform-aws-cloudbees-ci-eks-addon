@@ -86,7 +86,7 @@ jobs:
         echo "hello" > hello.txt
         aws s3api put-object \
             --bucket ${{ env.BUCKET_NAME_TF_STATE }} \
-            --region ${{ env.AWS_REGION }}
+            --region ${{ env.AWS_REGION }} \
             --key hello.txt \
             --body kubeconf/hello.txt
 
