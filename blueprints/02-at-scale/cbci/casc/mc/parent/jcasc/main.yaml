@@ -38,6 +38,16 @@ unclassified:
     endpoint: ${ot_endpoint}
   cascItemsConfiguration:
     variableInterpolationEnabledForAdmin: true
+  globalLibraries:
+    libraries:
+    - defaultVersion: ${sharedLibBranch}
+      name: "common"
+      retriever:
+        modernSCM:
+          libraryPath: ${sharedLibPath}
+          scm:
+            git:
+              remote: ${sharedLibRepo}
 aws:
   s3:
     container: "${sec_s3bucketName}"

@@ -81,7 +81,7 @@ resource "kubernetes_secret" "cbci_sec_reg" {
   data = {
     ".dockerconfigjson" = jsonencode({
       auths = {
-        "${var.reg_secret_auth["server"]}" = {
+        (var.reg_secret_auth["server"]) = {
           "username" = var.reg_secret_auth["username"]
           "password" = var.reg_secret_auth["password"]
           "email"    = var.reg_secret_auth["email"]

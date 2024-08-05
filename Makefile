@@ -4,8 +4,8 @@ MAKEFLAGS       	+= --no-print-directory
 CI 					?= false
 BP_AGENT_USER       := bp-agent
 MKFILEDIR 			:= $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
-CASC_ENDPOINT		?= https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon.git
-CASC_BRANCH			?= main
+CBCI_REPO		    ?= https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon.git
+CBCI_BRANCH			?= main
 NUKE_DRY_RUN		?= true
 
 define helpers
@@ -96,11 +96,11 @@ set-kube-env: agentCheck
 	@$(call helpers,set-kube-env)
 	@$(call helpers,INFO "Setting Kube environment finished succesfully.")
 
-.PHONY: set-casc-branch
-set-casc-location: ## Update Casc bundle location to the endpoint and branch passed as parameter. Example: CASC_ENDPOINT=https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon.git CASC_BRANCH=new-feat make set-casc-location
-set-casc-location: agentCheck guard-CASC_ENDPOINT guard-CASC_BRANCH
-	@$(call helpers,set-casc-location $(CASC_ENDPOINT) $(CASC_BRANCH))
-	@$(call helpers,INFO "Setting new Casc location to $(CASC_ENDPOINT) $(CASC_BRANCH) finished succesfully.")
+.PHONY: set-cbci-location
+set-cbci-location: ## Update cbci folder location per parameter. Example: CBCI_REPO=https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon.git CBCI_BRANCH=new-feat make set-cbci-location
+set-cbci-location: agentCheck guard-CBCI_REPO guard-CBCI_BRANCH
+	@$(call helpers,set-cbci-location $(CBCI_REPO) $(CBCI_BRANCH))
+	@$(call helpers,INFO "Setting new Casc location to $(CBCI_REPO) $(CBCI_BRANCH) finished succesfully.")
 
 .PHONY: run-aws-nuke
 run-aws-nuke: ## Run aws nuke by https://github.com/rebuy-de/aws-nuke. Example: NUKE_DRY_RUN=true make run-aws-nuke

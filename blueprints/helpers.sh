@@ -187,17 +187,18 @@ set-kube-env () {
   done
 }
 
-set-casc-location () {
-  local endpoint="$1"
+set-cbci-location () {
+  local repo="$1"
   local branch="$2"
-  #Endpoint
-  sed -i "s|scmRepo: .*|scmRepo: \"$endpoint\"|g" "$SCRIPTDIR/02-at-scale/k8s/cbci-values.yml"
-  sed -i "s|scmCascMmStore: .*|scmCascMmStore: \"$endpoint\"|g" "$SCRIPTDIR/02-at-scale/casc/oc/variables/variables.yaml"
+  #Repo
+  sed -i "s|scmRepo: .*|scmRepo: \"$repo\"|g" "$SCRIPTDIR/02-at-scale/k8s/cbci-values.yml"
+  sed -i "s|scmCascMmStore: .*|scmCascMmStore: \"$repo\"|g" "$SCRIPTDIR/02-at-scale/cbci/casc/oc/variables/variables.yaml"
   #Branch
   sed -i "s|scmBranch: .*|scmBranch: $branch|g" "$SCRIPTDIR/02-at-scale/k8s/cbci-values.yml"
-  sed -i "s|cascBranch: .*|cascBranch: $branch|g" "$SCRIPTDIR/02-at-scale/casc/oc/variables/variables.yaml"
-  sed -i "s|bundle: \".*/none-ha\"|bundle: \"$branch/none-ha\"|g" "$SCRIPTDIR/02-at-scale/casc/oc/items/root.yaml"
-  sed -i "s|bundle: \".*/ha\"|bundle: \"$branch/ha\"|g" "$SCRIPTDIR/02-at-scale/casc/oc/items/root.yaml"
+  sed -i "s|cascBranch: .*|cascBranch: $branch|g" "$SCRIPTDIR/02-at-scale/cbci/casc/oc/variables/variables.yaml"
+  sed -i "s|sharedLibBranch: .*|sharedLibBranch: $branch|g" "$SCRIPTDIR/02-at-scale/cbci/casc/mc/parent/variables/variables.yaml"
+  sed -i "s|bundle: \".*/none-ha\"|bundle: \"$branch/none-ha\"|g" "$SCRIPTDIR/02-at-scale/cbci/casc/oc/items/root.yaml"
+  sed -i "s|bundle: \".*/ha\"|bundle: \"$branch/ha\"|g" "$SCRIPTDIR/02-at-scale/cbci/casc/oc/items/root.yaml"
 }
 
 run-aws-nuke () {

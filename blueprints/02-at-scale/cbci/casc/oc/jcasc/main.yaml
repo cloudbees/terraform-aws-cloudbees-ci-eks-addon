@@ -13,8 +13,7 @@ unclassified:
           defaultVersion: ${cascBranch}
           scmSource:
             git:
-              credentialsId: "GH-token"
-              remote: ${scmCascMmStore}
+              remote: ${cascRepo}
               traits:
               - "gitBranchDiscovery"
               - headWildcardFilter:
@@ -22,7 +21,7 @@ unclassified:
               - sparseCheckoutPaths:
                   extension:
                     sparseCheckoutPaths:
-                    - path: "/blueprints/02-at-scale/cbci/casc/mc/"
+                    - path: ${cascPathController}
   cascAutoControllerProvisioning:
     provisionControllerOnCreation: true
   buildDiscarders:
