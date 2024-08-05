@@ -98,18 +98,6 @@ jobs:
       if: contains(env.STAGES, 'deploy')
       shell: bash
       run : |
-        cat <<EOT >> blueprints/${{ env.ROOT }}/.auto.tfvars
-        ${{ env.TF_AUTO_VARS_FILE }}
-        EOT
-        cat <<EOT >> blueprints/${{ env.ROOT }}/backend.tf
-        terraform {
-          backend "s3" {
-            bucket = "${{ env.BUCKET_NAME_TF_STATE }}"
-            key    = "${{ env.ROOT }}/ci.terraform.tfstate"
-            region = "${{ env.AWS_REGION }}"
-          }
-        }
-        EOT
         CI=true make deploy
         aws s3api put-object \
             --bucket ${{ env.BUCKET_NAME_TF_STATE }} \
@@ -122,7 +110,7 @@ jobs:
       if: contains(env.STAGES, 'validate')
       shell: bash
       run : |
-        echo "validate"
+        CI=true make validate
 
     - name: 01-getting-started - Destroy
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
