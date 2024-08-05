@@ -281,7 +281,7 @@ HashiCorp Vault is used as a credential provider for CloudBees CI Pipelines in t
 
 ##### Container Registry
 
-This blueprints uses a couple of container registries for different purposes.
+This blueprints use a couple of container registries for different purposes.
 
 - The Public Registry uses DockerHub.
 - The Private Registry uses AWS ECR.
