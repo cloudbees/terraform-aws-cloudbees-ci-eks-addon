@@ -267,7 +267,7 @@ HashiCorp Vault is used as a credential provider for CloudBees CI Pipelines in t
       eval $(terraform output --raw cbci_controller_c_windows_node_build)
       ```
 
-      It triggers `windows-build-nodes` pipeline from `team-c-ha` controller.
+      It triggers the `windows-build-nodes` Pipeline from the `team-c-ha` controller.
 
       Note that the first build for a new Windows image container can take up to 10 minutes to run; subsequent builds should take seconds to run. This behavior can be improved as explained in the section [Architecture](#architecture).
 
