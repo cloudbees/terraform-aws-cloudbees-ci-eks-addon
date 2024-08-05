@@ -33,7 +33,7 @@ repos:
         - --hook-config=--retry-once-with-cleanup=true
     - id: terraform_tflint
       args:
-        #- '--args=--only=terraform_deprecated_interpolation'
+        - '--args=--only=terraform_deprecated_interpolation'
         - '--args=--only=terraform_deprecated_index'
         - '--args=--only=terraform_unused_declarations'
         - '--args=--only=terraform_comment_syntax'
