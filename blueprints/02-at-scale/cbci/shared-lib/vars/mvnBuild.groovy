@@ -1,6 +1,7 @@
 // vars/mvnBuild
 
-def call(boolean skipTests=false){
+def call(Map args = [:]) {
+	def skipTests = args.containsKey('skipTests') ? args.skipTests : error('mvnBuild: skipTests parameter is required')
 	if (skipTests) {
 		sh 'mvn clean package -DskipTests -Dmaven.repo.local=./maven-repo'
 	} else {
