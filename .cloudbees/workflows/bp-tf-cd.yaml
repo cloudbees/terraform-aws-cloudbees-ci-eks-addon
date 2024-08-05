@@ -12,9 +12,11 @@ on:
   workflow_dispatch:
 
 env:
-  AWS_REGION: "us-east-1"
+  AWS_REGION_TF_BUCKET: "us-east-1"
+  AWS_REGION_BP: "us-west-2"
   BUCKET_NAME_TF_STATE: "cbci-eks-addon-tf-state-v2"
   AWS_ROLE_TO_ASSUME: "infra-admin-ci"
+  SUFFIX: "ci-v11"
   TF_AUTO_VARS_FILE: |
     tags = {
       "cb-owner" : "professional-services"
@@ -27,7 +29,7 @@ env:
       email = "ci.user@cloudbees.io"
       company = "CloudBees Inc."
     }
-    suffix = "ci-v11"
+    suffix = "${{ env.SUFFIX }}"
     ci = true
 
 jobs:
@@ -37,7 +39,7 @@ jobs:
     - name: Configure AWS Credentials
       uses: cloudbees-io/configure-aws-credentials@v1
       with:
-        aws-region: ${{ env.AWS_REGION }}
+        aws-region: ${{ env.AWS_REGION_TF_BUCKET }}
         aws-access-key-id: ${{ secrets.AWS_TF_CBCI_EKS_AccessKeyID }}
         aws-secret-access-key: ${{ secrets.AWS_TF_CBCI_EKS_SecretAccessKey }}
         role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
@@ -52,15 +54,14 @@ jobs:
         set -x
         aws s3api create-bucket \
           --bucket ${{ env.BUCKET_NAME_TF_STATE }} \
-          --region ${{ env.AWS_REGION }} || echo "Bucket ${{ env.BUCKET_NAME_TF_STATE }} already exists"
-        aws kms delete-alias --alias-name alias/eks/cbci-bp01-ci-v11-eks --region us-west-2
+          --region ${{ env.AWS_REGION_TF_BUCKET }} || echo "Bucket ${{ env.BUCKET_NAME_TF_STATE }} already exists"
 
   bp01:
     env:
       ROOT: 01-getting-started
       TF_VAR_hosted_zone: bp01.aws.ps.beescloud.com
       # Add the stages to execute in the pipeline: deploy,validate,destroy,wipeout
-      STAGES: ""
+      STAGES: "deploy"
     needs:
       - init
     steps:
@@ -68,7 +69,7 @@ jobs:
     - name: Configure AWS Credentials
       uses: cloudbees-io/configure-aws-credentials@v1
       with:
-        aws-region: ${{ env.AWS_REGION }}
+        aws-region: ${{ env.AWS_REGION_BP }}
         aws-access-key-id: ${{ secrets.AWS_TF_CBCI_EKS_AccessKeyID }}
         aws-secret-access-key: ${{ secrets.AWS_TF_CBCI_EKS_SecretAccessKey }}
         role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
@@ -90,7 +91,7 @@ jobs:
           backend "s3" {
             bucket = "${{ env.BUCKET_NAME_TF_STATE }}"
             key    = "${{ env.ROOT }}/ci.terraform.tfstate"
-            region = "${{ env.AWS_REGION }}"
+            region = "${{ env.AWS_REGION_TF_BUCKET }}"
           }
         }
         EOT
@@ -100,10 +101,12 @@ jobs:
       if: contains(env.STAGES, 'deploy')
       shell: bash
       run : |
+        set -x
+        aws kms delete-alias --alias-name alias/eks/cbci-bp01-${{ env.SUFFIX }}-eks --region ${{ env.AWS_REGION_BP }} || echo "Alias alias/eks/cbci-bp01-${{ env.SUFFIX }}-eks does not exist"
         CI=true make deploy
         aws s3api put-object \
             --bucket ${{ env.BUCKET_NAME_TF_STATE }} \
-            --region ${{ env.AWS_REGION }} \
+            --region ${{ env.AWS_REGION_TF_BUCKET }} \
             --key ${{ env.ROOT }}/${{ env.ROOT }}.kubeconfig.yaml \
             --body $(cd blueprints/${{ env.ROOT }} && terraform output --raw kubeconfig_file)
 
@@ -141,7 +144,7 @@ jobs:
     - name: Configure AWS Credentials
       uses: cloudbees-io/configure-aws-credentials@v1
       with:
-        aws-region: ${{ env.AWS_REGION }}
+        aws-region: ${{ env.AWS_REGION_BP }}
         aws-access-key-id: ${{ secrets.AWS_TF_CBCI_EKS_AccessKeyID }}
         aws-secret-access-key: ${{ secrets.AWS_TF_CBCI_EKS_SecretAccessKey }}
         role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
@@ -168,7 +171,7 @@ jobs:
           backend "s3" {
             bucket = "${{ env.BUCKET_NAME_TF_STATE }}"
             key    = "${{ env.ROOT }}/ci.terraform.tfstate"
-            region = "${{ env.AWS_REGION }}"
+            region = "${{ env.AWS_REGION_TF_BUCKET }}"
           }
         }
         EOT
@@ -178,11 +181,12 @@ jobs:
       if: contains(env.STAGES, 'deploy')
       shell: bash
       run : |
-        CI=true make deploy
         set -x
+        aws kms delete-alias --alias-name alias/eks/cbci-bp02-${{ env.SUFFIX }}-eks --region ${{ env.AWS_REGION_BP }} || echo "Alias alias/eks/cbci-bp02-${{ env.SUFFIX }}-eks does not exist"
+        CI=true make deploy
         aws s3api put-object \
             --bucket ${{ env.BUCKET_NAME_TF_STATE }} \
-            --region ${{ env.AWS_REGION }} \
+            --region ${{ env.AWS_REGION_TF_BUCKET }} \
             --key ${{ env.ROOT }}/${{ env.ROOT }}.kubeconfig.yaml \
             --body $(cd blueprints/${{ env.ROOT }} && terraform output --raw kubeconfig_file)
 
