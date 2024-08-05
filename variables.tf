@@ -74,7 +74,7 @@ variable "create_reg_secret" {
 }
 
 variable "reg_secret_ns" {
-  description = "Agent Namespace to allocate cbci-sec-reg secret. It is required when create_reg_secret is enabled."
+  description = "Agent namespace to allocate cbci-sec-reg secret. It is required when create_reg_secret is enabled."
   default     = "cbci"
   type        = string
   validation {
