@@ -52,7 +52,7 @@ variable "trial_license" {
 }
 
 variable "create_casc_secrets" {
-  description = "Create a Kubernetes basic secret for CloudBees Configuration as Code (cbci-sec-casc) and mount it into the Operation Center /var/run/secrets/cbci."
+  description = "Create a Kubernetes basic secret for CloudBees CasC (cbci-sec-casc) and mount it into the operations center (/var/run/secrets/cbci)."
   default     = false
   type        = bool
 }
