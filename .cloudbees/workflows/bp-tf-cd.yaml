@@ -60,7 +60,7 @@ jobs:
       ROOT: 01-getting-started
       TF_VAR_hosted_zone: bp01.aws.ps.beescloud.com
       # Add the stages to execute in the pipeline: deploy,validate,destroy,wipeout
-      STAGES: "deploy"
+      STAGES: "deploy,validate,destroy"
     needs:
       - init
     steps:
@@ -82,10 +82,10 @@ jobs:
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
       shell: bash
       run : |
-        set -x
         cat <<EOT >> blueprints/${{ env.ROOT }}/.auto.tfvars
         ${{ env.TF_AUTO_VARS_FILE }}
         EOT
+        cat blueprints/${{ env.ROOT }}/.auto.tfvars
         cat <<EOT >> blueprints/${{ env.ROOT }}/backend.tf
         terraform {
           backend "s3" {
@@ -95,6 +95,7 @@ jobs:
           }
         }
         EOT
+        cat blueprints/${{ env.ROOT }}/backend.tf
 
     - name: 01-getting-started - Deploy
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
@@ -137,7 +138,7 @@ jobs:
       ROOT: 02-at-scale
       TF_VAR_hosted_zone: bp02.aws.ps.beescloud.com
       # Add the stages to execute in the pipeline: deploy,validate,destroy,wipeout
-      STAGES: ""
+      STAGES: "deploy,validate,destroy"
     needs:
       - init
     steps:
@@ -159,7 +160,6 @@ jobs:
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
       shell: bash
       run : |
-        set -x
         cat <<EOT >> blueprints/${{ env.ROOT }}/.auto.tfvars
         ${{ env.TF_AUTO_VARS_FILE }}
         dh_reg_secret_auth = {
@@ -168,6 +168,7 @@ jobs:
           email = "example@gmail.com"
         }
         EOT
+        cat blueprints/${{ env.ROOT }}/.auto.tfvars
         cat <<EOT >> blueprints/${{ env.ROOT }}/backend.tf
         terraform {
           backend "s3" {
@@ -177,6 +178,7 @@ jobs:
           }
         }
         EOT
+        blueprints/${{ env.ROOT }}/backend.tf
 
     - name: 02-at-scale - Deploy
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
