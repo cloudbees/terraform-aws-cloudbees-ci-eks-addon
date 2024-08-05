@@ -212,7 +212,7 @@ HashiCorp Vault is used as a credential provider for CloudBees CI Pipelines in t
    eval $(terraform output --raw vault_configure)
    ```
 
-2. Access the HashiCorp Vault UI by issuing the following command. Enter the root token to log in from the _step 1_.
+2. Issue the following command to access the HashiCorp Vault UI. Enter the root token to sign in from _step 1_.
 
    ```sh
    eval $(terraform output --raw vault_dashboard)
