@@ -1,4 +1,0 @@
-version: 1
-type: pipeline-template-catalog
-name: cbBlogExamples
-displayName: CloudBees Blog Post Examples
