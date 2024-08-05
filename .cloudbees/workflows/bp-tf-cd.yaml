@@ -53,6 +53,7 @@ jobs:
         aws s3api create-bucket \
           --bucket ${{ env.BUCKET_NAME_TF_STATE }} \
           --region ${{ env.AWS_REGION }} || echo "Bucket ${{ env.BUCKET_NAME_TF_STATE }} already exists"
+        aws kms delete-alias --alias-name alias/eks/cbci-bp01-ci-v11-eks --region us-west-2
 
   bp01:
     env:
@@ -132,7 +133,7 @@ jobs:
       ROOT: 02-at-scale
       TF_VAR_hosted_zone: bp02.aws.ps.beescloud.com
       # Add the stages to execute in the pipeline: deploy,validate,destroy,wipeout
-      STAGES: "deploy"
+      STAGES: ""
     needs:
       - init
     steps:
