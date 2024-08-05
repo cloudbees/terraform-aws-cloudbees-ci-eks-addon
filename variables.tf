@@ -63,7 +63,7 @@ variable "casc_secrets_file" {
   type        = string
   validation {
     condition     = length(trimspace(var.casc_secrets_file)) > 0
-    error_message = "Casc secret file  must not be an empty string."
+    error_message = "CasC secret file must not be an empty string."
   }
 }
 
