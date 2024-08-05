@@ -99,7 +99,7 @@ jobs:
             --bucket ${{ env.BUCKET_NAME_TF_STATE }} \
             --region ${{ env.AWS_REGION }} \
             --key ${{ env.ROOT }}/${{ env.ROOT }}.kubeconfig.yaml \
-            --body ${{ cd blueprints/${{ env.ROOT }} && terraform output --raw kubeconfig_file }}
+            --body $(cd blueprints/${{ env.ROOT }} && terraform output --raw kubeconfig_file)
 
     - name: 01-getting-started - Validate
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
@@ -170,7 +170,7 @@ jobs:
             --bucket ${{ env.BUCKET_NAME_TF_STATE }} \
             --region ${{ env.AWS_REGION }} \
             --key ${{ env.ROOT }}/${{ env.ROOT }}.kubeconfig.yaml \
-            --body ${{ cd blueprints/${{ env.ROOT }} && terraform output --raw kubeconfig_file }}
+            --body $(cd blueprints/${{ env.ROOT }} && terraform output --raw kubeconfig_file)
 
     - name: 02-at-scale - Validate
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
