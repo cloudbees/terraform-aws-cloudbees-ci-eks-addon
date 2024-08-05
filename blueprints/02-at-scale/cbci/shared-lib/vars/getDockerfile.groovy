@@ -1,10 +1,10 @@
 // vars/getDockerfile
 
-def call(String fileName){
-    if (fileName?.trim()) {
-        Object dockerfileContent = libraryResource "dockerfiles/${fileName}"
+def call(String filePath){
+    if (filePath?.trim()) {
+        Object dockerfileContent = libraryResource "dockerfiles/${filePath}"
         writeFile file: 'Dockerfile', text: dockerfileContent
     } else {
-        error 'fileName is empty. Please provide a valid location.'
+        error 'filePath is empty. Please provide a valid location.'
     }
 }

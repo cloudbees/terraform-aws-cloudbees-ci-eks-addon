@@ -1,4 +1,4 @@
-Get the Dockerfile passed as a parameter (fileName) from the Shared Library Resources and copy it into the workspace.
+Get the Dockerfile passed as a parameter (filePath) from the Shared Library Resources and copy it into the workspace.
 
 ```
 getDockerfile("HelloWorld.Dockerfile")
