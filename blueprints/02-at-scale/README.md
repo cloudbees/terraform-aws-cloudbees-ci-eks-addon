@@ -119,7 +119,7 @@ This blueprint divides scalable node groups for different types of workloads:
 
 ## Prerequisites
 
-This blueprint uses [DockerHub](https://hub.docker.com/) as a Container Registry Service. Then, an existing DockerHub account is required (username, password and email).
+This blueprint uses [DockerHub](https://hub.docker.com/) as a container registry service. Note that an existing DockerHub account is required (username, password, and email).
 
 > [!TIP]
 > Use `docker login` to validate username and password.
