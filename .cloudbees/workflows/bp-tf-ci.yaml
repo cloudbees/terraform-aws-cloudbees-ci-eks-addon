@@ -212,4 +212,4 @@ jobs:
         TF_VAR_hosted_zone: bp02.aws.ps.beescloud.com
       shell: bash
       run : |
-        CI=true make destroy
+        terraform -chdir=blueprints/${{ env.ROOT }} init -reconfigure && CI=true make destroy
