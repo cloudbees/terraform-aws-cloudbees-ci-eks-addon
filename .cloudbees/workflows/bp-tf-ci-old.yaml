@@ -55,8 +55,7 @@ jobs:
 
   bp01:
     env:
-      # Add the stages to execute in the pipeline: deploy,validate,destroy
-      STAGES: "deploy,validate,destroy"
+      CLEAN_UP: "false"
     needs:
       - init
     steps:
@@ -76,37 +75,46 @@ jobs:
 
     - name: 01-getting-started - Deploy
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
-      if: contains(env.STAGES, 'deploy')
       env:
         ROOT: 01-getting-started
         TF_VAR_hosted_zone: bp01.aws.ps.beescloud.com
       shell: bash
       run : |
-        echo "deploy"
+        cat <<EOT >> blueprints/${{ env.ROOT }}/.auto.tfvars
+        ${{ env.TF_AUTO_VARS_FILE }}
+        EOT
+        cat <<EOT >> blueprints/${{ env.ROOT }}/backend.tf
+        terraform {
+          backend "s3" {
+            bucket = "${{ env.BUCKET_NAME_TF_STATE }}"
+            key    = "${{ env.ROOT }}/ci.terraform.tfstate"
+            region = "${{ env.AWS_REGION }}"
+          }
+        }
+        EOT
+        [ "${{ env.CLEAN_UP }}" = "true" ] && echo "Skipping... Clean up mode." || CI=true make deploy
 
     - name: 01-getting-started - Validate
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
-      if: contains(env.STAGES, 'validate')
       env:
         ROOT: 01-getting-started
       shell: bash
       run : |
-        echo "validate"
+        [ "${{ env.CLEAN_UP }}" = "true" ] && echo "Skipping... Clean up mode." || CI=true make validate
 
     - name: 01-getting-started - Destroy
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
-      if: contains(env.STAGES, 'destroy')
       env:
         ROOT: 01-getting-started
         TF_VAR_hosted_zone: bp01.aws.ps.beescloud.com
       shell: bash
       run : |
-        echo "destroy"
+        [ "${{ env.CLEAN_UP }}" = "true" ] && terraform -chdir=blueprints/${{ env.ROOT }} init -reconfigure && CI=true make destroy \
+          || CI=true make destroy
 
   bp02:
     env:
-      # Add the stages to execute in the pipeline: deploy,validate,destroy
-      STAGES: "deploy,validate,destroy"
+        CLEAN_UP: "false"
     needs:
       - init
     steps:
@@ -126,29 +134,41 @@ jobs:
 
     - name: 02-at-scale - Deploy
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
-      if: contains(env.STAGES, 'deploy')
       env:
         ROOT: 02-at-scale
         TF_VAR_hosted_zone: bp02.aws.ps.beescloud.com
       shell: bash
       run : |
-        echo "deploy"
+        cat <<EOT >> blueprints/${{ env.ROOT }}/.auto.tfvars
+        ${{ env.TF_AUTO_VARS_FILE }}
+        gh_user = "exampleUser"
+        gh_token = "ExampleToken1234"
+        EOT
+        cat <<EOT >> blueprints/${{ env.ROOT }}/backend.tf
+        terraform {
+          backend "s3" {
+            bucket = "${{ env.BUCKET_NAME_TF_STATE }}"
+            key    = "${{ env.ROOT }}/ci.terraform.tfstate"
+            region = "${{ env.AWS_REGION }}"
+          }
+        }
+        EOT
+        [ "${{ env.CLEAN_UP }}" = "true" ] && echo "Skipping... Clean up mode." || CI=true make deploy
 
     - name: 02-at-scale - Validate
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
-      if: contains(env.STAGES, 'validate')
       env:
         ROOT: 02-at-scale
       shell: bash
       run : |
-        echo "validate"
+        [ "${{ env.CLEAN_UP }}" = "true" ] && echo "Skipping... Clean up mode." || CI=true make validate
 
     - name: 02-at-scale - Destroy
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
-      if: contains(env.STAGES, 'destroy')
       env:
         ROOT: 02-at-scale
         TF_VAR_hosted_zone: bp02.aws.ps.beescloud.com
       shell: bash
       run : |
-        echo "destroy"
+        [ "${{ env.CLEAN_UP }}" = "true" ] && terraform -chdir=blueprints/${{ env.ROOT }} init -reconfigure && CI=true make destroy \
+          || CI=true make destroy
