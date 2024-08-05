@@ -43,7 +43,7 @@ variable "trial_license" {
   type        = map(string)
   validation {
     condition     = contains(keys(var.trial_license), "first_name") && contains(keys(var.trial_license), "last_name") && contains(keys(var.trial_license), "email") && contains(keys(var.trial_license), "company")
-    error_message = "trial_license must contain the following keys: first_name, last_name, email, company."
+    error_message = "The trial_license must contain the following keys: first_name, last_name, email, company."
   }
   validation {
     condition     = length(var.trial_license) == 4
@@ -94,11 +94,11 @@ variable "reg_secret_auth" {
   }
   validation {
     condition     = contains(keys(var.reg_secret_auth), "server") && contains(keys(var.reg_secret_auth), "username") && contains(keys(var.reg_secret_auth), "password") && contains(keys(var.reg_secret_auth), "email")
-    error_message = "reg_server must contain the following keys: server, username, password and email."
+    error_message = "The reg_secret_auth must contain the following keys: server, username, password and email."
   }
   validation {
     condition     = length(var.reg_secret_auth) == 4
-    error_message = "reg_server must contain 4 keys."
+    error_message = "The reg_secret_auth must contain 4 keys."
   }
 }
 
