@@ -16,7 +16,7 @@ env:
   AWS_REGION_BP: "us-west-2"
   BUCKET_NAME_TF_STATE: "cbci-eks-addon-tf-state-v2"
   AWS_ROLE_TO_ASSUME: "infra-admin-ci"
-  SUFFIX: "ci-v11"
+  TF_VAR_suffix: "ci-v11"
   TF_AUTO_VARS_FILE: |
     tags = {
       "cb-owner" : "professional-services"
@@ -29,7 +29,6 @@ env:
       email = "ci.user@cloudbees.io"
       company = "CloudBees Inc."
     }
-    suffix = "${{ env.SUFFIX }}"
     ci = true
 
 jobs:
@@ -102,7 +101,7 @@ jobs:
       shell: bash
       run : |
         set -x
-        aws kms delete-alias --alias-name alias/eks/cbci-bp01-${{ env.SUFFIX }}-eks --region ${{ env.AWS_REGION_BP }} || echo "Alias alias/eks/cbci-bp01-${{ env.SUFFIX }}-eks does not exist"
+        aws kms delete-alias --alias-name alias/eks/cbci-bp01-${{ env.TF_VAR_suffix }}-eks --region ${{ env.AWS_REGION_BP }} || echo "Alias alias/eks/cbci-bp01-${{ env.TF_VAR_suffix }}-eks does not exist"
         CI=true make deploy
         aws s3api put-object \
             --bucket ${{ env.BUCKET_NAME_TF_STATE }} \
@@ -182,7 +181,7 @@ jobs:
       shell: bash
       run : |
         set -x
-        aws kms delete-alias --alias-name alias/eks/cbci-bp02-${{ env.SUFFIX }}-eks --region ${{ env.AWS_REGION_BP }} || echo "Alias alias/eks/cbci-bp02-${{ env.SUFFIX }}-eks does not exist"
+        aws kms delete-alias --alias-name alias/eks/cbci-bp02-${{ env.TF_VAR_suffix }}-eks --region ${{ env.TF_VAR_suffix }} || echo "Alias alias/eks/cbci-bp02-${{ env.SUFFIX }}-eks does not exist"
         CI=true make deploy
         aws s3api put-object \
             --bucket ${{ env.BUCKET_NAME_TF_STATE }} \
