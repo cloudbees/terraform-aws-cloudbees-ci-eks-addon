@@ -96,7 +96,7 @@ The CloudBees CI add-on uses `helms release` for its resources definition, makin
 | hosted_zone | Amazon Route 53 hosted zone name. | `string` | n/a | yes |
 | trial_license | CloudBees CI trial license details for evaluation. | `map(string)` | n/a | yes |
 | casc_secrets_file | Secrets .yml file path containing the names: values secrets. It is required when create_casc_secrets is enabled. | `string` | `"secrets-values.yml"` | no |
-| create_casc_secrets | Create a Kubernetes basic secret for CloudBees Configuration as Code (cbci-sec-casc) and mount it into the Operation Center /var/run/secrets/cbci. | `bool` | `false` | no |
+| create_casc_secrets | Create a Kubernetes basic secret for CloudBees CasC (cbci-sec-casc) and mount it into the operations center (/var/run/secrets/cbci). | `bool` | `false` | no |
 | create_reg_secret | Create a Kubernetes dockerconfigjson secret for container registry authentication (cbci-sec-reg) for CI builds agents. | `bool` | `false` | no |
 | helm_config | CloudBees CI Helm chart configuration. | `any` | <pre>{<br>  "values": [<br>    ""<br>  ]<br>}</pre> | no |
 | prometheus_target | Creates a service monitor to discover the CloudBees CI Prometheus target dynamically. It is designed to be enabled with the AWS EKS Terraform Addon Kube Prometheus Stack. | `bool` | `false` | no |
