@@ -58,7 +58,7 @@ jobs:
       ROOT: 01-getting-started
       TF_VAR_hosted_zone: bp01.aws.ps.beescloud.com
       # Add the stages to execute in the pipeline: deploy,validate,destroy,wipeout
-      STAGES: "wipeout"
+      STAGES: "deploy"
     needs:
       - init
     steps:
@@ -131,7 +131,7 @@ jobs:
       ROOT: 02-at-scale
       TF_VAR_hosted_zone: bp02.aws.ps.beescloud.com
       # Add the stages to execute in the pipeline: deploy,validate,destroy,wipeout
-      STAGES: "wipeout"
+      STAGES: "deploy"
     needs:
       - init
     steps:
