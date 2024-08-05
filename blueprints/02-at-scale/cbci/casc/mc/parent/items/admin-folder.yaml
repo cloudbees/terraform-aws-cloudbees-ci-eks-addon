@@ -255,13 +255,13 @@ items:
                 stage('Public Registry') {
                   steps {
                     container(name: 'kaniko', shell: '/busybox/sh') {
-                      getDockerfile("HelloWorld.Dockerfile")  
+                      getDockerfile("HelloWorld.Dockerfile")
                       sh '''#!/busybox/sh
                         /kaniko/executor --context `pwd` --destination ^${TARGET_DH_ORG}/cbci-bp02-kaniko:^${BUILD_ID}
                       '''
                     }
                   }
-                }  
+                }
                 stage('Private Registry') {
                   steps {
                     container(name: 'kaniko-ecr', shell: '/busybox/sh') {
