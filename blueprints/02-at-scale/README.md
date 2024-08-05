@@ -49,7 +49,7 @@ This blueprint divides scalable node groups for different types of workloads:
     - Windows (role: `build-windows`): Windows 2019 AMI type.
 
 > [!IMPORTANT]
-> It is known that Linux container lunch time are faster than Windows container. That reality can be improved by using a cache container image strategy (see [Speeding up Windows container launch times with EC2 Image builder and image cache strategy](https://aws.amazon.com/blogs/containers/speeding-up-windows-container-launch-times-with-ec2-image-builder-and-image-cache-strategy/) and more about [Windows Container Best Practices](https://aws.github.io/aws-eks-best-practices/windows/docs/ami/)). Alternatively to Windows Containes, it is possible to use Windows VMs using [Shared Agent](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/shared-agents).
+> The launch time for Linux containers is faster than Windows containers. This can be improved by using a cache container image strategy. Refer to [Speeding up Windows container launch times with EC2 Image builder and image cache strategy](https://aws.amazon.com/blogs/containers/speeding-up-windows-container-launch-times-with-ec2-image-builder-and-image-cache-strategy/) and more about [Windows Container Best Practices](https://aws.github.io/aws-eks-best-practices/windows/docs/ami/)). Another potential alternative is to use Windows VMs with a [shared agent](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/shared-agents).
 
 ![Architecture](img/at-scale.architect.drawio.svg)
 
