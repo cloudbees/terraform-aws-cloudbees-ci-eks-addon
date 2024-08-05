@@ -187,7 +187,7 @@ This blueprint Kubernetes secrets for different purposes.
 > - Beyond the CloudBees CI add-on (used for demo purposes), Kubernetes secrets can be managed via [External Secret Operators](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/external-secrets/).
 > - Kubernetes secrets could be also be retrived as Jenkins Credentials via using the [Kubernetes Credentials Provider plugin](https://jenkinsci.github.io/kubernetes-credentials-provider-plugin/).
 
-###### Casc Secrets
+###### CasC secrets
 
 The secrets key/value file defined in [k8s/secrets-values.yml](k8s/secrets-values.yml) is converted into a Kubernetes secret (`cbci-sec-casc`) and mounted into /run/secrets/ for Operation Center and Controllers to be consumed via CloudBees Casc. See [Configuration as Code - Handling Secrets - Kubernetes Secrets](https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/docs/features/secrets.adoc#kubernetes-secrets) for more information.
 
