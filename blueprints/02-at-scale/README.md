@@ -269,7 +269,7 @@ HashiCorp Vault is used as a credential provider for CloudBees CI Pipelines in t
 
       It triggers the `windows-build-nodes` Pipeline from the `team-c-ha` controller.
 
-      Note that the first build for a new Windows image container can take up to 10 minutes to run; subsequent builds should take seconds to run. This behavior can be improved as explained in the section [Architecture](#architecture).
+      Note that the first build for a new Windows image container can take up to 10 minutes to run; subsequent builds should take seconds to run. This behavior can be improved, as explained in the section [Architecture](#architecture).
 
 3. Right after triggering the builds, issue the following to validate pod agent provisioning to build the pipeline code:
 
