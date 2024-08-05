@@ -56,7 +56,7 @@ jobs:
   bp01:
     env:
       # Add the stages to execute in the pipeline: deploy,validate,destroy
-      STAGES: "deploy,validate,destroy"
+      STAGES: "destroy"
     needs:
       - init
     steps:
@@ -106,7 +106,7 @@ jobs:
   bp02:
     env:
       # Add the stages to execute in the pipeline: deploy,validate,destroy
-      STAGES: "deploy,validate,destroy"
+      STAGES: "deploy,validate"
     needs:
       - init
     steps:
