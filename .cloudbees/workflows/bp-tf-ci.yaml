@@ -55,8 +55,8 @@ jobs:
 
   bp01:
     env:
-      # Add the stages to execute in the pipeline: deploy,validate,destroy
-      STAGES: "deploy,validate"
+      # Add the stages to execute in the pipeline: deploy,validate,destroy,reconfigure-destroy
+      STAGES: "reconfigure-destroy"
     needs:
       - init
     steps:
@@ -118,12 +118,23 @@ jobs:
         TF_VAR_hosted_zone: bp01.aws.ps.beescloud.com
       shell: bash
       run : |
-        echo "destroy"
+        CI=true make destroy
+
+    # Use this to clean up failed deployments
+    - name: 01-getting-started - Reconfigure and Destroy
+      uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
+      if: contains(env.STAGES, 'reconfigure-destroy')
+      env:
+        ROOT: 01-getting-started
+        TF_VAR_hosted_zone: bp01.aws.ps.beescloud.com
+      shell: bash
+      run : |
+        terraform -chdir=blueprints/${{ env.ROOT }} init -reconfigure && CI=true make destroy
 
   bp02:
     env:
-      # Add the stages to execute in the pipeline: deploy,validate,destroy
-      STAGES: "deploy,validate"
+      # Add the stages to execute in the pipeline: deploy,validate,destroy,reconfigure-destroy
+      STAGES: "reconfigure-destroy"
     needs:
       - init
     steps:
@@ -154,6 +165,7 @@ jobs:
         dh_reg_secret_auth = {
           username = "foo"
           password = "d0ckerPass12"
+          email = "example@gmail.com"
         }
         EOT
         cat <<EOT >> blueprints/${{ env.ROOT }}/backend.tf
@@ -189,4 +201,15 @@ jobs:
         TF_VAR_hosted_zone: bp02.aws.ps.beescloud.com
       shell: bash
       run : |
-        echo "destroy"
+        CI=true make destroy
+    
+    # Use this to clean up failed deployments
+    - name: 02-at-scale - Reconfigure and Destroy
+      uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
+      if: contains(env.STAGES, 'reconfigure-destroy')
+      env:
+        ROOT: 02-at-scale
+        TF_VAR_hosted_zone: bp02.aws.ps.beescloud.com
+      shell: bash
+      run : |
+        CI=true make destroy
