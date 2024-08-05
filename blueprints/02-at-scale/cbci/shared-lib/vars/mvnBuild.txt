@@ -1,4 +1,4 @@
-Execute mvn package target following best practices. 
+Execute mvn package target following best practices.
 
 ```
 mvnBuild(skipTests: true)
