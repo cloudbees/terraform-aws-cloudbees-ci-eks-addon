@@ -255,7 +255,7 @@ HashiCorp Vault is used as a credential provider for CloudBees CI Pipelines in t
       eval $(terraform output --raw cbci_controller_b_s3_build)
       ```
 
-      It triggers `s3-WScacheAndArtifacts` pipeline from `team-b` controller. This pipeline validates a couple of s3 integrations in parallel: one for [CloudBees Workspace Caching](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-cache-step) (using `linux-mavenAndKaniko-L`) and another for [s3 Artifact Manager](https://plugins.jenkins.io/artifact-manager-s3/) (using `linux-mavenAndKaniko-XL`).
+      It triggers the `s3-WScacheAndArtifacts` Pipeline from the `team-b` controller. This pipeline validates S3 integrations in parallel for [CloudBees workspace caching](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-cache-step) (using `linux-mavenAndKaniko-L`) and the [S3 artifact manager](https://plugins.jenkins.io/artifact-manager-s3/) (using `linux-mavenAndKaniko-XL`).
 
       Once the second build is complete, you can find the read cache operation at the beginning of the build logs and the write cache operation at the end of the build logs.
 
