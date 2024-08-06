@@ -13,7 +13,7 @@ on:
 
 env:
   AWS_REGION_TF_BUCKET: "us-east-1"
-  BUCKET_NAME_TF_STATE: "cbci-eks-addon-tf-state-v2"
+  BUCKET_NAME_TF_STATE: "cbci-eks-addon-tf-state-cd"
   AWS_ROLE_TO_ASSUME: "infra-admin-ci"
   TF_VAR_suffix: "ci-v11"
   TF_VAR_aws_region: "us-west-2"
@@ -208,13 +208,14 @@ jobs:
             --region ${{ env.AWS_REGION_TF_BUCKET }} \
             --key ${{ env.ROOT }}/${{ env.ROOT }}.terraform.output \
             --body blueprints/${{ env.ROOT }}/terraform.output
-        cd blueprints/${{ env.ROOT }} && eval $(terraform output --raw kubeconfig_export)
-        cd blueprints/${{ env.ROOT }} && eval $(terraform output --raw vault_init)
-        aws s3api put-object \
-            --bucket ${{ env.BUCKET_NAME_TF_STATE }} \
-            --region ${{ env.AWS_REGION_TF_BUCKET }} \
-            --key ${{ env.ROOT }}/${{ env.ROOT }}.vault.init.log \
-            --body $(cd blueprints/${{ env.ROOT }} && terraform output --raw vault_init_log_file) || echo "No vault-init.log found"
+        # TODO: Add vault init log to s3    
+        # cd blueprints/${{ env.ROOT }} && eval $(terraform output --raw kubeconfig_export)
+        # cd blueprints/${{ env.ROOT }} && eval $(terraform output --raw vault_init)
+        # aws s3api put-object \
+        #     --bucket ${{ env.BUCKET_NAME_TF_STATE }} \
+        #     --region ${{ env.AWS_REGION_TF_BUCKET }} \
+        #     --key ${{ env.ROOT }}/${{ env.ROOT }}.vault.init.log \
+        #     --body $(cd blueprints/${{ env.ROOT }} && terraform output --raw vault_init_log_file) || echo "No vault-init.log found"
 
     - name: 02-at-scale - Validate
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest

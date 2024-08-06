@@ -20,7 +20,7 @@ on:
 
 env:
   AWS_REGION_TF_BUCKET: "us-east-1"
-  BUCKET_NAME_TF_STATE: "cbci-eks-addon-tf-state-v2"
+  BUCKET_NAME_TF_STATE: "cbci-eks-addon-tf-state-ci"
   AWS_ROLE_TO_ASSUME: "infra-admin-ci"
   TF_VAR_suffix: "ci-v11"
   TF_VAR_aws_region: "us-west-2"
