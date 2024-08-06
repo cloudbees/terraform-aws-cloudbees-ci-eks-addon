@@ -68,3 +68,8 @@ output "eks_cluster_arn" {
   description = "Amazon EKS cluster ARN."
   value       = module.eks.cluster_arn
 }
+
+output "eks_cluster_name" {
+  description = "Amazon EKS cluster Name."
+  value       = module.eks.cluster_name
+}
