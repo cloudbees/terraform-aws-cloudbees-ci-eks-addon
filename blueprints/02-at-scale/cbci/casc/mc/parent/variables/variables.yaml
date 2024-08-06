@@ -1,0 +1,7 @@
+variables:
+  - ot_endpoint: "http://tempo.kube-prometheus-stack.svc.cluster.local:4317"
+  - s3bucketPreffix: "cbci"
+  - regSecretsName: "cbci-sec-reg"
+  - sharedLibRepo: "https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon.git"
+  - sharedLibBranch: develop
+  - sharedLibPath: "blueprints/02-at-scale/cbci/shared-lib"

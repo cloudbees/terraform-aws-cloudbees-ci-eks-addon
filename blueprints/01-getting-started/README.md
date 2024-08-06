@@ -19,7 +19,7 @@ This blueprint presents the minimum setup to run CloudBees CI on Amazon EKS; one
   - Instance type: [Graviton Processor](https://aws.amazon.com/ec2/graviton/) family.
   - Amazon Machine Image (AMI) type: [Amazon EKS-Optimized Amazon Linux 2023](https://aws.amazon.com/blogs/containers/amazon-eks-optimized-amazon-linux-2023-amis-now-available/)
 
-### Kubernetes cluster
+### Workloads
 
 ![K8sApps](img/getting-started.k8s.drawio.svg)
 
@@ -51,6 +51,7 @@ This blueprint presents the minimum setup to run CloudBees CI on Amazon EKS; one
 | cbci_oc_pod | Operations center pod for the CloudBees CI add-on. |
 | cbci_oc_url | URL of the CloudBees CI operations center for the CloudBees CI add-on. |
 | eks_cluster_arn | Amazon EKS cluster ARN. |
+| eks_cluster_name | Amazon EKS cluster Name. |
 | kubeconfig_add | Add kubeconfig to your local configuration to access the Kubernetes API. |
 | kubeconfig_export | Export the KUBECONFIG environment variable to access the Kubernetes API. |
 | vpc_arn | VPC ID. |

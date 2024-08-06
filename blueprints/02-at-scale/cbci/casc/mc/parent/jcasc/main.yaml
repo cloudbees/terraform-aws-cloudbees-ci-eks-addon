@@ -36,11 +36,25 @@ unclassified:
     gracePeriod: 3600
   openTelemetry:
     endpoint: ${ot_endpoint}
+  cascItemsConfiguration:
+    variableInterpolationEnabledForAdmin: true
+  globalLibraries:
+    libraries:
+    - defaultVersion: ${sharedLibBranch}
+      name: "common"
+      retriever:
+        modernSCM:
+          libraryPath: ${sharedLibPath}
+          scm:
+            git:
+              remote: ${sharedLibRepo}
 aws:
+  awsCredentials:
+    region: "${sec_awsRegion}"
   s3:
     container: "${sec_s3bucketName}"
     disableSessionToken: false
-    prefix: "cbci/"
+    prefix: "${s3bucketPreffix}/"
     useHttp: false
     usePathStyleUrl: false
     useTransferAcceleration: false

@@ -19,8 +19,8 @@
 
 The CloudBees CI [AWS partner add-on](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/aws-partner-addons/) streamlines the adoption and experimentation of CloudBees CI enterprise features by:
 
-- Encapsulating the deployment of [CloudBees CI on modern platforms in AWS EKS](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/installing-eks-using-helm#_configuring_your_environment) into a Terraform module.
-- Providing a series of [blueprints](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/tree/main/blueprints) that implement the CloudBees CI add-on module for use with [Amazon EKS blueprints for Terraform](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/), which are aligned with the [EKS Best Practices Guides](https://aws.github.io/aws-eks-best-practices/).
+- Encapsulating the deployment of [CloudBees CI on modern platforms in AWS EKS](https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/installing-eks-using-helm#_configuring_your_environment) and additional Kubernetes resources into a Terraform module.
+- Providing a series of opinionated [blueprints](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/tree/main/blueprints) that implement the CloudBees CI add-on module for use with [Amazon EKS blueprints for Terraform](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/), which are aligned with the [EKS Best Practices Guides](https://aws.github.io/aws-eks-best-practices/).
 
 ## Usage
 
@@ -95,10 +95,13 @@ The CloudBees CI add-on uses `helms release` for its resources definition, makin
 | cert_arn | AWS Certificate Manager (ACM) certificate for Amazon Resource Names (ARN). | `string` | n/a | yes |
 | hosted_zone | Amazon Route 53 hosted zone name. | `string` | n/a | yes |
 | trial_license | CloudBees CI trial license details for evaluation. | `map(string)` | n/a | yes |
-| create_k8s_secrets | Create the Kubernetes cbci-secrets. It can be consumed by CloudBees CasC for the operations center. | `bool` | `false` | no |
+| casc_secrets_file | Secrets .yml file path containing the names: values secrets. It is required when create_casc_secrets is enabled. | `string` | `"secrets-values.yml"` | no |
+| create_casc_secrets | Create a Kubernetes basic secret for CloudBees CasC (cbci-sec-casc) and mount it into the operations center (/var/run/secrets/cbci). | `bool` | `false` | no |
+| create_reg_secret | Create a Kubernetes dockerconfigjson secret for container registry authentication (cbci-sec-reg) for CI builds agents. | `bool` | `false` | no |
 | helm_config | CloudBees CI Helm chart configuration. | `any` | <pre>{<br>  "values": [<br>    ""<br>  ]<br>}</pre> | no |
-| k8s_secrets | Secrets .yml file as a string containing the names:values secrets. It is required when create_k8s_secrets is enabled. | `string` | `"secrets-values.yml"` | no |
 | prometheus_target | Creates a service monitor to discover the CloudBees CI Prometheus target dynamically. It is designed to be enabled with the AWS EKS Terraform Addon Kube Prometheus Stack. | `bool` | `false` | no |
+| reg_secret_auth | Registry server authentication details for cbci-sec-reg secret. It is required when create_reg_secret is enabled. | `map(string)` | <pre>{<br>  "email": "foo.bar@acme.com",<br>  "password": "changeme1234",<br>  "server": "my-registry.acme:5000",<br>  "username": "foo"<br>}</pre> | no |
+| reg_secret_ns | Agent namespace to allocate cbci-sec-reg secret. It is required when create_reg_secret is enabled. | `string` | `"cbci"` | no |
 
 ### Outputs
 
@@ -111,7 +114,8 @@ The CloudBees CI add-on uses `helms release` for its resources definition, makin
 | cbci_oc_ing | Operations center Ingress for the CloudBees CI add-on. |
 | cbci_oc_pod | Operations center pod for the CloudBees CI add-on. |
 | cbci_oc_url | Operations center URL for the CloudBees CI add-on using a subdomain and certificates. |
-| cbci_secrets | Optional. Kubernetes secrets name for CloudBees CI. |
+| cbci_sec_casc | Optional. Kubernetes secrets name for CloudBees CI Casc. |
+| cbci_sec_registry | Optional. Kubernetes secrets name for CloudBees CI agents to autheticate to registry. |
 | merged_helm_config | (merged) Helm configuration for CloudBees CI. |
 <!-- END_TF_DOCS -->
 

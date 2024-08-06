@@ -83,7 +83,7 @@ items:
                   store:
                     s3Store:
                       bucketName: "${sec_s3bucketName}"
-                      bucketFolder: cbci/backup
+                      bucketFolder: "${s3bucketPreffix}/backup"
                       region: "${sec_awsRegion}"
               itemSource:
                 jenkinsRootItemSource: {

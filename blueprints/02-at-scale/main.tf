@@ -5,23 +5,30 @@ data "aws_route53_zone" "this" {
 data "aws_availability_zones" "available" {}
 
 locals {
-  name = var.suffix == "" ? "cbci-bp02" : "cbci-bp02-${var.suffix}"
 
+  ############
+  # Infra
+  ############
 
-  vpc_name              = "${local.name}-vpc"
-  cluster_name          = "${local.name}-eks"
-  efs_name              = "${local.name}-efs"
-  resource_group_name   = "${local.name}-rg"
-  bucket_name           = "${local.name}-s3"
-  cbci_instance_profile = "${local.name}-instance_profile"
-  cbci_iam_role         = "${local.name}-iam_role_mn"
-  kubeconfig_file       = "kubeconfig_${local.name}.yaml"
-  kubeconfig_file_path  = abspath("k8s/${local.kubeconfig_file}")
+  name                      = var.suffix == "" ? "cbci-bp02" : "cbci-bp02-${var.suffix}"
+  vpc_name                  = "${local.name}-vpc"
+  cluster_name              = "${local.name}-eks"
+  efs_name                  = "${local.name}-efs"
+  resource_group_name       = "${local.name}-rg"
+  bucket_name               = "${local.name}-s3"
+  cbci_instance_profile_s3  = "${local.name}-instance_profile_s3"
+  cbci_iam_role_s3          = "${local.name}-iam_role_s3"
+  cbci_inline_policy_s3     = "${local.name}-iam_inline_policy_s3"
+  cbci_instance_profile_ecr = "${local.name}-instance_profile_ecr"
+  cbci_iam_role_ecr         = "${local.name}-iam_role_ecr"
+  cbci_inline_policy_ecr    = "${local.name}-iam_inline_policy_ecr"
+  kubeconfig_file           = "kubeconfig_${local.name}.yaml"
+  kubeconfig_file_path      = abspath("k8s/${local.kubeconfig_file}")
 
-  hibernation_monitor_url = "https://hibernation-${module.eks_blueprints_addon_cbci.cbci_namespace}.${module.eks_blueprints_addon_cbci.cbci_domain_name}"
-
-  vpc_cidr = "10.0.0.0/16"
-  azs      = slice(data.aws_availability_zones.available.names, 0, 3)
+  vpc_cidr         = "10.0.0.0/16"
+  azs              = slice(data.aws_availability_zones.available.names, 0, 3)
+  route53_zone_id  = data.aws_route53_zone.this.id
+  route53_zone_arn = data.aws_route53_zone.this.arn
 
   mng = {
     cbci_apps = {
@@ -36,6 +43,27 @@ locals {
     }
   }
 
+  cbci_s3_prefix        = "cbci"
+  cbci_s3_location      = "${module.cbci_s3_bucket.s3_bucket_arn}/${local.cbci_s3_prefix}"
+  fluentbit_s3_location = "${module.cbci_s3_bucket.s3_bucket_arn}/fluentbit"
+  velero_s3_location    = "${module.cbci_s3_bucket.s3_bucket_arn}/velero"
+
+  epoch_millis                    = time_static.epoch.unix * 1000
+  cloudwatch_logs_expiration_days = 7
+  s3_objects_expiration_days      = 90
+
+  tags = merge(var.tags, {
+    "tf-blueprint"  = local.name
+    "tf-repository" = "github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon"
+  })
+
+  ############
+  # K8s Apps
+  ############
+
+  global_password      = random_string.global_pass_string.result
+  global_pass_jsonpath = "'{.data.sec_globalPassword}'"
+
   bottlerocket_bootstrap_extra_args = <<-EOT
               [settings.host-containers.admin]
               enabled = false
@@ -47,39 +75,21 @@ locals {
               "bottlerocket.aws/updater-interface-version" = "2.0.0"
             EOT
 
-  route53_zone_id  = data.aws_route53_zone.this.id
-  route53_zone_arn = data.aws_route53_zone.this.arn
-
-  tags = merge(var.tags, {
-    "tf-blueprint"  = local.name
-    "tf-repository" = "github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon"
-  })
-
-  #s3 application prefixes
-  cbci_s3_location      = "${module.cbci_s3_bucket.s3_bucket_arn}/cbci"
-  fluentbit_s3_location = "${module.cbci_s3_bucket.s3_bucket_arn}/fluentbit"
-  velero_s3_location    = "${module.cbci_s3_bucket.s3_bucket_arn}/velero"
-
-  epoch_millis    = time_static.epoch.unix * 1000
-  global_password = random_string.global_pass_string.result
-
-  cloudwatch_logs_expiration_days = 7
-  s3_objects_expiration_days      = 90
-
-  # Validation Phase for Terraform Outputs
-
   #Velero Backups: Only for controllers using block storage (for example, Amazon EBS volumes in AWS)
   velero_controller_backup          = "team-b"
   velero_controller_backup_selector = "tenant=${local.velero_controller_backup}"
   velero_schedule_name              = "schedule-${local.velero_controller_backup}"
 
-  cbci_agents_ns = "cbci-agents"
+  hibernation_monitor_url = "https://hibernation-${module.eks_blueprints_addon_cbci.cbci_namespace}.${module.eks_blueprints_addon_cbci.cbci_domain_name}"
+  cbci_admin_user         = "admin_cbci_a"
+  cbci_agents_ns          = "cbci-agents"
   #K8S agent template name from the CasC bundle
-  cbci_agent_linuxtempl   = "linux-mavenAndGo"
+  cbci_agent_linuxtempl   = "linux-mavenAndKaniko-"
   cbci_agent_windowstempl = "windows-powershell"
 
-  cbci_admin_user      = "admin_cbci_a"
-  global_pass_jsonpath = "'{.data.sec_globalPassword}'"
+  vault_ns               = "vault"
+  vault_config_file_path = abspath("k8s/vault-config.sh")
+  vault_init_file_path   = abspath("k8s/vault-init.log")
 }
 
 resource "random_string" "global_pass_string" {
@@ -97,11 +107,12 @@ resource "time_static" "epoch" {
 # EKS: Add-ons
 ################################################################################
 
-# CloudBees CI Add-ons
+# CloudBees CI Add-on
 
 module "eks_blueprints_addon_cbci" {
-  source  = "cloudbees/cloudbees-ci-eks-addon/aws"
-  version = ">= 3.18072.0"
+  # source  = "cloudbees/cloudbees-ci-eks-addon/aws"
+  # version = ">= 3.18072.0"
+  source = "../../"
 
   depends_on = [module.eks_blueprints_addons]
 
@@ -118,15 +129,23 @@ module "eks_blueprints_addon_cbci" {
     })]
   }
 
-  create_k8s_secrets = true
-  k8s_secrets = templatefile("k8s/secrets-values.yml", {
+  create_casc_secrets = true
+  casc_secrets_file = templatefile("k8s/secrets-values.yml", {
     global_password = local.global_password
     s3bucketName    = local.bucket_name
     awsRegion       = var.aws_region
     adminMail       = var.trial_license["email"]
-    githubUser      = var.gh_user
-    githubToken     = var.gh_token
   })
+
+  create_reg_secret = true
+  reg_secret_ns     = local.cbci_agents_ns
+  #Note: This blueprint tests DockerHub as container registry but different registries can be used.
+  reg_secret_auth = {
+    server   = "https://index.docker.io/v1/"
+    username = var.dh_reg_secret_auth["username"]
+    password = var.dh_reg_secret_auth["password"]
+    email    = var.dh_reg_secret_auth["email"]
+  }
 
   prometheus_target = true
 
@@ -299,7 +318,9 @@ module "eks_blueprints_addons" {
   bottlerocket_update_operator = {
     values = [file("k8s/br-update-operator-values.yml")]
   }
+  #####################
   #Additional Helm Releases
+  #####################
   helm_releases = {
     openldap-stack = {
       chart            = "openldap-stack-ha"
@@ -313,12 +334,13 @@ module "eks_blueprints_addons" {
       })]
     }
     aws-node-termination-handler = {
-      name          = "aws-node-termination-handler"
-      namespace     = "kube-system"
-      chart         = "aws-node-termination-handler"
-      chart_version = "0.21.0"
-      repository    = "https://aws.github.io/eks-charts"
-      values        = [file("k8s/aws-node-term-handler-values.yml")]
+      name             = "aws-node-termination-handler"
+      namespace        = "kube-system"
+      create_namespace = false
+      chart            = "aws-node-termination-handler"
+      chart_version    = "0.21.0"
+      repository       = "https://aws.github.io/eks-charts"
+      values           = [file("k8s/aws-node-term-handler-values.yml")]
     }
     grafana-tempo = {
       name             = "tempo"
@@ -328,6 +350,16 @@ module "eks_blueprints_addons" {
       chart_version    = "1.7.2"
       repository       = "https://grafana.github.io/helm-charts"
       values           = [file("k8s/grafana-tempo.yml")]
+    }
+    #Based on hashicorp/hashicorp-vault-eks-addon/aws
+    vault = {
+      name             = "vault"
+      namespace        = local.vault_ns
+      create_namespace = true
+      chart            = "vault"
+      chart_version    = "0.28.0"
+      repository       = "https://helm.releases.hashicorp.com"
+      values           = [file("k8s/vault-values.yml")]
     }
   }
 
@@ -431,7 +463,7 @@ module "eks" {
         storage = "enabled"
       }
       create_iam_role            = false
-      iam_role_arn               = aws_iam_role.managed_ng.arn
+      iam_role_arn               = aws_iam_role.managed_ng_s3.arn
       ami_type                   = "BOTTLEROCKET_ARM_64"
       platform                   = "bottlerocket"
       enable_bootstrap_user_data = true
@@ -447,6 +479,8 @@ module "eks" {
       labels = {
         role = "build-linux"
       }
+      create_iam_role            = false
+      iam_role_arn               = aws_iam_role.managed_ng_ecr.arn
       ami_type                   = "BOTTLEROCKET_ARM_64"
       platform                   = "bottlerocket"
       enable_bootstrap_user_data = true
@@ -466,6 +500,8 @@ module "eks" {
       labels = {
         role = "build-linux-spot"
       }
+      create_iam_role            = false
+      iam_role_arn               = aws_iam_role.managed_ng_ecr.arn
       ami_type                   = "BOTTLEROCKET_ARM_64"
       platform                   = "bottlerocket"
       enable_bootstrap_user_data = true
@@ -483,6 +519,8 @@ module "eks" {
       labels = {
         role = "build-linux-spot"
       }
+      create_iam_role            = false
+      iam_role_arn               = aws_iam_role.managed_ng_ecr.arn
       ami_type                   = "BOTTLEROCKET_ARM_64"
       platform                   = "bottlerocket"
       enable_bootstrap_user_data = true
@@ -527,9 +565,9 @@ data "aws_iam_policy_document" "managed_ng_assume_role_policy" {
   }
 }
 
-resource "aws_iam_role" "managed_ng" {
-  name                  = local.cbci_iam_role
-  description           = "EKS Managed Node group IAM Role"
+resource "aws_iam_role" "managed_ng_s3" {
+  name                  = local.cbci_iam_role_s3
+  description           = "EKS Managed Node group IAM Role s3"
   assume_role_policy    = data.aws_iam_policy_document.managed_ng_assume_role_policy.json
   path                  = "/"
   force_detach_policies = true
@@ -542,7 +580,7 @@ resource "aws_iam_role" "managed_ng" {
   ]
   # Additional Permissions for for EKS Managed Node Group per https://docs.aws.amazon.com/eks/latest/userguide/create-node-role.html
   inline_policy {
-    name = "${local.name}-iam_inline_policy"
+    name = local.cbci_inline_policy_s3
     policy = jsonencode(
       {
         "Version" : "2012-10-17",
@@ -565,10 +603,10 @@ resource "aws_iam_role" "managed_ng" {
             "Resource" : module.cbci_s3_bucket.s3_bucket_arn
             "Condition" : {
               "StringLike" : {
-                "s3:prefix" : "cbci/*"
+                "s3:prefix" : "${local.cbci_s3_prefix}/*"
               }
             }
-          },
+          }
         ]
       }
     )
@@ -576,9 +614,62 @@ resource "aws_iam_role" "managed_ng" {
   tags = var.tags
 }
 
-resource "aws_iam_instance_profile" "managed_ng" {
-  name = local.cbci_instance_profile
-  role = aws_iam_role.managed_ng.name
+resource "aws_iam_instance_profile" "managed_ng_s3" {
+  name = local.cbci_instance_profile_s3
+  role = aws_iam_role.managed_ng_s3.name
+  path = "/"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  tags = var.tags
+}
+
+resource "aws_iam_role" "managed_ng_ecr" {
+  name                  = local.cbci_iam_role_ecr
+  description           = "EKS Managed Node group IAM Role ECR"
+  assume_role_policy    = data.aws_iam_policy_document.managed_ng_assume_role_policy.json
+  path                  = "/"
+  force_detach_policies = true
+  # Mandatory for EKS Managed Node Group
+  managed_policy_arns = [
+    "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy",
+    "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy",
+    "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+  ]
+  # Additional Permissions for for EKS Managed Node Group per https://docs.aws.amazon.com/eks/latest/userguide/create-node-role.html
+  inline_policy {
+    name = local.cbci_inline_policy_ecr
+    policy = jsonencode(
+      {
+        "Version" : "2012-10-17",
+        "Statement" : [
+          {
+            "Sid" : "ecrKaniko",
+            "Effect" : "Allow",
+            "Action" : [
+              "ecr:GetDownloadUrlForLayer",
+              "ecr:GetAuthorizationToken",
+              "ecr:InitiateLayerUpload",
+              "ecr:UploadLayerPart",
+              "ecr:CompleteLayerUpload",
+              "ecr:PutImage",
+              "ecr:BatchGetImage",
+              "ecr:BatchCheckLayerAvailability"
+            ],
+            "Resource" : "*"
+          }
+        ]
+      }
+    )
+  }
+  tags = var.tags
+}
+
+resource "aws_iam_instance_profile" "managed_ng_ecr" {
+  name = local.cbci_instance_profile_ecr
+  role = aws_iam_role.managed_ng_ecr.name
   path = "/"
 
   lifecycle {

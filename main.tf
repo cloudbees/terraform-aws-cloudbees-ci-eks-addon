@@ -1,9 +1,12 @@
 # Copyright (c) CloudBees, Inc.
 
 locals {
-  cbci_ns           = "cbci"
-  cbci_secrets_name = "cbci-secrets"
-  create_secret     = alltrue([var.create_k8s_secrets, length(var.k8s_secrets) > 0])
+  cbci_ns                = "cbci"
+  cbci_sec_casc_name     = "cbci-sec-casc"
+  cbci_sec_registry_name = "cbci-sec-reg"
+  create_secret_casc     = alltrue([var.create_casc_secrets, length(var.casc_secrets_file) > 0])
+  create_secret_reg      = alltrue([var.create_reg_secret, length(var.reg_secret_ns) > 0, length(var.reg_secret_auth) > 0])
+  #This section needs to be included in controllers to make use of the CBCI Casc Secrets
   oc_secrets_mount = [
     <<-EOT
       OperationsCenter:
@@ -13,7 +16,7 @@ locals {
         ExtraVolumes:
           - name: cbci-secrets
             secret:
-              secretName: ${local.cbci_secrets_name}
+              secretName: ${local.cbci_sec_casc_name}
         ExtraVolumeMounts:
           - name: cbci-secrets
             mountPath: /var/run/secrets/cbci
@@ -48,15 +51,45 @@ resource "kubernetes_namespace" "cbci" {
 
 # Kubernetes Secrets to be passed to Casc
 # https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/docs/features/secrets.adoc#kubernetes-secrets
-resource "kubernetes_secret" "oc_secrets" {
-  count = local.create_secret ? 1 : 0
+resource "kubernetes_secret" "cbci_sec_casc" {
+  count = local.create_secret_casc ? 1 : 0
 
   metadata {
-    name      = local.cbci_secrets_name
+    name      = local.cbci_sec_casc_name
     namespace = kubernetes_namespace.cbci[0].metadata[0].name
   }
 
-  data = yamldecode(var.k8s_secrets)
+  type = "Opaque"
+
+  data = yamldecode(var.casc_secrets_file)
+
+}
+
+# Kubernetes Secrets to authenticate with DockerHub
+# https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/using-kaniko#_create_a_new_kubernetes_secret
+resource "kubernetes_secret" "cbci_sec_reg" {
+  count = local.create_secret_reg ? 1 : 0
+  # Agent namespace needs to be created before creating this secret
+  depends_on = [helm_release.cloudbees_ci]
+  metadata {
+    name      = local.cbci_sec_registry_name
+    namespace = var.reg_secret_ns
+  }
+
+  type = "kubernetes.io/dockerconfigjson"
+
+  data = {
+    ".dockerconfigjson" = jsonencode({
+      auths = {
+        (var.reg_secret_auth["server"]) = {
+          "username" = var.reg_secret_auth["username"]
+          "password" = var.reg_secret_auth["password"]
+          "email"    = var.reg_secret_auth["email"]
+          "auth"     = base64encode("${var.reg_secret_auth["username"]}:${var.reg_secret_auth["password"]}")
+        }
+      }
+    })
+  }
 }
 
 resource "kubectl_manifest" "service_monitor_cb_controllers" {
@@ -90,7 +123,7 @@ resource "kubernetes_labels" "oc_sm_label" {
 
   api_version = "v1"
   kind        = "Service"
-  # This is true because the resources was already created by the
+  # This is true because the resources was already created by the helm_release
   force = "true"
 
   metadata {
@@ -108,9 +141,9 @@ resource "helm_release" "cloudbees_ci" {
   description      = try(var.helm_config.description, null)
   chart            = "cloudbees-core"
   #vCBCI_Helm#
-  version                    = try(var.helm_config.version, "3.18072.0+dc5abfae7856")
+  version                    = try(var.helm_config.version, "3.18306.0+b5ad27c80a6b")
   repository                 = try(var.helm_config.repository, "https://public-charts.artifacts.cloudbees.com/repository/public/")
-  values                     = local.create_secret ? concat(var.helm_config.values, local.oc_secrets_mount, [templatefile("${path.module}/values.yml", local.cbci_template_values)]) : concat(var.helm_config.values, [templatefile("${path.module}/values.yml", local.cbci_template_values)])
+  values                     = local.create_secret_casc ? concat(var.helm_config.values, local.oc_secrets_mount, [templatefile("${path.module}/values.yml", local.cbci_template_values)]) : concat(var.helm_config.values, [templatefile("${path.module}/values.yml", local.cbci_template_values)])
   timeout                    = try(var.helm_config.timeout, 1200)
   repository_key_file        = try(var.helm_config.repository_key_file, null)
   repository_cert_file       = try(var.helm_config.repository_cert_file, null)

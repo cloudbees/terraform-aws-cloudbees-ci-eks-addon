@@ -7,6 +7,7 @@ FROM alpine:3.19.0
 ENV TF_VERSION=1.6.6 \
     KUBECTL_VERSION=1.29.0 \
     VELERO_VERSION=1.13.0 \
+    EKSCTL_VERSION=0.188.0 \
     ARCH=amd64
 
 RUN apk add --update --no-cache \
@@ -33,3 +34,8 @@ RUN curl -sLO https://github.com/vmware-tanzu/velero/releases/download/v${VELERO
     mv velero-v${VELERO_VERSION}-linux-${ARCH}/velero /usr/bin/velero && \
     chmod +x /usr/bin/velero && \
     rm velero-v${VELERO_VERSION}-linux-${ARCH}.tar.gz
+
+RUN curl -sLO "https://github.com/weaveworks/eksctl/releases/download/v${EKSCTL_VERSION}/eksctl_Linux_${ARCH}.tar.gz" && \
+    tar -xzf eksctl_Linux_${ARCH}.tar.gz -C /usr/bin && \
+    chmod +x /usr/bin/eksctl && \
+    rm eksctl_Linux_${ARCH}.tar.gz

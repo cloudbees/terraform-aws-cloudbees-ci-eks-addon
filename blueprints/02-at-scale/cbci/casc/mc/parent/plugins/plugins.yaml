@@ -7,6 +7,7 @@ plugins:
   - id: cloudbees-disk-usage-simple
   - id: cloudbees-groovy-view
   - id: cloudbees-jenkins-advisor
+  - id: cloudbees-hashicorp-vault
   - id: cloudbees-pipeline-explorer
   - id: cloudbees-prometheus
   - id: cloudbees-s3-cache

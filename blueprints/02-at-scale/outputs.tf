@@ -1,4 +1,3 @@
-
 output "kubeconfig_export" {
   description = "Export the KUBECONFIG environment variable to access the Kubernetes API."
   value       = "export KUBECONFIG=${local.kubeconfig_file_path}"
@@ -47,12 +46,12 @@ output "cbci_oc_url" {
 
 output "cbci_oc_export_admin_crumb" {
   description = "Exports the operations center cbci_admin_user crumb, to access the REST API when CSRF is enabled."
-  value       = "export CBCI_ADMIN_CRUMB=$(curl -s '${module.eks_blueprints_addon_cbci.cbci_oc_url}/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,%22:%22,//crumb)' --cookie-jar /tmp/cookies.txt --user ${local.cbci_admin_user}:$(kubectl get secret ${module.eks_blueprints_addon_cbci.cbci_secrets} -n cbci -o jsonpath=${local.global_pass_jsonpath} | base64 -d))"
+  value       = "export CBCI_ADMIN_CRUMB=$(curl -s '${module.eks_blueprints_addon_cbci.cbci_oc_url}/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,%22:%22,//crumb)' --cookie-jar /tmp/cookies.txt --user ${local.cbci_admin_user}:$(kubectl get secret ${module.eks_blueprints_addon_cbci.cbci_sec_casc} -n ${module.eks_blueprints_addon_cbci.cbci_namespace} -o jsonpath=${local.global_pass_jsonpath} | base64 -d))"
 }
 
 output "cbci_oc_export_admin_api_token" {
   description = "Exports the operations center cbci_admin_user API token to access the REST API when CSRF is enabled. It expects CBCI_ADMIN_CRUMB as the environment variable."
-  value       = "export CBCI_ADMIN_TOKEN=$(curl -s '${module.eks_blueprints_addon_cbci.cbci_oc_url}/user/${local.cbci_admin_user}/descriptorByName/jenkins.security.ApiTokenProperty/generateNewToken' --user ${local.cbci_admin_user}:$(kubectl get secret ${module.eks_blueprints_addon_cbci.cbci_secrets} -n cbci -o jsonpath=${local.global_pass_jsonpath} | base64 -d)  --data 'newTokenName=kb-token' --cookie /tmp/cookies.txt -H $CBCI_ADMIN_CRUMB | jq -r .data.tokenValue)"
+  value       = "export CBCI_ADMIN_TOKEN=$(curl -s '${module.eks_blueprints_addon_cbci.cbci_oc_url}/user/${local.cbci_admin_user}/descriptorByName/jenkins.security.ApiTokenProperty/generateNewToken' --user ${local.cbci_admin_user}:$(kubectl get secret ${module.eks_blueprints_addon_cbci.cbci_sec_casc} -n ${module.eks_blueprints_addon_cbci.cbci_namespace} -o jsonpath=${local.global_pass_jsonpath} | base64 -d)  --data 'newTokenName=kb-token' --cookie /tmp/cookies.txt -H $CBCI_ADMIN_CRUMB | jq -r .data.tokenValue)"
 }
 
 output "cbci_oc_take_backups" {
@@ -70,9 +69,9 @@ output "cbci_controller_c_hpa" {
   value       = "kubectl get hpa team-c-ha -n ${module.eks_blueprints_addon_cbci.cbci_namespace}"
 }
 
-output "cbci_controller_b_ws_cache_build" {
-  description = "team-b hibernation monitor endpoint to the build workspace cache. It expects CBCI_ADMIN_TOKEN as the environment variable."
-  value       = "curl -i -XPOST -u ${local.cbci_admin_user}:$CBCI_ADMIN_TOKEN ${local.hibernation_monitor_url}/hibernation/queue/team-b/job/admin/job/validations/job/ws-cache/build"
+output "cbci_controller_b_s3_build" {
+  description = "team-b hibernation monitor endpoint to the build s3-WScacheAndArtifacts. It expects CBCI_ADMIN_TOKEN as the environment variable."
+  value       = "curl -i -XPOST -u ${local.cbci_admin_user}:$CBCI_ADMIN_TOKEN ${local.hibernation_monitor_url}/hibernation/queue/team-b/job/admin/job/validations/job/s3-WScacheAndArtifacts/build"
 }
 
 output "cbci_controller_c_windows_node_build" {
@@ -95,6 +94,11 @@ output "cbci_agent_windowstempl_events" {
   value       = "kubectl get events -n ${local.cbci_agents_ns} | grep -i pod/${local.cbci_agent_windowstempl}"
 }
 
+output "cbci_agent_sec_reg" {
+  description = "Retrieves the container registry secret deployed in the agents namespace."
+  value       = "kubectl get secret ${module.eks_blueprints_addon_cbci.cbci_sec_registry} -n ${local.cbci_agents_ns} -o jsonpath='{.data.*}' | base64 -d"
+}
+
 output "acm_certificate_arn" {
   description = "AWS Certificate Manager (ACM) certificate for Amazon Resource Names (ARN)."
   value       = module.acm.acm_certificate_arn
@@ -108,6 +112,11 @@ output "vpc_arn" {
 output "eks_cluster_arn" {
   description = "Amazon EKS cluster ARN."
   value       = module.eks.cluster_arn
+}
+
+output "eks_cluster_name" {
+  description = "Amazon EKS cluster Name."
+  value       = module.eks.cluster_name
 }
 
 output "s3_cbci_arn" {
@@ -177,5 +186,25 @@ output "grafana_dashboard" {
 
 output "global_password" {
   description = "Random string that is used as the global password."
-  value       = "kubectl get secret ${module.eks_blueprints_addon_cbci.cbci_secrets} -n cbci -o jsonpath=${local.global_pass_jsonpath} | base64 -d"
+  value       = "kubectl get secret ${module.eks_blueprints_addon_cbci.cbci_sec_casc} -n ${module.eks_blueprints_addon_cbci.cbci_namespace} -o jsonpath=${local.global_pass_jsonpath} | base64 -d"
+}
+
+output "vault_init" {
+  description = "Inicialization of Vault Service."
+  value       = "kubectl exec -it vault-0 -n ${local.vault_ns} -- vault operator init | tee ${local.vault_init_file_path} || echo \"Vault initialization failed.\""
+}
+
+output "vault_init_log_file" {
+  description = "Vault Inicialization log file."
+  value       = local.vault_init_file_path
+}
+
+output "vault_configure" {
+  description = "Configure Vault with initial secrets and creates approle for integration with CloudBees CI (role-id and secret-id). It requires unseal keys and the root token from the vault_init output."
+  value       = "bash ${local.vault_config_file_path} ${local.vault_ns}"
+}
+
+output "vault_dashboard" {
+  description = "Provides access to Hashicorp Vault dashboard. It requires the root token from the vault_init output."
+  value       = "kubectl port-forward svc/vault 50003:8200 -n ${local.vault_ns}"
 }
