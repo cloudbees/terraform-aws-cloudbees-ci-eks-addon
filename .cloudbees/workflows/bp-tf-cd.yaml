@@ -1,5 +1,10 @@
 # Copyright (c) CloudBees, Inc.
 
+# Stages
+# CI: deploy,validate,destroy
+# CD: deploy,validate,onboarding
+# Nuke: wipeout
+
 apiVersion: automation.cloudbees.io/v1alpha1
 kind: workflow
 name: ci
@@ -59,8 +64,7 @@ jobs:
     env:
       ROOT: 01-getting-started
       TF_VAR_hosted_zone: bp01.aws.ps.beescloud.com
-      # Add the stages to execute in the pipeline: deploy,validate,destroy,wipeout
-      STAGES: "deploy,users"
+      STAGES: "deploy,validate,onboarding"
     needs:
       - init
     steps:
@@ -132,9 +136,9 @@ jobs:
       run : |
         terraform -chdir=blueprints/${{ env.ROOT }} init -reconfigure && CI=true make destroy
     
-    - name: 01-getting-started - Add users
+    - name: 01-getting-started - Role Onboarding
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
-      if: contains(env.STAGES, 'users')
+      if: contains(env.STAGES, 'onboarding')
       env:
         TARGET_ROLE: arn:aws:iam::324005994172:role/AWSReservedSSO_infra-admin_256addbf79cfacd1
       shell: bash
@@ -154,8 +158,7 @@ jobs:
     env:
       ROOT: 02-at-scale
       TF_VAR_hosted_zone: bp02.aws.ps.beescloud.com
-      # Add the stages to execute in the pipeline: deploy,validate,destroy,wipeout
-      STAGES: "deploy,users"
+      STAGES: "deploy,validate,onboarding"
     needs:
       - init
     steps:
@@ -232,9 +235,9 @@ jobs:
       run : |
         terraform -chdir=blueprints/${{ env.ROOT }} init -reconfigure && CI=true make destroy
 
-    - name: 02-at-scale  - Add users
+    - name: 02-at-scale  - Role Onboarding
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
-      if: contains(env.STAGES, 'users')
+      if: contains(env.STAGES, 'onboarding')
       env:
         TARGET_ROLE: arn:aws:iam::324005994172:role/AWSReservedSSO_infra-admin_256addbf79cfacd1
       shell: bash
