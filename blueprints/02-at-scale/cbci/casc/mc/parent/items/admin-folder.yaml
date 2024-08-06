@@ -226,8 +226,8 @@ items:
                         steps {
                             sh '''
                                 echo 'Printing credentials from Vault'
-                                echo ^$U1
-                                echo ^$S1
+                                echo ^${U1}
+                                echo ^${S1}
                             '''
                         }
                     }
