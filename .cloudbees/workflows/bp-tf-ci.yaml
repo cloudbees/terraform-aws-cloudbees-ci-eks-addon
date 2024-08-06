@@ -185,9 +185,9 @@ jobs:
         cat <<EOT >> blueprints/${{ env.ROOT }}/.auto.tfvars
         ${{ env.TF_AUTO_VARS_FILE }}
         dh_reg_secret_auth = {
-          username = "foo"
-          password = "d0ckerPass12"
-          email = "example@gmail.com"
+          username = "${{ secrets.AWS_TF_CBCI_EKS_DHUser }}"
+          password = "${{ secrets.AWS_TF_CBCI_EKS_DHPass }}"
+          email = "${{ secrets.AWS_TF_CBCI_EKS_DHMail }}"
         }
         EOT
         cat blueprints/${{ env.ROOT }}/.auto.tfvars
