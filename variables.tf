@@ -52,34 +52,34 @@ variable "trial_license" {
 }
 
 variable "create_casc_secrets" {
-  description = "Create a Kubernetes basic secret for CloudBees Configuration as Code (cbci-sec-casc) and mount it into the Operation Center /var/run/secrets/cbci."
+  description = "Create a Kubernetes basic secret for CloudBees CasC (cbci-sec-casc) and mount it into the operations center (/var/run/secrets/cbci)."
   default     = false
   type        = bool
 }
 
 variable "casc_secrets_file" {
-  description = "Secrets .yml file path containing the names:values secrets. It is required when create_casc_secrets is enabled."
+  description = "Secrets .yml file path containing the names: values secrets. It is required when create_casc_secrets is enabled."
   default     = "secrets-values.yml"
   type        = string
   validation {
     condition     = length(trimspace(var.casc_secrets_file)) > 0
-    error_message = "Casc secret file  must not be an empty string."
+    error_message = "CasC secret file must not be an empty string."
   }
 }
 
 variable "create_reg_secret" {
-  description = "Create a Kubernetes dockerconfigjson secret for Container Registry authentication (cbci-sec-reg) for CI builds agents."
+  description = "Create a Kubernetes dockerconfigjson secret for container registry authentication (cbci-sec-reg) for CI builds agents."
   default     = false
   type        = bool
 }
 
 variable "reg_secret_ns" {
-  description = "Agent Namespace to allocate cbci-sec-reg secret. It is required when create_reg_secret is enabled."
+  description = "Agent namespace to allocate cbci-sec-reg secret. It is required when create_reg_secret is enabled."
   default     = "cbci"
   type        = string
   validation {
     condition     = length(trimspace(var.reg_secret_ns)) > 0
-    error_message = "Agent Namespace must not be an empty string."
+    error_message = "Agent namespace must not be an empty string."
   }
 }
 
@@ -94,7 +94,7 @@ variable "reg_secret_auth" {
   }
   validation {
     condition     = contains(keys(var.reg_secret_auth), "server") && contains(keys(var.reg_secret_auth), "username") && contains(keys(var.reg_secret_auth), "password") && contains(keys(var.reg_secret_auth), "email")
-    error_message = "The reg_secret_auth must contain the following keys: server, username, password and email."
+    error_message = "The reg_secret_auth must contain the following keys: server, username, password, and email."
   }
   validation {
     condition     = length(var.reg_secret_auth) == 4

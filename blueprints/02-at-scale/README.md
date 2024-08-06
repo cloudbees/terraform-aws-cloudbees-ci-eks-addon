@@ -27,7 +27,7 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
   | [Grafana Tempo](https://grafana.com/oss/tempo/) | Provides backend tracing for [Jenkins OpenTelemetry](https://plugins.jenkins.io/opentelemetry/). |
   | [Hashicorp Vault](https://github.com/hashicorp/vault-helm) | Secrets management system that is integrated via [CloudBees HashiCorp Vault Plugin](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-secure-guide/hashicorp-vault-plugin). |
 
-- Cloudbees CI uses [Configuration as Code (CasC)](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/casc-intro) (refer to the [casc](cbci/casc) folder) to enable [exciting new features for streamlined DevOps](https://www.cloudbees.com/blog/cloudbees-ci-exciting-new-features-for-streamlined-devops) and other enterprise features, such as [CloudBees CI hibernation](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#_hibernation_in_managed_masters).
+- Cloudbees CI uses [Configuration as Code (CasC)](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/casc-intro) (refer to the [casc](cbci/casc) folder) to enable [exciting new features for streamlined DevOps](https://www.cloudbees.com/blog/cloudbees-ci-exciting-new-features-for-streamlined-devops) and other enterprise features, such as [CloudBees CI hibernation](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#hibernation-managed-controllers).
   - The operations center is using the [CasC Bundle Retriever](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/bundle-retrieval-scm).
   - Managed controller configurations are managed from the operations center using [source control management (SCM)](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-controller/add-bundle#_adding_casc_bundles_from_an_scm_tool).
   - The managed controllers are using [CasC bundle inheritance](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-controller/advanced#_configuring_bundle_inheritance_with_casc) (refer to the [parent](cbci/casc/mc/parent) folder). This "parent" bundle is inherited by two types of "child" controller bundles: `ha` and `none-ha`, to accommodate [considerations about HA controllers](https://docs.cloudbees.com/docs/cloudbees-ci/latest/ha/ha-considerations).
@@ -41,15 +41,15 @@ This blueprint divides scalable node groups for different types of workloads:
 
 - Shared node group services (role: `shared`): For common/shared workloads using [Amazon EKS-Optimized Amazon Linux 2023](https://aws.amazon.com/blogs/containers/amazon-eks-optimized-amazon-linux-2023-amis-now-available/) Amazon Machine Image (AMI) type.
 - CloudBees CI node groups:
-  - CI Services (role: `cb-apps`)
+  - CI services (role: `cb-apps`):
     - Services instance type: [AWS Graviton Processor](https://aws.amazon.com/ec2/graviton/) and [Bottlerocket OS](https://aws.amazon.com/bottlerocket/) AMI type.
-    - It uses an [instance profile](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2_instance-profiles.html) for operating with AWS Services permissions (eg. s3 Buckets). However, the recommended options are explained in [Issue 56](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/issues/56).
-  - CI Agents (Ephemeral):
+    - It uses an [instance profile](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2_instance-profiles.html) for operating with AWS services permissions (for example, S3 buckets). However, the recommended options are explained in [Issue 56](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/issues/56).
+  - CI agents (ephemeral):
     - Linux: [AWS Graviton Processor](https://aws.amazon.com/ec2/graviton/) and [Bottlerocket OS](https://aws.amazon.com/bottlerocket/) AMI type and includes on-demand (role: `build-linux`) and Spot (role: `build-linux-spot`) capacity types. The Spot agent node groups follow the principles described in [Building for Cost Optimization and Resilience for EKS with Spot Instances](https://aws.amazon.com/blogs/compute/cost-optimization-and-resilience-eks-with-spot-instances/).
     - Windows (role: `build-windows`): Windows 2019 AMI type.
 
 > [!IMPORTANT]
-> It is known that Linux container lunch time are faster than Windows container. That reality can be improved by using a cache container image strategy (see [Speeding up Windows container launch times with EC2 Image builder and image cache strategy](https://aws.amazon.com/blogs/containers/speeding-up-windows-container-launch-times-with-ec2-image-builder-and-image-cache-strategy/) and more about [Windows Container Best Practices](https://aws.github.io/aws-eks-best-practices/windows/docs/ami/)). Alternatively to Windows Containes, it is possible to use Windows VMs using [Shared Agent](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/shared-agents).
+> The launch time for Linux containers is faster than Windows containers. This can be improved by using a cache container image strategy. Refer to [Speeding up Windows container launch times with EC2 Image builder and image cache strategy](https://aws.amazon.com/blogs/containers/speeding-up-windows-container-launch-times-with-ec2-image-builder-and-image-cache-strategy/) and more about [Windows Container Best Practices](https://aws.github.io/aws-eks-best-practices/windows/docs/ami/)). Another potential alternative is to use Windows VMs with a [shared agent](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/shared-agents).
 
 ![Architecture](img/at-scale.architect.drawio.svg)
 
@@ -122,7 +122,7 @@ This blueprint divides scalable node groups for different types of workloads:
 
 ## Prerequisites
 
-This blueprint uses [DockerHub](https://hub.docker.com/) as a Container Registry Service. Then, an existing DockerHub account is required (username, password and email).
+This blueprint uses [DockerHub](https://hub.docker.com/) as a container registry service. Note that an existing DockerHub account is required (username, password, and email).
 
 > [!TIP]
 > Use `docker login` to validate username and password.
@@ -166,7 +166,7 @@ Once the resources have been created, a `kubeconfig` file is created in the [/k8
 
    There are differences in CloudBees CI permissions and folder restrictions when signed in as a user of the Admin group versus the Development group. For example, only Admin users have access to the agent validation jobs.
 
-3. CasC is enabled for the [operations center](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/) (`cjoc`) and [controllers](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-controller/) (`team-b` and `team-c-ha`). `team-a` is not using CasC, to illustrate the difference between the two approaches. Issue the following command to verify that all controllers are Running:
+3. CasC is enabled for the [operations center](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/) (`cjoc`) and [controllers](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-controller/) (`team-b` and `team-c-ha`). `team-a` is not using CasC, to illustrate the difference between the two approaches. Issue the following command to verify that all controllers are running:
 
    ```sh
    eval $(terraform output --raw cbci_controllers_pods)
@@ -180,21 +180,21 @@ Once the resources have been created, a `kubeconfig` file is created in the [/k8
    eval $(terraform output --raw cbci_controller_c_hpa)
    ```
 
-#### Secrets Management
+#### Secrets management
 
-##### Kubernetes Secret
+##### Kubernetes secret
 
-This blueprint uses a couple of Kubernetes secrets for different purposes.
+This blueprint Kubernetes secrets for different purposes.
 
 > [!NOTE]
-> - Beyond the CloudBees CI Addon (for demo purposes), Kubernetes secrets can be managed via [External Secret Operators](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/external-secrets/).
+> - Beyond the CloudBees CI add-on (used for demo purposes), Kubernetes secrets can be managed via [External Secret Operators](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/external-secrets/).
 > - Kubernetes secrets could be also be retrived as Jenkins Credentials via using the [Kubernetes Credentials Provider plugin](https://jenkinsci.github.io/kubernetes-credentials-provider-plugin/).
 
-###### Casc Secrets
+###### CasC secrets
 
-The secrets key/value file defined in [k8s/secrets-values.yml](k8s/secrets-values.yml) is converted into a Kubernetes secret (`cbci-sec-casc`) and mounted into /run/secrets/ for Operation Center and Controllers to be consumed via CloudBees Casc. See [Configuration as Code - Handling Secrets - Kubernetes Secrets](https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/docs/features/secrets.adoc#kubernetes-secrets) for more information.
+The secrets key/value file defined in [k8s/secrets-values.yml](k8s/secrets-values.yml) is converted into a Kubernetes secret (`cbci-sec-casc`) and mounted into `/run/secrets/` for the operations center and controllers to be consumed via CloudBees CasC. Refer to [Configuration as Code - Handling Secrets - Kubernetes Secrets](https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/docs/features/secrets.adoc#kubernetes-secrets) for more information.
 
-###### Container Registry Secrets
+###### Container registry secrets
 
 DockerHub authentication is stored as Kubernetes secrets (`cbci-agent-sec-reg`) and mounted to [Kaniko agent containers](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/using-kaniko) to build and push images to this registry. The secret is created using the `dh_reg_secret_auth` variable.
 
@@ -227,7 +227,13 @@ HashiCorp Vault is used as a credential provider for CloudBees CI Pipelines in t
    eval $(terraform output --raw vault_dashboard)
    ```
 
-4. Access with admin role to CloudBees CI Operation Center and complete the configuration for the CloudBees CI Vault Plugin by entering the Role ID and Secret ID for `cbci-oc` App Role from _step 2_ in _Manage Jenkins_ > _Credentials Providers_ > _HashiCorp Vault Credentials Provider_. Click on `Test Connection` to verify the inputs are right. Finally, move to `team-b` or `team-c-ha` to run the pipeline _admin_ > _validations_ > _vault-credentials_ and validate that credentials are fetched correctly from Hashicorp Vault.
+4. Sign in to the CloudBees CI operations center as a user with the admin role. 
+
+5. Navigate to **Manage Jenkins > Credentials Providers > HashiCorp Vault Credentials Provider** and complete the configuration for the CloudBees CI Vault Plugin by entering the role ID and secret ID for the `cbci-oc` application role from _step 1_.
+
+6. Select **Test Connection** to verify the inputs are correct.
+
+7. Move to `team-b` or `team-c-ha` to run the Pipeline (**admin > validations > vault-credentials**) and validate that credentials are fetched correctly from the Hashicorp Vault.
 
 > [!NOTE]
 > Hashicorp Vault can be also be configured to be used for [Configuration as Code - Handling Secrets - Vault](https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/docs/features/secrets.adoc#hashicorp-vault-secret-source).
@@ -258,11 +264,11 @@ HashiCorp Vault is used as a credential provider for CloudBees CI Pipelines in t
       eval $(terraform output --raw cbci_controller_b_s3_build)
       ```
 
-      It triggers `s3-WScacheAndArtifacts` pipeline from `team-b` controller. This pipeline validates a couple of s3 integrations in parallel: one for [CloudBees Workspace Caching](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-cache-step) (using `linux-mavenAndKaniko-L`) and another for [s3 Artifact Manager](https://plugins.jenkins.io/artifact-manager-s3/) (using `linux-mavenAndKaniko-XL`).
+      It triggers the `s3-WScacheAndArtifacts` Pipeline from the `team-b` controller. This pipeline validates S3 integrations in parallel for [CloudBees workspace caching](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-cache-step) (using `linux-mavenAndKaniko-L`) and the [S3 artifact manager](https://plugins.jenkins.io/artifact-manager-s3/) (using `linux-mavenAndKaniko-XL`).
 
       Once the second build is complete, you can find the read cache operation at the beginning of the build logs and the write cache operation at the end of the build logs.
 
-      The `linux-mavenAndKaniko-L` agent template is deployed over On-demand Linux Nodes that have smaller instance types vs the `linux-mavenAndKaniko-XL` template that is deployed over Spot Linux Nodes that have defined larger instance types.
+      The `linux-mavenAndKaniko-L` agent template is deployed over on-demand Linux nodes that have smaller instance types versus the `linux-mavenAndKaniko-XL` template that is deployed over Spot Linux nodes that have defined larger instance types.
 
    - For Windows node pool use:
 
@@ -270,29 +276,29 @@ HashiCorp Vault is used as a credential provider for CloudBees CI Pipelines in t
       eval $(terraform output --raw cbci_controller_c_windows_node_build)
       ```
 
-      It triggers `windows-build-nodes` pipeline from `team-c-ha` controller.
+      It triggers the `windows-build-nodes` Pipeline from the `team-c-ha` controller.
 
-      Note that the first build for a new Windows image container can take up to 10 minutes to run; subsequent builds should take seconds to run. This behavior can be improved as explained in the section [Architecture](#architecture).
+      Note that the first build for a new Windows image container can take up to 10 minutes to run; subsequent builds should take seconds to run. This behavior can be improved, as explained in the section [Architecture](#architecture).
 
-3. Right after triggering the builds, issue the following to validate pod agent provisioning to build the pipeline code:
+3. Right after triggering the builds, issue the following to validate pod agent provisioning to build the Pipeline code:
 
    ```sh
    eval $(terraform output --raw cbci_agents_pods)
    ```
 
-4. Check build logs by signing in to the `team-b` and `team-c-ha` controllers, respectively. Navigate to the pipeline jobs and select the first build, indicated by the `#1` build number. [CloudBees Pipeline Explorer](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-pipeline-explorer-plugin) is enabled as a default.
+4. Check build logs by signing in to the `team-b` and `team-c-ha` controllers, respectively. Navigate to the Pipeline jobs and select the first build, indicated by the `#1` build number. [CloudBees Pipeline Explorer](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-pipeline-explorer-plugin) is enabled by default.
 
 ##### Container Registry
 
-This blueprints uses a couple of container registries for different purposes.
+This blueprints use a couple of container registries for different purposes.
 
-- The Public Registry uses DockerHub.
-- The Private Registry uses AWS ECR.
+- The public registry uses DockerHub.
+- The private registry uses AWS ECR.
 
 > [!NOTE]
-> Other Container Registry services can be used for the same purporses.
+> Other Container Registry services can be used for the same purposes.
 
-Access with admin role to CloudBees CI to `team-b` or `team-c-ha` to run the pipeline _admin_ > _validations_ > _kaniko_ enter as parameters an existing DockerHub Organization and an existing AWS ECR Repository to test that Build and Push towards every repository works fine.
+Sign in to the CloudBees CI to `team-b` or `team-c-ha` controllers with admin access. Run the **admin > validations > kaniko** Pipeline and enter (using parameters) an existing DockerHub organization and an existing AWS ECR Repository to test that building and pushing to all repositories works as expected.
 
 > [!NOTE]
 > Besides Kaniko, there are [other alternitives tools](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/using-kaniko#_alternatives).
