@@ -65,7 +65,7 @@ jobs:
   bp01:
     env:
       ROOT: 01-getting-started
-      TF_VAR_hosted_zone: bp01.aws.ps.beescloud.com
+      TF_VAR_hosted_zone: bp01-ci.aws.ps.beescloud.com
       STAGES: "deploy,validate,destroy"
     needs:
       - init
@@ -159,7 +159,7 @@ jobs:
   bp02:
     env:
       ROOT: 02-at-scale
-      TF_VAR_hosted_zone: bp02.aws.ps.beescloud.com
+      TF_VAR_hosted_zone: bp02-ci.aws.ps.beescloud.com
       STAGES: "deploy,validate,destroy"
     needs:
       - init

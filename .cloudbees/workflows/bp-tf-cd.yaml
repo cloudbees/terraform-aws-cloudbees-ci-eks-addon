@@ -58,7 +58,7 @@ jobs:
   bp01:
     env:
       ROOT: 01-getting-started
-      TF_VAR_hosted_zone: bp01.aws.ps.beescloud.com
+      TF_VAR_hosted_zone: bp01-cd.aws.ps.beescloud.com
       STAGES: "wipeout"
     needs:
       - init
@@ -152,7 +152,7 @@ jobs:
   bp02:
     env:
       ROOT: 02-at-scale
-      TF_VAR_hosted_zone: bp02.aws.ps.beescloud.com
+      TF_VAR_hosted_zone: bp02-cd.aws.ps.beescloud.com
       STAGES: "wipeout"
     needs:
       - init
