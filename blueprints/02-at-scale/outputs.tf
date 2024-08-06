@@ -191,7 +191,7 @@ output "global_password" {
 
 output "vault_init" {
   description = "Inicialization of Vault Service."
-  value       = "kubectl exec -it vault-0 -n ${local.vault_ns} -- vault operator init | tee ${local.vault_init_file_path} || echo \"Vault is already initialized.\""
+  value       = "kubectl exec -it vault-0 -n ${local.vault_ns} -- vault operator init | tee ${local.vault_init_file_path} || echo \"Vault initialization failed.\""
 }
 
 output "vault_init_log_file" {
