@@ -1,4 +1,3 @@
-
 output "kubeconfig_export" {
   description = "Export the KUBECONFIG environment variable to access the Kubernetes API."
   value       = "export KUBECONFIG=${local.kubeconfig_file_path}"
@@ -115,6 +114,11 @@ output "eks_cluster_arn" {
   value       = module.eks.cluster_arn
 }
 
+output "eks_cluster_name" {
+  description = "Amazon EKS cluster Name."
+  value       = module.eks.cluster_name
+}
+
 output "s3_cbci_arn" {
   description = "CloudBees CI Amazon S3 bucket ARN."
   value       = module.cbci_s3_bucket.s3_bucket_arn
@@ -185,8 +189,18 @@ output "global_password" {
   value       = "kubectl get secret ${module.eks_blueprints_addon_cbci.cbci_sec_casc} -n ${module.eks_blueprints_addon_cbci.cbci_namespace} -o jsonpath=${local.global_pass_jsonpath} | base64 -d"
 }
 
+output "vault_init" {
+  description = "Inicialization of Vault Service."
+  value       = "kubectl exec -it vault-0 -n ${local.vault_ns} -- vault operator init | tee ${local.vault_init_file_path} || echo \"Vault initialization failed.\""
+}
+
+output "vault_init_log_file" {
+  description = "Vault Inicialization log file."
+  value       = local.vault_init_file_path
+}
+
 output "vault_configure" {
-  description = "Provides access to Hashicorp Vault dashboard. It requires the root token from the vault_init output."
+  description = "Configure Vault with initial secrets and creates approle for integration with CloudBees CI (role-id and secret-id). It requires unseal keys and the root token from the vault_init output."
   value       = "bash ${local.vault_config_file_path} ${local.vault_ns}"
 }
 

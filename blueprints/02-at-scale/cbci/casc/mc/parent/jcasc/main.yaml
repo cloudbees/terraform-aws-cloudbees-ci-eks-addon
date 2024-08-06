@@ -49,6 +49,8 @@ unclassified:
             git:
               remote: ${sharedLibRepo}
 aws:
+  awsCredentials:
+    region: "${sec_awsRegion}"
   s3:
     container: "${sec_s3bucketName}"
     disableSessionToken: false

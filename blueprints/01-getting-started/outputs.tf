@@ -1,4 +1,3 @@
-
 output "kubeconfig_export" {
   description = "Export the KUBECONFIG environment variable to access the Kubernetes API."
   value       = "export KUBECONFIG=${local.kubeconfig_file_path}"
@@ -63,4 +62,9 @@ output "vpc_arn" {
 output "eks_cluster_arn" {
   description = "Amazon EKS cluster ARN."
   value       = module.eks.cluster_arn
+}
+
+output "eks_cluster_name" {
+  description = "Amazon EKS cluster Name."
+  value       = module.eks.cluster_name
 }

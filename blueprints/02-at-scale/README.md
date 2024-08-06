@@ -100,6 +100,7 @@ This blueprint divides scalable node groups for different types of workloads:
 | efs_access_points | Amazon EFS access points. |
 | efs_arn | Amazon EFS ARN. |
 | eks_cluster_arn | Amazon EKS cluster ARN. |
+| eks_cluster_name | Amazon EKS cluster Name. |
 | global_password | Random string that is used as the global password. |
 | grafana_dashboard | Provides access to Grafana dashboards. |
 | kubeconfig_add | Add kubeconfig to the local configuration to access the Kubernetes API. |
@@ -109,8 +110,10 @@ This blueprint divides scalable node groups for different types of workloads:
 | s3_cbci_arn | CloudBees CI Amazon S3 bucket ARN. |
 | s3_cbci_name | CloudBees CI Amazon S3 bucket name. It is required by CloudBees CI for workspace caching and artifact management. |
 | s3_list_objects | Recursively lists all objects stored in the Amazon S3 bucket. |
-| vault_configure | Provides access to Hashicorp Vault dashboard. It requires the root token from the vault_init output. |
+| vault_configure | Configure Vault with initial secrets and creates approle for integration with CloudBees CI (role-id and secret-id). It requires unseal keys and the root token from the vault_init output. |
 | vault_dashboard | Provides access to Hashicorp Vault dashboard. It requires the root token from the vault_init output. |
+| vault_init | Inicialization of Vault Service. |
+| vault_init_log_file | Vault Inicialization log file. |
 | velero_backup_on_demand | Takes an on-demand Velero backup from the schedule for the selected controller that is using block storage. |
 | velero_backup_schedule | Creates a Velero backup schedule for the selected controller that is using block storage, and then deletes the existing schedule, if it exists. |
 | velero_restore | Restores the selected controller that is using block storage from a backup. |
@@ -206,25 +209,31 @@ DockerHub authentication is stored as Kubernetes secrets (`cbci-agent-sec-reg`) 
 
 HashiCorp Vault is used as a credential provider for CloudBees CI Pipelines in this blueprint.
 
-1. Run the configure Hashicorp Vault script. Store the admin token and unseal keys (saved in `k8s/vault-init.log`) and role ID and secret ID for the `cbci-oc` application role in a safe place.
+1. Initialize Hashicorp Vault. Keep in a safe place Admin Token and Unseal Keys (saved in `k8s/vault-init.log`).
+
+   ```sh
+   eval $(terraform output --raw vault_init)
+   ```
+
+2. Run the configure Hashicorp Vault script. It configures Vault with initial secrets and creates `approle` for integration with CloudBees CI (role-id and secret-id)
 
    ```sh
    eval $(terraform output --raw vault_configure)
    ```
 
-2. Issue the following command to access the HashiCorp Vault UI. Enter the root token to sign in from _step 1_.
+3. Access the HashiCorp Vault UI by issuing the following command. Enter the root token to log in from the _step 1_.
 
    ```sh
    eval $(terraform output --raw vault_dashboard)
    ```
 
-3. Sign in to the CloudBees CI operations center as a user with the admin role. 
+4. Sign in to the CloudBees CI operations center as a user with the admin role.
 
-4. Navigate to **Manage Jenkins > Credentials Providers > HashiCorp Vault Credentials Provider** and complete the configuration for the CloudBees CI Vault Plugin by entering the role ID and secret ID for the `cbci-oc` application role from _step 1_.
+5. Navigate to **Manage Jenkins > Credentials Providers > HashiCorp Vault Credentials Provider** and complete the configuration for the CloudBees CI Vault Plugin by entering the role ID and secret ID for the `cbci-oc` application role from _step 1_.
 
-5. Select **Test Connection** to verify the inputs are correct.
+6. Select **Test Connection** to verify the inputs are correct.
 
-6. Move to `team-b` or `team-c-ha` to run the Pipeline (**admin > validations > vault-credentials**) and validate that credentials are fetched correctly from the Hashicorp Vault.
+7. Move to `team-b` or `team-c-ha` to run the Pipeline (**admin > validations > vault-credentials**) and validate that credentials are fetched correctly from the Hashicorp Vault.
 
 > [!NOTE]
 > Hashicorp Vault can be also be configured to be used for [Configuration as Code - Handling Secrets - Vault](https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/docs/features/secrets.adoc#hashicorp-vault-secret-source).

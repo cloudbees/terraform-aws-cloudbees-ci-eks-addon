@@ -4,16 +4,12 @@
 
 set -xeuo pipefail
 
-HERE="$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
 # Vault namespace
 vault_ns="${1:-vault}"
 # App role name
 approle="cbci-oc"
 
 # https://github.com/hashicorp/terraform-aws-hashicorp-vault-eks-addon?tab=readme-ov-file#usage
-## Init vault
-kubectl exec -it vault-0 -n "$vault_ns" -- vault operator init | tee "$HERE/vault-init.log" || echo "Vault already initialized"
 ## Useal the vault
 for i in {1..3}; do
   read -r -p "INFO: Enter Unseal Key number $i [press Enter]: " key
