@@ -152,8 +152,7 @@ jobs:
           --region ${{ env.TF_VAR_aws_region }} \
           --arn arn:aws:sts::324005994172:assumed-role/AWSReservedSSO_infra-admin_256addbf79cfacd1/crodriguezlopez@cloudbees.com \
           --username k8s-admin-user \
-          --group system:masters \
-          --no-duplicate-arns
+          --group system:masters
         kubectl get configmap aws-auth -n kube-system -o yaml
 
   bp02:
