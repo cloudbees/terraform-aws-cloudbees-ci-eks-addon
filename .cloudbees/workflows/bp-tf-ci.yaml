@@ -1,0 +1,256 @@
+# Copyright (c) CloudBees, Inc.
+
+# Stages
+# CI: deploy,validate,destroy
+# Troubleshooting: deploy,validate,onboarding
+# Nuke (Delete Dangling resource): wipeout
+
+apiVersion: automation.cloudbees.io/v1alpha1
+kind: workflow
+name: ci
+
+on:
+  # Enable once Issue #83 is solved (Disable Manual trigger. workflow_dispatch)
+  # It requires 
+
+  # pull_request:
+  #   branches:
+  #     - 'main'
+  workflow_dispatch:
+
+env:
+  AWS_REGION_TF_BUCKET: "us-east-1"
+  BUCKET_NAME_TF_STATE: "cbci-eks-addon-tf-state-v2"
+  AWS_ROLE_TO_ASSUME: "infra-admin-ci"
+  TF_VAR_suffix: "ci-v11"
+  TF_VAR_aws_region: "us-west-2"
+  TF_AUTO_VARS_FILE: |
+    tags = {
+      "cb-owner" : "professional-services"
+      "cb-user" : "cb-platform"
+      "cb-purpose" : "ci"
+    }
+    trial_license = {
+      first_name  = "CloudBees.io"
+      last_name  = "Platform"
+      email = "ci.user@cloudbees.io"
+      company = "CloudBees Inc."
+    }
+    ci = true
+
+jobs:
+  init:
+    steps:
+
+    - name: Configure AWS Credentials
+      uses: cloudbees-io/configure-aws-credentials@v1
+      with:
+        aws-region: ${{ env.AWS_REGION_TF_BUCKET }}
+        aws-access-key-id: ${{ secrets.AWS_TF_CBCI_EKS_AccessKeyID }}
+        aws-secret-access-key: ${{ secrets.AWS_TF_CBCI_EKS_SecretAccessKey }}
+        role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
+        role-external-id: cloudbees
+        role-duration-seconds: "3600"
+
+    #TODO: Add tags for the bucket
+    - name: Create Terraform Backend Bucket if not exists
+      uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
+      shell: bash
+      run: |
+        set -x
+        aws s3api create-bucket \
+          --bucket ${{ env.BUCKET_NAME_TF_STATE }} \
+          --region ${{ env.AWS_REGION_TF_BUCKET }} || echo "Bucket ${{ env.BUCKET_NAME_TF_STATE }} already exists"
+
+  bp01:
+    env:
+      ROOT: 01-getting-started
+      TF_VAR_hosted_zone: bp01.aws.ps.beescloud.com
+      STAGES: "deploy,validate,destroy"
+    needs:
+      - init
+    steps:
+
+    - name: Configure AWS Credentials
+      uses: cloudbees-io/configure-aws-credentials@v1
+      with:
+        aws-region: ${{ env.TF_VAR_aws_region }}
+        aws-access-key-id: ${{ secrets.AWS_TF_CBCI_EKS_AccessKeyID }}
+        aws-secret-access-key: ${{ secrets.AWS_TF_CBCI_EKS_SecretAccessKey }}
+        role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
+        role-external-id: cloudbees
+        role-duration-seconds: "3600"
+
+    - name: Checkout code
+      uses: cloudbees-io/checkout@v1
+
+    - name: 01-getting-started - Set
+      uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
+      shell: bash
+      run : |
+        cat <<EOT >> blueprints/${{ env.ROOT }}/.auto.tfvars
+        ${{ env.TF_AUTO_VARS_FILE }}
+        EOT
+        cat blueprints/${{ env.ROOT }}/.auto.tfvars
+        cat <<EOT >> blueprints/${{ env.ROOT }}/backend.tf
+        terraform {
+          backend "s3" {
+            bucket = "${{ env.BUCKET_NAME_TF_STATE }}"
+            key    = "${{ env.ROOT }}/ci.terraform.tfstate"
+            region = "${{ env.AWS_REGION_TF_BUCKET }}"
+          }
+        }
+        EOT
+
+    - name: 01-getting-started - Deploy
+      uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
+      if: contains(env.STAGES, 'deploy')
+      shell: bash
+      run : |
+        set -x
+        aws kms delete-alias --alias-name alias/eks/cbci-bp01-${{ env.TF_VAR_suffix }}-eks --region ${{ env.TF_VAR_aws_region }} || echo "Alias alias/eks/cbci-bp01-${{ env.TF_VAR_suffix }}-eks does not exist"
+        aws kms delete-alias --alias-name alias/eks/cbci-bp01-${{ env.TF_VAR_suffix }} --region ${{ env.TF_VAR_aws_region }} || echo "Alias alias/eks/cbci-bp01-${{ env.TF_VAR_suffix }} does not exist"
+        CI=true make deploy
+        aws s3api put-object \
+            --bucket ${{ env.BUCKET_NAME_TF_STATE }} \
+            --region ${{ env.AWS_REGION_TF_BUCKET }} \
+            --key ${{ env.ROOT }}/${{ env.ROOT }}.terraform.output \
+            --body blueprints/${{ env.ROOT }}/terraform.output
+
+    - name: 01-getting-started - Validate
+      uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
+      if: contains(env.STAGES, 'validate')
+      shell: bash
+      run : |
+        CI=true make validate
+
+    - name: 01-getting-started - Destroy
+      uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
+      if: contains(env.STAGES, 'destroy')
+      shell: bash
+      run : |
+        CI=true make destroy
+
+    - name: 01-getting-started - Wipeout Failed Deployment
+      uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
+      if: contains(env.STAGES, 'wipeout')
+      shell: bash
+      run : |
+        terraform -chdir=blueprints/${{ env.ROOT }} init -reconfigure && CI=true make destroy
+
+    - name: 02-at-scale  - Role Onboarding
+      uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
+      if: contains(env.STAGES, 'onboarding')
+      env:
+        TARGET_ROLE: arn:aws:iam::324005994172:role/AWSReservedSSO_infra-admin_256addbf79cfacd1
+      shell: bash
+      run : |
+        set -x
+        cd blueprints/${{ env.ROOT }} && eval $(terraform output --raw kubeconfig_export)
+        kubectl describe configmap aws-auth -n kube-system
+        eksctl create iamidentitymapping \
+          --cluster $(terraform output --raw eks_cluster_name) \
+          --region ${{ env.TF_VAR_aws_region }} \
+          --arn ${{ env.TARGET_ROLE }} \
+          --username k8s-admin-rol \
+          --group system:masters
+        kubectl describe configmap aws-auth -n kube-system
+
+  bp02:
+    env:
+      ROOT: 02-at-scale
+      TF_VAR_hosted_zone: bp02.aws.ps.beescloud.com
+      STAGES: "deploy,validate,destroy"
+    needs:
+      - init
+    steps:
+
+    - name: Configure AWS Credentials
+      uses: cloudbees-io/configure-aws-credentials@v1
+      with:
+        aws-region: ${{ env.TF_VAR_aws_region }}
+        aws-access-key-id: ${{ secrets.AWS_TF_CBCI_EKS_AccessKeyID }}
+        aws-secret-access-key: ${{ secrets.AWS_TF_CBCI_EKS_SecretAccessKey }}
+        role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
+        role-external-id: cloudbees
+        role-duration-seconds: "3600"
+
+    - name: Checkout code
+      uses: cloudbees-io/checkout@v1
+
+    - name: 02-at-scale - Set
+      uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
+      shell: bash
+      run : |
+        cat <<EOT >> blueprints/${{ env.ROOT }}/.auto.tfvars
+        ${{ env.TF_AUTO_VARS_FILE }}
+        dh_reg_secret_auth = {
+          username = "foo"
+          password = "d0ckerPass12"
+          email = "example@gmail.com"
+        }
+        EOT
+        cat blueprints/${{ env.ROOT }}/.auto.tfvars
+        cat <<EOT >> blueprints/${{ env.ROOT }}/backend.tf
+        terraform {
+          backend "s3" {
+            bucket = "${{ env.BUCKET_NAME_TF_STATE }}"
+            key    = "${{ env.ROOT }}/ci.terraform.tfstate"
+            region = "${{ env.AWS_REGION_TF_BUCKET }}"
+          }
+        }
+        EOT
+
+    - name: 02-at-scale - Deploy
+      uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
+      if: contains(env.STAGES, 'deploy')
+      shell: bash
+      run : |
+        set -x
+        aws kms delete-alias --alias-name alias/eks/cbci-bp02-${{ env.TF_VAR_suffix }}-eks --region ${{ env.TF_VAR_aws_region }} || echo "Alias alias/eks/cbci-bp02-${{ env.TF_VAR_suffix }}-eks does not exist"
+        aws kms delete-alias --alias-name alias/eks/cbci-bp02-${{ env.TF_VAR_suffix }} --region ${{ env.TF_VAR_aws_region }} || echo "Alias alias/eks/cbci-bp02-${{ env.TF_VAR_suffix }} does not exist"
+        CI=true make deploy
+        aws s3api put-object \
+            --bucket ${{ env.BUCKET_NAME_TF_STATE }} \
+            --region ${{ env.AWS_REGION_TF_BUCKET }} \
+            --key ${{ env.ROOT }}/${{ env.ROOT }}.terraform.output \
+            --body blueprints/${{ env.ROOT }}/terraform.output
+
+    - name: 02-at-scale - Validate
+      uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
+      if: contains(env.STAGES, 'validate')
+      shell: bash
+      run : |
+        CI=true make validate
+
+    - name: 02-at-scale - Destroy
+      uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
+      if: contains(env.STAGES, 'destroy')
+      shell: bash
+      run : |
+        CI=true make destroy
+    
+    - name: 02-at-scale - Wipeout Failed Deployment
+      uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
+      if: contains(env.STAGES, 'wipeout')
+      shell: bash
+      run : |
+        terraform -chdir=blueprints/${{ env.ROOT }} init -reconfigure && CI=true make destroy
+    
+    - name: 02-at-scale  - Role Onboarding
+      uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
+      if: contains(env.STAGES, 'onboarding')
+      env:
+        TARGET_ROLE: arn:aws:iam::324005994172:role/AWSReservedSSO_infra-admin_256addbf79cfacd1
+      shell: bash
+      run : |
+        set -x
+        cd blueprints/${{ env.ROOT }} && eval $(terraform output --raw kubeconfig_export)
+        kubectl describe configmap aws-auth -n kube-system
+        eksctl create iamidentitymapping \
+          --cluster $(terraform output --raw eks_cluster_name) \
+          --region ${{ env.TF_VAR_aws_region }} \
+          --arn ${{ env.TARGET_ROLE }} \
+          --username k8s-admin-rol \
+          --group system:masters
+        kubectl describe configmap aws-auth -n kube-system
