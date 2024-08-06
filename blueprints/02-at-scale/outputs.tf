@@ -119,6 +119,11 @@ output "eks_cluster_arn" {
   value       = module.eks.cluster_arn
 }
 
+output "eks_cluster_name" {
+  description = "Amazon EKS cluster Name."
+  value       = module.eks.cluster_name
+}
+
 output "s3_cbci_arn" {
   description = "CloudBees CI Amazon S3 bucket ARN."
   value       = module.cbci_s3_bucket.s3_bucket_arn
