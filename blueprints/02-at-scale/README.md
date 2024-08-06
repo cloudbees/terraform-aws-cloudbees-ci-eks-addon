@@ -100,10 +100,12 @@ This blueprint divides scalable node groups for different types of workloads:
 | efs_access_points | Amazon EFS access points. |
 | efs_arn | Amazon EFS ARN. |
 | eks_cluster_arn | Amazon EKS cluster ARN. |
+| eks_cluster_name | Amazon EKS cluster Name. |
 | global_password | Random string that is used as the global password. |
 | grafana_dashboard | Provides access to Grafana dashboards. |
 | kubeconfig_add | Add kubeconfig to the local configuration to access the Kubernetes API. |
 | kubeconfig_export | Export the KUBECONFIG environment variable to access the Kubernetes API. |
+| kubeconfig_file | Kubeconfig file path to access the Kubernetes API. |
 | prometheus_active_targets | Checks active Prometheus targets from the operations center. |
 | prometheus_dashboard | Provides access to Prometheus dashboards. |
 | s3_cbci_arn | CloudBees CI Amazon S3 bucket ARN. |
