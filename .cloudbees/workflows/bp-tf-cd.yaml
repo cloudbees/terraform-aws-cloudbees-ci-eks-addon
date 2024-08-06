@@ -139,13 +139,13 @@ jobs:
       run : |
         set -x
         cd blueprints/${{ env.ROOT }} && eval $(terraform output --raw kubeconfig_export)
-        kubectl get configmap aws-auth -n kube-system
-        #eksctl create iamidentitymapping \
-          --cluster $(terraform output --raw eks_cluster_name) \
-          --arn arn:aws:iam::324005994172:role/aws-reserved/sso.amazonaws.com/AWSReservedSSO_infra-admin_256addbf79cfacd1 \
-          --username k8s-admin \
-          --group system:masters
-        #kubectl get configmap aws-auth -n kube-system
+        kubectl get configmap aws-auth -n kube-system -o yaml
+        # eksctl create iamidentitymapping \
+        #   --cluster $(terraform output --raw eks_cluster_name) \
+        #   --arn arn:aws:iam::324005994172:role/aws-reserved/sso.amazonaws.com/AWSReservedSSO_infra-admin_256addbf79cfacd1 \
+        #   --username k8s-admin \
+        #   --group system:masters
+        #kubectl get configmap aws-auth -n kube-system -o yaml
 
   bp02:
     env:
