@@ -227,6 +227,8 @@ HashiCorp Vault is used as a credential provider for CloudBees CI Pipelines in t
    eval $(terraform output --raw vault_dashboard)
    ```
 
+   If successful, the Vault web service should be available at `http://localhost:50003` and you can view the secrets that were created in _step 2_.
+
 4. Sign in to the CloudBees CI operations center as a user with the admin role.
 
 5. Navigate to **Manage Jenkins > Credentials Providers > HashiCorp Vault Credentials Provider** and complete the configuration for the CloudBees CI Vault Plugin by entering the role ID and secret ID for the `cbci-oc` application role from _step 1_.
@@ -373,7 +375,7 @@ Grafana is used to visualize and query:
    eval $(terraform output --raw prometheus_dashboard)
    ```  
 
-   If successful, the Prometheus dashboard should be available at `http://localhost:50001` and you can view the configured alerts for CloudBees CI.
+   If successful, the Prometheus web service is available at `http://localhost:50001` and you can view the configured alerts for CloudBees CI. Additionally, check _Status_ > _Targets_ shows targets in `UP` status.
 
 3. Issue the following command to access Grafana dashboards at `localhost:50002`. For the username, use `admin` and set the password using the `global_password` terraform variable:
 
@@ -381,9 +383,9 @@ Grafana is used to visualize and query:
    eval $(terraform output --raw grafana_dashboard)
    ```
 
-   If successful, the Grafana dashboard should be available at `http://localhost:50002`.
+   If successful, the Grafana web service is available `http://localhost:50002`.
 
-   - For Jenkins Metrics Dashboards navigate to **Dashboards > CloudBees CI**. Then, select the controller pod to view the metrics. The following image shows metrics for team-b.
+   - For Jenkins Metrics Dashboards navigate to **Home > Dashboards > CloudBees CI**. Then, select the controller pod to view the metrics. The following image shows metrics for team-b.
 
    ![CloudBees CI Dashboard](img/observability/cbci-dashboard.png)
 
