@@ -194,6 +194,11 @@ output "vault_init" {
   value       = "kubectl exec -it vault-0 -n ${local.vault_ns} -- vault operator init | tee ${local.vault_init_file_path} || echo \"Vault is already initialized.\""
 }
 
+output "vault_init_log_file" {
+  description = "Vault Inicialization log file."
+  value       = local.vault_init_file_path
+}
+
 output "vault_configure" {
   description = "Configure Vault with initial secrets and creates approle for integration with CloudBees CI (role-id and secret-id). It requires unseal keys and the root token from the vault_init output."
   value       = "bash ${local.vault_config_file_path} ${local.vault_ns}"
