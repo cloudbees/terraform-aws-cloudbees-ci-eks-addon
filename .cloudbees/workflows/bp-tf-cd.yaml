@@ -132,6 +132,7 @@ jobs:
       run : |
         terraform -chdir=blueprints/${{ env.ROOT }} init -reconfigure && CI=true make destroy
     
+    #https://repost.aws/knowledge-center/eks-api-server-unauthorized-error
     - name: 01-getting-started - Add users
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
       if: contains(env.STAGES, 'users')
@@ -142,9 +143,17 @@ jobs:
         kubectl get configmap aws-auth -n kube-system -o yaml
         eksctl create iamidentitymapping \
           --cluster $(terraform output --raw eks_cluster_name) \
+          --region ${{ env.TF_VAR_aws_region }} \
           --arn arn:aws:iam::324005994172:role/aws-reserved/sso.amazonaws.com/AWSReservedSSO_infra-admin_256addbf79cfacd1 \
-          --username k8s-admin \
+          --username k8s-admin-rol \
           --group system:masters
+        eksctl create iamidentitymapping \
+          --cluster $(terraform output --raw eks_cluster_name)  \
+          --region ${{ env.TF_VAR_aws_region }} \
+          --arn arn:aws:sts::324005994172:assumed-role/AWSReservedSSO_infra-admin_256addbf79cfacd1/crodriguezlopez@cloudbees.com \
+          --username k8s-admin-user \
+          --group system:masters \
+          --no-duplicate-arns
         kubectl get configmap aws-auth -n kube-system -o yaml
 
   bp02:
