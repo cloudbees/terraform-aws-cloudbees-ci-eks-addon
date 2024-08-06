@@ -153,7 +153,7 @@ jobs:
     env:
       ROOT: 02-at-scale
       TF_VAR_hosted_zone: bp02.aws.ps.beescloud.com
-      STAGES: "deploy,validate"
+      STAGES: "deploy,validate,onboarding"
     needs:
       - init
     steps:
