@@ -131,7 +131,7 @@ jobs:
       run : |
         CI=true make destroy
 
-    - name: 01-getting-started - Wipeout Failed Deployment
+    - name: 01-getting-started - Wipeout
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
       if: contains(env.STAGES, 'wipeout')
       shell: bash
@@ -230,7 +230,7 @@ jobs:
       run : |
         CI=true make destroy
 
-    - name: 02-at-scale - Wipeout Failed Deployment
+    - name: 02-at-scale - Wipeout
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
       if: contains(env.STAGES, 'wipeout')
       shell: bash
