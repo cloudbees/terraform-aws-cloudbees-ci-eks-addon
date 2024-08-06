@@ -108,8 +108,8 @@ jobs:
         aws s3api put-object \
             --bucket ${{ env.BUCKET_NAME_TF_STATE }} \
             --region ${{ env.AWS_REGION_TF_BUCKET }} \
-            --key ${{ env.ROOT }}/${{ env.ROOT }}.kubeconfig.yaml \
-            --body $(cd blueprints/${{ env.ROOT }} && terraform output --raw kubeconfig_file)
+            --key ${{ env.ROOT }}/${{ env.ROOT }}.terraform.output \
+            --body blueprints/${{ env.ROOT }}/terraform.output
 
     - name: 01-getting-started - Validate
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
@@ -132,7 +132,6 @@ jobs:
       run : |
         terraform -chdir=blueprints/${{ env.ROOT }} init -reconfigure && CI=true make destroy
     
-    #https://repost.aws/knowledge-center/eks-api-server-unauthorized-error
     - name: 01-getting-started - Add users
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
       if: contains(env.STAGES, 'users')
@@ -140,21 +139,21 @@ jobs:
       run : |
         set -x
         cd blueprints/${{ env.ROOT }} && eval $(terraform output --raw kubeconfig_export)
-        kubectl get configmap aws-auth -n kube-system -o yaml
+        kubectl describe configmap aws-auth -n kube-system
         eksctl create iamidentitymapping \
           --cluster $(terraform output --raw eks_cluster_name) \
           --region ${{ env.TF_VAR_aws_region }} \
           --arn arn:aws:iam::324005994172:role/AWSReservedSSO_infra-admin_256addbf79cfacd1 \
           --username k8s-admin-rol \
           --group system:masters
-        kubectl get configmap aws-auth -n kube-system -o yaml
+        kubectl describe configmap aws-auth -n kube-system
 
   bp02:
     env:
       ROOT: 02-at-scale
       TF_VAR_hosted_zone: bp02.aws.ps.beescloud.com
       # Add the stages to execute in the pipeline: deploy,validate,destroy,wipeout
-      STAGES: ""
+      STAGES: "deploy,users"
     needs:
       - init
     steps:
@@ -207,8 +206,8 @@ jobs:
         aws s3api put-object \
             --bucket ${{ env.BUCKET_NAME_TF_STATE }} \
             --region ${{ env.AWS_REGION_TF_BUCKET }} \
-            --key ${{ env.ROOT }}/${{ env.ROOT }}.kubeconfig.yaml \
-            --body $(cd blueprints/${{ env.ROOT }} && terraform output --raw kubeconfig_file)
+            --key ${{ env.ROOT }}/${{ env.ROOT }}.terraform.output \
+            --body blueprints/${{ env.ROOT }}/terraform.output
 
     - name: 02-at-scale - Validate
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
@@ -230,3 +229,19 @@ jobs:
       shell: bash
       run : |
         terraform -chdir=blueprints/${{ env.ROOT }} init -reconfigure && CI=true make destroy
+
+    - name: 02-at-scale - Add users
+      uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
+      if: contains(env.STAGES, 'users')
+      shell: bash
+      run : |
+        set -x
+        cd blueprints/${{ env.ROOT }} && eval $(terraform output --raw kubeconfig_export)
+        kubectl describe configmap aws-auth -n kube-system
+        eksctl create iamidentitymapping \
+          --cluster $(terraform output --raw eks_cluster_name) \
+          --region ${{ env.TF_VAR_aws_region }} \
+          --arn arn:aws:iam::324005994172:role/AWSReservedSSO_infra-admin_256addbf79cfacd1 \
+          --username k8s-admin-rol \
+          --group system:masters
+        kubectl describe configmap aws-auth -n kube-system
