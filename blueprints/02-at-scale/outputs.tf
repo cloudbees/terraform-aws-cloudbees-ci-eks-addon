@@ -196,11 +196,11 @@ output "global_password" {
 
 output "vault_init" {
   description = "Inicialization of Vault Service."
-  value       = "kubectl exec -it vault-0 -n ${local.vault_ns} -- vault operator init | tee $HERE/vault-init.log || echo \"Vault is already initialized.\""
+  value       = "kubectl exec -it vault-0 -n ${local.vault_ns} -- vault operator init | tee ${local.vault_init_file_path} || echo \"Vault is already initialized.\""
 }
 
 output "vault_configure" {
-  description = "Configure Vault with iniitla set of secrets. It requires unseal keys and the root token from the vault_init output."
+  description = "Configure Vault with initial secrets and creates approle for integration with CloudBees CI (role-id and secret-id). It requires unseal keys and the root token from the vault_init output."
   value       = "bash ${local.vault_config_file_path} ${local.vault_ns}"
 }
 

@@ -208,19 +208,25 @@ DockerHub authentication is stored as Kubernetes secrets (`cbci-agent-sec-reg`) 
 
 HashiCorp Vault is used as a credential provider for CloudBees CI Pipelines in this blueprint.
 
-1. Run the configure Hashicorp Vault script. Keep in a safe place Admin Token and Unseal Keys (saved in `k8s/vault-init.log`) as well as Role ID and Secret ID for `cbci-oc` App Role.
+1. Initialize Hashicorp Vault. Keep in a safe place Admin Token and Unseal Keys (saved in `k8s/vault-init.log`).
+
+   ```sh
+   eval $(terraform output --raw vault_init)
+   ```
+
+2. Run the configure Hashicorp Vault script. It configures Vault with initial secrets and creates `approle` for integration with CloudBees CI (role-id and secret-id)
 
    ```sh
    eval $(terraform output --raw vault_configure)
    ```
 
-2. Access the HashiCorp Vault UI by issuing the following command. Enter the root token to log in from the _step 1_.
+3. Access the HashiCorp Vault UI by issuing the following command. Enter the root token to log in from the _step 1_.
 
    ```sh
    eval $(terraform output --raw vault_dashboard)
    ```
 
-3. Access with admin role to CloudBees CI Operation Center and complete the configuration for the CloudBees CI Vault Plugin by entering the Role ID and Secret ID for `cbci-oc` App Role from _step 1_ in _Manage Jenkins_ > _Credentials Providers_ > _HashiCorp Vault Credentials Provider_. Click on `Test Connection` to verify the inputs are right. Finally, move to `team-b` or `team-c-ha` to run the pipeline _admin_ > _validations_ > _vault-credentials_ and validate that credentials are fetched correctly from Hashicorp Vault.
+4. Access with admin role to CloudBees CI Operation Center and complete the configuration for the CloudBees CI Vault Plugin by entering the Role ID and Secret ID for `cbci-oc` App Role from _step 2_ in _Manage Jenkins_ > _Credentials Providers_ > _HashiCorp Vault Credentials Provider_. Click on `Test Connection` to verify the inputs are right. Finally, move to `team-b` or `team-c-ha` to run the pipeline _admin_ > _validations_ > _vault-credentials_ and validate that credentials are fetched correctly from Hashicorp Vault.
 
 > [!NOTE]
 > Hashicorp Vault can be also be configured to be used for [Configuration as Code - Handling Secrets - Vault](https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/docs/features/secrets.adoc#hashicorp-vault-secret-source).

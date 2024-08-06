@@ -89,6 +89,7 @@ locals {
 
   vault_ns               = "vault"
   vault_config_file_path = abspath("k8s/vault-config.sh")
+  vault_init_file_path   = abspath("k8s/vault-init.log")
 }
 
 resource "random_string" "global_pass_string" {
