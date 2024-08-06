@@ -135,6 +135,8 @@ jobs:
     - name: 01-getting-started - Add users
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
       if: contains(env.STAGES, 'users')
+      env:
+        TARGET_ROLE: arn:aws:iam::324005994172:role/AWSReservedSSO_infra-admin_256addbf79cfacd1
       shell: bash
       run : |
         set -x
@@ -143,7 +145,7 @@ jobs:
         eksctl create iamidentitymapping \
           --cluster $(terraform output --raw eks_cluster_name) \
           --region ${{ env.TF_VAR_aws_region }} \
-          --arn arn:aws:iam::324005994172:role/AWSReservedSSO_infra-admin_256addbf79cfacd1 \
+          --arn ${{ env.TARGET_ROLE }} \
           --username k8s-admin-rol \
           --group system:masters
         kubectl describe configmap aws-auth -n kube-system
@@ -230,9 +232,11 @@ jobs:
       run : |
         terraform -chdir=blueprints/${{ env.ROOT }} init -reconfigure && CI=true make destroy
 
-    - name: 02-at-scale - Add users
+    - name: 02-at-scale  - Add users
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
       if: contains(env.STAGES, 'users')
+      env:
+        TARGET_ROLE: arn:aws:iam::324005994172:role/AWSReservedSSO_infra-admin_256addbf79cfacd1
       shell: bash
       run : |
         set -x
@@ -241,7 +245,7 @@ jobs:
         eksctl create iamidentitymapping \
           --cluster $(terraform output --raw eks_cluster_name) \
           --region ${{ env.TF_VAR_aws_region }} \
-          --arn arn:aws:iam::324005994172:role/AWSReservedSSO_infra-admin_256addbf79cfacd1 \
+          --arn ${{ env.TARGET_ROLE }} \
           --username k8s-admin-rol \
           --group system:masters
         kubectl describe configmap aws-auth -n kube-system
