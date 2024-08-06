@@ -11,7 +11,7 @@ name: ci
 
 on:
   # Enable once Issue #83 is solved (Disable Manual trigger. workflow_dispatch)
-  # It requires 
+  # It requires
 
   # pull_request:
   #   branches:
@@ -229,14 +229,14 @@ jobs:
       shell: bash
       run : |
         CI=true make destroy
-    
+
     - name: 02-at-scale - Wipeout Failed Deployment
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
       if: contains(env.STAGES, 'wipeout')
       shell: bash
       run : |
         terraform -chdir=blueprints/${{ env.ROOT }} init -reconfigure && CI=true make destroy
-    
+
     - name: 02-at-scale  - Role Onboarding
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
       if: contains(env.STAGES, 'onboarding')

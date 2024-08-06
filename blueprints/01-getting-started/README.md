@@ -54,7 +54,6 @@ This blueprint presents the minimum setup to run CloudBees CI on Amazon EKS; one
 | eks_cluster_name | Amazon EKS cluster Name. |
 | kubeconfig_add | Add kubeconfig to your local configuration to access the Kubernetes API. |
 | kubeconfig_export | Export the KUBECONFIG environment variable to access the Kubernetes API. |
-| kubeconfig_file | Kubeconfig file path to access the Kubernetes API. |
 | vpc_arn | VPC ID. |
 <!-- END_TF_DOCS -->
 

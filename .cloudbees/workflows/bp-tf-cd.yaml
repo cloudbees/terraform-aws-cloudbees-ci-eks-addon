@@ -130,7 +130,7 @@ jobs:
       shell: bash
       run : |
         terraform -chdir=blueprints/${{ env.ROOT }} init -reconfigure && CI=true make destroy
-    
+
     - name: 01-getting-started - Role Onboarding
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
       if: contains(env.STAGES, 'onboarding')
@@ -228,7 +228,7 @@ jobs:
       shell: bash
       run : |
         CI=true make destroy
-    
+
     - name: 02-at-scale - Wipeout Failed Deployment
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
       if: contains(env.STAGES, 'wipeout')
