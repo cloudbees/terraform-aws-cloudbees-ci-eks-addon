@@ -208,6 +208,7 @@ jobs:
             --region ${{ env.AWS_REGION_TF_BUCKET }} \
             --key ${{ env.ROOT }}/${{ env.ROOT }}.terraform.output \
             --body blueprints/${{ env.ROOT }}/terraform.output
+        cd blueprints/${{ env.ROOT }} && eval $(terraform output --raw kubeconfig_export)
         cd blueprints/${{ env.ROOT }} && eval $(terraform output --raw vault_init)
         aws s3api put-object \
             --bucket ${{ env.BUCKET_NAME_TF_STATE }} \
