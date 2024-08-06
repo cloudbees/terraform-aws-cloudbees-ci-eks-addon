@@ -21,7 +21,7 @@ env:
     tags = {
       "cb-owner" : "professional-services"
       "cb-user" : "cb-platform"
-      "cb-purpose" : "ci"
+      "cb-purpose" : "cd"
     }
     trial_license = {
       first_name  = "CloudBees.io"
