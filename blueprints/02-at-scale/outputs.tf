@@ -194,8 +194,13 @@ output "global_password" {
   value       = "kubectl get secret ${module.eks_blueprints_addon_cbci.cbci_sec_casc} -n ${module.eks_blueprints_addon_cbci.cbci_namespace} -o jsonpath=${local.global_pass_jsonpath} | base64 -d"
 }
 
+output "vault_init" {
+  description = "Inicialization of Vault Service."
+  value       = "kubectl exec -it vault-0 -n ${local.vault_ns} -- vault operator init | tee $HERE/vault-init.log || echo \"Vault is already initialized.\""
+}
+
 output "vault_configure" {
-  description = "Provides access to Hashicorp Vault dashboard. It requires the root token from the vault_init output."
+  description = "Configure Vault with iniitla set of secrets. It requires unseal keys and the root token from the vault_init output."
   value       = "bash ${local.vault_config_file_path} ${local.vault_ns}"
 }
 
