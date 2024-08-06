@@ -147,12 +147,6 @@ jobs:
           --arn arn:aws:iam::324005994172:role/AWSReservedSSO_infra-admin_256addbf79cfacd1 \
           --username k8s-admin-rol \
           --group system:masters
-        eksctl create iamidentitymapping \
-          --cluster $(terraform output --raw eks_cluster_name)  \
-          --region ${{ env.TF_VAR_aws_region }} \
-          --arn arn:aws:sts::324005994172:assumed-role/AWSReservedSSO_infra-admin_256addbf79cfacd1/crodriguezlopez@cloudbees.com \
-          --username k8s-admin-user \
-          --group system:masters
         kubectl get configmap aws-auth -n kube-system -o yaml
 
   bp02:
