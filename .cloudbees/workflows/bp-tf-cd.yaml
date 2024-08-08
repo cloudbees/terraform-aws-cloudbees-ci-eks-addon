@@ -210,7 +210,7 @@ jobs:
             --body blueprints/${{ env.ROOT }}/terraform.output
         # TODO: Add vault init log to s3
         eval $(terraform -chdir="blueprints/${{ env.ROOT }}" output --raw kubeconfig_export)
-        kubectl exec vault-0 -n vault -- vault operator init > vault-init.log
+        kubectl exec vault-0 -n vault -- vault operator init > vault-init.log || true
         echo "Vault init log" > blueprints/${{ env.ROOT }}/vault-init.log
         aws s3api put-object \
             --bucket ${{ env.BUCKET_NAME_TF_STATE }} \
