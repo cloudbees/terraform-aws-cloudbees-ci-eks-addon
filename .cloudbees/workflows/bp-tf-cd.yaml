@@ -209,9 +209,12 @@ jobs:
             --key ${{ env.ROOT }}/${{ env.ROOT }}.terraform.output \
             --body blueprints/${{ env.ROOT }}/terraform.output
         # TODO: Add vault init log to s3
-        cd blueprints/${{ env.ROOT }} && eval $(terraform output --raw kubeconfig_export)
+        cd blueprints/${{ env.ROOT }}; \
+          eval $(terraform output --raw kubeconfig_export); \
+          kubectl exec -it vault-0 -n vault -- vault operator init > vault-init.log
+        ls -laR  
         # cd blueprints/${{ env.ROOT }} && eval $(terraform output --raw vault_init)
-        cd blueprints/${{ env.ROOT }} && kubectl exec -it vault-0 -n vault -- vault operator init > vault-init.log
+        #cd blueprints/${{ env.ROOT }} && kubectl exec -it vault-0 -n vault -- vault operator init > vault-init.log
         aws s3api put-object \
             --bucket ${{ env.BUCKET_NAME_TF_STATE }} \
             --region ${{ env.AWS_REGION_TF_BUCKET }} \
