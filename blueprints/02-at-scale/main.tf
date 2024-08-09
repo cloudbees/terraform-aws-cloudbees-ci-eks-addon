@@ -349,7 +349,7 @@ module "eks_blueprints_addons" {
       chart            = "tempo"
       chart_version    = "1.7.2"
       repository       = "https://grafana.github.io/helm-charts"
-      values           = [file("k8s/grafana-tempo.yml")]
+      values           = [file("k8s/grafana-tempo-values.yml")]
     }
     #Based on hashicorp/hashicorp-vault-eks-addon/aws
     vault = {
