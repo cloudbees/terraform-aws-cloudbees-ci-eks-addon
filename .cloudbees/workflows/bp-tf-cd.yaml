@@ -154,7 +154,7 @@ jobs:
     env:
       ROOT: 02-at-scale
       TF_VAR_hosted_zone: bp02-cd.aws.ps.beescloud.com
-      STAGES: "deploy,validate,onboarding"
+      STAGES: "wipeout"
     needs:
       - init
     steps:
