@@ -218,7 +218,7 @@ items:
             pipeline {
                 agent any
                 environment {
-                    U1=credentials('cbci-oc-secret-a')
+                    U1=credentials('cbci-oc_secret-a') 
                     S1=credentials('cbci-oc_secret-b')
                 }
                 stages {
