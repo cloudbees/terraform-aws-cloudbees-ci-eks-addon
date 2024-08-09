@@ -228,6 +228,8 @@ jobs:
     - name: 02-at-scale - Destroy
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
       if: contains(env.STAGES, 'destroy')
+      env:
+        DESTROY_ONLY_APPS: false
       shell: bash
       run : |
         CI=true make destroy
@@ -235,6 +237,8 @@ jobs:
     - name: 02-at-scale - Wipeout
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
       if: contains(env.STAGES, 'wipeout')
+      env:
+        DESTROY_ONLY_APPS: true
       shell: bash
       run : |
         terraform -chdir=blueprints/${{ env.ROOT }} init -reconfigure && CI=true make destroy

@@ -7,6 +7,7 @@ MKFILEDIR 			:= $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 CBCI_REPO		    ?= https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon.git
 CBCI_BRANCH			?= main
 NUKE_DRY_RUN		?= true
+DESTROY_ONLY_APPS	?= false
 
 define helpers
 	source blueprints/helpers.sh && $(1)
@@ -62,8 +63,13 @@ destroy: tfChecks agentCheck
 ifeq ($(CI),false)
 	@$(call helpers,ask-confirmation "Destroy $(ROOT)")
 endif
-	@$(call helpers,tf-destroy $(ROOT) $(CBCI_ONLY))
-	@$(call helpers,INFO "CloudBees CI Blueprint $(ROOT) Destroy target finished succesfully.")
+ifeq ($(DESTROY_ONLY_APPS),false)
+	@$(call helpers,tf-destroy $(ROOT))
+	@$(call helpers,INFO "CloudBees CI Blueprint $(ROOT) Destroy target finished succesfully. Mode: ALL")
+else
+	@$(call helpers,tf-destroy-apps $(ROOT))
+	@$(call helpers,INFO "CloudBees CI Blueprint $(ROOT) Destroy ONLY APPS target finished succesfully. Mode: ONLY APPS")
+endif
 
 .PHONY: clean
 clean: ## Clean Blueprint passed as parameter. Example: ROOT=02-at-scale make clean
