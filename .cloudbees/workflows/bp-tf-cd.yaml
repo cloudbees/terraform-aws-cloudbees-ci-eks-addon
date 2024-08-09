@@ -211,12 +211,12 @@ jobs:
             --key ${{ env.ROOT }}/${{ env.ROOT }}.terraform.output \
             --body blueprints/${{ env.ROOT }}/terraform.output
         eval $(terraform -chdir="blueprints/${{ env.ROOT }}" output --raw kubeconfig_export)
-        kubectl exec vault-0 -n vault -- vault operator init > vault-init.log || echo "Vault already initialized."
+        eval $(terraform -chdir="blueprints/${{ env.ROOT }}" output --raw vault_init)
         aws s3api put-object \
             --bucket ${{ env.BUCKET_NAME_TF_STATE }} \
             --region ${{ env.AWS_REGION_TF_BUCKET }} \
             --key ${{ env.ROOT }}/${{ env.ROOT }}.vault.init.log \
-            --body blueprints/${{ env.ROOT }}/vault-init.log || echo "Failed to upload vault-init.log, likely because it already initialized."
+            --body blueprints/${{ env.ROOT }}/k8s/vault-init.log || echo "Failed to upload vault-init.log, likely because it already initialized."
 
     - name: 02-at-scale - Validate
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
