@@ -101,6 +101,7 @@ jobs:
       shell: bash
       run : |
         set -x
+        # It resolves Issue #66
         aws kms delete-alias --alias-name alias/eks/cbci-bp01-${{ env.TF_VAR_suffix }}-eks --region ${{ env.TF_VAR_aws_region }} || echo "Alias alias/eks/cbci-bp01-${{ env.TF_VAR_suffix }}-eks does not exist"
         aws kms delete-alias --alias-name alias/eks/cbci-bp01-${{ env.TF_VAR_suffix }} --region ${{ env.TF_VAR_aws_region }} || echo "Alias alias/eks/cbci-bp01-${{ env.TF_VAR_suffix }} does not exist"
         CI=true make deploy
@@ -200,6 +201,7 @@ jobs:
       shell: bash
       run : |
         set -x
+        # It Resolves Issue #66
         aws kms delete-alias --alias-name alias/eks/cbci-bp02-${{ env.TF_VAR_suffix }}-eks --region ${{ env.TF_VAR_aws_region }} || echo "Alias alias/eks/cbci-bp02-${{ env.TF_VAR_suffix }}-eks does not exist"
         aws kms delete-alias --alias-name alias/eks/cbci-bp02-${{ env.TF_VAR_suffix }} --region ${{ env.TF_VAR_aws_region }} || echo "Alias alias/eks/cbci-bp02-${{ env.TF_VAR_suffix }} does not exist"
         CI=true make deploy
@@ -208,15 +210,13 @@ jobs:
             --region ${{ env.AWS_REGION_TF_BUCKET }} \
             --key ${{ env.ROOT }}/${{ env.ROOT }}.terraform.output \
             --body blueprints/${{ env.ROOT }}/terraform.output
-        # TODO: Add vault init log to s3
         eval $(terraform -chdir="blueprints/${{ env.ROOT }}" output --raw kubeconfig_export)
-        kubectl exec vault-0 -n vault -- vault operator init > vault-init.log || true
-        echo "Vault init log" > blueprints/${{ env.ROOT }}/vault-init.log
+        kubectl exec vault-0 -n vault -- vault operator init > vault-init.log || echo "Vault already initialized."
         aws s3api put-object \
             --bucket ${{ env.BUCKET_NAME_TF_STATE }} \
             --region ${{ env.AWS_REGION_TF_BUCKET }} \
             --key ${{ env.ROOT }}/${{ env.ROOT }}.vault.init.log \
-            --body blueprints/${{ env.ROOT }}/vault-init.log
+            --body blueprints/${{ env.ROOT }}/vault-init.log || echo "Failed to upload vault-init.log, likely because it already initialized."
 
     - name: 02-at-scale - Validate
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
