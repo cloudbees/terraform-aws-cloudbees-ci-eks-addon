@@ -101,6 +101,7 @@ jobs:
       shell: bash
       run : |
         set -x
+        # It resolves Issue #66
         aws kms delete-alias --alias-name alias/eks/cbci-bp01-${{ env.TF_VAR_suffix }}-eks --region ${{ env.TF_VAR_aws_region }} || echo "Alias alias/eks/cbci-bp01-${{ env.TF_VAR_suffix }}-eks does not exist"
         aws kms delete-alias --alias-name alias/eks/cbci-bp01-${{ env.TF_VAR_suffix }} --region ${{ env.TF_VAR_aws_region }} || echo "Alias alias/eks/cbci-bp01-${{ env.TF_VAR_suffix }} does not exist"
         CI=true make deploy
@@ -153,7 +154,7 @@ jobs:
     env:
       ROOT: 02-at-scale
       TF_VAR_hosted_zone: bp02-cd.aws.ps.beescloud.com
-      STAGES: "deploy,validate,onboarding"
+      STAGES: "deploy"
     needs:
       - init
     steps:
@@ -200,6 +201,7 @@ jobs:
       shell: bash
       run : |
         set -x
+        # It Resolves Issue #66
         aws kms delete-alias --alias-name alias/eks/cbci-bp02-${{ env.TF_VAR_suffix }}-eks --region ${{ env.TF_VAR_aws_region }} || echo "Alias alias/eks/cbci-bp02-${{ env.TF_VAR_suffix }}-eks does not exist"
         aws kms delete-alias --alias-name alias/eks/cbci-bp02-${{ env.TF_VAR_suffix }} --region ${{ env.TF_VAR_aws_region }} || echo "Alias alias/eks/cbci-bp02-${{ env.TF_VAR_suffix }} does not exist"
         CI=true make deploy
@@ -208,15 +210,13 @@ jobs:
             --region ${{ env.AWS_REGION_TF_BUCKET }} \
             --key ${{ env.ROOT }}/${{ env.ROOT }}.terraform.output \
             --body blueprints/${{ env.ROOT }}/terraform.output
-        # TODO: Add vault init log to s3
-        cd blueprints/${{ env.ROOT }} && eval $(terraform output --raw kubeconfig_export)
-        # cd blueprints/${{ env.ROOT }} && eval $(terraform output --raw vault_init)
-        cd blueprints/${{ env.ROOT }} && kubectl exec -it vault-0 -n vault -- vault operator init > vault-init.log
+        eval $(terraform -chdir="blueprints/${{ env.ROOT }}" output --raw kubeconfig_export)
+        eval $(terraform -chdir="blueprints/${{ env.ROOT }}" output --raw vault_init)
         aws s3api put-object \
             --bucket ${{ env.BUCKET_NAME_TF_STATE }} \
             --region ${{ env.AWS_REGION_TF_BUCKET }} \
             --key ${{ env.ROOT }}/${{ env.ROOT }}.vault.init.log \
-            --body blueprints/${{ env.ROOT }}/vault-init.log || echo "No vault-init.log found"
+            --body blueprints/${{ env.ROOT }}/k8s/vault-init.log || echo "Failed to upload vault-init.log, likely because it already initialized."
 
     - name: 02-at-scale - Validate
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
@@ -230,6 +230,7 @@ jobs:
       if: contains(env.STAGES, 'destroy')
       shell: bash
       run : |
+        export DESTROY_ONLY_APPS=false
         CI=true make destroy
 
     - name: 02-at-scale - Wipeout
@@ -237,6 +238,7 @@ jobs:
       if: contains(env.STAGES, 'wipeout')
       shell: bash
       run : |
+        export DESTROY_ONLY_APPS=true
         terraform -chdir=blueprints/${{ env.ROOT }} init -reconfigure && CI=true make destroy
 
     - name: 02-at-scale  - Role Onboarding

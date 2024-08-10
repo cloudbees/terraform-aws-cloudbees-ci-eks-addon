@@ -91,11 +91,17 @@ tf-apply () {
 tf-destroy () {
   local root="$1"
   export TF_LOG_PATH="$SCRIPTDIR/$root/terraform.log"
-  retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.eks_blueprints_addon_cbci -auto-approve"
-  retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.eks_blueprints_addons -auto-approve"
+  tf-destroy-apps "$root"
   retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.eks -auto-approve"
   retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -auto-approve"
   rm -f "$SCRIPTDIR/$root/terraform.output"
+}
+
+tf-destroy-apps () {
+  local root="$1"
+  export TF_LOG_PATH="$SCRIPTDIR/$root/terraform.log"
+  retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.eks_blueprints_addon_cbci -auto-approve"
+  retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.eks_blueprints_addons -auto-approve"
 }
 
 probes () {
