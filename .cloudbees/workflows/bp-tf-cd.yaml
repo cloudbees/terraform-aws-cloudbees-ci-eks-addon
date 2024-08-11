@@ -49,7 +49,6 @@ jobs:
     - name: Checkout code
       uses: cloudbees-io/checkout@v1
 
-    #TODO: Add tags for the bucket
     - name: Create Terraform Backend Bucket if not exists
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
       shell: bash
@@ -107,22 +106,15 @@ jobs:
       shell: bash
       run : |
         set -x
+        source ${{ env.WORKFLOW_ROOT_PATH }}/helpers.sh
         # It Resolves Issue #66
-        aws kms delete-alias --alias-name alias/eks/cbci-bp02-${{ env.TF_VAR_suffix }}-eks --region ${{ env.TF_VAR_aws_region }} || echo "Alias alias/eks/cbci-bp02-${{ env.TF_VAR_suffix }}-eks does not exist"
-        aws kms delete-alias --alias-name alias/eks/cbci-bp02-${{ env.TF_VAR_suffix }} --region ${{ env.TF_VAR_aws_region }} || echo "Alias alias/eks/cbci-bp02-${{ env.TF_VAR_suffix }} does not exist"
+        kms-delete-alias alias/eks/cbci-bp02-${{ env.TF_VAR_suffix }}-eks ${{ env.TF_VAR_aws_region }}
+        kms-delete-alias alias/eks/cbci-bp02-${{ env.TF_VAR_suffix }} ${{ env.TF_VAR_aws_region }}
         CI=true make deploy
-        aws s3api put-object \
-            --bucket ${{ env.BUCKET_NAME_TF_STATE }} \
-            --region ${{ env.AWS_REGION_TF_BUCKET }} \
-            --key ${{ env.ROOT }}/${{ env.ROOT }}.terraform.output \
-            --body blueprints/${{ env.ROOT }}/terraform.output
+        s3-put-object ${{ env.BUCKET_NAME_TF_STATE }} ${{ env.AWS_REGION_TF_BUCKET }} ${{ env.ROOT }}/${{ env.ROOT }}.terraform.output blueprints/${{ env.ROOT }}/terraform.output
         eval $(terraform -chdir="blueprints/${{ env.ROOT }}" output --raw kubeconfig_export)
         eval $(terraform -chdir="blueprints/${{ env.ROOT }}" output --raw vault_init)
-        aws s3api put-object \
-            --bucket ${{ env.BUCKET_NAME_TF_STATE }} \
-            --region ${{ env.AWS_REGION_TF_BUCKET }} \
-            --key ${{ env.ROOT }}/${{ env.ROOT }}.vault.init.log \
-            --body blueprints/${{ env.ROOT }}/k8s/vault-init.log || echo "Failed to upload vault-init.log, likely because it already initialized."
+        s3-put-object ${{ env.BUCKET_NAME_TF_STATE }} ${{ env.AWS_REGION_TF_BUCKET }} ${{ env.ROOT }}/${{ env.ROOT }}.vault.init.log blueprints/${{ env.ROOT }}/k8s/vault-init.log
 
     - name: 02-at-scale - Validate
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
