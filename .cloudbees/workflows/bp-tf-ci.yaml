@@ -105,6 +105,7 @@ jobs:
     - name: 01-getting-started - Deploy
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
       if: contains(env.STAGES, 'deploy')
+      kind: build
       shell: bash
       run : |
         set -x
@@ -120,6 +121,7 @@ jobs:
     - name: 01-getting-started - Validate
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
       if: contains(env.STAGES, 'validate')
+      kind: test
       shell: bash
       run : |
         CI=true make validate
