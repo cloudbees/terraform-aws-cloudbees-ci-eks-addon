@@ -35,7 +35,6 @@ jobs:
     - name: Configure AWS Credentials
       uses: cloudbees-io/configure-aws-credentials@v1
       with:
-        aws-region: ${{ env.AWS_REGION_TF_BUCKET }}
         aws-access-key-id: ${{ secrets.AWS_TF_CBCI_EKS_AccessKeyID }}
         aws-secret-access-key: ${{ secrets.AWS_TF_CBCI_EKS_SecretAccessKey }}
         role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
@@ -63,7 +62,6 @@ jobs:
     - name: Configure AWS Credentials
       uses: cloudbees-io/configure-aws-credentials@v1
       with:
-        aws-region: ${{ env.TF_VAR_aws_region }}
         aws-access-key-id: ${{ secrets.AWS_TF_CBCI_EKS_AccessKeyID }}
         aws-secret-access-key: ${{ secrets.AWS_TF_CBCI_EKS_SecretAccessKey }}
         role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
