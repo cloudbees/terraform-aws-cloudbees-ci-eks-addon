@@ -1,23 +1,13 @@
-# Copyright (c) CloudBees, Inc.
-
-# Stages
-# CD: deploy,validate,onboarding
-# Nuke: wipeout
-
 apiVersion: automation.cloudbees.io/v1alpha1
 kind: workflow
-name: ci
-
+name: cd
 on:
   workflow_dispatch:
-
 env:
-  AWS_REGION_TF_BUCKET: "us-east-1"
-  BUCKET_NAME_TF_STATE: "cbci-eks-addon-tf-state-cd"
-  AWS_ROLE_TO_ASSUME: "infra-admin-ci"
-  WORKFLOW_ROOT_PATH: ".cloudbees/workflows"
-  TF_VAR_suffix: "ci-v11"
-  TF_VAR_aws_region: "us-west-2"
+  AWS_ROLE_TO_ASSUME: infra-admin-ci
+  WORKFLOW_ROOT_PATH: .cloudbees/workflows
+  TF_VAR_suffix: ci-v11
+  TF_VAR_aws_region: us-west-2
   TF_AUTO_VARS_FILE: |
     tags = {
       "cb-owner" : "professional-services"
@@ -31,7 +21,6 @@ env:
       company = "CloudBees Inc."
     }
     ci = true
-
 jobs:
   init:
     steps:
@@ -53,13 +42,13 @@ jobs:
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
       shell: bash
       run: |
-        source ${{ env.WORKFLOW_ROOT_PATH }}/helpers.sh && s3-create-bucket ${{ env.BUCKET_NAME_TF_STATE }} ${{ env.AWS_REGION_TF_BUCKET }}
+        source ${{ env.WORKFLOW_ROOT_PATH }}/helpers.sh && s3-create-bucket
 
   bp02:
     env:
       ROOT: 02-at-scale
       TF_VAR_hosted_zone: bp02-cd.aws.ps.beescloud.com
-      STAGES: "deploy"
+      STAGES: "deploy,validate,onboarding"
     needs:
       - init
     steps:
@@ -103,22 +92,28 @@ jobs:
     - name: 02-at-scale - Deploy
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
       if: contains(env.STAGES, 'deploy')
+      kind: deploy
       shell: bash
       run : |
         set -x
         source ${{ env.WORKFLOW_ROOT_PATH }}/helpers.sh
         # It Resolves Issue #66
-        kms-delete-alias alias/eks/cbci-bp02-${{ env.TF_VAR_suffix }}-eks ${{ env.TF_VAR_aws_region }}
-        kms-delete-alias alias/eks/cbci-bp02-${{ env.TF_VAR_suffix }} ${{ env.TF_VAR_aws_region }}
+        aliases=("alias/eks/cbci-bp02-${{ env.TF_VAR_suffix }}-eks" "alias/eks/cbci-bp02-${{ env.TF_VAR_suffix }}")
+        for alias in "${aliases[@]}"; do
+          aws kms delete-alias \
+          --alias-name $alias \
+          --region ${{ env.TF_VAR_aws_region }} || echo "$alias does not exist"
+        done
         CI=true make deploy
-        s3-put-object ${{ env.BUCKET_NAME_TF_STATE }} ${{ env.AWS_REGION_TF_BUCKET }} ${{ env.ROOT }}/${{ env.ROOT }}.terraform.output blueprints/${{ env.ROOT }}/terraform.output
+        s3-put-object blueprints/${{ env.ROOT }}/terraform.output ${{ env.ROOT }}/${{ env.ROOT }}.terraform.output
         eval $(terraform -chdir="blueprints/${{ env.ROOT }}" output --raw kubeconfig_export)
         eval $(terraform -chdir="blueprints/${{ env.ROOT }}" output --raw vault_init)
-        s3-put-object ${{ env.BUCKET_NAME_TF_STATE }} ${{ env.AWS_REGION_TF_BUCKET }} ${{ env.ROOT }}/${{ env.ROOT }}.vault.init.log blueprints/${{ env.ROOT }}/k8s/vault-init.log
+        s3-put-object blueprints/${{ env.ROOT }}/k8s/vault-init.log ${{ env.ROOT }}/${{ env.ROOT }}.vault.init.log
 
     - name: 02-at-scale - Validate
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
       if: contains(env.STAGES, 'validate')
+      kind: test
       shell: bash
       run : |
         CI=true make validate
