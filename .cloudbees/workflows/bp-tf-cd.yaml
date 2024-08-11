@@ -14,7 +14,6 @@ env:
   BUCKET_NAME_TF_STATE: cbci-eks-addon-tf-state-cd
   AWS_REGION_TF_BUCKET: "us-east-1"
   AWS_ROLE_TO_ASSUME: infra-admin-ci
-  WORKFLOW_ROOT_PATH: .cloudbees/workflows
   TF_VAR_suffix: ci-v11
   TF_VAR_aws_region: us-west-2
   TF_AUTO_VARS_FILE: |
