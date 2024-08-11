@@ -19,8 +19,6 @@ on:
   workflow_dispatch:
 
 env:
-  AWS_REGION_TF_BUCKET: "us-east-1"
-  BUCKET_NAME_TF_STATE: "cbci-eks-addon-tf-state-ci"
   AWS_ROLE_TO_ASSUME: "infra-admin-ci"
   TF_VAR_suffix: "ci-v11"
   TF_VAR_aws_region: "us-west-2"
@@ -57,10 +55,7 @@ jobs:
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
       shell: bash
       run: |
-        set -x
-        aws s3api create-bucket \
-          --bucket ${{ env.BUCKET_NAME_TF_STATE }} \
-          --region ${{ env.AWS_REGION_TF_BUCKET }} || echo "Bucket ${{ env.BUCKET_NAME_TF_STATE }} already exists"
+        source ${{ env.WORKFLOW_ROOT_PATH }}/s3-state.sh && s3-create-bucket
 
   bp01:
     env:
@@ -109,14 +104,15 @@ jobs:
       shell: bash
       run : |
         set -x
-        aws kms delete-alias --alias-name alias/eks/cbci-bp01-${{ env.TF_VAR_suffix }}-eks --region ${{ env.TF_VAR_aws_region }} || echo "Alias alias/eks/cbci-bp01-${{ env.TF_VAR_suffix }}-eks does not exist"
-        aws kms delete-alias --alias-name alias/eks/cbci-bp01-${{ env.TF_VAR_suffix }} --region ${{ env.TF_VAR_aws_region }} || echo "Alias alias/eks/cbci-bp01-${{ env.TF_VAR_suffix }} does not exist"
+        # It Resolves Issue #66
+        aliases=("alias/eks/cbci-bp02-${{ env.TF_VAR_suffix }}-eks" "alias/eks/cbci-bp02-${{ env.TF_VAR_suffix }}")
+        for alias in "${aliases[@]}"; do
+          aws kms delete-alias \
+          --alias-name $alias \
+          --region ${{ env.TF_VAR_aws_region }} || echo "$alias does not exist"
+        done
         CI=true make deploy
-        aws s3api put-object \
-            --bucket ${{ env.BUCKET_NAME_TF_STATE }} \
-            --region ${{ env.AWS_REGION_TF_BUCKET }} \
-            --key ${{ env.ROOT }}/${{ env.ROOT }}.terraform.output \
-            --body blueprints/${{ env.ROOT }}/terraform.output
+        s3-put-object blueprints/${{ env.ROOT }}/terraform.output ${{ env.ROOT }}/${{ env.ROOT }}.terraform.output
 
     - name: 01-getting-started - Validate
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
@@ -206,21 +202,19 @@ jobs:
     - name: 02-at-scale - Deploy
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
       if: contains(env.STAGES, 'deploy')
+      kind: build
       shell: bash
       run : |
         set -x
         aws kms delete-alias --alias-name alias/eks/cbci-bp02-${{ env.TF_VAR_suffix }}-eks --region ${{ env.TF_VAR_aws_region }} || echo "Alias alias/eks/cbci-bp02-${{ env.TF_VAR_suffix }}-eks does not exist"
         aws kms delete-alias --alias-name alias/eks/cbci-bp02-${{ env.TF_VAR_suffix }} --region ${{ env.TF_VAR_aws_region }} || echo "Alias alias/eks/cbci-bp02-${{ env.TF_VAR_suffix }} does not exist"
         CI=true make deploy
-        aws s3api put-object \
-            --bucket ${{ env.BUCKET_NAME_TF_STATE }} \
-            --region ${{ env.AWS_REGION_TF_BUCKET }} \
-            --key ${{ env.ROOT }}/${{ env.ROOT }}.terraform.output \
-            --body blueprints/${{ env.ROOT }}/terraform.output
+        s3-put-object blueprints/${{ env.ROOT }}/terraform.output ${{ env.ROOT }}/${{ env.ROOT }}.terraform.output
 
     - name: 02-at-scale - Validate
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
       if: contains(env.STAGES, 'validate')
+      kind: test
       shell: bash
       run : |
         CI=true make validate
