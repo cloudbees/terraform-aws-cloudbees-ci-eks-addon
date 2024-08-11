@@ -11,6 +11,8 @@ name: cd
 on:
   workflow_dispatch:
 env:
+  BUCKET_NAME_TF_STATE: cbci-eks-addon-tf-state-cd
+  AWS_REGION_TF_BUCKET: "us-east-1"
   AWS_ROLE_TO_ASSUME: infra-admin-ci
   WORKFLOW_ROOT_PATH: .cloudbees/workflows
   TF_VAR_suffix: ci-v11
@@ -35,21 +37,20 @@ jobs:
     - name: Configure AWS Credentials
       uses: cloudbees-io/configure-aws-credentials@v1
       with:
-        aws-region: ${{ env.TF_VAR_aws_region }}
+        aws-region: ${{ env.AWS_REGION_TF_BUCKET }}
         aws-access-key-id: ${{ secrets.AWS_TF_CBCI_EKS_AccessKeyID }}
         aws-secret-access-key: ${{ secrets.AWS_TF_CBCI_EKS_SecretAccessKey }}
         role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
         role-external-id: cloudbees
         role-duration-seconds: "3600"
 
-    - name: Checkout code
-      uses: cloudbees-io/checkout@v1
-
     - name: Create Terraform Backend Bucket if not exists
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
       shell: bash
       run: |
-        source ${{ env.WORKFLOW_ROOT_PATH }}/s3-state.sh && s3-create-bucket
+        aws s3api create-bucket \
+          --bucket "${{ env.BUCKET_NAME_TF_STATE }}" \
+          --region "${{ env.AWS_REGION_TF_BUCKET }}" || echo "${{ env.BUCKET_NAME_TF_STATE }} already exists"
 
   bp02:
     env:
@@ -103,7 +104,6 @@ jobs:
       shell: bash
       run : |
         set -x
-        source ${{ env.WORKFLOW_ROOT_PATH }}/s3-state.sh
         # It Resolves Issue #66
         aliases=("alias/eks/cbci-bp02-${{ env.TF_VAR_suffix }}-eks" "alias/eks/cbci-bp02-${{ env.TF_VAR_suffix }}")
         for alias in "${aliases[@]}"; do
@@ -112,10 +112,19 @@ jobs:
           --region ${{ env.TF_VAR_aws_region }} || echo "$alias does not exist"
         done
         CI=true make deploy
-        s3-put-object blueprints/${{ env.ROOT }}/terraform.output ${{ env.ROOT }}/${{ env.ROOT }}.terraform.output
+        aws s3api put-object \
+          --bucket "${{ env.BUCKET_NAME_TF_STATE }}" \
+          --region "${{ env.AWS_REGION_TF_BUCKET }}" \
+          --body blueprints/${{ env.ROOT }}/terraform.output \
+          --key ${{ env.ROOT }}/${{ env.ROOT }}.terraform.output || echo "Failed to put $body object in ${{ env.BUCKET_NAME_TF_STATE }}"
         eval $(terraform -chdir="blueprints/${{ env.ROOT }}" output --raw kubeconfig_export)
         eval $(terraform -chdir="blueprints/${{ env.ROOT }}" output --raw vault_init)
-        s3-put-object blueprints/${{ env.ROOT }}/k8s/vault-init.log ${{ env.ROOT }}/${{ env.ROOT }}.vault.init.log
+        aws s3api put-object \
+          --bucket "${{ env.BUCKET_NAME_TF_STATE }}" \
+          --region "${{ env.AWS_REGION_TF_BUCKET }}" \
+          --body blueprints/${{ env.ROOT }}/k8s/vault-init.log \
+          --key ${{ env.ROOT }}/${{ env.ROOT }}.vault.init.log || echo "Failed to put $body object in ${{ env.BUCKET_NAME_TF_STATE }}"
+
 
     - name: 02-at-scale - Validate
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
