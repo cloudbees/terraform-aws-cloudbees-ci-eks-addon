@@ -50,10 +50,7 @@ jobs:
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
       shell: bash
       run: |
-        set -x
-        aws s3api create-bucket \
-          --bucket ${{ env.BUCKET_NAME_TF_STATE }} \
-          --region ${{ env.AWS_REGION_TF_BUCKET }} || echo "Bucket ${{ env.BUCKET_NAME_TF_STATE }} already exists"
+        source blueprints/helpers.sh && s3-create-bucket ${{ env.BUCKET_NAME_TF_STATE }} ${{ env.AWS_REGION_TF_BUCKET }}
 
   bp02:
     env:
