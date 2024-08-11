@@ -15,6 +15,7 @@ env:
   AWS_REGION_TF_BUCKET: "us-east-1"
   BUCKET_NAME_TF_STATE: "cbci-eks-addon-tf-state-cd"
   AWS_ROLE_TO_ASSUME: "infra-admin-ci"
+  WORKFLOW_ROOT_PATH: ".cloudbees/workflows"
   TF_VAR_suffix: "ci-v11"
   TF_VAR_aws_region: "us-west-2"
   TF_AUTO_VARS_FILE: |
@@ -50,7 +51,7 @@ jobs:
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
       shell: bash
       run: |
-        source blueprints/helpers.sh && s3-create-bucket ${{ env.BUCKET_NAME_TF_STATE }} ${{ env.AWS_REGION_TF_BUCKET }}
+        source ${{ env.WORKFLOW_ROOT_PATH }}/helpers.sh && s3-create-bucket ${{ env.BUCKET_NAME_TF_STATE }} ${{ env.AWS_REGION_TF_BUCKET }}
 
   bp02:
     env:
