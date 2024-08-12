@@ -99,7 +99,7 @@ jobs:
         terraform {
           backend "s3" {
             bucket = "${{ env.BUCKET_NAME_TF_STATE }}"
-            key    = "${{ env.ROOT }}/ci.terraform.tfstate"
+            key    = "${{ env.ROOT }}/cd.terraform.tfstate"
             region = "${{ env.AWS_REGION_TF_BUCKET }}"
           }
         }
@@ -128,14 +128,14 @@ jobs:
           --bucket "${{ env.BUCKET_NAME_TF_STATE }}" \
           --region "${{ env.AWS_REGION_TF_BUCKET }}" \
           --body blueprints/${{ env.ROOT }}/terraform.output \
-          --key ${{ env.ROOT }}/${{ env.ROOT }}.terraform.output || echo "Failed to put $body object in ${{ env.BUCKET_NAME_TF_STATE }}"
+          --key ${{ env.ROOT }}/${{ env.ROOT }}.cd.terraform.output || echo "Failed to put $body object in ${{ env.BUCKET_NAME_TF_STATE }}"
         eval $(terraform -chdir="blueprints/${{ env.ROOT }}" output --raw kubeconfig_export)
         eval $(terraform -chdir="blueprints/${{ env.ROOT }}" output --raw vault_init)
         aws s3api put-object \
           --bucket "${{ env.BUCKET_NAME_TF_STATE }}" \
           --region "${{ env.AWS_REGION_TF_BUCKET }}" \
           --body blueprints/${{ env.ROOT }}/k8s/vault-init.log \
-          --key ${{ env.ROOT }}/${{ env.ROOT }}.vault.init.log || echo "Failed to put $body object in ${{ env.BUCKET_NAME_TF_STATE }}"
+          --key ${{ env.ROOT }}/${{ env.ROOT }}.cd.vault.init.log || echo "Failed to put $body object in ${{ env.BUCKET_NAME_TF_STATE }}"
 
 
     - name: 02-at-scale - Validate
