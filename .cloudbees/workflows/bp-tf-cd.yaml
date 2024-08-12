@@ -98,6 +98,7 @@ jobs:
         EOT
         #Workaround: Boolean values are not interpreted correctly within env vars
         export DESTROY_ONLY_APPS=false
+        echo "Environment Variables:"
         printenv
 
     - name: 02-at-scale - Deploy

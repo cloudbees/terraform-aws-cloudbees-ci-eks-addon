@@ -100,6 +100,8 @@ jobs:
           }
         }
         EOT
+        echo "Environment Variables:"
+        printenv
 
     - name: 01-getting-started - Deploy
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
@@ -206,6 +208,8 @@ jobs:
           }
         }
         EOT
+        echo "Environment Variables:"
+        printenv
 
     - name: 02-at-scale - Deploy
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
