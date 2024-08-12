@@ -1,10 +1,5 @@
 # Copyright (c) CloudBees, Inc.
 
-# Stages
-# CI: deploy,validate,destroy
-# Troubleshooting: deploy,validate,onboarding
-# Nuke (Delete Dangling resource): wipeout
-
 apiVersion: automation.cloudbees.io/v1alpha1
 kind: workflow
 name: ci
@@ -21,6 +16,19 @@ on:
 env:
   BUCKET_NAME_TF_STATE: cbci-eks-addon-tf-state-ci
   AWS_REGION_TF_BUCKET: "us-east-1"
+  TAGS_TF_BUCKET: |
+    {
+      "TagSet": [
+        {
+          "Key": "Environment",
+          "Value": "Production"
+        },
+        {
+          "Key": "Project",
+          "Value": "MyProject"
+        }
+      ]
+    }
   AWS_ROLE_TO_ASSUME: "infra-admin-ci"
   TF_VAR_suffix: "ci-v11"
   TF_VAR_aws_region: "us-west-2"
@@ -59,13 +67,18 @@ jobs:
       run: |
         aws s3api create-bucket \
           --bucket "${{ env.BUCKET_NAME_TF_STATE }}" \
-          --region "${{ env.AWS_REGION_TF_BUCKET }}" || echo "${{ env.BUCKET_NAME_TF_STATE }} already exists"
+          --region "${{ env.AWS_REGION_TF_BUCKET }}" 
+          --tagging "${{ env.TAGS_TF_BUCKET }}" || echo "Failed to put tags in ${{ env.BUCKET_NAME_TF_STATE }}"
 
   bp01:
     env:
+      # Stages
+      # CI: deploy,validate,destroy
+      # Troubleshooting: deploy,validate,onboarding
+      # Nuke (Delete Dangling resource): wipeout
+      STAGES: "deploy,validate,destroy"
       ROOT: 01-getting-started
       TF_VAR_hosted_zone: bp01-ci.aws.ps.beescloud.com
-      STAGES: "deploy,validate,destroy"
     needs:
       - init
     steps:
@@ -166,9 +179,13 @@ jobs:
 
   bp02:
     env:
+      # Stages
+      # CI: deploy,validate,destroy
+      # Troubleshooting: deploy,validate,onboarding
+      # Nuke (Delete Dangling resource): wipeout
+      STAGES: "deploy,validate,destroy"
       ROOT: 02-at-scale
       TF_VAR_hosted_zone: bp02-ci.aws.ps.beescloud.com
-      STAGES: "deploy,validate,destroy"
     needs:
       - init
     steps:

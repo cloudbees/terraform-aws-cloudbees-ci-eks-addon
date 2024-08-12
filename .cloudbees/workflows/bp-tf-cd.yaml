@@ -8,6 +8,19 @@ on:
 env:
   BUCKET_NAME_TF_STATE: cbci-eks-addon-tf-state-cd
   AWS_REGION_TF_BUCKET: "us-east-1"
+  TAGS_TF_BUCKET: |
+    {
+      "TagSet": [
+        {
+          "Key": "Environment",
+          "Value": "Production"
+        },
+        {
+          "Key": "Project",
+          "Value": "MyProject"
+        }
+      ]
+    }
   AWS_ROLE_TO_ASSUME: infra-admin-ci
   TF_VAR_suffix: ci-v11
   TF_VAR_aws_region: us-west-2
@@ -44,7 +57,8 @@ jobs:
       run: |
         aws s3api create-bucket \
           --bucket "${{ env.BUCKET_NAME_TF_STATE }}" \
-          --region "${{ env.AWS_REGION_TF_BUCKET }}" || echo "${{ env.BUCKET_NAME_TF_STATE }} already exists"
+          --region "${{ env.AWS_REGION_TF_BUCKET }}" 
+          --tagging "${{ env.TAGS_TF_BUCKET }}" || echo "Failed to put tags in ${{ env.BUCKET_NAME_TF_STATE }}"
 
   bp02:
     env:
@@ -52,7 +66,7 @@ jobs:
       # CD: deploy,validate,onboarding
       # Troubleshooting: deploy,validate,onboarding
       # Nuke (Delete Dangling resource): wipeout
-      STAGES: "wipeout"
+      STAGES: ""
       ROOT: 02-at-scale
       TF_VAR_hosted_zone: bp02-cd.aws.ps.beescloud.com
       #Boolean values are not interpreted correctly within env vars
