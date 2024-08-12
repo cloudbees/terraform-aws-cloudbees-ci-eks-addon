@@ -95,6 +95,9 @@ jobs:
           }
         }
         EOT
+        #Workaround: Boolean values are not interpreted correctly
+        export DESTROY_ONLY_APPS=false
+        printenv
 
     - name: 02-at-scale - Deploy
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
@@ -138,7 +141,6 @@ jobs:
       if: contains(env.STAGES, 'destroy')
       shell: bash
       run : |
-        #export DESTROY_ONLY_APPS=false
         CI=true make destroy
 
     - name: 02-at-scale - Wipeout
@@ -146,7 +148,6 @@ jobs:
       if: contains(env.STAGES, 'wipeout')
       shell: bash
       run : |
-        #export DESTROY_ONLY_APPS=false
         terraform -chdir=blueprints/${{ env.ROOT }} init -reconfigure && CI=true make destroy
 
     - name: 02-at-scale  - Role Onboarding
