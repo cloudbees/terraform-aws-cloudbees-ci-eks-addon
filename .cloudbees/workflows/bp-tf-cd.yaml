@@ -57,6 +57,9 @@ jobs:
       run: |
         aws s3api create-bucket \
           --bucket "${{ env.BUCKET_NAME_TF_STATE }}" \
+          --region "${{ env.AWS_REGION_TF_BUCKET }}" || echo "Failed to create in ${{ env.BUCKET_NAME_TF_STATE }}"
+        aws s3api put-bucket-tagging \
+          --bucket "${{ env.BUCKET_NAME_TF_STATE }}" \
           --region "${{ env.AWS_REGION_TF_BUCKET }}" \
           --tagging "${{ env.TAGS_TF_BUCKET }}" || echo "Failed to put tags in ${{ env.BUCKET_NAME_TF_STATE }}"
 
