@@ -8,15 +8,15 @@ on:
 env:
   BUCKET_NAME_TF_STATE: cbci-eks-addon-bp
   AWS_REGION_TF_BUCKET: us-east-1
-  TAGS_TF_BUCKET: '[{Key=organization,Value=marketing2}]'
+  TAGS_TF_BUCKET: '[{Key=cb-owner,Value=professional-services},{Key=cb-user,Value=cb-platform},{Key=cb-purpose,Value=production shared cluster}]'
   AWS_ROLE_TO_ASSUME: infra-admin-ci
-  TF_VAR_suffix: ci-v11
+  TF_VAR_suffix: cd
   TF_VAR_aws_region: us-east-1
   TF_AUTO_VARS_FILE: |
     tags = {
       "cb-owner" : "professional-services"
       "cb-user" : "cb-platform"
-      "cb-purpose" : "cd"
+      "cb-purpose" : "production shared cluster"
     }
     trial_license = {
       first_name  = "CloudBees.io"

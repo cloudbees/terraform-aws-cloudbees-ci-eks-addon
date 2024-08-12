@@ -14,23 +14,11 @@ on:
   workflow_dispatch:
 
 env:
-  BUCKET_NAME_TF_STATE: cbci-eks-addon-tf-state-ci
-  AWS_REGION_TF_BUCKET: "us-east-1"
-  TAGS_TF_BUCKET: |
-    {
-      "TagSet": [
-        {
-          "Key": "Environment",
-          "Value": "Production"
-        },
-        {
-          "Key": "Project",
-          "Value": "MyProject"
-        }
-      ]
-    }
+  BUCKET_NAME_TF_STATE: cbci-eks-addon-bp
+  AWS_REGION_TF_BUCKET: us-east-1
+  TAGS_TF_BUCKET: '[{Key=organization,Value=marketing2}]'
   AWS_ROLE_TO_ASSUME: "infra-admin-ci"
-  TF_VAR_suffix: "ci-v11"
+  TF_VAR_suffix: "ci"
   TF_VAR_aws_region: "us-west-2"
   TF_AUTO_VARS_FILE: |
     tags = {
