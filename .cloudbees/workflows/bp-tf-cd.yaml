@@ -23,7 +23,7 @@ env:
     }
   AWS_ROLE_TO_ASSUME: infra-admin-ci
   TF_VAR_suffix: ci-v11
-  TF_VAR_aws_region: us-west-2
+  TF_VAR_aws_region: us-east-1
   TF_AUTO_VARS_FILE: |
     tags = {
       "cb-owner" : "professional-services"
@@ -61,8 +61,7 @@ jobs:
         else
           echo "Bucket ${{ env.BUCKET_NAME_TF_STATE }} does not exist. Creating now..."
           aws s3api create-bucket --bucket ${{ env.BUCKET_NAME_TF_STATE }} \
-              --region ${{ env.AWS_REGION_TF_BUCKET }} \
-              --create-bucket-configuration LocationConstraint="${{ env.AWS_REGION_TF_BUCKET }}"
+              --region ${{ env.AWS_REGION_TF_BUCKET }}
           aws s3api put-bucket-tagging --bucket ${{ env.BUCKET_NAME_TF_STATE }} \
               --tagging 'TagSet=[{Key=organization,Value=marketing}]'
         fi
