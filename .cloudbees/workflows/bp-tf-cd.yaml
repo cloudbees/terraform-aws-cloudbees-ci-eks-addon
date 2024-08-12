@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 env:
   BUCKET_NAME_TF_STATE: cbci-eks-addon-bp
-  AWS_REGION_TF_BUCKET: "us-east-1"
+  AWS_REGION_TF_BUCKET: us-west-2
   TAGS_TF_BUCKET: |
     {
       "TagSet": [
