@@ -33,7 +33,7 @@ env:
     trial_license = {
       first_name  = "CloudBees.io"
       last_name  = "Platform"
-      email = "ci.user@cloudbees.io"
+      email = "cd.user@cloudbees.io"
       company = "CloudBees Inc."
     }
     ci = true
@@ -57,7 +57,7 @@ jobs:
       run: |
         aws s3api create-bucket \
           --bucket "${{ env.BUCKET_NAME_TF_STATE }}" \
-          --region "${{ env.AWS_REGION_TF_BUCKET }}" 
+          --region "${{ env.AWS_REGION_TF_BUCKET }}" \
           --tagging "${{ env.TAGS_TF_BUCKET }}" || echo "Failed to put tags in ${{ env.BUCKET_NAME_TF_STATE }}"
 
   bp02:
