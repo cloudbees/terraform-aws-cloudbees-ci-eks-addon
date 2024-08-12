@@ -55,7 +55,8 @@ jobs:
       STAGES: "wipeout"
       ROOT: 02-at-scale
       TF_VAR_hosted_zone: bp02-cd.aws.ps.beescloud.com
-      DESTROY_ONLY_APPS: false
+      #Boolean values are not interpreted correctly within env vars
+      #DESTROY_ONLY_APPS: false
     needs:
       - init
     steps:
@@ -95,7 +96,7 @@ jobs:
           }
         }
         EOT
-        #Workaround: Boolean values are not interpreted correctly
+        #Workaround: Boolean values are not interpreted correctly within env vars
         export DESTROY_ONLY_APPS=false
         printenv
 
