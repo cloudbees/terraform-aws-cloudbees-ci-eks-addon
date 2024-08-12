@@ -55,6 +55,7 @@ jobs:
       uses: docker://public.ecr.aws/r1n1q0e5/cloudbees-labs/tf-aws-cb-ci-eks-addon-agent:latest
       shell: bash
       run: |
+        set -x
         if aws s3api head-bucket --bucket ${{ env.BUCKET_NAME_TF_STATE }} 2>/dev/null; then
           echo "Bucket ${{ env.BUCKET_NAME_TF_STATE }} already exists."
         else
