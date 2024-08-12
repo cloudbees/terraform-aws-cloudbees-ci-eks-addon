@@ -8,8 +8,7 @@ on:
 env:
   BUCKET_NAME_TF_STATE: cbci-eks-addon-bp
   AWS_REGION_TF_BUCKET: us-east-1
-  TAGS_TF_BUCKET: |
-    [{Key=organization,Value=marketing2}]
+  TAGS_TF_BUCKET: '[{Key=organization,Value=marketing2}]'
   AWS_ROLE_TO_ASSUME: infra-admin-ci
   TF_VAR_suffix: ci-v11
   TF_VAR_aws_region: us-east-1
