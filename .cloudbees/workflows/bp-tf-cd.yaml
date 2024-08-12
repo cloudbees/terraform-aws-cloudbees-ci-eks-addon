@@ -1,10 +1,5 @@
 # Copyright (c) CloudBees, Inc.
 
-# Stages
-# CD: deploy,validate,onboarding
-# Troubleshooting: deploy,validate,onboarding
-# Nuke (Delete Dangling resource): wipeout
-
 apiVersion: automation.cloudbees.io/v1alpha1
 kind: workflow
 name: cd
@@ -53,9 +48,14 @@ jobs:
 
   bp02:
     env:
+      # Stages
+      # CD: deploy,validate,onboarding
+      # Troubleshooting: deploy,validate,onboarding
+      # Nuke (Delete Dangling resource): wipeout
+      STAGES: "wipeout"
       ROOT: 02-at-scale
       TF_VAR_hosted_zone: bp02-cd.aws.ps.beescloud.com
-      STAGES: "wipeout"
+      DESTROY_ONLY_APPS: false
     needs:
       - init
     steps:
@@ -138,7 +138,7 @@ jobs:
       if: contains(env.STAGES, 'destroy')
       shell: bash
       run : |
-        export DESTROY_ONLY_APPS=false
+        #export DESTROY_ONLY_APPS=false
         CI=true make destroy
 
     - name: 02-at-scale - Wipeout
@@ -146,7 +146,7 @@ jobs:
       if: contains(env.STAGES, 'wipeout')
       shell: bash
       run : |
-        export DESTROY_ONLY_APPS=true
+        #export DESTROY_ONLY_APPS=false
         terraform -chdir=blueprints/${{ env.ROOT }} init -reconfigure && CI=true make destroy
 
     - name: 02-at-scale  - Role Onboarding
