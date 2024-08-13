@@ -21,7 +21,7 @@ env:
     trial_license = {
       first_name  = "CloudBees.io"
       last_name  = "Platform"
-      email = "cd.user@cloudbees.io"
+      email = "cd.cbci.eks.bp@cloudbees.io"
       company = "CloudBees Inc."
     }
     ci = true
@@ -60,7 +60,7 @@ jobs:
       # CD: deploy,validate,onboarding
       # Troubleshooting: deploy,validate,onboarding
       # Nuke (Delete Dangling resource): wipeout
-      STAGES: ""
+      STAGES: "deploy,validate,onboarding"
       ROOT: 02-at-scale
       TF_VAR_hosted_zone: bp02-cd.aws.ps.beescloud.com
       #Boolean values are not interpreted correctly within env vars
