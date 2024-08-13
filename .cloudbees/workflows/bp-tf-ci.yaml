@@ -29,7 +29,7 @@ env:
     trial_license = {
       first_name  = "CloudBees.io"
       last_name  = "Platform"
-      email = "ci.user@cloudbees.io"
+      email = "ci.cbci.eks.bp@cloudbees.io"
       company = "CloudBees Inc."
     }
     ci = true
