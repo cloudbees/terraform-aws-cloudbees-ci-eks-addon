@@ -171,10 +171,10 @@ jobs:
       shell: bash
       run : |
         set -x
-        cd blueprints/${{ env.ROOT }} && eval $(terraform output --raw kubeconfig_export)
+        eval $(terraform -chdir="blueprints/${{ env.ROOT }}" output --raw --raw kubeconfig_export)
         kubectl describe configmap aws-auth -n kube-system
         eksctl create iamidentitymapping \
-          --cluster $(terraform output --raw eks_cluster_name) \
+          --cluster $(terraform -chdir="blueprints/${{ env.ROOT }}" output --raw eks_cluster_name) \
           --region ${{ env.TF_VAR_aws_region }} \
           --arn ${{ env.TARGET_ROLE }} \
           --username k8s-admin-rol \
