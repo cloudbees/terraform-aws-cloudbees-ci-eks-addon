@@ -24,7 +24,7 @@ The CloudBees CI [AWS partner add-on](https://aws-ia.github.io/terraform-aws-eks
 
 ## Usage
 
-Implementation examples are included in the [blueprints](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/tree/main/blueprints) folder, however this is the simplest example of usage:
+Implementation examples are included in the [blueprints](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/tree/main/blueprints) folder, however, this is the simplest example of usage:
 
 ```terraform
 module "eks_blueprints_addon_cbci" {
