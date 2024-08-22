@@ -206,19 +206,3 @@ set-cbci-location () {
   sed -i "s|bundle: \".*/none-ha\"|bundle: \"$branch/none-ha\"|g" "$SCRIPTDIR/02-at-scale/cbci/casc/oc/items/root.yaml"
   sed -i "s|bundle: \".*/ha\"|bundle: \"$branch/ha\"|g" "$SCRIPTDIR/02-at-scale/cbci/casc/oc/items/root.yaml"
 }
-
-run-aws-nuke () {
-  local dry_run="$1"
-  local aws_nuke_file="$SCRIPTDIR/../.cloudbees/aws-nuke/bp-tf-ci-nuke.yaml"
-  local aws_nuke_file_log="$SCRIPTDIR/../.cloudbees/aws-nuke/aws-nuke.log"
-  if [ "$dry_run" == "true" ]; then
-    INFO "Running AWS Nuke in Dry Run Mode..."
-    rm "$aws_nuke_file_log" || INFO "No log file to remove."
-    aws-nuke -c "$aws_nuke_file" | tee "$aws_nuke_file_log"
-    INFO "Listing candidated resources to be deleted by using $aws_nuke_file"
-    grep "remove" "$aws_nuke_file_log" ||  INFO "No candidates to delete."
-  else
-    WARN "Running AWS Nuke in Not Dry Run Mode..."
-    aws-nuke -c "$aws_nuke_file" --no-dry-run
-  fi
-}
