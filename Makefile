@@ -6,7 +6,6 @@ BP_AGENT_USER       := bp-agent
 MKFILEDIR 			:= $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 CBCI_REPO		    ?= https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon.git
 CBCI_BRANCH			?= main
-NUKE_DRY_RUN		?= true
 DESTROY_ONLY_APPS	?= false
 
 define helpers
@@ -107,15 +106,6 @@ set-cbci-location: ## Update cbci folder location per parameter. Example: CBCI_R
 set-cbci-location: agentCheck guard-CBCI_REPO guard-CBCI_BRANCH
 	@$(call helpers,set-cbci-location $(CBCI_REPO) $(CBCI_BRANCH))
 	@$(call helpers,INFO "Setting new Casc location to $(CBCI_REPO) $(CBCI_BRANCH) finished succesfully.")
-
-.PHONY: run-aws-nuke
-run-aws-nuke: ## Run aws nuke by https://github.com/rebuy-de/aws-nuke. Example: NUKE_DRY_RUN=true make run-aws-nuke
-run-aws-nuke: guard-NUKE_DRY_RUN
-ifeq ($(NUKE_DRY_RUN),false)
-	@$(call helpers,ask-confirmation "Running AWS Nuke to destroy selected resources.")
-endif
-	@$(call helpers,run-aws-nuke $(NUKE_DRY_RUN))
-	@$(call helpers,INFO "AWS nuke finished successfully with DRY_RUN=$(NUKE_DRY_RUN).")
 
 ##########################
 # Global
