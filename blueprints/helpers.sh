@@ -91,17 +91,17 @@ tf-apply () {
 tf-destroy () {
   local root="$1"
   export TF_LOG_PATH="$SCRIPTDIR/$root/terraform.log"
-  tf-destroy-apps "$root"
+  tf-destroy-wl "$root"
   retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.eks -auto-approve"
   retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -auto-approve"
   rm -f "$SCRIPTDIR/$root/terraform.output"
 }
 
-tf-destroy-apps () {
+tf-destroy-wl () {
   local root="$1"
   export TF_LOG_PATH="$SCRIPTDIR/$root/terraform.log"
   retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.eks_blueprints_addon_cbci -auto-approve"
-  retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.eks_blueprints_addons -auto-approve"
+  #retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.eks_blueprints_addons -auto-approve"
 }
 
 probes () {
@@ -199,10 +199,13 @@ set-cbci-location () {
   #Repo
   sed -i "s|scmRepo: .*|scmRepo: \"$repo\"|g" "$SCRIPTDIR/02-at-scale/k8s/cbci-values.yml"
   sed -i "s|scmCascMmStore: .*|scmCascMmStore: \"$repo\"|g" "$SCRIPTDIR/02-at-scale/cbci/casc/oc/variables/variables.yaml"
+  sed -i "s|sharedLibRepo: .*|sharedLibRepo: \"$repo\"|g" "$SCRIPTDIR/02-at-scale/cbci/casc/mc/ha/variables/variables.yaml"
+  sed -i "s|sharedLibRepo: .*|sharedLibRepo: \"$repo\"|g" "$SCRIPTDIR/02-at-scale/cbci/casc/mc/none-ha/variables/variables.yaml"
   #Branch
   sed -i "s|scmBranch: .*|scmBranch: $branch|g" "$SCRIPTDIR/02-at-scale/k8s/cbci-values.yml"
   sed -i "s|cascBranch: .*|cascBranch: $branch|g" "$SCRIPTDIR/02-at-scale/cbci/casc/oc/variables/variables.yaml"
-  sed -i "s|sharedLibBranch: .*|sharedLibBranch: $branch|g" "$SCRIPTDIR/02-at-scale/cbci/casc/mc/parent/variables/variables.yaml"
+  sed -i "s|sharedLibBranch: .*|sharedLibBranch: $branch|g" "$SCRIPTDIR/02-at-scale/cbci/casc/mc/ha/variables/variables.yaml"
+  sed -i "s|sharedLibBranch: .*|sharedLibBranch: $branch|g" "$SCRIPTDIR/02-at-scale/cbci/casc/mc/none-ha/variables/variables.yaml"
   sed -i "s|bundle: \".*/none-ha\"|bundle: \"$branch/none-ha\"|g" "$SCRIPTDIR/02-at-scale/cbci/casc/oc/items/root.yaml"
   sed -i "s|bundle: \".*/ha\"|bundle: \"$branch/ha\"|g" "$SCRIPTDIR/02-at-scale/cbci/casc/oc/items/root.yaml"
 }
