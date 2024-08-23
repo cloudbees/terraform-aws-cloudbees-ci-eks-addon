@@ -1,3 +1,13 @@
 unclassified:
   globalDefaultFlowDurabilityLevel:
     durabilityHint: MAX_SURVIVABILITY
+  globalLibraries:
+    libraries:
+    - defaultVersion: ${sharedLibBranch}
+      name: "common"
+      retriever:
+        modernSCM:
+          libraryPath: ${sharedLibPath}
+          scm:
+            git:
+              remote: ${sharedLibRepo}

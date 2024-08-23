@@ -7,3 +7,5 @@ allowCapExceptions: true
 jcascMergeStrategy: "errorOnConflict"
 jcasc:
   - jcasc
+variables:
+  - variables

@@ -1,3 +1,13 @@
 unclassified:
   globalDefaultFlowDurabilityLevel:
     durabilityHint: PERFORMANCE_OPTIMIZED
+  globalLibraries:
+    libraries:
+    - defaultVersion: ${sharedLibBranch}
+      name: "common"
+      retriever:
+        modernSCM:
+          libraryPath: ${sharedLibPath}
+          scm:
+            git:
+              remote: ${sharedLibRepo}
