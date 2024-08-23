@@ -728,12 +728,12 @@ resource "kubernetes_storage_class_v1" "efs" {
   reclaim_policy      = "Delete"
   parameters = {
     # Dynamic provisioning
-    provisioningMode = "efs-ap" 
+    provisioningMode = "efs-ap"
     fileSystemId     = module.efs.id
     directoryPerms   = "700"
     #Issue #190
-    uid              = "1000"
-    gid              = "1000"
+    uid = "1000"
+    gid = "1000"
   }
 
   mount_options = [
