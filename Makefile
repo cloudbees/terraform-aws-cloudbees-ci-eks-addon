@@ -6,7 +6,7 @@ BP_AGENT_USER       := bp-agent
 MKFILEDIR 			:= $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 CBCI_REPO		    ?= https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon.git
 CBCI_BRANCH			?= main
-DESTROY_ONLY_APPS	?= false
+DESTROY_WL_ONLY	?= false
 
 define helpers
 	source blueprints/helpers.sh && $(1)
@@ -57,18 +57,17 @@ endif
 	@$(call helpers,INFO "CloudBees CI Blueprint $(ROOT) Validation target finished succesfully.")
 
 .PHONY: destroy
-destroy: ## Destroy Terraform Blueprint passed as parameter. Example: ROOT=02-at-scale make destroy
-destroy: tfChecks agentCheck
+destroy: ## Destroy Terraform Blueprint passed as parameter. Example: [DESTROY_WL_ONLY=false] ROOT=02-at-scale make destroy
+destroy: tfChecks agentCheck guard-DESTROY_WL_ONLY
 ifeq ($(CI),false)
-	@$(call helpers,ask-confirmation "Destroy $(ROOT)")
+	@$(call helpers,ask-confirmation "Destroy $(ROOT) with Destroy Workloads Only=$(DESTROY_WL_ONLY)")
 endif
-ifeq ($(DESTROY_ONLY_APPS),false)
+ifeq ($(DESTROY_WL_ONLY),false)
 	@$(call helpers,tf-destroy $(ROOT))
-	@$(call helpers,INFO "CloudBees CI Blueprint $(ROOT) Destroy target finished succesfully. Mode: ALL")
 else
-	@$(call helpers,tf-destroy-apps $(ROOT))
-	@$(call helpers,INFO "CloudBees CI Blueprint $(ROOT) Destroy ONLY APPS target finished succesfully. Mode: ONLY APPS")
+	@$(call helpers,tf-destroy-wl $(ROOT))
 endif
+	@$(call helpers,INFO "CloudBees CI Blueprint $(ROOT) Destroy target finished succesfully. Destroy Workloads Only=$(DESTROY_WL_ONLY)")
 
 .PHONY: clean
 clean: ## Clean Blueprint passed as parameter. Example: ROOT=02-at-scale make clean
