@@ -235,7 +235,9 @@ HashiCorp Vault is used as a credential provider for CloudBees CI Pipelines in t
 
 6. Select **Test Connection** to verify the inputs are correct.
 
-7. Move to `team-b` or `team-c-ha` to run the Pipeline (**admin > validations > vault-credentials**) and validate that credentials are fetched correctly from the Hashicorp Vault.
+7. Move to `team-b` to run the Pipeline (**admin > validations > vault-credentials**) and validate that credentials are fetched correctly from the Hashicorp Vault.
+
+   Known issue [#190](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/issues/190) makes the same pipeline fails in `team-c-ha`
 
 > [!NOTE]
 > Hashicorp Vault can be also be configured to be used for [Configuration as Code - Handling Secrets - Vault](https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/docs/features/secrets.adoc#hashicorp-vault-secret-source).
@@ -271,6 +273,8 @@ HashiCorp Vault is used as a credential provider for CloudBees CI Pipelines in t
       Once the second build is complete, you can find the read cache operation at the beginning of the build logs and the write cache operation at the end of the build logs.
 
       The `linux-mavenAndKaniko-L` agent template is deployed over on-demand Linux nodes that have smaller instance types versus the `linux-mavenAndKaniko-XL` template that is deployed over Spot Linux nodes that have defined larger instance types.
+
+      Known issue [#190](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/issues/190) makes the same pipeline fails in `team-c-ha`
 
    - For Windows node pool use:
 
