@@ -57,17 +57,17 @@ endif
 	@$(call helpers,INFO "CloudBees CI Blueprint $(ROOT) Validation target finished succesfully.")
 
 .PHONY: destroy
-destroy: ## Destroy Terraform Blueprint passed as parameter. Example: [DESTROY_ONLY_WL=false] ROOT=02-at-scale make destroy
+destroy: ## Destroy Terraform Blueprint passed as parameter. Example: [DESTROY_WL_ONLY=false] ROOT=02-at-scale make destroy
 destroy: tfChecks agentCheck guard-DESTROY_WL_ONLY
 ifeq ($(CI),false)
-	@$(call helpers,ask-confirmation "Destroy $(ROOT) with Destroy Workloads Only=$(DESTROY_ONLY_WL)")
+	@$(call helpers,ask-confirmation "Destroy $(ROOT) with Destroy Workloads Only=$(DESTROY_WL_ONLY)")
 endif
 ifeq ($(DESTROY_WL_ONLY),false)
 	@$(call helpers,tf-destroy $(ROOT))
 else
 	@$(call helpers,tf-destroy-wl $(ROOT))
 endif
-	@$(call helpers,INFO "CloudBees CI Blueprint $(ROOT) Destroy target finished succesfully. Destroy Workloads Only=$(DESTROY_ONLY_WL)")
+	@$(call helpers,INFO "CloudBees CI Blueprint $(ROOT) Destroy target finished succesfully. Destroy Workloads Only=$(DESTROY_WL_ONLY)")
 
 .PHONY: clean
 clean: ## Clean Blueprint passed as parameter. Example: ROOT=02-at-scale make clean
