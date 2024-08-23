@@ -11,3 +11,5 @@ unclassified:
           scm:
             git:
               remote: ${sharedLibRepo}
+      cachingConfiguration:
+        refreshTimeMinutes: 0

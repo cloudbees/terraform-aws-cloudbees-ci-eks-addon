@@ -7,7 +7,14 @@ unclassified:
       name: "common"
       retriever:
         modernSCM:
+          clone: true
           libraryPath: ${sharedLibPath}
           scm:
             git:
               remote: ${sharedLibRepo}
+              traits:
+              - cloneOption:
+                  extension:
+                    depth: 1
+                    noTags: false
+                    shallow: true
