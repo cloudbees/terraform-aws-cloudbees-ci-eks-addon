@@ -730,6 +730,9 @@ resource "kubernetes_storage_class_v1" "efs" {
     provisioningMode = "efs-ap" # Dynamic provisioning
     fileSystemId     = module.efs.id
     directoryPerms   = "700"
+    #Issue #190
+    uid              = "1000"
+    gid              = "1000"
   }
 
   mount_options = [
