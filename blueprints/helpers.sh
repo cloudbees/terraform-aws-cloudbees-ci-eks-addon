@@ -122,8 +122,6 @@ probes () {
       INFO "Initial Admin Password: $INITIAL_PASS."
   fi
   if [ "$root" == "02-at-scale" ]; then
-    until [ "$(eval "$(tf-output "$root" cbci_controllers_pods)" | awk '{ print $3 }' | grep -v STATUS | grep -v -c Running)" == 0 ]; do sleep $wait && echo "Waiting for Controllers Pod to get into Ready State..."; done ;\
-      eval "$(tf-output "$root" cbci_controllers_pods)" && INFO "All Controllers Pods are Ready."
     GLOBAL_PASS=$(eval "$(tf-output "$root" global_password)") && \
       if [ -n "$GLOBAL_PASS" ]; then
         INFO "Password for admin_cbci_a: $GLOBAL_PASS."
@@ -145,6 +143,8 @@ probes () {
       fi
     until eval "$(tf-output "$root" cbci_controller_c_hpa)"; do sleep $wait && echo "Waiting for Team C HPA to get Ready..."; done ;\
       INFO "Team C HPA is Ready."
+    until [ "$(eval "$(tf-output "$root" cbci_controllers_pods)" | awk '{ print $3 }' | grep -v STATUS | grep -v -c Running)" == 0 ]; do sleep $wait && echo "Waiting for Controllers Pod to get into Ready State..."; done ;\
+      eval "$(tf-output "$root" cbci_controllers_pods)" && INFO "All Controllers Pods are Ready."
     until [ "$(eval "$(tf-output "$root" cbci_agent_windowstempl_events)" | grep -c 'Allocated Resource vpc.amazonaws.com')" -ge 1 ]; do sleep $wait && echo "Waiting for Windows Template Pod to allocate resource vpc.amazonaws.com"; done ;\
       eval "$(tf-output "$root" cbci_agent_windowstempl_events)" && INFO "Windows Template Example is OK."
     until [ "$(eval "$(tf-output "$root" cbci_agent_linuxtempl_events)" | grep -c 'Created container maven')" -ge 2 ]; do sleep $wait && echo "Waiting for both Linux Template Pods (On demand and Spot) to create maven container"; done ;\

@@ -439,7 +439,7 @@ module "eks" {
   eks_managed_node_groups = {
     #Note: Openldap is not compatible with Bottlerocket or Graviton.
     shared_apps = {
-      node_group_name = "mg-shared"
+      node_group_name = "shared"
       instance_types  = ["m5d.xlarge"]
       ami_type        = "AL2023_x86_64_STANDARD"
       platform        = "linux"
@@ -452,7 +452,7 @@ module "eks" {
       }
     }
     cb_apps = {
-      node_group_name = "mg-cb-apps"
+      node_group_name = "cb-apps"
       instance_types  = ["m7g.2xlarge"] #Graviton
       min_size        = 1
       max_size        = 6
@@ -469,15 +469,20 @@ module "eks" {
       enable_bootstrap_user_data = true
       bootstrap_extra_args       = local.bottlerocket_bootstrap_extra_args
     }
-    cb_agents_2x = {
-      node_group_name = "mg-agent-2x"
-      instance_types  = ["m7g.large"] #Graviton
-      min_size        = 1
-      max_size        = 3
-      desired_size    = 1
-      taints          = [{ key = "dedicated", value = "build-linux", effect = "NO_SCHEDULE" }]
+    #https://aws.amazon.com/blogs/compute/cost-optimization-and-resilience-eks-with-spot-instances/
+    #https://www.eksworkshop.com/docs/fundamentals/managed-node-groups/spot/instance-diversification
+    cb_agents_lin_2x = {
+      node_group_name = "agent-lin-2x"
+      #ec2-instance-selector --vcpus 2 --memory 8 --region us-east-1 --deny-list 't.*' --current-generation -a arm64 --gpus 0 --usage-class spot
+      instance_types = ["im4gn.large", "m6g.large", "m6gd.large", "m7g.large", "m7gd.large"] #Graviton
+      capacity_type  = "SPOT"
+      min_size       = 1
+      max_size       = 3
+      desired_size   = 1
+      taints         = [{ key = "dedicated", value = "build-linux-l", effect = "NO_SCHEDULE" }]
       labels = {
-        role = "build-linux"
+        role = "build-linux-l"
+        size = "2x"
       }
       create_iam_role            = false
       iam_role_arn               = aws_iam_role.managed_ng_ecr.arn
@@ -486,19 +491,18 @@ module "eks" {
       enable_bootstrap_user_data = true
       bootstrap_extra_args       = local.bottlerocket_bootstrap_extra_args
     }
-    #https://aws.amazon.com/blogs/compute/cost-optimization-and-resilience-eks-with-spot-instances/
-    #https://www.eksworkshop.com/docs/fundamentals/managed-node-groups/spot/instance-diversification
-    cb_agents_spot_4x = {
-      node_group_name = "mng-agent-spot-4x"
+    cb_agents_lin_4x = {
+      node_group_name = "agent-lin-4x"
       #ec2-instance-selector --vcpus 4 --memory 16 --region us-east-1 --deny-list 't.*' --current-generation -a arm64 --gpus 0 --usage-class spot
       instance_types = ["im4gn.xlarge", "m6g.xlarge", "m6gd.xlarge", "m7g.xlarge", "m7gd.xlarge"] #Graviton
       capacity_type  = "SPOT"
       min_size       = 0
       max_size       = 3
       desired_size   = 0
-      taints         = [{ key = "dedicated", value = "build-linux-spot", effect = "NO_SCHEDULE" }]
+      taints         = [{ key = "dedicated", value = "build-linux-xl", effect = "NO_SCHEDULE" }]
       labels = {
-        role = "build-linux-spot"
+        role = "build-linux-xl"
+        size = "4x"
       }
       create_iam_role            = false
       iam_role_arn               = aws_iam_role.managed_ng_ecr.arn
@@ -507,17 +511,18 @@ module "eks" {
       enable_bootstrap_user_data = true
       bootstrap_extra_args       = local.bottlerocket_bootstrap_extra_args
     }
-    cb_agents_spot_8x = {
-      node_group_name = "mng-agent-spot-8x"
+    cb_agents_lin_8x = {
+      node_group_name = "agent-lin-8x"
       #ec2-instance-selector --vcpus 8 --memory 32 --region us-east-1 --deny-list 't.*' --current-generation -a arm64 --gpus 0 --usage-class spot
       instance_types = ["im4gn.2xlarge", "m6g.2xlarge", "m6gd.2xlarge", "m7g.2xlarge", "m7gd.2xlarge"] #Graviton
       capacity_type  = "SPOT"
       min_size       = 0
       max_size       = 3
       desired_size   = 0
-      taints         = [{ key = "dedicated", value = "build-linux-spot", effect = "NO_SCHEDULE" }]
+      taints         = [{ key = "dedicated", value = "build-linux-xl", effect = "NO_SCHEDULE" }]
       labels = {
-        role = "build-linux-spot"
+        role = "build-linux-xl"
+        size = "8x"
       }
       create_iam_role            = false
       iam_role_arn               = aws_iam_role.managed_ng_ecr.arn
@@ -526,15 +531,18 @@ module "eks" {
       enable_bootstrap_user_data = true
       bootstrap_extra_args       = local.bottlerocket_bootstrap_extra_args
     }
-    mg_windows = {
+    cb_agents_win = {
+      node_group_name = "agent-win-4x"
       min_size        = 1
       max_size        = 3
       desired_size    = 1
       platform        = "windows"
       ami_type        = "WINDOWS_CORE_2019_x86_64"
       use_name_prefix = true
-      instance_types  = ["m5d.xlarge", "m5ad.xlarge"]
-      taints          = [{ key = "dedicated", value = "build-windows", effect = "NO_SCHEDULE" }]
+      #ec2-instance-selector --vcpus 4 --memory 16 --region us-east-1 --deny-list 't.*' --current-generation -a amd64 --gpus 0 --usage-class spot
+      instance_types = ["m5.xlarge", "m5a.xlarge", "m5d.xlarge", "m5dn.xlarge", "m5n.xlarge", "m5zn.xlarge", "m6a.xlarge", "m6i.xlarge", "m6id.xlarge", "m6idn.xlarge", "m6in.xlarge", "m7a.xlarge", "m7i.xlarge"]
+      capacity_type  = "SPOT"
+      taints         = [{ key = "dedicated", value = "build-windows", effect = "NO_SCHEDULE" }]
       labels = {
         role = "build-windows"
       }
