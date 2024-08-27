@@ -284,15 +284,6 @@ module "eks_blueprints_addons" {
       repository       = "https://aws.github.io/eks-charts"
       values           = [file("k8s/aws-node-term-handler-values.yml")]
     }
-    grafana-tempo = {
-      name             = "tempo"
-      namespace        = kubernetes_namespace.observability.metadata[0].name
-      create_namespace = false
-      chart            = "tempo"
-      chart_version    = "1.7.2"
-      repository       = "https://grafana.github.io/helm-charts"
-      values           = [file("k8s/grafana-tempo-values.yml")]
-    }
     #Based on hashicorp/hashicorp-vault-eks-addon/aws
     vault = {
       name             = "vault"
@@ -321,6 +312,7 @@ module "eks_blueprints_addons" {
       repository       = "https://jaegertracing.github.io/helm-charts"
       values           = [file("k8s/jaeger-values.yml")]
     }
+    
   }
 
   tags = local.tags
