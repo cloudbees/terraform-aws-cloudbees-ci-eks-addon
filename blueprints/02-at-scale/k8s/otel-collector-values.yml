@@ -1,0 +1,35 @@
+# Copyright (c) CloudBees, Inc.
+
+# https://github.com/open-telemetry/opentelemetry-helm-charts/blob/main/charts/opentelemetry-collector/values.yaml
+
+nodeSelector:
+  kubernetes.io/os: linux
+
+mode: "deployment"
+config:
+  exporters:
+    otlp:
+      endpoint: jaeger-collector:4317
+      tls:
+        insecure: true
+  receivers:
+    otlp:
+      protocols:
+        grpc:
+          endpoint: ${env:MY_POD_IP}:4317
+
+  service:
+    pipelines:
+      traces:
+        exporters:
+          - otlp
+        processors:
+          - batch
+        receivers:
+          - otlp
+
+image:
+  repository: "otel/opentelemetry-collector-k8s"
+
+command:
+  name: "otelcol-k8s"

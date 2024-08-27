@@ -123,9 +123,9 @@ grafana:
     datasources.yaml:
       apiVersion: 1
       datasources:
-        - name: Tempo
-          type: tempo
-          url: http://tempo.kube-prometheus-stack.svc.cluster.local:3100
+        - name: Jaeger
+          type: jaeger
+          url: http://jaeger-query:16686
           access: proxy
           isDefault: false
   dashboardProviders:
