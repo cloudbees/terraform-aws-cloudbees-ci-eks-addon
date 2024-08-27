@@ -107,3 +107,13 @@ variable "prometheus_target" {
   default     = false
   type        = bool
 }
+
+variable "prometheus_target_ns" {
+  description = "Namespace. It is designed to be enabled with the AWS EKS Terraform Addon Kube Prometheus Stack. It is required when prometheus_target is enabled."
+  default     = "observability"
+  type        = string
+  validation {
+    condition     = length(trimspace(var.prometheus_target_ns)) > 0
+    error_message = "Prometheus target namespace must not be an empty string."
+  }
+}

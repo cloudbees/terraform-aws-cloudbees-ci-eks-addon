@@ -100,7 +100,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: servicemonitor-cbci
-  namespace: kube-prometheus-stack
+  namespace: ${var.prometheus_target_ns}
   labels:
     release: kube-prometheus-stack
     app.kubernetes.io/part-of: kube-prometheus-stack
