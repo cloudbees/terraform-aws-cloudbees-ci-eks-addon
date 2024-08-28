@@ -3,10 +3,6 @@
 #https://artifacthub.io/packages/helm/opentelemetry-helm/opentelemetry-collector
 #https://github.com/open-telemetry/opentelemetry-helm-charts/blob/main/charts/opentelemetry-collector/values.yaml
 
-#ERROR:
-#error decoding 'exporters': unknown type: "prometheus" for id: "prometheus" (valid values: [otlp otlphttp file loadbalancing otelarrow debug nop])
-#2024/08/28 09:38:01 collector server run finished with error: failed to get config: cannot unmarshal the configuration: decoding failed due to the following error(s):
-
 nodeSelector:
   kubernetes.io/os: linux
 
@@ -27,9 +23,6 @@ ports:
     containerPort: 8889
     servicePort: 8889
     protocol: TCP
-podAnnotations:
-  prometheus.io/scrape: "true"
-  prometheus.io/port: "8889"
 config:
   exporters:
     otlp/jaeger:
