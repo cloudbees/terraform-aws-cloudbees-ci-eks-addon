@@ -36,6 +36,10 @@ unclassified:
     gracePeriod: 3600
   openTelemetry:
     endpoint: ${ot_endpoint}
+    observabilityBackends:
+    - grafana:
+        grafanaBaseUrl: ${sec_grafana_url}
+        tempoDataSourceIdentifier: "Jaeger"
   cascItemsConfiguration:
     variableInterpolationEnabledForAdmin: true
 aws:

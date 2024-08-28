@@ -30,6 +30,9 @@ locals {
   vault_ns               = "vault"
   vault_config_file_path = abspath("k8s/vault-config.sh")
   vault_init_file_path   = abspath("k8s/vault-init.log")
+
+  grafana_hostname = "grafana.${var.hosted_zone}"
+  grafana_url      = "https://${local.grafana_hostname}"
 }
 
 resource "random_string" "global_pass_string" {
@@ -75,6 +78,7 @@ module "eks_blueprints_addon_cbci" {
     s3bucketName    = local.bucket_name
     awsRegion       = var.aws_region
     adminMail       = var.trial_license["email"]
+    grafana_url     = local.grafana_url
   })
 
   create_reg_secret = true
@@ -223,6 +227,8 @@ module "eks_blueprints_addons" {
     create_namespace = false
     values = [templatefile("k8s/kube-prom-stack-values.yml", {
       grafana_password = local.global_password
+      grafana_hostname = local.grafana_hostname
+      cert_arn         = module.acm.acm_certificate_arn 
     })]
   }
   enable_aws_for_fluentbit = true

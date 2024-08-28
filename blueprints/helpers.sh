@@ -102,6 +102,9 @@ tf-destroy-wl () {
   export TF_LOG_PATH="$SCRIPTDIR/$root/terraform.log"
   retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.eks_blueprints_addon_cbci -auto-approve"
   retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.eks_blueprints_addons -auto-approve"
+  if [ "$root" == "02-at-scale" ]; then
+    retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -target=kubernetes_namespace.observability -auto-approve"
+  fi
 }
 
 probes () {
