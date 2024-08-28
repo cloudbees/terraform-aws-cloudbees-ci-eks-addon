@@ -1,35 +1,64 @@
 # Copyright (c) CloudBees, Inc.
 
-# https://github.com/open-telemetry/opentelemetry-helm-charts/blob/main/charts/opentelemetry-collector/values.yaml
+#https://artifacthub.io/packages/helm/opentelemetry-helm/opentelemetry-collector
+#https://github.com/open-telemetry/opentelemetry-helm-charts/blob/main/charts/opentelemetry-collector/values.yaml
+
+#ERROR:
+#error decoding 'exporters': unknown type: "prometheus" for id: "prometheus" (valid values: [otlp otlphttp file loadbalancing otelarrow debug nop])
+#2024/08/28 09:38:01 collector server run finished with error: failed to get config: cannot unmarshal the configuration: decoding failed due to the following error(s):
 
 nodeSelector:
   kubernetes.io/os: linux
 
+image:
+  repository: "otel/opentelemetry-collector-contrib"
+
 mode: "deployment"
+presets:
+  kubernetesAttributes:
+    enabled: true
+service:
+    type: ClusterIP
+ports:
+  metrics:
+    enabled: true
+  prometheus:
+    enabled: true
+    containerPort: 8889
+    servicePort: 8889
+    protocol: TCP
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/port: "8889"
 config:
   exporters:
-    otlp:
-      endpoint: jaeger-collector:4317
+    otlp/jaeger:
+      endpoint: 'jaeger-collector:4317'
       tls:
         insecure: true
+    prometheus:
+      endpoint: '${env:MY_POD_IP}:8889'
+    debug:
   receivers:
     otlp:
       protocols:
         grpc:
-          endpoint: ${env:MY_POD_IP}:4317
-
+          endpoint: '${env:MY_POD_IP}:4317'
   service:
     pipelines:
       traces:
-        exporters:
+        receivers:
           - otlp
         processors:
           - batch
+        exporters:
+          - otlp/jaeger
+          - debug
+      metrics:
         receivers:
           - otlp
-
-image:
-  repository: "otel/opentelemetry-collector-k8s"
-
-command:
-  name: "otelcol-k8s"
+        processors:
+          - batch
+        exporters:
+          - prometheus
+          - debug

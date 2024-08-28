@@ -312,7 +312,7 @@ module "eks_blueprints_addons" {
       repository       = "https://jaegertracing.github.io/helm-charts"
       values           = [file("k8s/jaeger-values.yml")]
     }
-    
+
   }
 
   tags = local.tags
