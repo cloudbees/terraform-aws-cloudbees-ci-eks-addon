@@ -176,6 +176,9 @@ grafana:
           url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-pods.json
           token: ""
     grafana-dashboards-cloudbees:
-      cb-controllers:
-        url: https://raw.githubusercontent.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/main/blueprints/02-at-scale/k8s/kube-prom-stack-grafana-db.json
+      prometheus-plugin:
+        url: https://raw.githubusercontent.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/main/blueprints/02-at-scale/k8s/prometheus-plugin-db.json
+        token: ""
+      otel-plugin:
+        url: https://raw.githubusercontent.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/main/blueprints/02-at-scale/k8s/opentelemetry-plugin-db.json
         token: ""
