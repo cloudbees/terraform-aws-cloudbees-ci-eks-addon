@@ -1,6 +1,10 @@
 
 locals {
 
+  kubeconfig_file           = "kubeconfig_${local.name}.yaml"
+  kubeconfig_file_path      = abspath("k8s/${local.kubeconfig_file}")
+  #clean_ns_file_path        = abspath("../force_delete_ns.sh")
+
   global_password      = random_string.global_pass_string.result
   global_pass_jsonpath = "'{.data.sec_globalPassword}'"
 
@@ -33,6 +37,8 @@ locals {
 
   grafana_hostname = "grafana.${var.hosted_zone}"
   grafana_url      = "https://${local.grafana_hostname}"
+
+
 }
 
 resource "random_string" "global_pass_string" {
@@ -124,6 +130,12 @@ resource "kubernetes_namespace" "observability" {
     name = "observability"
   }
 
+}
+
+resource "time_sleep" "wait_30_seconds" {
+  depends_on = [kubernetes_namespace.observability]
+
+  destroy_duration = "30s"
 }
 
 module "eks_blueprints_addons" {
@@ -401,3 +413,15 @@ resource "terraform_data" "create_kubeconfig" {
     command = "aws eks update-kubeconfig --name ${module.eks.cluster_name} --region ${var.aws_region} --kubeconfig ${local.kubeconfig_file_path}"
   }
 }
+
+# resource "terraform_data" "create_kubeconfig" {
+#   depends_on = [module.eks_blueprints_addons]
+
+#   provisioner "local-exec" {
+#     command = "bash ${local.clean_ns_file_path} ${kubernetes_namespace.observability.metadata[0].name}"
+#     when    = destroy
+#     environment = {
+#       KUBECONFIG = local.kubeconfig_file_path
+#     }
+#   }
+# }

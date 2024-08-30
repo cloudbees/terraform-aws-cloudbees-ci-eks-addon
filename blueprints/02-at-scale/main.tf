@@ -18,8 +18,6 @@ locals {
   cbci_instance_profile_ecr = "${local.name}-instance_profile_ecr"
   cbci_iam_role_ecr         = "${local.name}-iam_role_ecr"
   cbci_inline_policy_ecr    = "${local.name}-iam_inline_policy_ecr"
-  kubeconfig_file           = "kubeconfig_${local.name}.yaml"
-  kubeconfig_file_path      = abspath("k8s/${local.kubeconfig_file}")
 
   vpc_cidr         = "10.0.0.0/16"
   azs              = slice(data.aws_availability_zones.available.names, 0, 3)
