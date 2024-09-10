@@ -14,10 +14,10 @@ This document provides guidelines for contributing to the CloudBees CI add-on fo
       - The `source` field in the `eks_blueprints_addon_cbci` at blueprints must point to the remote [terraform registry version](https://registry.terraform.io/modules/cloudbees/cloudbees-ci-eks-addon/aws/latest) and `version >= "x.x.x"`. It is important for the telemetry in https://registry.terraform.io/modules/cloudbees/cloudbees-ci-eks-addon/aws/latest.
       - The CasC bundles SCM configuration must point to the https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon repository and its `main` branch.
   - `develop` branch:
-    - It is the integration branch and it is used for testing new features and updates before merging them into the `main` branch.
+    - It is the integration branch, and is used for testing new features and updates before merging them into the `main` branch.
     - Requirements:
-      - The `source` field in the `eks_blueprints_addon_cbci` in the blueprints folder must point to the local root of the https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon repository (for example, `source = "../../"`).
-      - The CasC bundles SCM configuration must point to the https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon repository and its `develop` branch.
+      - The `source` field in the `eks_blueprints_addon_cbci` in the blueprints folder must point to the local root of the [terraform-aws-cloudbees-ci-eks-addon](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon) repository (for example, `source = "../../"`).
+      - The CasC bundles SCM configuration must point to the `develop` branch in the [terraform-aws-cloudbees-ci-eks-addon](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon) repository.
 
 ## Report bugs and feature requests
 
@@ -54,7 +54,7 @@ To submit a pull request:
 7. Pay attention to any automated CI failures reported in the pull request, and stay involved in the conversation.
 
 > [!IMPORTANT]
-> If you make updates to embeded repository (e.g. CasC bundles), you must push the changes to the public upstream (repository/branch) before running `terraform apply` locally. The endpoint and/or branch can be updated via `set-casc-location` from the companion [Makefile](Makefile).
+> If you make updates to embedded repository (for example, CasC bundles), you must push the changes to the public upstream (repository/branch) before running `terraform apply` locally. The endpoint and/or branch can be updated via `set-casc-location` from the companion [Makefile](Makefile).
 
 ### Pre-commits: Linting, formatting and secrets scanning
 
@@ -73,7 +73,7 @@ Validate your pull request changes inside the blueprint agent described in the [
 The [bp-tf-ci.yaml](.cloudbees/workflows/bp-tf-ci.yaml) blueprints are orchestrated into the [CloudBees platform](https://www.cloudbees.com/products/saas-platform) inside the [CloudBees Professional Services (PS) sub-organization](https://cloudbees.io/orgs/cloudbees~professional-services/components/94c50dcf-125e-4767-b9c5-58d6d669a1f6/runs).
 
 > [!NOTE]
-> At the time of writing, the pipeline triggers on `push` events only and not for `pull_requests`. Although pull request event is supported, it is requires filters for file patters ()`*.tf`).
+> The pipeline triggers on `push` events only, and does not trigger for `pull_requests`. Although the `pull_requests` event is supported, it requires filters for file patters (for example, `*.tf`).
 
 #### Prerequisites
 
