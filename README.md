@@ -115,7 +115,7 @@ The CloudBees CI add-on uses `helms release` for its resources definition, makin
 | cbci_oc_pod | Operations center pod for the CloudBees CI add-on. |
 | cbci_oc_url | Operations center URL for the CloudBees CI add-on using a subdomain and certificates. |
 | cbci_sec_casc | Optional. Kubernetes secrets name for CloudBees CI Casc. |
-| cbci_sec_registry | Optional. Kubernetes secrets name for CloudBees CI agents to autheticate to registry. |
+| cbci_sec_registry | Optional. Kubernetes secrets name for CloudBees CI agents to authenticate to registry. |
 | merged_helm_config | (merged) Helm configuration for CloudBees CI. |
 <!-- END_TF_DOCS -->
 
