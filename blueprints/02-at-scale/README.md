@@ -57,7 +57,7 @@ This blueprint divides scalable node groups for different types of workloads:
 
 ![K8sApps](img/at-scale.k8s.drawio.svg)
 
-## Terraform Docs
+## Terraform documentation
 
 <!-- BEGIN_TF_DOCS -->
 ### Inputs
