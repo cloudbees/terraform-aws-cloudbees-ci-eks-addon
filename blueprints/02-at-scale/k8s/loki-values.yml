@@ -17,6 +17,7 @@ loki:
         period: 24h
       object_store: filesystem # we're storing on filesystem so there's no real persistence here.
       schema: v13
+  auth_enabled: false
 singleBinary:
   replicas: 1
   nodeSelector:
