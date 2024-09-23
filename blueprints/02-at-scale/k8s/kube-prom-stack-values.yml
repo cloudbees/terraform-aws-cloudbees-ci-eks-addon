@@ -12,7 +12,7 @@ prometheus:
     additionalScrapeConfigs:
       - job_name: "otel-collector"
         static_configs:
-          #OTEL collector own metrics
+          #OTEL collector own metrics https://opentelemetry.io/docs/collector/internal-telemetry/
           - targets: ["otel-collector-opentelemetry-collector:8888"]
           #OTEL collector exporter prometheus metrics
           - targets: ["otel-collector-opentelemetry-collector:8889"]
@@ -140,7 +140,10 @@ grafana:
           type: jaeger
           url: http://jaeger-query:16686
           access: proxy
-          isDefault: false
+        - name: Loki
+          type: loki
+          url: http://logging-loki-gateway.loki.svc.cluster.local/
+          access: proxy
   dashboardProviders:
     dashboardproviders.yaml:
       apiVersion: 1

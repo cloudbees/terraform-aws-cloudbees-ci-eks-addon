@@ -24,24 +24,35 @@ ports:
     servicePort: 8889
     protocol: TCP
 config:
+  receivers:
+    otlp/jenkins:
+      protocols:
+        grpc:
+          endpoint: '${env:MY_POD_IP}:4317'
   exporters:
+    otlphttp/loki:
+      endpoint: 'http://logging-loki-gateway.loki.svc.cluster.local/otlp'
     otlp/jaeger:
       endpoint: 'jaeger-collector:4317'
       tls:
         insecure: true
     prometheus:
       endpoint: '${env:MY_POD_IP}:8889'
-    debug:
-  receivers:
-    otlp:
-      protocols:
-        grpc:
-          endpoint: '${env:MY_POD_IP}:4317'
+      resource_to_telemetry_conversion:
+        enabled: true
   service:
     pipelines:
+      logs:
+        receivers:
+          - otlp/jenkins
+        processors:
+          - batch
+        exporters:
+          - otlphttp/loki
+          - debug
       traces:
         receivers:
-          - otlp
+          - otlp/jenkins
         processors:
           - batch
         exporters:
@@ -49,7 +60,7 @@ config:
           - debug
       metrics:
         receivers:
-          - otlp
+          - otlp/jenkins
         processors:
           - batch
         exporters:

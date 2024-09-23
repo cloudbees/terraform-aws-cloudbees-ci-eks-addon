@@ -2,13 +2,12 @@
 
 # https://github.com/jaegertracing/helm-charts/blob/main/charts/jaeger/values.yaml
 
-nodeSelector:
-  kubernetes.io/os: linux
-
 provisionDataStore:
   cassandra: false
 allInOne:
   enabled: true
+  nodeSelector:
+      kubernetes.io/os: linux
 storage:
   type: memory
 agent:
