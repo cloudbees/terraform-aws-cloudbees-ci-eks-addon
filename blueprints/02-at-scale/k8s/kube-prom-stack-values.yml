@@ -138,12 +138,12 @@ grafana:
       datasources:
         - name: Jaeger
           type: jaeger
-          url: http://jaeger-query:16686
           access: proxy
+          url: http://jaeger-query:16686
         - name: Loki
           type: loki
-          url: http://logging-loki-gateway.loki.svc.cluster.local/
           access: proxy
+          url: http://loki-gateway
   dashboardProviders:
     dashboardproviders.yaml:
       apiVersion: 1

@@ -31,7 +31,7 @@ config:
           endpoint: '${env:MY_POD_IP}:4317'
   exporters:
     otlphttp/loki:
-      endpoint: 'http://logging-loki-gateway.loki.svc.cluster.local/otlp'
+      endpoint: 'http://loki-gateway/otlp'
     otlp/jaeger:
       endpoint: 'jaeger-collector:4317'
       tls:
