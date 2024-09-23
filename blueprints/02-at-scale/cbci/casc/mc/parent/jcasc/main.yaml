@@ -40,6 +40,7 @@ unclassified:
     - grafana:
         grafanaBaseUrl: ${sec_grafana_url}
         tempoDataSourceIdentifier: "Jaeger"
+        grafanaLogsBackend: "grafanaLogsBackendBackendWithLogMirroringInJenkins"
   cascItemsConfiguration:
     variableInterpolationEnabledForAdmin: true
 aws:
