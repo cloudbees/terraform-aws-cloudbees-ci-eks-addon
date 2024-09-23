@@ -49,6 +49,12 @@ resource "kubernetes_namespace" "cbci" {
 
 }
 
+resource "time_sleep" "wait_30_seconds" {
+  depends_on = [kubernetes_namespace.cbci]
+
+  destroy_duration = "30s"
+}
+
 # Kubernetes Secrets to be passed to Casc
 # https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/docs/features/secrets.adoc#kubernetes-secrets
 resource "kubernetes_secret" "cbci_sec_casc" {
@@ -200,17 +206,4 @@ resource "helm_release" "cloudbees_ci" {
 
   depends_on = [time_sleep.wait_30_seconds]
 
-}
-
-# Need to wait a few seconds when removing the cbci resource to give helm
-# time to finish cleaning up.
-#
-# Otherwise, after `terraform destroy`:
-# │ Error: uninstallation completed with 1 error(s): uninstall: Failed to purge
-#   the release: release: not found
-
-resource "time_sleep" "wait_30_seconds" {
-  depends_on = [kubernetes_namespace.cbci]
-
-  destroy_duration = "30s"
 }
