@@ -171,17 +171,17 @@ output "velero_restore" {
 
 output "prometheus_dashboard" {
   description = "Provides access to Prometheus dashboards."
-  value       = "kubectl port-forward svc/kube-prometheus-stack-prometheus 50001:9090 -n kube-prometheus-stack"
+  value       = "kubectl port-forward svc/kube-prometheus-stack-prometheus 50001:9090 -n ${kubernetes_namespace.observability.metadata[0].name}"
 }
 
 output "prometheus_active_targets" {
   description = "Checks active Prometheus targets from the operations center."
-  value       = "kubectl exec -n cbci -ti cjoc-0 --container jenkins -- curl -sSf kube-prometheus-stack-prometheus.kube-prometheus-stack.svc.cluster.local:9090/api/v1/targets"
+  value       = "kubectl exec -n cbci -ti cjoc-0 --container jenkins -- curl -sSf kube-prometheus-stack-prometheus.${kubernetes_namespace.observability.metadata[0].name}.svc.cluster.local:9090/api/v1/targets"
 }
 
 output "grafana_dashboard" {
   description = "Provides access to Grafana dashboards."
-  value       = "kubectl port-forward svc/kube-prometheus-stack-grafana 50002:80 -n kube-prometheus-stack"
+  value       = "kubectl port-forward svc/kube-prometheus-stack-grafana 50002:80 -n ${kubernetes_namespace.observability.metadata[0].name}"
 }
 
 output "global_password" {
