@@ -3,7 +3,7 @@ locals {
 
   kubeconfig_file           = "kubeconfig_${local.name}.yaml"
   kubeconfig_file_path      = abspath("k8s/${local.kubeconfig_file}")
-  #clean_ns_file_path        = abspath("../force_delete_ns.sh")
+  #clean_ns_file_path        = abspath("../scripts/elb_grafana_delete.sh")
 
   global_password      = random_string.global_pass_string.result
   global_pass_jsonpath = "'{.data.sec_globalPassword}'"
@@ -236,6 +236,7 @@ module "eks_blueprints_addons" {
   enable_kube_prometheus_stack = true
   kube_prometheus_stack = {
     namespace        = kubernetes_namespace.observability.metadata[0].name
+    chart_version    = "62.0.0"
     create_namespace = false
     values = [templatefile("k8s/kube-prom-stack-values.yml", {
       grafana_password = local.global_password
@@ -315,22 +316,30 @@ module "eks_blueprints_addons" {
     otel-collector = {
       name             = "otel-collector"
       namespace        = kubernetes_namespace.observability.metadata[0].name
-      create_namespace = true
+      create_namespace = false
       chart            = "opentelemetry-collector"
-      chart_version    = "0.102.1"
+      chart_version    = "0.105.1"
       repository       = "https://open-telemetry.github.io/opentelemetry-helm-charts"
       values           = [file("k8s/otel-collector-values.yml")]
     }
     jaeger = {
       name             = "jaeger"
       namespace        = kubernetes_namespace.observability.metadata[0].name
-      create_namespace = true
+      create_namespace = false
       chart            = "jaeger"
-      chart_version    = "3.1.2"
+      chart_version    = "3.3.1"
       repository       = "https://jaegertracing.github.io/helm-charts"
       values           = [file("k8s/jaeger-values.yml")]
     }
-
+    loki = {
+      name             = "loki"
+      namespace        = kubernetes_namespace.observability.metadata[0].name
+      create_namespace = false
+      chart            = "loki"
+      chart_version    = "6.12.0"
+      repository       = "https://grafana.github.io/helm-charts"
+      values           = [file("k8s/loki-values.yml")]
+    }
   }
 
   tags = local.tags
@@ -414,11 +423,11 @@ resource "terraform_data" "create_kubeconfig" {
   }
 }
 
-# resource "terraform_data" "create_kubeconfig" {
+# resource "terraform_data" "clean_grafana_elb" {
 #   depends_on = [module.eks_blueprints_addons]
 
 #   provisioner "local-exec" {
-#     command = "bash ${local.clean_ns_file_path} ${kubernetes_namespace.observability.metadata[0].name}"
+#     command = "bash ${local.clean_ns_file_path}"
 #     when    = destroy
 #     environment = {
 #       KUBECONFIG = local.kubeconfig_file_path
