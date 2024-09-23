@@ -81,19 +81,27 @@ tf-output () {
 tf-apply () {
   local root="$1"
   export TF_LOG_PATH="$SCRIPTDIR/$root/terraform.log"
+  rm TF_LOG_PATH || INFO "No previous log found."
   retry 3 "terraform -chdir=$SCRIPTDIR/$root apply -target=module.vpc -auto-approve"
+  INFO "Apply target module.vpc completed."
   retry 3 "terraform -chdir=$SCRIPTDIR/$root apply -target=module.eks -auto-approve"
+  INFO "Apply target module.eks completed."
   retry 3 "terraform -chdir=$SCRIPTDIR/$root apply -auto-approve"
+  INFO "Apply the rest completed."
   terraform -chdir="$SCRIPTDIR/$root" output > "$SCRIPTDIR/$root/terraform.output"
+  INFO "Outputs saved corretely."
 }
 
 #https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#destroy
 tf-destroy () {
   local root="$1"
   export TF_LOG_PATH="$SCRIPTDIR/$root/terraform.log"
+  rm "$TF_LOG_PATH" || INFO "No previous log found."
   tf-destroy-wl "$root"
   retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.eks -auto-approve"
+  INFO "Destroy target module.eks completed."
   retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -auto-approve"
+  INFO "Destroy the rest completed."
   rm -f "$SCRIPTDIR/$root/terraform.output"
 }
 
@@ -101,10 +109,15 @@ tf-destroy-wl () {
   local root="$1"
   export TF_LOG_PATH="$SCRIPTDIR/$root/terraform.log"
   retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.eks_blueprints_addon_cbci -auto-approve"
+  INFO "Destroy target module.eks_blueprints_addon_cbci completed."
   retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.eks_blueprints_addons -auto-approve"
-  if [ "$root" == "02-at-scale" ]; then
-    retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -target=kubernetes_namespace.observability -auto-approve"
-  fi
+  INFO "Destroy target module.eks_blueprints_addons completed."
+  # if [ "$root" == "${BLUEPRINTS[1]}" ]; then
+  #   eval "$(tf-output "$root" kubeconfig_export)"
+  #   bash "$SCRIPTDIR/force_delete_ns.sh" "observability"
+  #   retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -target=kubernetes_namespace.observability -auto-approve"
+  #   INFO "Destroy kubernetes_namespace.observability completed."
+  # fi
 }
 
 probes () {
@@ -120,11 +133,11 @@ probes () {
   OC_URL=$(tf-output "$root" cbci_oc_url)
   until eval "$(tf-output "$root" cbci_liveness_probe_ext)"; do sleep $wait && echo "Waiting for Operation Center Service to pass Health Check from outside the clustery..."; done ;\
     INFO "Operation Center Service passed Health Check outside the cluster. It is available at $OC_URL."
-  if [ "$root" == "01-getting-started" ]; then
+  if [ "$root" == "${BLUEPRINTS[0]}" ]; then
     INITIAL_PASS=$(eval "$(tf-output "$root" cbci_initial_admin_password)"); \
       INFO "Initial Admin Password: $INITIAL_PASS."
   fi
-  if [ "$root" == "02-at-scale" ]; then
+  if [ "$root" == "${BLUEPRINTS[1]}" ]; then
     GLOBAL_PASS=$(eval "$(tf-output "$root" global_password)") && \
       if [ -n "$GLOBAL_PASS" ]; then
         INFO "Password for admin_cbci_a: $GLOBAL_PASS."
@@ -211,4 +224,6 @@ set-cbci-location () {
   sed -i "s|sharedLibBranch: .*|sharedLibBranch: $branch|g" "$SCRIPTDIR/02-at-scale/cbci/casc/mc/none-ha/variables/variables.yaml"
   sed -i "s|bundle: \".*/none-ha\"|bundle: \"$branch/none-ha\"|g" "$SCRIPTDIR/02-at-scale/cbci/casc/oc/items/root.yaml"
   sed -i "s|bundle: \".*/ha\"|bundle: \"$branch/ha\"|g" "$SCRIPTDIR/02-at-scale/cbci/casc/oc/items/root.yaml"
+  sed -i "s|https://raw.githubusercontent.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/.*/blueprints/02-at-scale/k8s/prometheus-plugin-db.json|https://raw.githubusercontent.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/$branch/blueprints/02-at-scale/k8s/prometheus-plugin-db.json|g" "$SCRIPTDIR/02-at-scale/k8s/kube-prom-stack-values.yml"
+  sed -i "s|https://raw.githubusercontent.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/.*/blueprints/02-at-scale/k8s/opentelemetry-plugin-db.json|https://raw.githubusercontent.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/$branch/blueprints/02-at-scale/k8s/opentelemetry-plugin-db.json|g" "$SCRIPTDIR/02-at-scale/k8s/kube-prom-stack-values.yml"
 }
