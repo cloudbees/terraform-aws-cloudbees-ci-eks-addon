@@ -13,6 +13,8 @@ mode: "deployment"
 presets:
   kubernetesAttributes:
     enabled: true
+    extractAllPodLabels: true
+    extractAllPodAnnotations: true
 service:
     type: ClusterIP
 ports:
@@ -31,16 +33,28 @@ config:
           endpoint: '${env:MY_POD_IP}:4317'
   exporters:
     otlphttp/loki:
-      endpoint: 'http://loki-gateway/otlp'
+      endpoint: 'http://loki.observability.svc.cluster.local:3100/otlp'
     otlp/jaeger:
-      endpoint: 'jaeger-collector:4317'
+      endpoint: 'jaeger-collector.observability.svc.cluster.local:4317'
       tls:
         insecure: true
     prometheus:
       endpoint: '${env:MY_POD_IP}:8889'
       resource_to_telemetry_conversion:
         enabled: true
+    debug:
+      verbosity: detailed
+      sampling_initial: 5
+      sampling_thereafter: 200
+  extensions:
+    health_check: {}
+    pprof:
+      endpoint: :1888
+    zpages:
+      endpoint: :55679
+
   service:
+    extensions: [pprof, zpages, health_check]
     pipelines:
       logs:
         receivers:
