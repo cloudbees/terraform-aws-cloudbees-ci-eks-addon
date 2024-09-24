@@ -39,6 +39,7 @@ unclassified:
     observabilityBackends:
     - grafana:
         grafanaBaseUrl: ${sec_grafana_url}
+        tempoDataSourceIdentifier: "jaegerDatasource"
         grafanaLogsBackend: "grafanaLogsBackendBackendWithLogMirroringInJenkins"
   cascItemsConfiguration:
     variableInterpolationEnabledForAdmin: true
