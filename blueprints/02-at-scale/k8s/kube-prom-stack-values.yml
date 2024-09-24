@@ -132,6 +132,8 @@ grafana:
     hosts:
       - ${grafana_hostname}
   adminPassword: ${grafana_password}
+  plugins:
+    - grafana-lokiexplore-app
   datasources:
     datasources.yaml:
       apiVersion: 1
@@ -140,10 +142,12 @@ grafana:
           type: jaeger
           access: proxy
           url: http://jaeger-query:16686
+          uid: jaegerDatasource
         - name: Loki
           type: loki
           access: proxy
           url: http://loki-gateway
+          uid: lokiDatasource
   dashboardProviders:
     dashboardproviders.yaml:
       apiVersion: 1
