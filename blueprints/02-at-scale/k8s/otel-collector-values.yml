@@ -31,13 +31,13 @@ config:
       protocols:
         grpc:
           endpoint: '${env:MY_POD_IP}:4317'
+        http:
+          endpoint: '${env:MY_POD_IP}:4318'
   exporters:
     otlphttp/loki:
       endpoint: 'http://loki.observability.svc.cluster.local:3100/otlp'
-    otlp/jaeger:
-      endpoint: 'jaeger-collector.observability.svc.cluster.local:4317'
-      tls:
-        insecure: true
+    otlphttp/tempo:
+      endpoint: http://tempo.observability.svc.cluster.local:4318
     prometheus:
       endpoint: '${env:MY_POD_IP}:8889'
       resource_to_telemetry_conversion:
@@ -70,7 +70,7 @@ config:
         processors:
           - batch
         exporters:
-          - otlp/jaeger
+          - otlphttp/tempo
           - debug
       metrics:
         receivers:
