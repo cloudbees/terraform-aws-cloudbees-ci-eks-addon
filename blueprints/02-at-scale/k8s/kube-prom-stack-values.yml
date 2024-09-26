@@ -138,16 +138,26 @@ grafana:
     datasources.yaml:
       apiVersion: 1
       datasources:
-        - name: Jaeger
-          type: jaeger
-          access: proxy
-          url: http://jaeger-query:16686
-          uid: jaegerDatasource
         - name: Loki
           type: loki
           access: proxy
           url: http://loki-gateway
           uid: lokiDatasource
+          derivedFields:
+          - datasourceUid: tempoDatasource
+            matcherRegex: trace_id=(\w+)
+            name: TraceID
+            url: '$${__value.raw}'
+        - name: Tempo
+          type: tempo
+          url: http://tempo:3100
+          access: proxy
+          uid: tempoDatasource
+          jsonData:
+            tracesToLogsV2:
+              datasourceUid: lokiDatasource
+            tracesToMetrics:
+              datasourceUid: prometheus
   dashboardProviders:
     dashboardproviders.yaml:
       apiVersion: 1
