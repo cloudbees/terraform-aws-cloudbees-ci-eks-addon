@@ -267,6 +267,20 @@ module "eks_blueprints_addons" {
       module.cbci_s3_bucket.s3_bucket_arn,
       "${local.fluentbit_s3_location}/*"
     ]
+    #Note: This values are duplicated in k8s/aws-for-fluent-bit-values.yml but they are required here to not be overwrite by default values.
+    set = [{
+        name  = "cloudWatchLogs.autoCreateGroup"
+        value = true
+      },
+      {
+        name  = "hostNetwork"
+        value = true
+      },
+      {
+        name  = "dnsPolicy"
+        value = "ClusterFirstWithHostNet"
+      }
+    ]
   }
   #Cert Manager - Requirement for Bottlerocket Update Operator
   enable_cert_manager = true
@@ -322,14 +336,14 @@ module "eks_blueprints_addons" {
       repository       = "https://open-telemetry.github.io/opentelemetry-helm-charts"
       values           = [file("k8s/otel-collector-values.yml")]
     }
-    jaeger = {
-      name             = "jaeger"
+    tempo = {
+      name             = "tempo"
       namespace        = kubernetes_namespace.observability.metadata[0].name
       create_namespace = false
-      chart            = "jaeger"
-      chart_version    = "3.3.1"
-      repository       = "https://jaegertracing.github.io/helm-charts"
-      values           = [file("k8s/jaeger-values.yml")]
+      chart            = "tempo"
+      chart_version    = "1.7.2"
+      repository       = "https://grafana.github.io/helm-charts"
+      values           = [file("k8s/grafana-tempo.yml")]
     }
     loki = {
       name             = "loki"
@@ -338,7 +352,7 @@ module "eks_blueprints_addons" {
       chart            = "loki"
       chart_version    = "6.12.0"
       repository       = "https://grafana.github.io/helm-charts"
-      values           = [file("k8s/loki-values.yml")]
+      values           = [file("k8s/grafana-loki-values.yml")]
     }
   }
 
