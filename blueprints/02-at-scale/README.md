@@ -398,7 +398,7 @@ Grafana imports Tempo as datasource and provides tracing dashboards per CI/CD pi
 
 At CloudBees CI, Opentelemetry plugin is configured to use Grafana as visualizacion backend. Then it offers a link `View pipeline with Grafana` for every pipeline run which redirects to Grafana Explorer using Tempo as datasource and passing Trace ID.
 
-![CloudBees CI Tracing Tempo](img/observability/cbci-tracing-example.png)
+![CloudBees CI Tracing Tempo](img/observability/cbci-tracing-tempo.png)
 
 Additionally other System traces can be visualized in Grafana Explorer too.
 
@@ -425,8 +425,8 @@ Fluent Bit acts as a router for applications logs (including CloudBees CI) and b
 
    ![CloudBees CI Logs from Cloudwatch](img/observability/cbci-logs-cloudwatch.png)
 
-   > [!NOTE]
-   > Control plane logs are available in `/aws/eks/CLUSTER_NAME>/cluster` Cloudwatch Log Group.
+> [!NOTE]
+> Control plane logs are available in `/aws/eks/CLUSTER_NAME>/cluster` Cloudwatch Log Group.
 
   - [Loki](https://grafana.com/oss/loki/) that is avaible from Grafana under `Explore` section, then select `Loki` as Datasource and you can filter by `com_cloudbees_cje_tenants` to select one CloudBees CI application logs.
   
