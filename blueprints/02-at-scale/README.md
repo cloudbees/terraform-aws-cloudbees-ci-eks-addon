@@ -358,18 +358,13 @@ Issue the following command to restore the controller from the last backup:
 
 ### Observability
 
-#### Grafana - Prometheus - Loki - Jagger
+Regarding the Observability Stack described in the following sections is relevant to point that CloudBees Prometheus Plugin is a Tier 1 plugin where as OpenTelemetry is Tier 3 (See [CloudBees plugin support policies](https://docs.cloudbees.com/docs/cloudbees-common/latest/plugin-support-policies)).
 
-Grafana is connected to the following datasources:
+#### Metrics
 
-- Prometheus to store Metrics from [Jenkins Metrics](https://plugins.jenkins.io/metrics/) and [Jenkins OpenTelemetry plugin](https://github.com/jenkinsci/opentelemetry-plugin/blob/main/docs/monitoring-metrics.md)
-- Jagger to store Tracing from Jenkins Tracing via OpenTelemetry: [HTTP](https://github.com/jenkinsci/opentelemetry-plugin/blob/main/docs/http-requests-traces.md) and [Jobs](https://github.com/jenkinsci/opentelemetry-plugin/blob/main/docs/job-traces.md).
-- Loki to store logs from Jenkins system and Build logs.
+Prometheus is used to store Metrics from [Jenkins Metrics](https://plugins.jenkins.io/metrics/) and [Jenkins OpenTelemetry plugin](https://github.com/jenkinsci/opentelemetry-plugin/blob/main/docs/monitoring-metrics.md).
 
->[!IMPORTANT]
-> CloudBees Prometheus Plugin is a CloudBees Tier 1 plugin where as OpenTelemetry is not. It has been found issues while using OpenTelemetry within the described technological stack for example: Build logs are not being sent to Loki. But it is interesting to include it this blueprint to demonstrate its potential capabilities.
-
-##### Prometheus datasource
+Grafana imports Prometheus as datasource and provides metrics dashboards for CloudBees CI.
 
 1. Issue the following command to verify that the CloudBees CI targets are connected to Prometheus:
 
@@ -393,43 +388,51 @@ Grafana is connected to the following datasources:
 
   Explore Metrics Dashboards in **Home > Dashboards > CloudBees CI**. Then, select the controller pod to view the metrics. The following image shows metrics for team-b.
 
-   ![CloudBees CI Dashboard](img/observability/cbci-dashboard.png)
+   ![CloudBees CI Metrics Dashboard](img/observability/cbci-metrics-dashboard.png)
 
-##### Jagger datasource
+##### Tracing
 
-1. Complete the installation of OpenTelemetry Tracing backend for CloudBees CI pipelines via browsing to **Manage Jenkins > System > OpenTelemetry > Visualization > Grafana > Advanced > Grafana > Tempo datasource identifier** and complete with the Datasource UUID. You can get this value from the Datasource URL e.g. `https://grafana.example.com/connections/datasources/edit/DATASOURCE_UUID`.
+Tempo is used as Tracing/APM backend for Jenkins Tracing data via OpenTelemetry plugin: [HTTP](https://github.com/jenkinsci/opentelemetry-plugin/blob/main/docs/http-requests-traces.md) and [Jobs](https://github.com/jenkinsci/opentelemetry-plugin/blob/main/docs/job-traces.md).
 
-2. For Pipeline Tracing, the recommended way is to click on the link `View pipeline with Grafana` from the pipeline run. This will open the Jagger Grafana Explorer with the pipeline trace.
+Grafana imports Tempo as datasource and provides tracing dashboards per CI/CD pipeline Trace ID.
 
-   ![CloudBees CI Tracing Example](img/observability/cbci-tracing-example.png)
+At CloudBees CI, Opentelemetry plugin is configured to use Grafana as visualizacion backend. Then it offers a link `View pipeline with Grafana` for every pipeline run which redirects to Grafana Explorer using Tempo as datasource and passing Trace ID.
 
-3. Additionally other System traces (and Pipeline tracing too) can be found from  **Home > Explore > Select Jagger > Select `Query Type: Search`**. Then, select the `service name: jenkins` and the desired `Span Name` to `Run Query`.
+![CloudBees CI Tracing Tempo](img/observability/cbci-tracing-example.png)
 
-> [!NOTE]
-> Grafana Ingress can be enabled as explained in Issue [#165](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/issues/165), but currently is incompatible with `terrafrom destroy`.
+Additionally other System traces can be visualized in Grafana Explorer too.
 
-##### Loki datasource
+##### Logs
 
-Bla, bla, bla
+###### Build Logs
 
-#### Fluent Bit - CloudWatch Logs
+The recommended approach for build logs is using [CloudBees Pipeline Explorer](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-pipeline-explorer-plugin).
 
-For application logs, Fluent Bit acts as a router.
+> [!IMPORTANT]
+> Although, [pipeline build logs can be sent to external storage via OpenTelemetry plugin](https://github.com/jenkinsci/opentelemetry-plugin/blob/main/docs/build-logs.md) there is a known limitation the it makes incompatible with CloudBees Pipeline Explorer.
 
-- Short-term application logs live in the [Amazon CloudWatch Logs](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/WhatIsCloudWatchLogs.html) group, under `/aws/eks/<CLUSTER_NAME>/aws-fluentbit-logs` and contains log streams for all the Kubernetes services running in the cluster, including CloudBees CI applications and agents. The following image shows an example of team b controller logs.
+###### System logs
+
+Fluent Bit acts as a router for applications logs (including CloudBees CI) and build agents conections.
+
+- Short-term Logs: Logs aggregation systems:
+  
+  - [Amazon CloudWatch Logs](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/WhatIsCloudWatchLogs.html) group, under `/aws/eks/<CLUSTER_NAME>/aws-fluentbit-logs` and contains log streams for all the Kubernetes services running in the cluster, including CloudBees CI applications and agents. The following image shows an example of team b controller logs.
 
    ```sh
    eval $(terraform output --raw aws_logstreams_fluentbit) | jq '.[] '
    ```
 
-   ![CloudBees CI Logs Example](img/observability/cbci-fluenbit-example.png)
+   ![CloudBees CI Logs from Cloudwatch](img/observability/cbci-logs-cloudwatch.png)
 
-- Long-term application logs live in an Amazon S3 bucket.
+   > [!NOTE]
+   > Control plane logs are available in `/aws/eks/CLUSTER_NAME>/cluster` Cloudwatch Log Group.
 
-For CloudBees CI build logs:
+  - [Loki](https://grafana.com/oss/loki/) that is avaible from Grafana under `Explore` section, then select `Loki` as Datasource and you can filter by `com_cloudbees_cje_tenants` to select one CloudBees CI application logs.
+  
+  ![CloudBees CI Logs from Loki](img/observability/cbci-logs-loki.png)
 
-- Short-term build logs live in the CloudBees CI controller and are managed using the [Build Discarder](https://plugins.jenkins.io/build-discarder/) Jenkins plugin, which is installed and configured using CasC.
-- Long-term logs can be handled (like any other artifact that is sent to an Amazon S3 bucket) using the [Artifact Manager on Amazon S3](https://plugins.jenkins.io/artifact-manager-s3/) Jenkins plugin, which is installed and configured by CasC.
+- Long-term Logs are storage inside Amazon S3 bucket under `fluentbit` path.
 
 ## Destroy
 
