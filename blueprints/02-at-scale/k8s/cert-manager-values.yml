@@ -1,6 +1,7 @@
 # Copyright (c) CloudBees, Inc.
 
-# https://github.com/cert-manager/cert-manager/blob/master/deploy/charts/cert-manager/Chart.template.yaml
+#https://artifacthub.io/packages/helm/cert-manager/cert-manager
+#https://github.com/cert-manager/cert-manager/blob/master/deploy/charts/cert-manager/Chart.template.yaml
 
 nodeSelector:
   kubernetes.io/os: linux

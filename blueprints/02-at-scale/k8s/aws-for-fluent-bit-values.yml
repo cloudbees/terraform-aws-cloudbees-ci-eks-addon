@@ -16,7 +16,7 @@ tolerations:
   key: "dedicated"
   operator: "Equal"
   value: "build-linux-xl"
-# Note: It is not compatible with Windows nodes by default. It might require some changes to work with Windows nodes.  
+# Note: It is not compatible with Windows nodes by default.  
 # - effect: "NoSchedule"
 #   key: "dedicated"
 #   operator: "Equal"

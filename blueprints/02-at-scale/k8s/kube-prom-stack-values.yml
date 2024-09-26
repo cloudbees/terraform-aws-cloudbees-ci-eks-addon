@@ -2,6 +2,9 @@
   
 #https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack
 #https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-prometheus-stack/values.yaml
+#https://artifacthub.io/packages/helm/prometheus-community/prometheus
+#https://artifacthub.io/packages/helm/grafana/grafana
+#https://artifacthub.io/packages/helm/prometheus-community/alertmanager
 
 alertmanager:
   alertmanagerSpec:
