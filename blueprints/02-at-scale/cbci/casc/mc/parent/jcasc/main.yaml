@@ -39,7 +39,8 @@ unclassified:
     observabilityBackends:
     - grafana:
         grafanaBaseUrl: ${sec_grafana_url}
-        tempoDataSourceIdentifier: "jaegerDatasource"
+        tempoDataSourceIdentifier: "tempoDatasource"
+        #Note: Not compatible with CPE 
         grafanaLogsBackend: "grafanaLogsBackendBackendWithLogMirroringInJenkins"
   cascItemsConfiguration:
     variableInterpolationEnabledForAdmin: true
