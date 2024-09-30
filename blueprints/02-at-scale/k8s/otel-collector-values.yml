@@ -27,7 +27,7 @@ ports:
     protocol: TCP
 config:
   receivers:
-    otlp/jenkins:
+    otlp:
       protocols:
         grpc:
           endpoint: '${env:MY_POD_IP}:4317'
@@ -68,7 +68,7 @@ config:
       #     - debug
       traces:
         receivers:
-          - otlp/jenkins
+          - otlp
         processors:
           - batch
         exporters:
@@ -76,7 +76,7 @@ config:
           - debug
       metrics:
         receivers:
-          - otlp/jenkins
+          - otlp
         processors:
           - batch
         exporters:
