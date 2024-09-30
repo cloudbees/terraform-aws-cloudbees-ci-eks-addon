@@ -2,3 +2,4 @@ variables:
   - ot_endpoint: "http://otel-collector-opentelemetry-collector.observability.svc.cluster.local:4317"
   - s3bucketPreffix: "cbci"
   - regSecretsName: "cbci-sec-reg"
+  - tempoDatasource: "tempoDatasource"
