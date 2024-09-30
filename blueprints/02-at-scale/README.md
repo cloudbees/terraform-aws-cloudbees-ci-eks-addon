@@ -383,7 +383,7 @@ Grafana imports Prometheus as datasource and provides metrics dashboards for Clo
 3. Issue the following command to access Grafana URL. For the username, use `admin` and set the password using the `global_password` terraform variable:
 
    ```sh
-   eval $(terraform output --raw grafana_dashboard)
+   eval $(terraform output --raw grafana_url)
    ```
 
   Explore Metrics Dashboards in **Home > Dashboards > CloudBees CI**. Then, select the controller pod to view the metrics. The following image shows metrics for team-b.
@@ -437,6 +437,8 @@ Fluent Bit acts as a router for applications logs (including CloudBees CI) and b
 ## Destroy
 
 To tear down and remove the resources created in the blueprint, refer to [Amazon EKS Blueprints for Terraform - Destroy](https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#destroy).
+
+To avoid [#165](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/issues/165) run  `kube-prometheus-destroy.sh` after destroying the EKS cluster.
 
 > [!TIP]
 > The `destroy` phase can be orchestrated via the companion [Makefile](../../Makefile).

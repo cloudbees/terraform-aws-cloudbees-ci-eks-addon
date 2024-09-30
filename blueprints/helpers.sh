@@ -100,6 +100,14 @@ tf-destroy () {
   tf-destroy-wl "$root"
   retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.eks -auto-approve"
   INFO "Destroy target module.eks completed."
+  #Prevent Issue #165
+  if [ "$root" == "${BLUEPRINTS[1]}" ]; then
+    eks_cluster_name=$(tf-output "$root" eks_cluster_name)
+    aws_region=$(tf-output "$root" aws_region)
+    eval "$(tf-output "$root" kubeconfig_export)"
+    bash "$SCRIPTDIR/$root/scripts/kube-prometheus-destroy.sh" "$eks_cluster_name" "$aws_region"
+    INFO "kube-prometheus-destroy.sh completed."
+  fi
   retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -auto-approve"
   INFO "Destroy the rest completed."
   rm -f "$SCRIPTDIR/$root/terraform.output"
@@ -112,12 +120,6 @@ tf-destroy-wl () {
   INFO "Destroy target module.eks_blueprints_addon_cbci completed."
   retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -target=module.eks_blueprints_addons -auto-approve"
   INFO "Destroy target module.eks_blueprints_addons completed."
-  # if [ "$root" == "${BLUEPRINTS[1]}" ]; then
-  #   eval "$(tf-output "$root" kubeconfig_export)"
-  #   bash "$SCRIPTDIR/force_delete_ns.sh" "observability"
-  #   retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -target=kubernetes_namespace.observability -auto-approve"
-  #   INFO "Destroy kubernetes_namespace.observability completed."
-  # fi
 }
 
 probes () {

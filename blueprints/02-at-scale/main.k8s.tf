@@ -1,9 +1,8 @@
 
 locals {
 
-  kubeconfig_file           = "kubeconfig_${local.name}.yaml"
-  kubeconfig_file_path      = abspath("k8s/${local.kubeconfig_file}")
-  #clean_ns_file_path        = abspath("../scripts/elb_grafana_delete.sh")
+  kubeconfig_file                     = "kubeconfig_${local.name}.yaml"
+  kubeconfig_file_path                = abspath("k8s/${local.kubeconfig_file}")
 
   global_password      = random_string.global_pass_string.result
   global_pass_jsonpath = "'{.data.sec_globalPassword}'"
@@ -35,9 +34,9 @@ locals {
   vault_config_file_path = abspath("k8s/vault-config.sh")
   vault_init_file_path   = abspath("k8s/vault-init.log")
 
+  observability_ns = "observability"
   grafana_hostname = "grafana.${var.hosted_zone}"
   grafana_url      = "https://${local.grafana_hostname}"
-
 
 }
 
@@ -62,7 +61,6 @@ module "eks_blueprints_addon_cbci" {
   # source  = "cloudbees/cloudbees-ci-eks-addon/aws"
   # version = ">= 3.18072.0"
   source = "../../"
-
   depends_on = [module.eks_blueprints_addons]
 
   hosted_zone   = var.hosted_zone
@@ -98,7 +96,7 @@ module "eks_blueprints_addon_cbci" {
   }
 
   prometheus_target = true
-  prometheus_target_ns = kubernetes_namespace.observability.metadata[0].name
+  prometheus_target_ns = local.observability_ns
 
 }
 
@@ -122,26 +120,11 @@ module "ebs_csi_driver_irsa" {
   tags = var.tags
 }
 
-# It must be separate to correctly purge the observability
-resource "kubernetes_namespace" "observability" {
-
-  depends_on = [module.eks]
-  metadata {
-    name = "observability"
-  }
-
-}
-
-resource "time_sleep" "wait_30_seconds" {
-  depends_on = [kubernetes_namespace.observability]
-
-  destroy_duration = "30s"
-}
-
 module "eks_blueprints_addons" {
   source = "aws-ia/eks-blueprints-addons/aws"
   #vEKSBpAddonsTFMod#
   version = "1.15.1"
+  depends_on = [module.eks]
 
   cluster_name      = module.eks.cluster_name
   cluster_endpoint  = module.eks.cluster_endpoint
@@ -233,11 +216,22 @@ module "eks_blueprints_addons" {
       EOT
     }]
   }
+  #Cert Manager - Requirement for Bottlerocket Update Operator
+  enable_cert_manager = true
+  cert_manager = {
+    wait = true
+  }
+  #Important: Update timing can be customized
+  #Bottlerocket Update Operator
+  enable_bottlerocket_update_operator = true
+  bottlerocket_update_operator = {
+    values = [file("k8s/br-update-operator-values.yml")]
+  }
   enable_kube_prometheus_stack = true
   kube_prometheus_stack = {
-    namespace        = kubernetes_namespace.observability.metadata[0].name
-    chart_version    = "62.0.0"
-    create_namespace = false
+    namespace        = local.observability_ns
+    chart_version    = "62.3.0"
+    create_namespace = true
     values = [templatefile("k8s/kube-prom-stack-values.yml", {
       grafana_password = local.global_password
       grafana_hostname = local.grafana_hostname
@@ -255,7 +249,8 @@ module "eks_blueprints_addons" {
     #Enable Container Insights just for troubleshooting
     #https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/ContainerInsights.html
     enable_containerinsights = false
-    namespace = kubernetes_namespace.observability.metadata[0].name
+    namespace = local.observability_ns
+    create_namespace = true
     values = [templatefile("k8s/aws-for-fluent-bit-values.yml", {
       region             = var.aws_region
       bucketName         = module.cbci_s3_bucket.s3_bucket_id
@@ -282,20 +277,6 @@ module "eks_blueprints_addons" {
       }
     ]
   }
-  #Cert Manager - Requirement for Bottlerocket Update Operator
-  enable_cert_manager = true
-  cert_manager = {
-    wait = true
-  }
-  #Important: Update timing can be customized
-  #Bottlerocket Update Operator
-  enable_bottlerocket_update_operator = true
-  bottlerocket_update_operator = {
-    values = [file("k8s/br-update-operator-values.yml")]
-  }
-  #####################
-  #Additional Helm Releases
-  #####################
   helm_releases = {
     openldap-stack = {
       chart            = "openldap-stack-ha"
@@ -329,8 +310,8 @@ module "eks_blueprints_addons" {
     }
     otel-collector = {
       name             = "otel-collector"
-      namespace        = kubernetes_namespace.observability.metadata[0].name
-      create_namespace = false
+      namespace        = local.observability_ns
+      create_namespace = true
       chart            = "opentelemetry-collector"
       chart_version    = "0.105.1"
       repository       = "https://open-telemetry.github.io/opentelemetry-helm-charts"
@@ -338,8 +319,8 @@ module "eks_blueprints_addons" {
     }
     tempo = {
       name             = "tempo"
-      namespace        = kubernetes_namespace.observability.metadata[0].name
-      create_namespace = false
+      namespace        = local.observability_ns
+      create_namespace = true
       chart            = "tempo"
       chart_version    = "1.7.2"
       repository       = "https://grafana.github.io/helm-charts"
@@ -347,15 +328,14 @@ module "eks_blueprints_addons" {
     }
     loki = {
       name             = "loki"
-      namespace        = kubernetes_namespace.observability.metadata[0].name
-      create_namespace = false
+      namespace        = local.observability_ns
+      create_namespace = true
       chart            = "loki"
       chart_version    = "6.12.0"
       repository       = "https://grafana.github.io/helm-charts"
       values           = [file("k8s/grafana-loki-values.yml")]
     }
   }
-
   tags = local.tags
 }
 
@@ -368,6 +348,7 @@ resource "kubernetes_annotations" "gp2" {
   kind        = "StorageClass"
   # This is true because the resources was already created by the ebs-csi-driver addon
   force = "true"
+  depends_on = [module.eks]
 
   metadata {
     name = "gp2"
@@ -386,6 +367,7 @@ resource "kubernetes_storage_class_v1" "gp3" {
       "storageclass.kubernetes.io/is-default-class" = "true"
     }
   }
+  depends_on = [module.eks]
 
   storage_provisioner    = "ebs.csi.aws.com"
   allow_volume_expansion = true
@@ -405,6 +387,7 @@ resource "kubernetes_storage_class_v1" "efs" {
   metadata {
     name = "efs"
   }
+  depends_on = [module.eks]
 
   storage_provisioner = "efs.csi.aws.com"
   reclaim_policy      = "Delete"
@@ -436,15 +419,3 @@ resource "terraform_data" "create_kubeconfig" {
     command = "aws eks update-kubeconfig --name ${module.eks.cluster_name} --region ${var.aws_region} --kubeconfig ${local.kubeconfig_file_path}"
   }
 }
-
-# resource "terraform_data" "clean_grafana_elb" {
-#   depends_on = [module.eks_blueprints_addons]
-
-#   provisioner "local-exec" {
-#     command = "bash ${local.clean_ns_file_path}"
-#     when    = destroy
-#     environment = {
-#       KUBECONFIG = local.kubeconfig_file_path
-#     }
-#   }
-# }

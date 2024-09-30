@@ -99,6 +99,11 @@ output "cbci_agent_sec_reg" {
   value       = "kubectl get secret ${module.eks_blueprints_addon_cbci.cbci_sec_registry} -n ${local.cbci_agents_ns} -o jsonpath='{.data.*}' | base64 -d"
 }
 
+output "aws_region" {
+  description = "AWS Region."
+  value       = var.aws_region
+}
+
 output "acm_certificate_arn" {
   description = "AWS Certificate Manager (ACM) certificate for Amazon Resource Names (ARN)."
   value       = module.acm.acm_certificate_arn
@@ -114,9 +119,11 @@ output "eks_cluster_arn" {
   value       = module.eks.cluster_arn
 }
 
+#Issue #165
+#not using module.eks.cluster_name because we need to get this value after the cluster is destroyed
 output "eks_cluster_name" {
   description = "Amazon EKS cluster Name."
-  value       = module.eks.cluster_name
+  value       = local.cluster_name
 }
 
 output "s3_cbci_arn" {
@@ -171,17 +178,17 @@ output "velero_restore" {
 
 output "prometheus_dashboard" {
   description = "Provides access to Prometheus dashboards."
-  value       = "kubectl port-forward svc/kube-prometheus-stack-prometheus 50001:9090 -n ${kubernetes_namespace.observability.metadata[0].name}"
+  value       = "kubectl port-forward svc/kube-prometheus-stack-prometheus 50001:9090 -n ${local.observability_ns}"
 }
 
 output "prometheus_active_targets" {
   description = "Checks active Prometheus targets from the operations center."
-  value       = "kubectl exec -n cbci -ti cjoc-0 --container jenkins -- curl -sSf kube-prometheus-stack-prometheus.${kubernetes_namespace.observability.metadata[0].name}.svc.cluster.local:9090/api/v1/targets"
+  value       = "kubectl exec -n cbci -ti cjoc-0 --container jenkins -- curl -sSf kube-prometheus-stack-prometheus.${local.observability_ns}.svc.cluster.local:9090/api/v1/targets"
 }
 
-output "grafana_dashboard" {
-  description = "Provides access to Grafana dashboards."
-  value       = "kubectl port-forward svc/kube-prometheus-stack-grafana 50002:80 -n ${kubernetes_namespace.observability.metadata[0].name}"
+output "grafana_url" {
+  description = "Grafana URL."
+  value       = local.grafana_url
 }
 
 output "global_password" {
