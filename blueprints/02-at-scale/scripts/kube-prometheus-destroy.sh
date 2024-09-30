@@ -49,11 +49,11 @@ for lb_arn in $load_balancers; do
     # Describe tags for the current load balancer
     tags=$(aws elbv2 describe-tags --resource-arns "$lb_arn" --region "$REGION")
     if echo "$tags" | jq -e --arg key1 "$TAG_KEY1" --arg value1 "$OBSERVABABILITY_NS/$TAG_VALUE1" --arg key2 "$TAG_KEY2" --arg value2 "$EKS_CLUSTER_NAME" '
-        .TagDescriptions[].Tags | 
-        any(.[]; .Key == $key1 and .Value == $value1) and 
+        .TagDescriptions[].Tags |
+        any(.[]; .Key == $key1 and .Value == $value1) and
         any(.[]; .Key == $key2 and .Value == $value2)
     ' > /dev/null; then
-        
+
         # Describe the load balancer to get its security groups
         lb_desc=$(aws elbv2 describe-load-balancers --load-balancer-arns "$lb_arn" --region "$REGION")
         security_groups=$(echo "$lb_desc" | jq -r '.LoadBalancers[].SecurityGroups[]')

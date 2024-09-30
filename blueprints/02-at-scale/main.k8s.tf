@@ -1,8 +1,8 @@
 
 locals {
 
-  kubeconfig_file                     = "kubeconfig_${local.name}.yaml"
-  kubeconfig_file_path                = abspath("k8s/${local.kubeconfig_file}")
+  kubeconfig_file      = "kubeconfig_${local.name}.yaml"
+  kubeconfig_file_path = abspath("k8s/${local.kubeconfig_file}")
 
   global_password      = random_string.global_pass_string.result
   global_pass_jsonpath = "'{.data.sec_globalPassword}'"
@@ -60,7 +60,7 @@ resource "time_static" "epoch" {
 module "eks_blueprints_addon_cbci" {
   # source  = "cloudbees/cloudbees-ci-eks-addon/aws"
   # version = ">= 3.18072.0"
-  source = "../../"
+  source     = "../../"
   depends_on = [module.eks_blueprints_addons]
 
   hosted_zone   = var.hosted_zone
@@ -95,7 +95,7 @@ module "eks_blueprints_addon_cbci" {
     email    = var.dh_reg_secret_auth["email"]
   }
 
-  prometheus_target = true
+  prometheus_target    = true
   prometheus_target_ns = local.observability_ns
 
 }
@@ -123,7 +123,7 @@ module "ebs_csi_driver_irsa" {
 module "eks_blueprints_addons" {
   source = "aws-ia/eks-blueprints-addons/aws"
   #vEKSBpAddonsTFMod#
-  version = "1.15.1"
+  version    = "1.15.1"
   depends_on = [module.eks]
 
   cluster_name      = module.eks.cluster_name
@@ -235,7 +235,7 @@ module "eks_blueprints_addons" {
     values = [templatefile("k8s/kube-prom-stack-values.yml", {
       grafana_password = local.global_password
       grafana_hostname = local.grafana_hostname
-      cert_arn         = module.acm.acm_certificate_arn 
+      cert_arn         = module.acm.acm_certificate_arn
     })]
   }
   enable_aws_for_fluentbit = true
@@ -249,8 +249,8 @@ module "eks_blueprints_addons" {
     #Enable Container Insights just for troubleshooting
     #https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/ContainerInsights.html
     enable_containerinsights = false
-    namespace = local.observability_ns
-    create_namespace = true
+    namespace                = local.observability_ns
+    create_namespace         = true
     values = [templatefile("k8s/aws-for-fluent-bit-values.yml", {
       region                  = var.aws_region
       bucketName              = module.cbci_s3_bucket.s3_bucket_id
@@ -266,8 +266,8 @@ module "eks_blueprints_addons" {
     ]
     #Note: This values are duplicated in k8s/aws-for-fluent-bit-values.yml but they are required here to not be overwrite by default values.
     set = [{
-        name  = "cloudWatchLogs.autoCreateGroup"
-        value = true
+      name  = "cloudWatchLogs.autoCreateGroup"
+      value = true
       },
       {
         name  = "hostNetwork"
@@ -349,7 +349,7 @@ resource "kubernetes_annotations" "gp2" {
   api_version = "storage.k8s.io/v1"
   kind        = "StorageClass"
   # This is true because the resources was already created by the ebs-csi-driver addon
-  force = "true"
+  force      = "true"
   depends_on = [module.eks]
 
   metadata {

@@ -57,7 +57,7 @@ config:
   service:
     extensions: [pprof, zpages, health_check]
     pipelines:
-      # Note: Not compatible with CPE 
+      # Note: Not compatible with CPE
       # logs:
       #   receivers:
       #     - otlp/jenkins

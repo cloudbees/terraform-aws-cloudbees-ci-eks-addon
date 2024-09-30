@@ -417,7 +417,7 @@ The recommended approach for build logs is using [CloudBees Pipeline Explorer](h
 Fluent Bit acts as a router for applications logs (including CloudBees CI) and build agents conections.
 
 - Short-term Logs: Logs aggregation systems:
-  
+
   - [Amazon CloudWatch Logs](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/WhatIsCloudWatchLogs.html) group, under `/aws/eks/<CLUSTER_NAME>/aws-fluentbit-logs` and contains log streams for all the Kubernetes services running in the cluster, including CloudBees CI applications and agents. The following image shows an example of team b controller logs.
 
    ```sh
@@ -430,7 +430,7 @@ Fluent Bit acts as a router for applications logs (including CloudBees CI) and b
 > Control plane logs are available in `/aws/eks/CLUSTER_NAME>/cluster` Cloudwatch Log Group.
 
   - [Loki](https://grafana.com/oss/loki/) that is avaible from Grafana under `Explore` section, then select `Loki` as Datasource and you can filter by `com_cloudbees_cje_tenants` to select one CloudBees CI application logs.
-  
+
   ![CloudBees CI Logs from Loki](img/observability/cbci-logs-loki.png)
 
 - Long-term Logs are storage inside Amazon S3 bucket under `fluentbit` path.

@@ -40,7 +40,7 @@ unclassified:
     - grafana:
         grafanaBaseUrl: ${sec_grafana_url}
         tempoDataSourceIdentifier: ${tempoDatasource}
-        #Note: Not compatible with CPE 
+        #Note: Not compatible with CPE
         grafanaLogsBackend: "grafanaLogsBackendBackendWithLogMirroringInJenkins"
   cascItemsConfiguration:
     variableInterpolationEnabledForAdmin: true
