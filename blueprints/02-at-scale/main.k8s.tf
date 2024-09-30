@@ -252,9 +252,11 @@ module "eks_blueprints_addons" {
     namespace = local.observability_ns
     create_namespace = true
     values = [templatefile("k8s/aws-for-fluent-bit-values.yml", {
-      region             = var.aws_region
-      bucketName         = module.cbci_s3_bucket.s3_bucket_id
-      log_retention_days = local.cloudwatch_logs_expiration_days
+      region                  = var.aws_region
+      bucketName              = module.cbci_s3_bucket.s3_bucket_id
+      log_retention_days      = local.cloudwatch_logs_expiration_days
+      cbciAppsTolerationKey   = local.mng["cbci_apps"]["taints"].key
+      cbciAppsTolerationValue = local.mng["cbci_apps"]["taints"].value
     })]
     kubelet_monitoring = true
     chart_version      = "0.1.28"

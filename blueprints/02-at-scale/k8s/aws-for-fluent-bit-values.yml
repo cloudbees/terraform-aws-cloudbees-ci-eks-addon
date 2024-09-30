@@ -5,9 +5,9 @@
 
 tolerations:
 - effect: "NoSchedule"
-  key: "dedicated"
+  key: "${cbciAppsTolerationKey}"
   operator: "Equal"
-  value: "cb-apps"
+  value: "${cbciAppsTolerationValue}"
 - effect: "NoSchedule"
   key: "dedicated"
   operator: "Equal"
