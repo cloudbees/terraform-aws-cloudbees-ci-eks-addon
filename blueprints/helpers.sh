@@ -104,7 +104,6 @@ tf-destroy () {
   if [ "$root" == "${BLUEPRINTS[1]}" ]; then
     eks_cluster_name=$(tf-output "$root" eks_cluster_name)
     aws_region=$(tf-output "$root" aws_region)
-    eval "$(tf-output "$root" kubeconfig_export)"
     bash "$SCRIPTDIR/$root/scripts/kube-prometheus-destroy.sh" "$eks_cluster_name" "$aws_region"
     INFO "kube-prometheus-destroy.sh completed."
   fi
