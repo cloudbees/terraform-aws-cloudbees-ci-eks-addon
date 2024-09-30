@@ -34,8 +34,9 @@ config:
         http:
           endpoint: '${env:MY_POD_IP}:4318'
   exporters:
-    otlphttp/loki:
-      endpoint: 'http://loki.observability.svc.cluster.local:3100/otlp'
+    # Note: Not compatible with CPE
+    # otlphttp/loki:
+    #   endpoint: 'http://loki.observability.svc.cluster.local:3100/otlp'
     otlphttp/tempo:
       endpoint: http://tempo.observability.svc.cluster.local:4318
     prometheus:
@@ -56,14 +57,15 @@ config:
   service:
     extensions: [pprof, zpages, health_check]
     pipelines:
-      logs:
-        receivers:
-          - otlp/jenkins
-        processors:
-          - batch
-        exporters:
-          - otlphttp/loki
-          - debug
+      # Note: Not compatible with CPE 
+      # logs:
+      #   receivers:
+      #     - otlp/jenkins
+      #   processors:
+      #     - batch
+      #   exporters:
+      #     - otlphttp/loki
+      #     - debug
       traces:
         receivers:
           - otlp/jenkins
