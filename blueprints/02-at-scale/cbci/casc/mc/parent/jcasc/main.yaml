@@ -41,7 +41,7 @@ unclassified:
         grafanaBaseUrl: ${sec_grafana_url}
         tempoDataSourceIdentifier: ${tempoDatasource}
         #Note: Not compatible with CPE
-        grafanaLogsBackend: "grafanaLogsBackendBackendWithLogMirroringInJenkins"
+        #grafanaLogsBackend: "grafanaLogsBackendBackendWithLogMirroringInJenkins"
   cascItemsConfiguration:
     variableInterpolationEnabledForAdmin: true
 aws:
