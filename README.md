@@ -4,7 +4,7 @@
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://images.ctfassets.net/vtn4rfaw6n2j/ieyxgJANPjaYhdkOXM7Ky/c65ade5254cca895cc99bb561df2dd91/Symbol-White.svg?fm=webp&q=85" height="120px">
   <source media="(prefers-color-scheme: light)" srcset="https://images.ctfassets.net/vtn4rfaw6n2j/6A6SnrhpUInrzTDmB3eHSU/e0f759f7f0cbb396af21b220c8259b89/Symbol-Black.svg?fm=webp&q=85" height="120px">
-  <img alt="CloudBees CI add-on for Amazon EKS blueprints" src="https://images.ctfassets.net/vtn4rfaw6n2j/6A6SnrhpUInrzTDmB3eHSU/e0f759f7f0cbb396af21b220c8259b89/Symbol-Black.svg?fm=webp&q=85" height="120px"></a>
+  <img alt="CloudBees CI add-on for Amazon EKS blueprints" src="https://images.ctfassets.net/vtn4rfaw6n2j/6A6SnrhpUInrzTDmB3eHSU/e0f759f7f0cbb396af21b220c8259b89/Symbol-Black.svg?fm=webp&q=85" height="120px">
 </picture></a></p>
 
 <p align="center">Deploy CloudBees CI to Amazon Web Services (AWS) Elastic Kubernetes Service (EKS) clusters</p>
