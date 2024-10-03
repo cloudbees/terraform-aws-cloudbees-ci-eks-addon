@@ -147,7 +147,7 @@ resource "helm_release" "cloudbees_ci" {
   description      = try(var.helm_config.description, null)
   chart            = "cloudbees-core"
   #vCBCI_Helm#
-  version                    = try(var.helm_config.version, "3.18306.0+b5ad27c80a6b")
+  version                    = try(var.helm_config.version, "3.19313.0+1afe0458111d")
   repository                 = try(var.helm_config.repository, "https://public-charts.artifacts.cloudbees.com/repository/public/")
   values                     = local.create_secret_casc ? concat(var.helm_config.values, local.oc_secrets_mount, [templatefile("${path.module}/values.yml", local.cbci_template_values)]) : concat(var.helm_config.values, [templatefile("${path.module}/values.yml", local.cbci_template_values)])
   timeout                    = try(var.helm_config.timeout, 1200)
