@@ -215,3 +215,8 @@ output "vault_dashboard" {
   description = "Provides access to Hashicorp Vault dashboard. It requires the root token from the vault_init output."
   value       = "kubectl port-forward svc/vault 50003:8200 -n ${local.vault_ns}"
 }
+
+output "tempo_tags" {
+  description = "List all tags injested in Tempo."
+  value       = "kubectl exec -n cbci -ti cjoc-0 --container jenkins -- curl -sG tempo.${local.observability_ns}.svc.cluster.local:3100/api/search/tags"
+}
