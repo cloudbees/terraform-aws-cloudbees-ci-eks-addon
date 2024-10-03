@@ -99,6 +99,11 @@ output "cbci_agent_sec_reg" {
   value       = "kubectl get secret ${module.eks_blueprints_addon_cbci.cbci_sec_registry} -n ${local.cbci_agents_ns} -o jsonpath='{.data.*}' | base64 -d"
 }
 
+output "aws_region" {
+  description = "AWS Region."
+  value       = var.aws_region
+}
+
 output "acm_certificate_arn" {
   description = "AWS Certificate Manager (ACM) certificate for Amazon Resource Names (ARN)."
   value       = module.acm.acm_certificate_arn
@@ -114,9 +119,11 @@ output "eks_cluster_arn" {
   value       = module.eks.cluster_arn
 }
 
+#Issue #165
+#not using module.eks.cluster_name because we need to get this value after the cluster is destroyed
 output "eks_cluster_name" {
   description = "Amazon EKS cluster Name."
-  value       = module.eks.cluster_name
+  value       = local.cluster_name
 }
 
 output "s3_cbci_arn" {
@@ -169,19 +176,21 @@ output "velero_restore" {
   value       = "kubectl delete all,pvc -n ${module.eks_blueprints_addon_cbci.cbci_namespace} -l ${local.velero_controller_backup_selector}; velero restore create --from-schedule ${local.velero_schedule_name} --restore-volumes=true"
 }
 
+
 output "prometheus_dashboard" {
   description = "Provides access to Prometheus dashboards."
-  value       = "kubectl port-forward svc/kube-prometheus-stack-prometheus 50001:9090 -n kube-prometheus-stack"
+  value       = "kubectl port-forward svc/kube-prometheus-stack-prometheus 50001:9090 -n ${local.observability_ns}"
 }
 
+#https://prometheus.io/docs/prometheus/latest/querying/api/
 output "prometheus_active_targets" {
   description = "Checks active Prometheus targets from the operations center."
-  value       = "kubectl exec -n cbci -ti cjoc-0 --container jenkins -- curl -sSf kube-prometheus-stack-prometheus.kube-prometheus-stack.svc.cluster.local:9090/api/v1/targets"
+  value       = "kubectl exec -n cbci -ti cjoc-0 --container jenkins -- curl -sSf kube-prometheus-stack-prometheus.${local.observability_ns}.svc.cluster.local:9090/api/v1/targets"
 }
 
-output "grafana_dashboard" {
-  description = "Provides access to Grafana dashboards."
-  value       = "kubectl port-forward svc/kube-prometheus-stack-grafana 50002:80 -n kube-prometheus-stack"
+output "grafana_url" {
+  description = "Grafana URL."
+  value       = local.grafana_url
 }
 
 output "global_password" {
@@ -207,4 +216,16 @@ output "vault_configure" {
 output "vault_dashboard" {
   description = "Provides access to Hashicorp Vault dashboard. It requires the root token from the vault_init output."
   value       = "kubectl port-forward svc/vault 50003:8200 -n ${local.vault_ns}"
+}
+
+#https://grafana.com/docs/tempo/latest/api_docs/
+output "tempo_tags" {
+  description = "List all tags injested in Tempo."
+  value       = "kubectl exec -n cbci -ti cjoc-0 --container jenkins -- curl -sG tempo.${local.observability_ns}.svc.cluster.local:3100/api/search/tags"
+}
+
+#https://grafana.com/docs/loki/latest/reference/loki-http-api/
+output "loki_labels" {
+  description = "List all labels injested in Loki."
+  value       = "kubectl exec -n cbci -ti cjoc-0 --container jenkins -- curl -sG loki.${local.observability_ns}.svc.cluster.local:3100/loki/api/v1/labels"
 }

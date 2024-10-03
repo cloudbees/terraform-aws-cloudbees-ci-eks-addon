@@ -100,6 +100,7 @@ The CloudBees CI add-on uses `helms release` for its resources definition, makin
 | create_reg_secret | Create a Kubernetes dockerconfigjson secret for container registry authentication (cbci-sec-reg) for CI builds agents. | `bool` | `false` | no |
 | helm_config | CloudBees CI Helm chart configuration. | `any` | <pre>{<br>  "values": [<br>    ""<br>  ]<br>}</pre> | no |
 | prometheus_target | Creates a service monitor to discover the CloudBees CI Prometheus target dynamically. It is designed to be enabled with the AWS EKS Terraform Addon Kube Prometheus Stack. | `bool` | `false` | no |
+| prometheus_target_ns | Namespace. It is designed to be enabled with the AWS EKS Terraform Addon Kube Prometheus Stack. It is required when prometheus_target is enabled. | `string` | `"observability"` | no |
 | reg_secret_auth | Registry server authentication details for cbci-sec-reg secret. It is required when create_reg_secret is enabled. | `map(string)` | <pre>{<br>  "email": "foo.bar@acme.com",<br>  "password": "changeme1234",<br>  "server": "my-registry.acme:5000",<br>  "username": "foo"<br>}</pre> | no |
 | reg_secret_ns | Agent namespace to allocate cbci-sec-reg secret. It is required when create_reg_secret is enabled. | `string` | `"cbci"` | no |
 

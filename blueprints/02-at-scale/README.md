@@ -13,7 +13,7 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
   | [AWS EFS CSI Driver](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/aws-efs-csi-driver/)| Connects the Amazon Elastic File System (Amazon EFS) drive to the Amazon EKS cluster. |
   | [AWS for Fluent Bit](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/aws-for-fluentbit/)| Acts as an applications log router for log observability in CloudWatch. |
   | [Cluster Autoscaler](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/cluster-autoscaler/) | Watches Amazon EKS managed node groups to accomplish [CloudBees CI auto-scaling nodes on EKS](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/eks-auto-scaling-nodes). |
-  | [Kube Prometheus Stack](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/kube-prometheus-stack/) | Used for metrics observability.|
+  | [Kube Prometheus Stack](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/kube-prometheus-stack/) | Observability backbone.|
   | [Metrics Server](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/metrics-server/) | This is a requirement for CloudBees CI HA/HS controllers for horizontal pod autoscaling.|
   | [Velero](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/velero/)| Backs up and restores Kubernetes resources and volume snapshots. It is only compatible with Amazon Elastic Block Store (Amazon EBS).|
   | [Bottlerocket Update Operator](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/bottlerocket/) | Coordinates Bottlerocket updates on hosts in a cluster. It is configured for CloudBees CI Applications and Agents Node Groups at a specific time according to `scheduler_cron_expression`, when the build workload is minimal (weekend). In a case where the CI service cannot be interrupted at any time by the Update Operator, it could be excluded from planned updates by removing the [bottlerocket.aws/updater-interface-version=2.0.0](https://github.com/bottlerocket-os/bottlerocket-update-operator#label-nodes) label. [Cert-manager](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/cert-manager/) is required for the API server to use a CA certificate when communicating over SSL with the agents. |
@@ -24,8 +24,10 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
   |-------------------------------|-------------|
   | [Helm Openldap](https://github.com/jp-gouin/helm-openldap/tree/master) | LDAP server for Kubernetes. |
   | [AWS Node Termination Handler](https://github.com/aws/aws-node-termination-handler) | Gracefully handles EC2 instance shutdown within Kubernetes. Note that this add-on is not compatible with managed instance groups. For more information, refer to [issue #23](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/issues/23). |
-  | [Grafana Tempo](https://grafana.com/oss/tempo/) | Provides backend tracing for [Jenkins OpenTelemetry](https://plugins.jenkins.io/opentelemetry/). |
   | [Hashicorp Vault](https://github.com/hashicorp/vault-helm) | Secrets management system that is integrated via [CloudBees HashiCorp Vault Plugin](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-secure-guide/hashicorp-vault-plugin). |
+  | [OTEL collector](https://grafana.com/oss/tempo/) | The collector for [Jenkins OpenTelemetry](https://plugins.jenkins.io/opentelemetry/) observability data. |
+  | [Jagger](https://www.jaegertracing.io/) | Provides tracing backend for [Jenkins OpenTelemetry](https://plugins.jenkins.io/opentelemetry/). |
+  | [Grafana Loki](https://grafana.com/oss/loki/) | Provides logs backend for [Jenkins OpenTelemetry](https://plugins.jenkins.io/opentelemetry/). |
 
 - Cloudbees CI uses [Configuration as Code (CasC)](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/casc-intro) (refer to the [casc](cbci/casc) folder) to enable [exciting new features for streamlined DevOps](https://www.cloudbees.com/blog/cloudbees-ci-exciting-new-features-for-streamlined-devops) and other enterprise features, such as [CloudBees CI hibernation](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#hibernation-managed-controllers).
   - The operations center is using the [CasC Bundle Retriever](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/bundle-retrieval-scm).
@@ -79,6 +81,7 @@ This blueprint divides scalable node groups for different types of workloads:
 | acm_certificate_arn | AWS Certificate Manager (ACM) certificate for Amazon Resource Names (ARN). |
 | aws_backup_efs_protected_resource | AWS description for the Amazon EFS drive that is used to back up protected resources. |
 | aws_logstreams_fluentbit | AWS CloudWatch log streams from Fluent Bit. |
+| aws_region | AWS Region. |
 | cbci_agent_linuxtempl_events | Retrieves a list of events related to Linux template agents. |
 | cbci_agent_sec_reg | Retrieves the container registry secret deployed in the agents namespace. |
 | cbci_agent_windowstempl_events | Retrieves a list of events related to Windows template agents. |
@@ -102,14 +105,16 @@ This blueprint divides scalable node groups for different types of workloads:
 | eks_cluster_arn | Amazon EKS cluster ARN. |
 | eks_cluster_name | Amazon EKS cluster Name. |
 | global_password | Random string that is used as the global password. |
-| grafana_dashboard | Provides access to Grafana dashboards. |
+| grafana_url | Grafana URL. |
 | kubeconfig_add | Add kubeconfig to the local configuration to access the Kubernetes API. |
 | kubeconfig_export | Export the KUBECONFIG environment variable to access the Kubernetes API. |
+| loki_labels | List all labels injested in Loki. |
 | prometheus_active_targets | Checks active Prometheus targets from the operations center. |
 | prometheus_dashboard | Provides access to Prometheus dashboards. |
 | s3_cbci_arn | CloudBees CI Amazon S3 bucket ARN. |
 | s3_cbci_name | CloudBees CI Amazon S3 bucket name. It is required by CloudBees CI for workspace caching and artifact management. |
 | s3_list_objects | Recursively lists all objects stored in the Amazon S3 bucket. |
+| tempo_tags | List all tags injested in Tempo. |
 | vault_configure | Configure Vault with initial secrets and creates approle for integration with CloudBees CI (role-id and secret-id). It requires unseal keys and the root token from the vault_init output. |
 | vault_dashboard | Provides access to Hashicorp Vault dashboard. It requires the root token from the vault_init output. |
 | vault_init | Inicialization of Vault Service. |
@@ -356,12 +361,14 @@ Issue the following command to restore the controller from the last backup:
 
 ### Observability
 
-#### Metrics and Tracing
+> [!IMPORTANT]
+> Regarding the Observability Stack described in the following sections is relevant to point that CloudBees Prometheus Plugin is a Tier 1 plugin where as OpenTelemetry is Tier 3 (See [CloudBees plugin support policies](https://docs.cloudbees.com/docs/cloudbees-common/latest/plugin-support-policies)).
 
-Grafana is used to visualize and query:
+#### Metrics
 
-- [Jenkins Metrics](https://plugins.jenkins.io/metrics/) that are stored in Prometheus.
-- [Jenkins Tracing via OpenTelemetry](https://plugins.jenkins.io/opentelemetry/) that stored into Grafana Tempo.
+Prometheus is used to store Metrics from [Jenkins Metrics](https://plugins.jenkins.io/metrics/) and [Jenkins OpenTelemetry plugin](https://github.com/jenkinsci/opentelemetry-plugin/blob/main/docs/monitoring-metrics.md).
+
+Grafana imports Prometheus as datasource and provides metrics dashboards for CloudBees CI.
 
 1. Issue the following command to verify that the CloudBees CI targets are connected to Prometheus:
 
@@ -369,7 +376,7 @@ Grafana is used to visualize and query:
    eval $(terraform output --raw prometheus_active_targets) | jq '.data.activeTargets[] | select(.labels.container=="jenkins") | {job: .labels.job, instance: .labels.instance, status: .health}'
    ```
 
-2. Issue the following command to access Kube Prometheus Stack dashboards from your web browser and verify that [Jenkins metrics](https://plugins.jenkins.io/metrics/) are available.
+2. Issue the following command to access Kube Prometheus Stack dashboards from your web browser and verify that that Targets are collecting metrics correctly.
 
    ```sh
    eval $(terraform output --raw prometheus_dashboard)
@@ -377,47 +384,65 @@ Grafana is used to visualize and query:
 
    If successful, the Prometheus web service is available at `http://localhost:50001` and you can view the configured alerts for CloudBees CI. Additionally, check _Status_ > _Targets_ shows targets in `UP` status.
 
-3. Issue the following command to access Grafana dashboards at `localhost:50002`. For the username, use `admin` and set the password using the `global_password` terraform variable:
+3. Issue the following command to access Grafana URL. For the username, use `admin` and set the password using the `global_password` terraform variable:
 
    ```sh
-   eval $(terraform output --raw grafana_dashboard)
+   eval $(terraform output --raw grafana_url)
    ```
 
-   If successful, the Grafana web service is available `http://localhost:50002`.
+  Explore Metrics Dashboards in **Home > Dashboards > CloudBees CI**. Then, select the controller pod to view the metrics. The following image shows metrics for team-b.
 
-   - For Jenkins Metrics Dashboards navigate to **Home > Dashboards > CloudBees CI**. Then, select the controller pod to view the metrics. The following image shows metrics for team-b.
+   ![CloudBees CI Metrics Dashboard](img/observability/cbci-metrics-dashboard.png)
 
-   ![CloudBees CI Dashboard](img/observability/cbci-dashboard.png)
+##### Tracing
 
-   - For Tracing Data, navigate to **Home > Explore > Select Tempo > Select `Query Type: Search`**. Then, select the `service name: jenkins` and the desired `Span Name` to `Run Query`. The following image shows an example of the ws-cache pipeline build.
+Tempo is used as Tracing/APM backend for Jenkins Tracing data via OpenTelemetry plugin: [HTTP](https://github.com/jenkinsci/opentelemetry-plugin/blob/main/docs/http-requests-traces.md) and [Jobs](https://github.com/jenkinsci/opentelemetry-plugin/blob/main/docs/job-traces.md).
 
-   ![CloudBees CI Tracing Example](img/observability/cbci-tracing-example.png)
+Grafana imports Tempo as datasource and provides tracing dashboards per CI/CD pipeline Trace ID.
 
-> [!NOTE]
-> Grafana Ingress can be enabled as explained in Issue [#165](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/issues/165), but currently is incompatible with `terrafrom destroy`.
+At CloudBees CI, Opentelemetry plugin is configured to use Grafana as visualizacion backend. Then it offers a link `View pipeline with Grafana` for every pipeline run which redirects to Grafana Explorer using Tempo as datasource and passing Trace ID.
 
-#### Logs
+![CloudBees CI Tracing Tempo](img/observability/cbci-tracing-tempo.png)
 
-For application logs, Fluent Bit acts as a router.
+Additionally other System traces can be visualized in Grafana Explorer too.
 
-- Short-term application logs live in the [Amazon CloudWatch Logs](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/WhatIsCloudWatchLogs.html) group, under `/aws/eks/<CLUSTER_NAME>/aws-fluentbit-logs` and contains log streams for all the Kubernetes services running in the cluster, including CloudBees CI applications and agents. The following image shows an example of team b controller logs.
+##### Logs
+
+###### Build Logs
+
+The recommended approach for build logs is using [CloudBees Pipeline Explorer](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-pipeline-explorer-plugin) (CPE).
+
+> [!IMPORTANT]
+> Although, [pipeline build logs can be sent to external storage via OpenTelemetry plugin](https://github.com/jenkinsci/opentelemetry-plugin/blob/main/docs/build-logs.md) there is a known limitation the it makes incompatible with CloudBees Pipeline Explorer (CPE).
+
+###### Containers logs
+
+Fluent Bit acts as a router for container logs.
+
+- Short-term Logs: Logs aggregation systems:
+
+  - [Amazon CloudWatch Logs](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/WhatIsCloudWatchLogs.html) group, under `/aws/eks/<CLUSTER_NAME>/aws-fluentbit-logs` and contains log streams for all the Kubernetes services running in the cluster, including CloudBees CI applications and agents. The following image shows an example of team b controller logs.
 
    ```sh
    eval $(terraform output --raw aws_logstreams_fluentbit) | jq '.[] '
    ```
 
-   ![CloudBees CI Logs Example](img/observability/cbci-fluenbit-example.png)
+   ![CloudBees CI Logs from Cloudwatch](img/observability/cbci-logs-cloudwatch.png)
 
-- Long-term application logs live in an Amazon S3 bucket.
+> [!NOTE]
+> Control plane logs are available in `/aws/eks/CLUSTER_NAME>/cluster` Cloudwatch Log Group.
 
-For CloudBees CI build logs:
+  - [Loki](https://grafana.com/oss/loki/) that is avaible from Grafana under `Explore` section, then select `Loki` as Datasource and you can filter by `com_cloudbees_cje_tenants` to select one CloudBees CI application logs.
 
-- Short-term build logs live in the CloudBees CI controller and are managed using the [Build Discarder](https://plugins.jenkins.io/build-discarder/) Jenkins plugin, which is installed and configured using CasC.
-- Long-term logs can be handled (like any other artifact that is sent to an Amazon S3 bucket) using the [Artifact Manager on Amazon S3](https://plugins.jenkins.io/artifact-manager-s3/) Jenkins plugin, which is installed and configured by CasC.
+  ![CloudBees CI Logs from Loki](img/observability/cbci-logs-loki.png)
+
+- Long-term Logs are storage inside Amazon S3 bucket under `fluentbit` path.
 
 ## Destroy
 
 To tear down and remove the resources created in the blueprint, refer to [Amazon EKS Blueprints for Terraform - Destroy](https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#destroy).
+
+To avoid [#165](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/issues/165) run  `kube-prometheus-destroy.sh` after destroying the EKS cluster.
 
 > [!TIP]
 > The `destroy` phase can be orchestrated via the companion [Makefile](../../Makefile).
