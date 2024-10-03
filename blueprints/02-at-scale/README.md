@@ -68,9 +68,9 @@ This blueprint divides scalable node groups for different types of workloads:
 |------|-------------|------|---------|:--------:|
 | hosted_zone | Amazon Route 53 hosted zone. CloudBees CI applications are configured to use subdomains in this hosted zone. | `string` | n/a | yes |
 | trial_license | CloudBees CI trial license details for evaluation. | `map(string)` | n/a | yes |
-| aws_region | AWS region to deploy resources to. It requires at minimum 3 AZs. | `string` | `"us-west-2"` | no |
+| aws_region | AWS region to deploy resources to. It requires a minimum of three availability zones. | `string` | `"us-west-2"` | no |
 | ci | Running in a CI service versus running locally. False when running locally, true when running in a CI service. | `bool` | `false` | no |
-| dh_reg_secret_auth | Docker Hub Registry server authentication details for cbci-sec-reg secret. | `map(string)` | <pre>{<br>  "email": "foo.bar@acme.com",<br>  "password": "changeme1234",<br>  "username": "foo"<br>}</pre> | no |
+| dh_reg_secret_auth | Docker Hub registry server authentication details for cbci-sec-reg secret. | `map(string)` | <pre>{<br>  "email": "foo.bar@acme.com",<br>  "password": "changeme1234",<br>  "username": "foo"<br>}</pre> | no |
 | suffix | Unique suffix to assign to all resources. When adding the suffix, changes are required in CloudBees CI for the validation phase. | `string` | `""` | no |
 | tags | Tags to apply to resources. | `map(string)` | `{}` | no |
 
@@ -106,19 +106,19 @@ This blueprint divides scalable node groups for different types of workloads:
 | eks_cluster_name | Amazon EKS cluster Name. |
 | global_password | Random string that is used as the global password. |
 | grafana_url | Grafana URL. |
-| kubeconfig_add | Add kubeconfig to the local configuration to access the Kubernetes API. |
-| kubeconfig_export | Export the KUBECONFIG environment variable to access the Kubernetes API. |
-| loki_labels | List all labels injested in Loki. |
-| prometheus_active_targets | Checks active Prometheus targets from the operations center. |
+| kubeconfig_add | Adds kubeconfig to the local configuration to access the Kubernetes API. |
+| kubeconfig_export | Exports the KUBECONFIG environment variable to access the Kubernetes API. |
+| loki_labels | Lists all labels ingested in Loki. |
+| prometheus_active_targets | Checks active Prometheus targets from the CloudBees operations center. |
 | prometheus_dashboard | Provides access to Prometheus dashboards. |
 | s3_cbci_arn | CloudBees CI Amazon S3 bucket ARN. |
 | s3_cbci_name | CloudBees CI Amazon S3 bucket name. It is required by CloudBees CI for workspace caching and artifact management. |
 | s3_list_objects | Recursively lists all objects stored in the Amazon S3 bucket. |
-| tempo_tags | List all tags injested in Tempo. |
-| vault_configure | Configure Vault with initial secrets and creates approle for integration with CloudBees CI (role-id and secret-id). It requires unseal keys and the root token from the vault_init output. |
+| tempo_tags | Lists all tags ingested in Tempo. |
+| vault_configure | Configures the vault with initial secrets and creates the application role for integration with CloudBees CI (role-id and secret-id). It requires unseal keys and the root token from the vault_init output. |
 | vault_dashboard | Provides access to Hashicorp Vault dashboard. It requires the root token from the vault_init output. |
-| vault_init | Initialization of Vault Service. |
-| vault_init_log_file | Vault Initialization log file. |
+| vault_init | Initialization of the vault service. |
+| vault_init_log_file | Vault initialization log file. |
 | velero_backup_on_demand | Takes an on-demand Velero backup from the schedule for the selected controller that is using block storage. |
 | velero_backup_schedule | Creates a Velero backup schedule for the selected controller that is using block storage, and then deletes the existing schedule, if it exists. |
 | velero_restore | Restores the selected controller that is using block storage from a backup. |
