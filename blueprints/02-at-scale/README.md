@@ -415,9 +415,9 @@ The recommended approach for build logs is using [CloudBees Pipeline Explorer](h
 > [!IMPORTANT]
 > Although, [pipeline build logs can be sent to external storage via OpenTelemetry plugin](https://github.com/jenkinsci/opentelemetry-plugin/blob/main/docs/build-logs.md) there is a known limitation the it makes incompatible with CloudBees Pipeline Explorer (CPE).
 
-###### System logs
+###### Containers logs
 
-Fluent Bit acts as a router for applications logs (including CloudBees CI) and build agents conections.
+Fluent Bit acts as a router for container logs.
 
 - Short-term Logs: Logs aggregation systems:
 
