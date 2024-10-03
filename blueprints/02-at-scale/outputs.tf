@@ -176,11 +176,13 @@ output "velero_restore" {
   value       = "kubectl delete all,pvc -n ${module.eks_blueprints_addon_cbci.cbci_namespace} -l ${local.velero_controller_backup_selector}; velero restore create --from-schedule ${local.velero_schedule_name} --restore-volumes=true"
 }
 
+
 output "prometheus_dashboard" {
   description = "Provides access to Prometheus dashboards."
   value       = "kubectl port-forward svc/kube-prometheus-stack-prometheus 50001:9090 -n ${local.observability_ns}"
 }
 
+#https://prometheus.io/docs/prometheus/latest/querying/api/
 output "prometheus_active_targets" {
   description = "Checks active Prometheus targets from the operations center."
   value       = "kubectl exec -n cbci -ti cjoc-0 --container jenkins -- curl -sSf kube-prometheus-stack-prometheus.${local.observability_ns}.svc.cluster.local:9090/api/v1/targets"
@@ -216,7 +218,14 @@ output "vault_dashboard" {
   value       = "kubectl port-forward svc/vault 50003:8200 -n ${local.vault_ns}"
 }
 
+#https://grafana.com/docs/tempo/latest/api_docs/
 output "tempo_tags" {
   description = "List all tags injested in Tempo."
   value       = "kubectl exec -n cbci -ti cjoc-0 --container jenkins -- curl -sG tempo.${local.observability_ns}.svc.cluster.local:3100/api/search/tags"
+}
+
+#https://grafana.com/docs/loki/latest/reference/loki-http-api/
+output "loki_labels" {
+  description = "List all labels injested in Loki."
+  value       = "kubectl exec -n cbci -ti cjoc-0 --container jenkins -- curl -sG loki.${local.observability_ns}.svc.cluster.local:3100/loki/api/v1/labels"
 }

@@ -178,8 +178,10 @@ probes () {
       INFO "CloudBees CI Targets are loaded in Prometheus."
     until eval "$(tf-output "$root" aws_logstreams_fluentbit)" | jq '.[] '; do sleep $wait && echo "Waiting for CloudBees CI Log streams in CloudWatch..."; done ;\
       INFO "CloudBees CI Log Streams are already in Cloud Watch."
-    until [ "$(eval "$(tf-output "$root" tempo_tags)" | grep -c 'jenkins.pipeline')" -ge 1 ]; do sleep $wait && echo "Waiting for Tempo to inject jenkins.pipeline tags from Open Telemetry plugin"; done ;\
+    until [ "$(eval "$(tf-output "$root" tempo_tags)" | grep -c 'jenkins.pipeline')" -ge 1 ]; do sleep $wait && echo "Waiting for Tempo to inject jenkins.pipeline* tags from Open Telemetry plugin"; done ;\
       eval "$(tf-output "$root" tempo_tags)" | jq .tagNames && INFO "Tempo has injested tags from Open Telemetry plugin."
+    until [ "$(eval "$(tf-output "$root" loki_labels)" | grep -c 'com_cloudbees')" -ge 1 ]; do sleep $wait && echo "Waiting for Loki to inject com_cloudbees* labels from FluentBit"; done ;\
+      eval "$(tf-output "$root" loki_label)" && INFO "Loki has injested labels from FluentBit."
   fi
 }
 
