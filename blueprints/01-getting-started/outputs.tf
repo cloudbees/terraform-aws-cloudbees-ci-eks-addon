@@ -1,10 +1,10 @@
 output "kubeconfig_export" {
-  description = "Export the KUBECONFIG environment variable to access the Kubernetes API."
+  description = "Exports the KUBECONFIG environment variable to access the Kubernetes API."
   value       = "export KUBECONFIG=${local.kubeconfig_file_path}"
 }
 
 output "kubeconfig_add" {
-  description = "Add kubeconfig to your local configuration to access the Kubernetes API."
+  description = "Adds kubeconfig to your local configuration to access the Kubernetes API."
   value       = "aws eks update-kubeconfig --region ${var.aws_region} --name ${local.cluster_name}"
 }
 

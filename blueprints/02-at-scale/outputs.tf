@@ -1,10 +1,10 @@
 output "kubeconfig_export" {
-  description = "Export the KUBECONFIG environment variable to access the Kubernetes API."
+  description = "Exports the KUBECONFIG environment variable to access the Kubernetes API."
   value       = "export KUBECONFIG=${local.kubeconfig_file_path}"
 }
 
 output "kubeconfig_add" {
-  description = "Add kubeconfig to the local configuration to access the Kubernetes API."
+  description = "Adds kubeconfig to the local configuration to access the Kubernetes API."
   value       = "aws eks update-kubeconfig --region ${var.aws_region} --name ${local.cluster_name}"
 }
 
@@ -184,7 +184,7 @@ output "prometheus_dashboard" {
 
 #https://prometheus.io/docs/prometheus/latest/querying/api/
 output "prometheus_active_targets" {
-  description = "Checks active Prometheus targets from the operations center."
+  description = "Checks active Prometheus targets from the CloudBees operations center."
   value       = "kubectl exec -n cbci -ti cjoc-0 --container jenkins -- curl -sSf kube-prometheus-stack-prometheus.${local.observability_ns}.svc.cluster.local:9090/api/v1/targets"
 }
 
@@ -199,17 +199,17 @@ output "global_password" {
 }
 
 output "vault_init" {
-  description = "Inicialization of Vault Service."
+  description = "Initialization of the vault service."
   value       = "kubectl exec -it vault-0 -n ${local.vault_ns} -- vault operator init | tee ${local.vault_init_file_path} || echo \"Vault initialization failed.\""
 }
 
 output "vault_init_log_file" {
-  description = "Vault Inicialization log file."
+  description = "Vault initialization log file."
   value       = local.vault_init_file_path
 }
 
 output "vault_configure" {
-  description = "Configure Vault with initial secrets and creates approle for integration with CloudBees CI (role-id and secret-id). It requires unseal keys and the root token from the vault_init output."
+  description = "Configures the vault with initial secrets and creates the application role for integration with CloudBees CI (role-id and secret-id). It requires unseal keys and the root token from the vault_init output."
   value       = "bash ${local.vault_config_file_path} ${local.vault_ns}"
 }
 
@@ -220,12 +220,12 @@ output "vault_dashboard" {
 
 #https://grafana.com/docs/tempo/latest/api_docs/
 output "tempo_tags" {
-  description = "List all tags injested in Tempo."
+  description = "Lists all tags ingested in Tempo."
   value       = "kubectl exec -n cbci -ti cjoc-0 --container jenkins -- curl -sG tempo.${local.observability_ns}.svc.cluster.local:3100/api/search/tags"
 }
 
 #https://grafana.com/docs/loki/latest/reference/loki-http-api/
 output "loki_labels" {
-  description = "List all labels injested in Loki."
+  description = "Lists all labels ingested in Loki."
   value       = "kubectl exec -n cbci -ti cjoc-0 --container jenkins -- curl -sG loki.${local.observability_ns}.svc.cluster.local:3100/loki/api/v1/labels"
 }

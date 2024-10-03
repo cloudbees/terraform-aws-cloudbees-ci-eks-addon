@@ -4,7 +4,7 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
 
 - An [Amazon Elastic File System (Amazon EFS) drive](https://aws.amazon.com/efs/) that is required by CloudBees CI High Availability/Horizontal Scalability (HA/HS) controllers and is optional for non-HA/HS controllers.
 - An [Amazon Simple Storage Service (Amazon S3) bucket](https://aws.amazon.com/s3/) to store assets from applications like CloudBees CI, Velero, and Fluent Bit.
-- [Amazon Elastic Kubernetes Service (Amazon EKS) managed node groups](https://docs.aws.amazon.com/eks/latest/userguide/managed-node-groups.html) for different workloads: shared services, CI applications, CI Linux on-demand agents, CI Linux spot agents, and CI Microsoft Windows on-demand agents.
+- [Amazon Elastic Kubernetes Service (Amazon EKS) managed node groups](https://docs.aws.amazon.com/eks/latest/userguide/managed-node-groups.html) for different workloads: shared services, CI applications, CI Linux on-demand agents, CI Linux Spot agents, and CI Microsoft Windows on-demand agents.
 - [Amazon CloudWatch Logs](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/WhatIsCloudWatchLogs.html) to explode control plane logs and Fluent Bit logs.
 - The following [Amazon EKS blueprints add-ons](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/):
 
@@ -16,7 +16,7 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
   | [Kube Prometheus Stack](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/kube-prometheus-stack/) | Observability backbone.|
   | [Metrics Server](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/metrics-server/) | This is a requirement for CloudBees CI HA/HS controllers for horizontal pod autoscaling.|
   | [Velero](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/velero/)| Backs up and restores Kubernetes resources and volume snapshots. It is only compatible with Amazon Elastic Block Store (Amazon EBS).|
-  | [Bottlerocket Update Operator](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/bottlerocket/) | Coordinates Bottlerocket updates on hosts in a cluster. It is configured for CloudBees CI Applications and Agents Node Groups at a specific time according to `scheduler_cron_expression`, when the build workload is minimal (weekend). In a case where the CI service cannot be interrupted at any time by the Update Operator, it could be excluded from planned updates by removing the [bottlerocket.aws/updater-interface-version=2.0.0](https://github.com/bottlerocket-os/bottlerocket-update-operator#label-nodes) label. [Cert-manager](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/cert-manager/) is required for the API server to use a CA certificate when communicating over SSL with the agents. |
+  | [Bottlerocket Update Operator](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/bottlerocket/) | Coordinates Bottlerocket updates on hosts in a cluster. It is configured for CloudBees CI Applications and Agents Node Groups at a specific time according to `scheduler_cron_expression`, when the build workload is minimal (for example, on the weekend). In a case where the CI service cannot be interrupted at any time by the Update Operator, it could be excluded from planned updates by removing the [bottlerocket.aws/updater-interface-version=2.0.0](https://github.com/bottlerocket-os/bottlerocket-update-operator#label-nodes) label. [Cert-manager](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/cert-manager/) is required for the API server to use a CA certificate when communicating over SSL with the agents. |
 
 - [Amazon EKS blueprints Helm Release Add-on](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/helm-release/) is used to install the following applications:
 
@@ -30,7 +30,7 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
   | [Grafana Loki](https://grafana.com/oss/loki/) | Provides logs backend for [Jenkins OpenTelemetry](https://plugins.jenkins.io/opentelemetry/). |
 
 - Cloudbees CI uses [Configuration as Code (CasC)](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/casc-intro) (refer to the [casc](cbci/casc) folder) to enable [exciting new features for streamlined DevOps](https://www.cloudbees.com/blog/cloudbees-ci-exciting-new-features-for-streamlined-devops) and other enterprise features, such as [CloudBees CI hibernation](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#hibernation-managed-controllers).
-  - The operations center is using the [CasC Bundle Retriever](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/bundle-retrieval-scm).
+  - The CloudBees operations center is using the [CasC Bundle Retriever](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/bundle-retrieval-scm).
   - Managed controller configurations are managed from the operations center using [source control management (SCM)](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-controller/add-bundle#_adding_casc_bundles_from_an_scm_tool).
   - The managed controllers are using [CasC bundle inheritance](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-controller/advanced#_configuring_bundle_inheritance_with_casc) (refer to the [parent](cbci/casc/mc/parent) folder). This "parent" bundle is inherited by two types of "child" controller bundles: `ha` and `none-ha`, to accommodate [considerations about HA controllers](https://docs.cloudbees.com/docs/cloudbees-ci/latest/ha/ha-considerations).
 
@@ -51,7 +51,7 @@ This blueprint divides scalable node groups for different types of workloads:
     - Windows (role: `build-windows`): Windows 2019 AMI type.
 
 > [!IMPORTANT]
-> The launch time for Linux containers is faster than Windows containers. This can be improved by using a cache container image strategy. Refer to [Speeding up Windows container launch times with EC2 Image builder and image cache strategy](https://aws.amazon.com/blogs/containers/speeding-up-windows-container-launch-times-with-ec2-image-builder-and-image-cache-strategy/) and more about [Windows Container Best Practices](https://aws.github.io/aws-eks-best-practices/windows/docs/ami/)). Another potential alternative is to use Windows VMs with a [shared agent](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/shared-agents).
+> The launch time for Linux containers is faster than Windows containers. This can be improved by using a cache container image strategy. Refer to [Speeding up Windows container launch times with EC2 Image builder and image cache strategy](https://aws.amazon.com/blogs/containers/speeding-up-windows-container-launch-times-with-ec2-image-builder-and-image-cache-strategy/) and more about [Windows Container Best Practices](https://aws.github.io/aws-eks-best-practices/windows/docs/ami/). Another potential alternative is to use Windows VMs with a [shared agent](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/shared-agents).
 
 ![Architecture](img/at-scale.architect.drawio.svg)
 
@@ -59,7 +59,7 @@ This blueprint divides scalable node groups for different types of workloads:
 
 ![K8sApps](img/at-scale.k8s.drawio.svg)
 
-## Terraform Docs
+## Terraform documentation
 
 <!-- BEGIN_TF_DOCS -->
 ### Inputs
@@ -68,9 +68,9 @@ This blueprint divides scalable node groups for different types of workloads:
 |------|-------------|------|---------|:--------:|
 | hosted_zone | Amazon Route 53 hosted zone. CloudBees CI applications are configured to use subdomains in this hosted zone. | `string` | n/a | yes |
 | trial_license | CloudBees CI trial license details for evaluation. | `map(string)` | n/a | yes |
-| aws_region | AWS region to deploy resources to. It requires at minimun 3 AZs. | `string` | `"us-west-2"` | no |
+| aws_region | AWS region to deploy resources to. It requires a minimum of three availability zones. | `string` | `"us-west-2"` | no |
 | ci | Running in a CI service versus running locally. False when running locally, true when running in a CI service. | `bool` | `false` | no |
-| dh_reg_secret_auth | Docker Hub Registry server authentication details for cbci-sec-reg secret. | `map(string)` | <pre>{<br>  "email": "foo.bar@acme.com",<br>  "password": "changeme1234",<br>  "username": "foo"<br>}</pre> | no |
+| dh_reg_secret_auth | Docker Hub registry server authentication details for cbci-sec-reg secret. | `map(string)` | <pre>{<br>  "email": "foo.bar@acme.com",<br>  "password": "changeme1234",<br>  "username": "foo"<br>}</pre> | no |
 | suffix | Unique suffix to assign to all resources. When adding the suffix, changes are required in CloudBees CI for the validation phase. | `string` | `""` | no |
 | tags | Tags to apply to resources. | `map(string)` | `{}` | no |
 
@@ -106,19 +106,19 @@ This blueprint divides scalable node groups for different types of workloads:
 | eks_cluster_name | Amazon EKS cluster Name. |
 | global_password | Random string that is used as the global password. |
 | grafana_url | Grafana URL. |
-| kubeconfig_add | Add kubeconfig to the local configuration to access the Kubernetes API. |
-| kubeconfig_export | Export the KUBECONFIG environment variable to access the Kubernetes API. |
-| loki_labels | List all labels injested in Loki. |
-| prometheus_active_targets | Checks active Prometheus targets from the operations center. |
+| kubeconfig_add | Adds kubeconfig to the local configuration to access the Kubernetes API. |
+| kubeconfig_export | Exports the KUBECONFIG environment variable to access the Kubernetes API. |
+| loki_labels | Lists all labels ingested in Loki. |
+| prometheus_active_targets | Checks active Prometheus targets from the CloudBees operations center. |
 | prometheus_dashboard | Provides access to Prometheus dashboards. |
 | s3_cbci_arn | CloudBees CI Amazon S3 bucket ARN. |
 | s3_cbci_name | CloudBees CI Amazon S3 bucket name. It is required by CloudBees CI for workspace caching and artifact management. |
 | s3_list_objects | Recursively lists all objects stored in the Amazon S3 bucket. |
-| tempo_tags | List all tags injested in Tempo. |
-| vault_configure | Configure Vault with initial secrets and creates approle for integration with CloudBees CI (role-id and secret-id). It requires unseal keys and the root token from the vault_init output. |
+| tempo_tags | Lists all tags ingested in Tempo. |
+| vault_configure | Configures the vault with initial secrets and creates the application role for integration with CloudBees CI (role-id and secret-id). It requires unseal keys and the root token from the vault_init output. |
 | vault_dashboard | Provides access to Hashicorp Vault dashboard. It requires the root token from the vault_init output. |
-| vault_init | Inicialization of Vault Service. |
-| vault_init_log_file | Vault Inicialization log file. |
+| vault_init | Initialization of the vault service. |
+| vault_init_log_file | Vault initialization log file. |
 | velero_backup_on_demand | Takes an on-demand Velero backup from the schedule for the selected controller that is using block storage. |
 | velero_backup_schedule | Creates a Velero backup schedule for the selected controller that is using block storage, and then deletes the existing schedule, if it exists. |
 | velero_restore | Restores the selected controller that is using block storage from a backup. |
@@ -157,12 +157,11 @@ Once the resources have been created, a `kubeconfig` file is created in the [/k8
    eval $(terraform output --raw kubeconfig_export)
    ```
 
-   If the command is successful, no output is returned.
+If the command is successful, no output is returned.
 
 ### CloudBees CI
 
 1. Complete the steps to [validate CloudBees CI](../01-getting-started/README.md#cloudbees-ci), if you have not done so already.
-
 2. Authentication in this blueprint is based on LDAP using the `cn` user (available in [k8s/openldap-stack-values.yml](./k8s/openldap-stack-values.yml)) and the global password. The authorization level defines a set of permissions configured using [RBAC](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-secure-guide/rbac). Additionally, the operations center and controller use [single sign-on (SS0)](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-secure-guide/using-sso), including a [fallback mechanism](https://docs.cloudbees.com/docs/cloudbees-ci-kb/latest/operations-center/how-ldap-plugin-works-on-cjoc-sso-context) that is enabled by default. Issue the following command to retrieve the global password (valid for all users):
 
    ```sh
@@ -189,11 +188,11 @@ Once the resources have been created, a `kubeconfig` file is created in the [/k8
 
 ##### Kubernetes secret
 
-This blueprint Kubernetes secrets for different purposes.
+This blueprint uses Kubernetes secrets for different purposes.
 
 > [!NOTE]
-> - Beyond the CloudBees CI add-on (used for demo purposes), Kubernetes secrets can be managed via [External Secret Operators](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/external-secrets/).
-> - Kubernetes secrets could be also be retrived as Jenkins Credentials via using the [Kubernetes Credentials Provider plugin](https://jenkinsci.github.io/kubernetes-credentials-provider-plugin/).
+> - Beyond the CloudBees CI add-on that is used for demo purposes, Kubernetes secrets can be managed via [External Secret Operators](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/external-secrets/).
+> - Kubernetes secrets can be also be retrieved as Jenkins credentials using the [Kubernetes Credentials Provider plugin](https://jenkinsci.github.io/kubernetes-credentials-provider-plugin/).
 
 ###### CasC secrets
 
@@ -208,7 +207,7 @@ DockerHub authentication is stored as Kubernetes secrets (`cbci-agent-sec-reg`) 
 ```
 
 > [!NOTE]
-> ECR authentication is done via instance profile connected to `build-linux-spot` Node pools.
+> Amazon Elastic Container Registry (Amazon ECR) authentication is done via instance profile connected to `build-linux-spot` Node pools.
 
 ##### HashiCorp Vault
 
@@ -297,7 +296,7 @@ HashiCorp Vault is used as a credential provider for CloudBees CI Pipelines in t
 
 ##### Container Registry
 
-This blueprints use a couple of container registries for different purposes.
+This blueprint use a couple of container registries for different purposes.
 
 - The public registry uses DockerHub.
 - The private registry uses AWS ECR.
@@ -305,10 +304,12 @@ This blueprints use a couple of container registries for different purposes.
 > [!NOTE]
 > Other Container Registry services can be used for the same purposes.
 
-Sign in to the CloudBees CI to `team-b` or `team-c-ha` controllers with admin access. Run the **admin > validations > kaniko** Pipeline and enter (using parameters) an existing DockerHub organization and an existing AWS ECR Repository to test that building and pushing to all repositories works as expected.
+1. In the CloudBees CI UI, sign in to `team-b` or `team-c-ha` controllers with admin access. 
+2. Navigate to the **admin > validations > kaniko** Pipeline.
+3. Using parameters, enter an existing DockerHub organization and an existing Amazon ECR repository to test that building and pushing to all repositories works as expected.
 
 > [!NOTE]
-> Besides Kaniko, there are [other alternitives tools](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/using-kaniko#_alternatives).
+> Besides Kaniko, there are [other alternative tools](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/using-kaniko#_alternatives).
 
 #### Back up and restore
 
@@ -317,8 +318,8 @@ For backup and restore operations, you can use the [preconfigured CloudBees CI C
 [Velero](#create-a-velero-backup-schedule) is an alternative for services only for controllers using Amazon EBS. Velero commands and configuration in this blueprint follow [Using Velero back up and restore Kubernetes cluster resources](https://docs.cloudbees.com/docs/cloudbees-ci/latest/backup-restore/velero-dr).
 
 > [!NOTE]
-> - An installation that has been completely converted to CasC may not need traditional backups; a restore operation could consist simply of running a CasC bootstrap script. This is only an option for a customer who has translated every significant system setting and job configuration to CasC. Even then it may be desirable to perform a filesystem-level restore from backup in order to preserve transient data such as build history.
-> - There is no alternative for services using Amazon EFS storage. Although [AWS Backup](https://aws.amazon.com/backup/) includes this Amazon EFS drive as a protected resource, there is not currently a best practice to dynamically restore Amazon EFS PVCs. For more information, refer to [Issue 39](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/issues/39).
+> - An installation that has been completely converted to CasC may not need traditional backups; a restore operation could consist simply of running a CasC bootstrap script. This is only an option if you have translated every significant system setting and job configuration to CasC. Even then it may be desirable to perform a filesystem-level restore from backup in order to preserve transient data, such as build history.
+> - There is no alternative for services using Amazon EFS storage. Although [AWS Backup](https://aws.amazon.com/backup/) includes the Amazon EFS drive as a protected resource, there is not currently a best practice to dynamically restore Amazon EFS PVCs. For more information, refer to [Issue 39](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/issues/39).
 
 ##### Create daily backups using a CloudBees CI Cluster Operations job
 
@@ -366,9 +367,9 @@ Issue the following command to restore the controller from the last backup:
 
 #### Metrics
 
-Prometheus is used to store Metrics from [Jenkins Metrics](https://plugins.jenkins.io/metrics/) and [Jenkins OpenTelemetry plugin](https://github.com/jenkinsci/opentelemetry-plugin/blob/main/docs/monitoring-metrics.md).
+Prometheus is used to store Metrics from [Jenkins Metrics](https://plugins.jenkins.io/metrics/) and the [Jenkins OpenTelemetry plugin](https://github.com/jenkinsci/opentelemetry-plugin/blob/main/docs/monitoring-metrics.md).
 
-Grafana imports Prometheus as datasource and provides metrics dashboards for CloudBees CI.
+Grafana imports Prometheus as a datasource and provides metrics dashboards for CloudBees CI.
 
 1. Issue the following command to verify that the CloudBees CI targets are connected to Prometheus:
 
@@ -382,7 +383,7 @@ Grafana imports Prometheus as datasource and provides metrics dashboards for Clo
    eval $(terraform output --raw prometheus_dashboard)
    ```  
 
-   If successful, the Prometheus web service is available at `http://localhost:50001` and you can view the configured alerts for CloudBees CI. Additionally, check _Status_ > _Targets_ shows targets in `UP` status.
+   If successful, the Prometheus web service is available at `http://localhost:50001` and you can view the configured alerts for CloudBees CI. Additionally, you can select **Status > Targets** to show targets with an `UP` status.
 
 3. Issue the following command to access Grafana URL. For the username, use `admin` and set the password using the `global_password` terraform variable:
 
@@ -396,11 +397,11 @@ Grafana imports Prometheus as datasource and provides metrics dashboards for Clo
 
 ##### Tracing
 
-Tempo is used as Tracing/APM backend for Jenkins Tracing data via OpenTelemetry plugin: [HTTP](https://github.com/jenkinsci/opentelemetry-plugin/blob/main/docs/http-requests-traces.md) and [Jobs](https://github.com/jenkinsci/opentelemetry-plugin/blob/main/docs/job-traces.md).
+Tempo is used as Tracing/APM backend for Jenkins tracing data via OpenTelemetry plugin: [HTTP](https://github.com/jenkinsci/opentelemetry-plugin/blob/main/docs/http-requests-traces.md) and [Jobs](https://github.com/jenkinsci/opentelemetry-plugin/blob/main/docs/job-traces.md).
 
-Grafana imports Tempo as datasource and provides tracing dashboards per CI/CD pipeline Trace ID.
+Grafana imports Tempo as a datasource and provides tracing dashboards per a CI/CD pipeline Trace ID.
 
-At CloudBees CI, Opentelemetry plugin is configured to use Grafana as visualizacion backend. Then it offers a link `View pipeline with Grafana` for every pipeline run which redirects to Grafana Explorer using Tempo as datasource and passing Trace ID.
+In CloudBees CI, the OpenTelemetry plugin is configured to use Grafana as visualization backend. Then it offers a **View pipeline with Grafana** link for every pipeline run, which redirects to Grafana Explorer using Tempo as datasource and passing Trace ID.
 
 ![CloudBees CI Tracing Tempo](img/observability/cbci-tracing-tempo.png)
 

@@ -1,8 +1,14 @@
 # CloudBees CI add-on for Amazon EKS blueprints
 
 <p align="center">
-  <a href="https://www.cloudbees.com/capabilities/continuous-integration"><img alt="CloudBees CI add-on for Amazon EKS blueprints" src="https://images.ctfassets.net/vtn4rfaw6n2j/7FKeUjwsXI1d2JPUIvSMZJ/be286872ace9ca3b6b66a64adbb3c16a/cb-tag-sm.svg"/></a>
-  <p align="center">Deploy CloudBees CI to Amazon Web Services (AWS) Elastic Kubernetes Service (EKS) clusters</p>
+  <a href="https://www.cloudbees.com/capabilities/continuous-integration">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://images.ctfassets.net/vtn4rfaw6n2j/ieyxgJANPjaYhdkOXM7Ky/c65ade5254cca895cc99bb561df2dd91/Symbol-White.svg?fm=webp&q=85" height="120px">
+  <source media="(prefers-color-scheme: light)" srcset="https://images.ctfassets.net/vtn4rfaw6n2j/6A6SnrhpUInrzTDmB3eHSU/e0f759f7f0cbb396af21b220c8259b89/Symbol-Black.svg?fm=webp&q=85" height="120px">
+  <img alt="CloudBees CI add-on for Amazon EKS blueprints" src="https://images.ctfassets.net/vtn4rfaw6n2j/6A6SnrhpUInrzTDmB3eHSU/e0f759f7f0cbb396af21b220c8259b89/Symbol-Black.svg?fm=webp&q=85" height="120px">
+</picture></a></p>
+
+<p align="center">Deploy CloudBees CI to Amazon Web Services (AWS) Elastic Kubernetes Service (EKS) clusters</p>
 
 ---
 
@@ -116,7 +122,7 @@ The CloudBees CI add-on uses `helms release` for its resources definition, makin
 | cbci_oc_pod | Operations center pod for the CloudBees CI add-on. |
 | cbci_oc_url | Operations center URL for the CloudBees CI add-on using a subdomain and certificates. |
 | cbci_sec_casc | Optional. Kubernetes secrets name for CloudBees CI Casc. |
-| cbci_sec_registry | Optional. Kubernetes secrets name for CloudBees CI agents to autheticate to registry. |
+| cbci_sec_registry | Optional. Kubernetes secrets name for CloudBees CI agents to authenticate to registry. |
 | merged_helm_config | (merged) Helm configuration for CloudBees CI. |
 <!-- END_TF_DOCS -->
 
