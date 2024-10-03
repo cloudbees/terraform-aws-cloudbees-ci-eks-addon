@@ -360,7 +360,8 @@ Issue the following command to restore the controller from the last backup:
 
 ### Observability
 
-Regarding the Observability Stack described in the following sections is relevant to point that CloudBees Prometheus Plugin is a Tier 1 plugin where as OpenTelemetry is Tier 3 (See [CloudBees plugin support policies](https://docs.cloudbees.com/docs/cloudbees-common/latest/plugin-support-policies)).
+> [!IMPORTANT]
+> Regarding the Observability Stack described in the following sections is relevant to point that CloudBees Prometheus Plugin is a Tier 1 plugin where as OpenTelemetry is Tier 3 (See [CloudBees plugin support policies](https://docs.cloudbees.com/docs/cloudbees-common/latest/plugin-support-policies)).
 
 #### Metrics
 
