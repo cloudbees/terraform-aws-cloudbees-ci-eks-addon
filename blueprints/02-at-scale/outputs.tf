@@ -184,7 +184,7 @@ output "prometheus_dashboard" {
 
 #https://prometheus.io/docs/prometheus/latest/querying/api/
 output "prometheus_active_targets" {
-  description = "Checks active Prometheus targets from the operations center."
+  description = "Checks active Prometheus targets from the CloudBees operations center."
   value       = "kubectl exec -n cbci -ti cjoc-0 --container jenkins -- curl -sSf kube-prometheus-stack-prometheus.${local.observability_ns}.svc.cluster.local:9090/api/v1/targets"
 }
 
@@ -199,12 +199,12 @@ output "global_password" {
 }
 
 output "vault_init" {
-  description = "Initialization of Vault Service."
+  description = "Initialization of the vault service."
   value       = "kubectl exec -it vault-0 -n ${local.vault_ns} -- vault operator init | tee ${local.vault_init_file_path} || echo \"Vault initialization failed.\""
 }
 
 output "vault_init_log_file" {
-  description = "Vault Initialization log file."
+  description = "Vault initialization log file."
   value       = local.vault_init_file_path
 }
 
@@ -220,12 +220,12 @@ output "vault_dashboard" {
 
 #https://grafana.com/docs/tempo/latest/api_docs/
 output "tempo_tags" {
-  description = "List all tags injested in Tempo."
+  description = "Lists all tags ingested in Tempo."
   value       = "kubectl exec -n cbci -ti cjoc-0 --container jenkins -- curl -sG tempo.${local.observability_ns}.svc.cluster.local:3100/api/search/tags"
 }
 
 #https://grafana.com/docs/loki/latest/reference/loki-http-api/
 output "loki_labels" {
-  description = "List all labels injested in Loki."
+  description = "Lists all labels ingested in Loki."
   value       = "kubectl exec -n cbci -ti cjoc-0 --container jenkins -- curl -sG loki.${local.observability_ns}.svc.cluster.local:3100/loki/api/v1/labels"
 }
