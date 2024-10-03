@@ -113,6 +113,7 @@ This blueprint divides scalable node groups for different types of workloads:
 | s3_cbci_arn | CloudBees CI Amazon S3 bucket ARN. |
 | s3_cbci_name | CloudBees CI Amazon S3 bucket name. It is required by CloudBees CI for workspace caching and artifact management. |
 | s3_list_objects | Recursively lists all objects stored in the Amazon S3 bucket. |
+| tempo_tags | List all tags injested in Tempo. |
 | vault_configure | Configure Vault with initial secrets and creates approle for integration with CloudBees CI (role-id and secret-id). It requires unseal keys and the root token from the vault_init output. |
 | vault_dashboard | Provides access to Hashicorp Vault dashboard. It requires the root token from the vault_init output. |
 | vault_init | Inicialization of Vault Service. |
