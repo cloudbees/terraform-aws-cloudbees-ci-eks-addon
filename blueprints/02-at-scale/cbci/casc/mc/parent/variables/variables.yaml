@@ -3,3 +3,4 @@ variables:
   - s3bucketPreffix: "cbci"
   - regSecretsName: "cbci-sec-reg"
   - tempoDatasource: "tempoDatasource"
+
