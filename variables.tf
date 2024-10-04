@@ -47,7 +47,7 @@ variable "trial_license" {
   }
   validation {
     condition     = length(var.trial_license) == 4
-    error_message = "The map must contain 4 keys."
+    error_message = "The map must contain four keys."
   }
 }
 
@@ -74,7 +74,7 @@ variable "create_reg_secret" {
 }
 
 variable "reg_secret_ns" {
-  description = "Agent namespace to allocate cbci-sec-reg secret. It is required when create_reg_secret is enabled."
+  description = "Agent namespace to allocate the cbci-sec-reg secret. It is required when create_reg_secret is enabled."
   default     = "cbci"
   type        = string
   validation {
@@ -98,7 +98,7 @@ variable "reg_secret_auth" {
   }
   validation {
     condition     = length(var.reg_secret_auth) == 4
-    error_message = "The reg_secret_auth must contain 4 keys."
+    error_message = "The reg_secret_auth must contain four keys."
   }
 }
 
@@ -109,7 +109,7 @@ variable "prometheus_target" {
 }
 
 variable "prometheus_target_ns" {
-  description = "Namespace. It is designed to be enabled with the AWS EKS Terraform Addon Kube Prometheus Stack. It is required when prometheus_target is enabled."
+  description = "Prometheus target namespace, designed to be enabled with the AWS EKS Terraform Addon Kube Prometheus Stack. It is required when prometheus_target is enabled."
   default     = "observability"
   type        = string
   validation {

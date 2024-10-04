@@ -100,7 +100,7 @@ output "cbci_agent_sec_reg" {
 }
 
 output "aws_region" {
-  description = "AWS Region."
+  description = "AWS region."
   value       = var.aws_region
 }
 
@@ -122,7 +122,7 @@ output "eks_cluster_arn" {
 #Issue #165
 #not using module.eks.cluster_name because we need to get this value after the cluster is destroyed
 output "eks_cluster_name" {
-  description = "Amazon EKS cluster Name."
+  description = "Amazon EKS cluster name."
   value       = local.cluster_name
 }
 
