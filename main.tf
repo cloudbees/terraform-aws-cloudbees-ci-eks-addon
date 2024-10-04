@@ -27,7 +27,7 @@ locals {
     hosted_zone  = var.hosted_zone
     cert_arn     = var.cert_arn
     LicFirstName = var.trial_license["first_name"]
-    LicLastName  = "${var.trial_license["last_name"]}, EKS_TF_ADDON"
+    LicLastName  = "${var.trial_license["last_name"]} [EKS_TF_ADDON]"
     LicEmail     = var.trial_license["email"]
     LicCompany   = var.trial_license["company"]
   }
