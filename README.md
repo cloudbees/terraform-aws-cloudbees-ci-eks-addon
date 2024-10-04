@@ -87,6 +87,9 @@ The two main components of CloudBees CI - the operations center and managed cont
 This module runs with a [trial license for CloudBees CI](https://docs.cloudbees.com/docs/cloudbees-ci-migration/latest/trial-guide/).
 Once the trial has expired, refer to [CloudBees CI license expiration FAQ](https://docs.cloudbees.com/docs/general-kb/latest/faqs/jenkins-enterprise-license-expiration-faq) to determine your next steps.
 
+> [!NOTE]
+> This addon appends the string `[EKS_TF_ADDON]` to the Trial License last name for telemetry purposes.
+
 ## Compatibility
 
 The CloudBees CI add-on uses `helms release` for its resources definition, making it compatible with [AWS EKS Blueprint v4](https://github.com/aws-ia/terraform-aws-eks-blueprints/tree/v4.32.1) and [AWS EKS Blueprint v5](https://github.com/aws-ia/terraform-aws-eks-blueprints/tree/v5.0.0). For more information, refer to [Amazon EKS Blueprints for Terraform: v4 to v5 migration](https://aws-ia.github.io/terraform-aws-eks-blueprints/v4-to-v5/motivation/).
