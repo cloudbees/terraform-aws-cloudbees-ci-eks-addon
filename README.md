@@ -109,9 +109,9 @@ The CloudBees CI add-on uses `helms release` for its resources definition, makin
 | create_reg_secret | Create a Kubernetes dockerconfigjson secret for container registry authentication (cbci-sec-reg) for CI builds agents. | `bool` | `false` | no |
 | helm_config | CloudBees CI Helm chart configuration. | `any` | <pre>{<br>  "values": [<br>    ""<br>  ]<br>}</pre> | no |
 | prometheus_target | Creates a service monitor to discover the CloudBees CI Prometheus target dynamically. It is designed to be enabled with the AWS EKS Terraform Addon Kube Prometheus Stack. | `bool` | `false` | no |
-| prometheus_target_ns | Namespace. It is designed to be enabled with the AWS EKS Terraform Addon Kube Prometheus Stack. It is required when prometheus_target is enabled. | `string` | `"observability"` | no |
+| prometheus_target_ns | Prometheus target namespace, designed to be enabled with the AWS EKS Terraform Addon Kube Prometheus Stack. It is required when prometheus_target is enabled. | `string` | `"observability"` | no |
 | reg_secret_auth | Registry server authentication details for cbci-sec-reg secret. It is required when create_reg_secret is enabled. | `map(string)` | <pre>{<br>  "email": "foo.bar@acme.com",<br>  "password": "changeme1234",<br>  "server": "my-registry.acme:5000",<br>  "username": "foo"<br>}</pre> | no |
-| reg_secret_ns | Agent namespace to allocate cbci-sec-reg secret. It is required when create_reg_secret is enabled. | `string` | `"cbci"` | no |
+| reg_secret_ns | Agent namespace to allocate the cbci-sec-reg secret. It is required when create_reg_secret is enabled. | `string` | `"cbci"` | no |
 
 ### Outputs
 
@@ -125,7 +125,7 @@ The CloudBees CI add-on uses `helms release` for its resources definition, makin
 | cbci_oc_pod | Operations center pod for the CloudBees CI add-on. |
 | cbci_oc_url | Operations center URL for the CloudBees CI add-on using a subdomain and certificates. |
 | cbci_sec_casc | Optional. Kubernetes secrets name for CloudBees CI Casc. |
-| cbci_sec_registry | Optional. Kubernetes secrets name for CloudBees CI agents to authenticate to registry. |
+| cbci_sec_registry | Optional. Kubernetes secrets name for CloudBees CI agents to authenticate the registry. |
 | merged_helm_config | (merged) Helm configuration for CloudBees CI. |
 <!-- END_TF_DOCS -->
 
