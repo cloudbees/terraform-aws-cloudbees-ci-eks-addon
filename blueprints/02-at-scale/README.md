@@ -18,7 +18,7 @@ Once you have familiarized yourself with [CloudBees CI blueprint add-on: Get sta
   | [Velero](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/velero/)| Backs up and restores Kubernetes resources and volume snapshots. It is only compatible with Amazon Elastic Block Store (Amazon EBS).|
   | [Bottlerocket Update Operator](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/bottlerocket/) | Coordinates Bottlerocket updates on hosts in a cluster. It is configured for CloudBees CI Applications and Agents Node Groups at a specific time according to `scheduler_cron_expression`, when the build workload is minimal (for example, on the weekend). In a case where the CI service cannot be interrupted at any time by the Update Operator, it could be excluded from planned updates by removing the [bottlerocket.aws/updater-interface-version=2.0.0](https://github.com/bottlerocket-os/bottlerocket-update-operator#label-nodes) label. [Cert-manager](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/addons/cert-manager/) is required for the API server to use a CA certificate when communicating over SSL with the agents. |
 
-- [Amazon EKS blueprints Helm Release Add-on](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/helm-release/) is used to install the following applications:
+- [Amazon EKS blueprints Helm Release add-on](https://aws-ia.github.io/terraform-aws-eks-blueprints-addons/main/helm-release/) is used to install the following applications:
 
   | Helm Chart | Description |
   |-------------------------------|-------------|
@@ -425,8 +425,8 @@ Fluent Bit acts as a router for container logs.
      eval $(terraform output --raw aws_logstreams_fluentbit) | jq '.[] '
      ```
     The following image shows an example of `team b` controller logs:
-   ![CloudBees CI logs from Cloudwatch](img/observability/cbci-logs-cloudwatch.png)
-  - Cloudwatch log group: Stores control plane logs in `/aws/eks/CLUSTER_NAME>/cluster`.
+   ![CloudBees CI logs from CloudWatch](img/observability/cbci-logs-cloudwatch.png)
+  - CloudWatch log group: Stores control plane logs in `/aws/eks/CLUSTER_NAME>/cluster`.
 
   - [Loki](https://grafana.com/oss/loki/):  In Grafana, navigate to the **Explore** section, select **Loki** as the datasource, filter by `com_cloudbees_cje_tenants`, and then select a CloudBees CI application log.
 
