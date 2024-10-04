@@ -62,8 +62,8 @@ This blueprint presents the minimum setup to run CloudBees CI on Amazon EKS; one
 When preparing to deploy, you must complete the following steps:
 
 1. Customize your Terraform values by copying `.auto.tfvars.example` to `.auto.tfvars`.
-2. Initialize the root module and any associated configuration for providers.
-3. Create the resources and deploy CloudBees CI to an EKS cluster. Refer to [Amazon EKS Blueprints for Terraform - Deploy](https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#deploy).
+1. Initialize the root module and any associated configuration for providers.
+1. Create the resources and deploy CloudBees CI to an EKS cluster. Refer to [Amazon EKS Blueprints for Terraform - Deploy](https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#deploy).
 
 For more information, refer to [The Core Terraform Workflow](https://www.terraform.io/intro/core-workflow) documentation.
 
@@ -94,13 +94,13 @@ Once you can access the Kubernetes API from your terminal, complete the followin
     eval $(terraform output --raw cbci_oc_pod)
     ```
 
-2. Issue the following command to verify that the Ingress is ready and has assigned a valid `ADDRESS`:
+1. Issue the following command to verify that the Ingress is ready and has assigned a valid `ADDRESS`:
 
     ```sh
     eval $(terraform output --raw cbci_oc_ing)
     ```
 
-3. Issue the following command to verify that the operations center service is running from inside the Kubernetes cluster:
+1. Issue the following command to verify that the operations center service is running from inside the Kubernetes cluster:
 
     ```sh
     eval $(terraform output --raw cbci_liveness_probe_int)
@@ -108,7 +108,7 @@ Once you can access the Kubernetes API from your terminal, complete the followin
 
     If the command is successful, no output is returned.
 
-4. Issue the following command to verify that the operations center service is running from outside the Kubernetes cluster:
+1. Issue the following command to verify that the operations center service is running from outside the Kubernetes cluster:
 
     ```sh
     eval $(terraform output --raw cbci_liveness_probe_ext)
@@ -116,15 +116,15 @@ Once you can access the Kubernetes API from your terminal, complete the followin
 
     If the command is successful, no output is returned.
 
-5. DNS propagation may take several minutes. Once propagation is complete, issue the following command, copy the output, and then paste it into a web browser.
+1. DNS propagation may take several minutes. Once propagation is complete, issue the following command, copy the output, and then paste it into a web browser.
 
     ```sh
     terraform output cbci_oc_url
     ```
 
-6. Paste the output of the previous command into your browser to access the CloudBees CI setup wizard to complete the CloudBees CI operations center installation.
+1. Paste the output of the previous command into your browser to access the CloudBees CI setup wizard to complete the CloudBees CI operations center installation.
 
-7. Issue the following command to retrieve the first administrative user password (required):
+1. Issue the following command to retrieve the first administrative user password (required):
 
     ```sh
     eval $(terraform output --raw cbci_initial_admin_password)

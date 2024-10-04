@@ -137,8 +137,8 @@ This blueprint uses [DockerHub](https://hub.docker.com/) as a container registry
 When preparing to deploy, you must complete the following steps:
 
 1. Customize your Terraform values by copying `.auto.tfvars.example` to `.auto.tfvars`.
-2. Initialize the root module and any associated configuration for providers.
-3. Create the resources and deploy CloudBees CI to an EKS cluster. Refer to [Amazon EKS Blueprints for Terraform - Deploy](https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#deploy).
+1. Initialize the root module and any associated configuration for providers.
+1. Create the resources and deploy CloudBees CI to an EKS cluster. Refer to [Amazon EKS Blueprints for Terraform - Deploy](https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#deploy).
 
 For more information, refer to [The Core Terraform Workflow](https://www.terraform.io/intro/core-workflow) documentation.
 
@@ -162,7 +162,7 @@ If the command is successful, no output is returned.
 ### CloudBees CI
 
 1. Complete the steps to [validate CloudBees CI](../01-getting-started/README.md#cloudbees-ci), if you have not done so already.
-2. Authentication in this blueprint is based on LDAP using the `cn` user (available in [k8s/openldap-stack-values.yml](./k8s/openldap-stack-values.yml)) and the global password. The authorization level defines a set of permissions configured using [RBAC](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-secure-guide/rbac). Additionally, the operations center and controller use [single sign-on (SS0)](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-secure-guide/using-sso), including a [fallback mechanism](https://docs.cloudbees.com/docs/cloudbees-ci-kb/latest/operations-center/how-ldap-plugin-works-on-cjoc-sso-context) that is enabled by default. Issue the following command to retrieve the global password (valid for all users):
+1. Authentication in this blueprint is based on LDAP using the `cn` user (available in [k8s/openldap-stack-values.yml](./k8s/openldap-stack-values.yml)) and the global password. The authorization level defines a set of permissions configured using [RBAC](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-secure-guide/rbac). Additionally, the operations center and controller use [single sign-on (SS0)](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-secure-guide/using-sso), including a [fallback mechanism](https://docs.cloudbees.com/docs/cloudbees-ci-kb/latest/operations-center/how-ldap-plugin-works-on-cjoc-sso-context) that is enabled by default. Issue the following command to retrieve the global password (valid for all users):
 
    ```sh
    eval $(terraform output --raw global_password)
@@ -170,7 +170,7 @@ If the command is successful, no output is returned.
 
    There are differences in CloudBees CI permissions and folder restrictions when signed in as a user of the Admin group versus the Development group. For example, only Admin users have access to the agent validation jobs.
 
-3. CasC is enabled for the [operations center](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/) (`cjoc`) and [controllers](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-controller/) (`team-b` and `team-c-ha`). `team-a` is not using CasC, to illustrate the difference between the two approaches. Issue the following command to verify that all controllers are running:
+1. CasC is enabled for the [operations center](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-oc/) (`cjoc`) and [controllers](https://docs.cloudbees.com/docs/cloudbees-ci/latest/casc-controller/) (`team-b` and `team-c-ha`). `team-a` is not using CasC, to illustrate the difference between the two approaches. Issue the following command to verify that all controllers are running:
 
    ```sh
    eval $(terraform output --raw cbci_controllers_pods)
@@ -178,7 +178,7 @@ If the command is successful, no output is returned.
 
    If successful, it should indicate that 2 replicas are running for `team-c-ha` since [CloudBees CI HA/HS](https://docs.cloudbees.com/docs/cloudbees-ci/latest/ha-install-guide/) is enabled on this controller.
 
-4. Issue the following command to verify that horizontal pod autoscaling is enabled for `team-c-ha`:
+1. Issue the following command to verify that horizontal pod autoscaling is enabled for `team-c-ha`:
 
    ```sh
    eval $(terraform output --raw cbci_controller_c_hpa)
@@ -207,7 +207,7 @@ DockerHub authentication is stored as Kubernetes secrets (`cbci-agent-sec-reg`) 
 ```
 
 > [!NOTE]
-> Amazon Elastic Container Registry (Amazon ECR) authentication is done via instance profile connected to `build-linux-spot` Node pools.
+> Amazon Elastic Container Registry (Amazon ECR) authentication is done via an instance profile connected to `build-linux-spot` node pools.
 
 ##### HashiCorp Vault
 
@@ -219,13 +219,13 @@ HashiCorp Vault is used as a credential provider for CloudBees CI Pipelines in t
    eval $(terraform output --raw vault_init)
    ```
 
-2. Run the configure Hashicorp Vault script. It configures Vault with initial secrets and creates `approle` for integration with CloudBees CI (role-id and secret-id)
+1. Run the configure Hashicorp Vault script. It configures Vault with initial secrets and creates `approle` for integration with CloudBees CI (role-id and secret-id)
 
    ```sh
    eval $(terraform output --raw vault_configure)
    ```
 
-3. Access the HashiCorp Vault UI by issuing the following command. Enter the root token to log in from the _step 1_.
+1. Access the HashiCorp Vault UI by issuing the following command. Enter the root token to log in from the _step 1_.
 
    ```sh
    eval $(terraform output --raw vault_dashboard)
@@ -233,13 +233,13 @@ HashiCorp Vault is used as a credential provider for CloudBees CI Pipelines in t
 
    If successful, the Vault web service should be available at `http://localhost:50003` and you can view the secrets that were created in _step 2_.
 
-4. Sign in to the CloudBees CI operations center as a user with the admin role.
+1. Sign in to the CloudBees CI operations center as a user with the admin role.
 
-5. Navigate to **Manage Jenkins > Credentials Providers > HashiCorp Vault Credentials Provider** and complete the configuration for the CloudBees CI Vault Plugin by entering the role ID and secret ID for the `cbci-oc` application role from _step 1_.
+1. Navigate to **Manage Jenkins > Credentials Providers > HashiCorp Vault Credentials Provider** and complete the configuration for the CloudBees CI Vault Plugin by entering the role ID and secret ID for the `cbci-oc` application role from _step 1_.
 
-6. Select **Test Connection** to verify the inputs are correct.
+1. Select **Test Connection** to verify the inputs are correct.
 
-7. Move to `team-b` or `team-c-ha` to run the Pipeline (**admin > validations > vault-credentials**) and validate that credentials are fetched correctly from the Hashicorp Vault.
+1. Move to `team-b` or `team-c-ha` to run the Pipeline (**admin > validations > vault-credentials**) and validate that credentials are fetched correctly from the Hashicorp Vault.
 
 > [!NOTE]
 > Hashicorp Vault can be also be configured to be used for [Configuration as Code - Handling Secrets - Vault](https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/docs/features/secrets.adoc#hashicorp-vault-secret-source).
@@ -262,7 +262,7 @@ HashiCorp Vault is used as a credential provider for CloudBees CI Pipelines in t
    eval $(terraform output --raw cbci_liveness_probe_ext)
    ```
 
-2. Once you have retrieved the API token, issue the following commands to trigger builds using the [POST queue for hibernation API endpoint](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#_post_queue_for_hibernation). If successful, an `HTTP/2 201` response is returned, indicating the REST API call has been correctly received by the CloudBees CI controller.
+1. Once you have retrieved the API token, issue the following commands to trigger builds using the [POST queue for hibernation API endpoint](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/managing-controllers#_post_queue_for_hibernation). If successful, an `HTTP/2 201` response is returned, indicating the REST API call has been correctly received by the CloudBees CI controller.
 
    - For Linux node pools use:
 
@@ -286,17 +286,17 @@ HashiCorp Vault is used as a credential provider for CloudBees CI Pipelines in t
 
       Note that the first build for a new Windows image container can take up to 10 minutes to run; subsequent builds should take seconds to run. This behavior can be improved, as explained in the section [Architecture](#architecture).
 
-3. Right after triggering the builds, issue the following to validate pod agent provisioning to build the Pipeline code:
+1. Right after triggering the builds, issue the following to validate pod agent provisioning to build the Pipeline code:
 
    ```sh
    eval $(terraform output --raw cbci_agents_pods)
    ```
 
-4. Check build logs by signing in to the `team-b` and `team-c-ha` controllers, respectively. Navigate to the Pipeline jobs and select the first build, indicated by the `#1` build number. [CloudBees Pipeline Explorer](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-pipeline-explorer-plugin) is enabled by default.
+1. Check build logs by signing in to the `team-b` and `team-c-ha` controllers, respectively. Navigate to the Pipeline jobs and select the first build, indicated by the `#1` build number. [CloudBees Pipeline Explorer](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-pipeline-explorer-plugin) is enabled by default.
 
 ##### Container Registry
 
-This blueprint use a couple of container registries for different purposes.
+This blueprint use a couple of container registries for different purposes:
 
 - The public registry uses DockerHub.
 - The private registry uses AWS ECR.
@@ -304,9 +304,9 @@ This blueprint use a couple of container registries for different purposes.
 > [!NOTE]
 > Other Container Registry services can be used for the same purposes.
 
-1. In the CloudBees CI UI, sign in to `team-b` or `team-c-ha` controllers with admin access.
-2. Navigate to the **admin > validations > kaniko** Pipeline.
-3. Using parameters, enter an existing DockerHub organization and an existing Amazon ECR repository to test that building and pushing to all repositories works as expected.
+1. In the CloudBees CI UI, sign in to the `team-b` or `team-c-ha` controllers with admin access.
+1. Navigate to the **admin > validations > kaniko** Pipeline.
+1. Using parameters, enter an existing DockerHub organization and an existing Amazon ECR repository to test that building and pushing to all repositories works as expected.
 
 > [!NOTE]
 > Besides Kaniko, there are [other alternative tools](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/using-kaniko#_alternatives).
@@ -318,7 +318,7 @@ For backup and restore operations, you can use the [preconfigured CloudBees CI C
 [Velero](#create-a-velero-backup-schedule) is an alternative for services only for controllers using Amazon EBS. Velero commands and configuration in this blueprint follow [Using Velero back up and restore Kubernetes cluster resources](https://docs.cloudbees.com/docs/cloudbees-ci/latest/backup-restore/velero-dr).
 
 > [!NOTE]
-> - An installation that has been completely converted to CasC may not need traditional backups; a restore operation could consist simply of running a CasC bootstrap script. This is only an option if you have translated every significant system setting and job configuration to CasC. Even then it may be desirable to perform a filesystem-level restore from backup in order to preserve transient data, such as build history.
+> - An installation that has been completely converted to CasC may not need traditional backups; a restore operation could consist simply of running a CasC bootstrap script. This is only an option if you have translated every significant system setting and job configuration to CasC. Even then, it may be desirable to perform a filesystem-level restore from backup to preserve transient data, such as build history.
 > - There is no alternative for services using Amazon EFS storage. Although [AWS Backup](https://aws.amazon.com/backup/) includes the Amazon EFS drive as a protected resource, there is not currently a best practice to dynamically restore Amazon EFS PVCs. For more information, refer to [Issue 39](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/issues/39).
 
 ##### Create daily backups using a CloudBees CI Cluster Operations job
@@ -328,8 +328,8 @@ The [CloudBees Backup plugin](https://docs.cloudbees.com/docs/cloudbees-ci/lates
 To view the **backup-all-controllers** job:
 
 1. Sign in to the CloudBees CI operations center UI as a user with **Administer** privileges. Note that access to back up jobs is restricted to admin users via RBAC.
-2. From the operations center dashboard, select **All** to view all folders on the operations center.
-3. Navigate to the **admin** folder, and then select the **backup-all-controllers** Cluster Operations job.
+1. From the operations center dashboard, select **All** to view all folders on the operations center.
+1. Navigate to the **admin** folder, and then select the **backup-all-controllers** Cluster Operations job.
 
 Restore operations can be done on-demand at the controller level from the preconfigured restore job.
 
@@ -363,11 +363,11 @@ Issue the following command to restore the controller from the last backup:
 ### Observability
 
 > [!IMPORTANT]
-> Regarding the Observability Stack described in the following sections is relevant to point that CloudBees Prometheus Plugin is a Tier 1 plugin where as OpenTelemetry is Tier 3 (See [CloudBees plugin support policies](https://docs.cloudbees.com/docs/cloudbees-common/latest/plugin-support-policies)).
+> Regarding the observability stack described in the following sections, note that the CloudBees Prometheus plugin is a CloudBees Tier 1 plugin, while the Jenkins OpenTelemetry plugin is a Tier 3 plugin. For more information, refer to the  [CloudBees plugin support policies](https://docs.cloudbees.com/docs/cloudbees-common/latest/plugin-support-policies).
 
 #### Metrics
 
-Prometheus is used to store Metrics from [Jenkins Metrics](https://plugins.jenkins.io/metrics/) and the [Jenkins OpenTelemetry plugin](https://github.com/jenkinsci/opentelemetry-plugin/blob/main/docs/monitoring-metrics.md).
+Prometheus is used to store metrics that are retrieved from the [Jenkins Metrics plugin](https://plugins.jenkins.io/metrics/) and the [Jenkins OpenTelemetry plugin](https://github.com/jenkinsci/opentelemetry-plugin/blob/main/docs/monitoring-metrics.md).
 
 Grafana imports Prometheus as a datasource and provides metrics dashboards for CloudBees CI.
 
@@ -377,7 +377,7 @@ Grafana imports Prometheus as a datasource and provides metrics dashboards for C
    eval $(terraform output --raw prometheus_active_targets) | jq '.data.activeTargets[] | select(.labels.container=="jenkins") | {job: .labels.job, instance: .labels.instance, status: .health}'
    ```
 
-2. Issue the following command to access Kube Prometheus Stack dashboards from your web browser and verify that that Targets are collecting metrics correctly.
+1. Issue the following command to access Kube Prometheus Stack dashboards from your web browser and verify that targets are correctly collecting metrics.
 
    ```sh
    eval $(terraform output --raw prometheus_dashboard)
@@ -385,65 +385,59 @@ Grafana imports Prometheus as a datasource and provides metrics dashboards for C
 
    If successful, the Prometheus web service is available at `http://localhost:50001` and you can view the configured alerts for CloudBees CI. Additionally, you can select **Status > Targets** to show targets with an `UP` status.
 
-3. Issue the following command to access Grafana URL. For the username, use `admin` and set the password using the `global_password` terraform variable:
+1. Issue the following command to access the Grafana URL. For the username, use `admin` and set the password using the `global_password` terraform variable:
 
    ```sh
    eval $(terraform output --raw grafana_url)
    ```
 
-  Explore Metrics Dashboards in **Home > Dashboards > CloudBees CI**. Then, select the controller pod to view the metrics. The following image shows metrics for team-b.
+1. To explore Metrics dashboards, navigate to **Home > Dashboards > CloudBees CI**, and then select the controller pod to view the metrics. The following image shows metrics for `team-b`:
 
    ![CloudBees CI Metrics Dashboard](img/observability/cbci-metrics-dashboard.png)
 
 ##### Tracing
 
-Tempo is used as Tracing/APM backend for Jenkins tracing data via OpenTelemetry plugin: [HTTP](https://github.com/jenkinsci/opentelemetry-plugin/blob/main/docs/http-requests-traces.md) and [Jobs](https://github.com/jenkinsci/opentelemetry-plugin/blob/main/docs/job-traces.md).
+Tempo is used as the Tracing/APM backend for Jenkins tracing data via the Jenkins OpenTelemetry plugin: [HTTP](https://github.com/jenkinsci/opentelemetry-plugin/blob/main/docs/http-requests-traces.md) and [Jobs](https://github.com/jenkinsci/opentelemetry-plugin/blob/main/docs/job-traces.md).
 
 Grafana imports Tempo as a datasource and provides tracing dashboards per a CI/CD pipeline Trace ID.
 
-In CloudBees CI, the OpenTelemetry plugin is configured to use Grafana as visualization backend. Then it offers a **View pipeline with Grafana** link for every pipeline run, which redirects to Grafana Explorer using Tempo as datasource and passing Trace ID.
+In CloudBees CI, the Jenkins OpenTelemetry plugin is configured to use Grafana as a visualization backend. Then, it offers a **View pipeline with Grafana** link for every pipeline run, which redirects to Grafana Explorer using Tempo as a datasource and passing a Trace ID. Other system traces can be visualized in Grafana Explorer as well.
 
 ![CloudBees CI Tracing Tempo](img/observability/cbci-tracing-tempo.png)
-
-Additionally other System traces can be visualized in Grafana Explorer too.
 
 ##### Logs
 
 ###### Build Logs
 
-The recommended approach for build logs is using [CloudBees Pipeline Explorer](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-pipeline-explorer-plugin) (CPE).
+The recommended approach for build logs is using [CloudBees Pipeline Explorer](https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-pipeline-explorer-plugin).
 
 > [!IMPORTANT]
-> Although, [pipeline build logs can be sent to external storage via OpenTelemetry plugin](https://github.com/jenkinsci/opentelemetry-plugin/blob/main/docs/build-logs.md) there is a known limitation the it makes incompatible with CloudBees Pipeline Explorer (CPE).
+> Although [pipeline build logs can be sent to external storage via the Jenkins OpenTelemetry plugin](https://github.com/jenkinsci/opentelemetry-plugin/blob/main/docs/build-logs.md), it is not compatible with CloudBees Pipeline Explorer.
 
-###### Containers logs
+###### Container logs
 
 Fluent Bit acts as a router for container logs.
 
-- Short-term Logs: Logs aggregation systems:
+- Short-term logs and log aggregation systems:
 
-  - [Amazon CloudWatch Logs](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/WhatIsCloudWatchLogs.html) group, under `/aws/eks/<CLUSTER_NAME>/aws-fluentbit-logs` and contains log streams for all the Kubernetes services running in the cluster, including CloudBees CI applications and agents. The following image shows an example of team b controller logs.
+  - [Amazon CloudWatch Logs](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/WhatIsCloudWatchLogs.html) group: Stores log streams for all the Kubernetes services running in the cluster, including CloudBees CI applications and agents in `/aws/eks/<CLUSTER_NAME>/aws-fluentbit-logs`.
+    ```sh
+     eval $(terraform output --raw aws_logstreams_fluentbit) | jq '.[] '
+     ```
+    The following image shows an example of `team b` controller logs:
+   ![CloudBees CI logs from Cloudwatch](img/observability/cbci-logs-cloudwatch.png)
+  - Cloudwatch log group: Stores control plane logs in `/aws/eks/CLUSTER_NAME>/cluster`.
 
-   ```sh
-   eval $(terraform output --raw aws_logstreams_fluentbit) | jq '.[] '
-   ```
+  - [Loki](https://grafana.com/oss/loki/):  In Grafana, navigate to the **Explore** section, select **Loki** as the datasource, filter by `com_cloudbees_cje_tenants`, and then select a CloudBees CI application log.
 
-   ![CloudBees CI Logs from Cloudwatch](img/observability/cbci-logs-cloudwatch.png)
+    ![CloudBees CI logs from Loki](img/observability/cbci-logs-loki.png)
 
-> [!NOTE]
-> Control plane logs are available in `/aws/eks/CLUSTER_NAME>/cluster` Cloudwatch Log Group.
-
-  - [Loki](https://grafana.com/oss/loki/) that is avaible from Grafana under `Explore` section, then select `Loki` as Datasource and you can filter by `com_cloudbees_cje_tenants` to select one CloudBees CI application logs.
-
-  ![CloudBees CI Logs from Loki](img/observability/cbci-logs-loki.png)
-
-- Long-term Logs are storage inside Amazon S3 bucket under `fluentbit` path.
+- Long-term logs are stored in an Amazon S3 bucket under the `fluentbit` path.
 
 ## Destroy
 
 To tear down and remove the resources created in the blueprint, refer to [Amazon EKS Blueprints for Terraform - Destroy](https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#destroy).
 
-To avoid [#165](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/issues/165) run  `kube-prometheus-destroy.sh` after destroying the EKS cluster.
-
 > [!TIP]
-> The `destroy` phase can be orchestrated via the companion [Makefile](../../Makefile).
+> - To avoid [#165](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/issues/165), run `kube-prometheus-destroy.sh` after destroying the EKS cluster.
+> - The `destroy` phase can be orchestrated via the companion [Makefile](../../Makefile).
