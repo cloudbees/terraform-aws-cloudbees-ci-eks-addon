@@ -1,7 +1,7 @@
 # Copyright (c) CloudBees, Inc.
 
-#https://artifacthub.io/packages/helm/opentelemetry-helm/opentelemetry-collector
-#https://github.com/open-telemetry/opentelemetry-helm-charts/blob/main/charts/opentelemetry-collector/values.yaml
+# https://artifacthub.io/packages/helm/opentelemetry-helm/opentelemetry-collector
+# https://github.com/open-telemetry/opentelemetry-helm-charts/blob/main/charts/opentelemetry-collector/values.yaml
 
 nodeSelector:
   kubernetes.io/os: linux

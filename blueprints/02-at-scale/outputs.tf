@@ -182,7 +182,7 @@ output "prometheus_dashboard" {
   value       = "kubectl port-forward svc/kube-prometheus-stack-prometheus 50001:9090 -n ${local.observability_ns}"
 }
 
-#https://prometheus.io/docs/prometheus/latest/querying/api/
+# https://prometheus.io/docs/prometheus/latest/querying/api/
 output "prometheus_active_targets" {
   description = "Checks active Prometheus targets from the CloudBees operations center."
   value       = "kubectl exec -n cbci -ti cjoc-0 --container jenkins -- curl -sSf kube-prometheus-stack-prometheus.${local.observability_ns}.svc.cluster.local:9090/api/v1/targets"
@@ -218,13 +218,13 @@ output "vault_dashboard" {
   value       = "kubectl port-forward svc/vault 50003:8200 -n ${local.vault_ns}"
 }
 
-#https://grafana.com/docs/tempo/latest/api_docs/
+# https://grafana.com/docs/tempo/latest/api_docs/
 output "tempo_tags" {
   description = "Lists all tags ingested in Tempo."
   value       = "kubectl exec -n cbci -ti cjoc-0 --container jenkins -- curl -sG tempo.${local.observability_ns}.svc.cluster.local:3100/api/search/tags"
 }
 
-#https://grafana.com/docs/loki/latest/reference/loki-http-api/
+# https://grafana.com/docs/loki/latest/reference/loki-http-api/
 output "loki_labels" {
   description = "Lists all labels ingested in Loki."
   value       = "kubectl exec -n cbci -ti cjoc-0 --container jenkins -- curl -sG loki.${local.observability_ns}.svc.cluster.local:3100/loki/api/v1/labels"

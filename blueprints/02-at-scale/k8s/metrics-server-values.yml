@@ -1,7 +1,7 @@
 # Copyright (c) CloudBees, Inc.
 
-#https://artifacthub.io/packages/helm/metrics-server/metrics-server
-#https://github.com/kubernetes-sigs/metrics-server/blob/master/charts/metrics-server/Chart.yaml
+# https://artifacthub.io/packages/helm/metrics-server/metrics-server
+# https://github.com/kubernetes-sigs/metrics-server/blob/master/charts/metrics-server/Chart.yaml
 
 nodeSelector:
   kubernetes.io/os: linux

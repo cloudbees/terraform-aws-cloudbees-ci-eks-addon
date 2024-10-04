@@ -1,7 +1,7 @@
 # Copyright (c) CloudBees, Inc.
 
-#https://github.com/grafana/helm-charts/blob/main/charts/tempo/values.yaml
-#https://artifacthub.io/packages/helm/grafana/tempo
+# https://github.com/grafana/helm-charts/blob/main/charts/tempo/values.yaml
+# https://artifacthub.io/packages/helm/grafana/tempo
 
 nodeSelector:
   kubernetes.io/os: linux

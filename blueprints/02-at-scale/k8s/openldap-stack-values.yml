@@ -1,6 +1,6 @@
 # Copyright (c) CloudBees, Inc.
 
-#https://artifacthub.io/packages/helm/helm-openldap/openldap-stack-ha
+# https://artifacthub.io/packages/helm/helm-openldap/openldap-stack-ha
 
 global:
   ldapDomain: "acme.org"

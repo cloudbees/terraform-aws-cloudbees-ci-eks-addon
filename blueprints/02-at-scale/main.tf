@@ -115,14 +115,14 @@ module "eks" {
     }
   }
 
-  #https://docs.aws.amazon.com/eks/latest/userguide/choosing-instance-type.html
-  #https://docs.aws.amazon.com/eks/latest/APIReference/API_Nodegroup.html
+  # https://docs.aws.amazon.com/eks/latest/userguide/choosing-instance-type.html
+  # https://docs.aws.amazon.com/eks/latest/APIReference/API_Nodegroup.html
   eks_managed_node_group_defaults = {
     capacity_type = "ON_DEMAND"
     disk_size     = 50
   }
   eks_managed_node_groups = {
-    #Note: Openldap is not compatible with Bottlerocket or Graviton.
+    # Note: Openldap is not compatible with Bottlerocket or Graviton.
     shared_apps = {
       node_group_name = "shared"
       instance_types  = ["m5d.xlarge"]
@@ -154,11 +154,11 @@ module "eks" {
       enable_bootstrap_user_data = true
       bootstrap_extra_args       = local.bottlerocket_bootstrap_extra_args
     }
-    #https://aws.amazon.com/blogs/compute/cost-optimization-and-resilience-eks-with-spot-instances/
-    #https://www.eksworkshop.com/docs/fundamentals/managed-node-groups/spot/instance-diversification
+    # https://aws.amazon.com/blogs/compute/cost-optimization-and-resilience-eks-with-spot-instances/
+    # https://www.eksworkshop.com/docs/fundamentals/managed-node-groups/spot/instance-diversification
     cb_agents_lin_2x = {
       node_group_name = "agent-lin-2x"
-      #ec2-instance-selector --vcpus 2 --memory 8 --region us-east-1 --deny-list 't.*' --current-generation -a arm64 --gpus 0 --usage-class spot
+      # ec2-instance-selector --vcpus 2 --memory 8 --region us-east-1 --deny-list 't.*' --current-generation -a arm64 --gpus 0 --usage-class spot
       instance_types = ["im4gn.large", "m6g.large", "m6gd.large", "m7g.large", "m7gd.large"] #Graviton
       capacity_type  = "SPOT"
       min_size       = 1
@@ -178,7 +178,7 @@ module "eks" {
     }
     cb_agents_lin_4x = {
       node_group_name = "agent-lin-4x"
-      #ec2-instance-selector --vcpus 4 --memory 16 --region us-east-1 --deny-list 't.*' --current-generation -a arm64 --gpus 0 --usage-class spot
+      # ec2-instance-selector --vcpus 4 --memory 16 --region us-east-1 --deny-list 't.*' --current-generation -a arm64 --gpus 0 --usage-class spot
       instance_types = ["im4gn.xlarge", "m6g.xlarge", "m6gd.xlarge", "m7g.xlarge", "m7gd.xlarge"] #Graviton
       capacity_type  = "SPOT"
       min_size       = 0
@@ -198,7 +198,7 @@ module "eks" {
     }
     cb_agents_lin_8x = {
       node_group_name = "agent-lin-8x"
-      #ec2-instance-selector --vcpus 8 --memory 32 --region us-east-1 --deny-list 't.*' --current-generation -a arm64 --gpus 0 --usage-class spot
+      # ec2-instance-selector --vcpus 8 --memory 32 --region us-east-1 --deny-list 't.*' --current-generation -a arm64 --gpus 0 --usage-class spot
       instance_types = ["im4gn.2xlarge", "m6g.2xlarge", "m6gd.2xlarge", "m7g.2xlarge", "m7gd.2xlarge"] #Graviton
       capacity_type  = "SPOT"
       min_size       = 0
@@ -224,7 +224,7 @@ module "eks" {
       platform        = "windows"
       ami_type        = "WINDOWS_CORE_2019_x86_64"
       use_name_prefix = true
-      #ec2-instance-selector --vcpus 4 --memory 16 --region us-east-1 --deny-list 't.*' --current-generation -a amd64 --gpus 0 --usage-class spot
+      # ec2-instance-selector --vcpus 4 --memory 16 --region us-east-1 --deny-list 't.*' --current-generation -a amd64 --gpus 0 --usage-class spot
       instance_types = ["m5.xlarge", "m5a.xlarge", "m5d.xlarge", "m5dn.xlarge", "m5n.xlarge", "m5zn.xlarge", "m6a.xlarge", "m6i.xlarge", "m6id.xlarge", "m6idn.xlarge", "m6in.xlarge", "m7a.xlarge", "m7i.xlarge"]
       capacity_type  = "SPOT"
       taints         = [{ key = "dedicated", value = "build-windows", effect = "NO_SCHEDULE" }]
@@ -234,8 +234,8 @@ module "eks" {
     }
   }
 
-  #https://docs.aws.amazon.com/eks/latest/userguide/control-plane-logs.html
-  #https://aws.amazon.com/blogs/containers/understanding-and-cost-optimizing-amazon-eks-control-plane-logs/
+  # https://docs.aws.amazon.com/eks/latest/userguide/control-plane-logs.html
+  # https://aws.amazon.com/blogs/containers/understanding-and-cost-optimizing-amazon-eks-control-plane-logs/
   create_cloudwatch_log_group            = true
   cluster_enabled_log_types              = ["audit", "api", "authenticator", "controllerManager", "scheduler"]
   cloudwatch_log_group_retention_in_days = local.cloudwatch_logs_expiration_days

@@ -1,7 +1,7 @@
 # Copyright (c) CloudBees, Inc.
 
-#https://artifacthub.io/packages/helm/vmware-tanzu/velero
-#https://github.com/vmware-tanzu/helm-charts/blob/main/charts/velero/values.yaml
+# https://artifacthub.io/packages/helm/vmware-tanzu/velero
+# https://github.com/vmware-tanzu/helm-charts/blob/main/charts/velero/values.yaml
 
 nodeSelector:
   kubernetes.io/os: linux

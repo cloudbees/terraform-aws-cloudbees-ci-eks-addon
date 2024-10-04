@@ -1,9 +1,9 @@
 # Copyright (c) CloudBees, Inc.
 
-#https://artifacthub.io/packages/helm/grafana/loki
-#https://github.com/grafana/helm-charts/blob/main/charts/loki/README.md
-#https://github.com/grafana/loki/blob/main/production/helm/loki/values.yaml
-#https://grafana.com/docs/loki/next/setup/install/helm/
+# https://artifacthub.io/packages/helm/grafana/loki
+# https://github.com/grafana/helm-charts/blob/main/charts/loki/README.md
+# https://github.com/grafana/loki/blob/main/production/helm/loki/values.yaml
+# https://grafana.com/docs/loki/next/setup/install/helm/
 
 deploymentMode: SingleBinary
 loki:

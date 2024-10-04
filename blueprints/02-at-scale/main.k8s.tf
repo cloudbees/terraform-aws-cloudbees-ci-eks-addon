@@ -18,7 +18,7 @@ locals {
               "bottlerocket.aws/updater-interface-version" = "2.0.0"
             EOT
 
-  #Velero Backups: Only for controllers using block storage (for example, Amazon EBS volumes in AWS)
+  # Velero Backups: Only for controllers using block storage (for example, Amazon EBS volumes in AWS)
   velero_controller_backup          = "team-b"
   velero_controller_backup_selector = "tenant=${local.velero_controller_backup}"
   velero_schedule_name              = "schedule-${local.velero_controller_backup}"
@@ -26,7 +26,7 @@ locals {
   hibernation_monitor_url = "https://hibernation-${module.eks_blueprints_addon_cbci.cbci_namespace}.${module.eks_blueprints_addon_cbci.cbci_domain_name}"
   cbci_admin_user         = "admin_cbci_a"
   cbci_agents_ns          = "cbci-agents"
-  #K8S agent template name from the CasC bundle
+  # K8S agent template name from the CasC bundle
   cbci_agent_linuxtempl   = "linux-mavenAndKaniko-"
   cbci_agent_windowstempl = "windows-powershell"
 
@@ -87,7 +87,7 @@ module "eks_blueprints_addon_cbci" {
 
   create_reg_secret = true
   reg_secret_ns     = local.cbci_agents_ns
-  #Note: This blueprint tests DockerHub as container registry but different registries can be used.
+  # Note: This blueprint tests DockerHub as container registry but different registries can be used.
   reg_secret_auth = {
     server   = "https://index.docker.io/v1/"
     username = var.dh_reg_secret_auth["username"]
@@ -216,13 +216,13 @@ module "eks_blueprints_addons" {
       EOT
     }]
   }
-  #Cert Manager - Requirement for Bottlerocket Update Operator
+  # Cert Manager - Requirement for Bottlerocket Update Operator
   enable_cert_manager = true
   cert_manager = {
     wait = true
   }
-  #Important: Update timing can be customized
-  #Bottlerocket Update Operator
+  # Important: Update timing can be customized
+  # Bottlerocket Update Operator
   enable_bottlerocket_update_operator = true
   bottlerocket_update_operator = {
     values = [file("k8s/br-update-operator-values.yml")]
@@ -246,8 +246,8 @@ module "eks_blueprints_addons" {
     retention       = local.cloudwatch_logs_expiration_days
   }
   aws_for_fluentbit = {
-    #Enable Container Insights just for troubleshooting
-    #https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/ContainerInsights.html
+    # Enable Container Insights just for troubleshooting
+    # https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/ContainerInsights.html
     enable_containerinsights = false
     namespace                = local.observability_ns
     create_namespace         = true
@@ -264,7 +264,7 @@ module "eks_blueprints_addons" {
       module.cbci_s3_bucket.s3_bucket_arn,
       "${local.fluentbit_s3_location}/*"
     ]
-    #Note: This values are duplicated in k8s/aws-for-fluent-bit-values.yml but they are required here to not be overwrite by default values.
+    # Note: This values are duplicated in k8s/aws-for-fluent-bit-values.yml but they are required here to not be overwrite by default values.
     set = [{
       name  = "cloudWatchLogs.autoCreateGroup"
       value = true
@@ -300,7 +300,7 @@ module "eks_blueprints_addons" {
       repository       = "https://aws.github.io/eks-charts"
       values           = [file("k8s/aws-node-term-handler-values.yml")]
     }
-    #Based on hashicorp/hashicorp-vault-eks-addon/aws
+    # Based on hashicorp/hashicorp-vault-eks-addon/aws
     vault = {
       name             = "vault"
       namespace        = local.vault_ns
@@ -398,7 +398,7 @@ resource "kubernetes_storage_class_v1" "efs" {
     provisioningMode = "efs-ap"
     fileSystemId     = module.efs.id
     directoryPerms   = "700"
-    #Issue #190
+    # Issue #190
     uid = "1000"
     gid = "1000"
   }

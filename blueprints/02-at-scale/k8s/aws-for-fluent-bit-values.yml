@@ -1,7 +1,7 @@
 # Copyright (c) CloudBees, Inc.
 
-#https://artifacthub.io/packages/helm/aws/aws-for-fluent-bit
-#https://github.com/aws/eks-charts/blob/master/stable/aws-for-fluent-bit/values.yaml
+# https://artifacthub.io/packages/helm/aws/aws-for-fluent-bit
+# https://github.com/aws/eks-charts/blob/master/stable/aws-for-fluent-bit/values.yaml
 
 tolerations:
 - effect: "NoSchedule"

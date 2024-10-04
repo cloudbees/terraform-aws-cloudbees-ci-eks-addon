@@ -1,7 +1,7 @@
 # Copyright (c) CloudBees, Inc.
 
-#https://artifacthub.io/packages/helm/aws/aws-node-termination-handler
-#https://github.com/aws/aws-node-termination-handler/tree/main/config/helm/aws-node-termination-handler
+# https://artifacthub.io/packages/helm/aws/aws-node-termination-handler
+# https://github.com/aws/aws-node-termination-handler/tree/main/config/helm/aws-node-termination-handler
 
 nodeSelector:
   role: build-linux-spot
