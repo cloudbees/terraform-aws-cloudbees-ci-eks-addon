@@ -304,7 +304,7 @@ This blueprint use a couple of container registries for different purposes.
 > [!NOTE]
 > Other Container Registry services can be used for the same purposes.
 
-1. In the CloudBees CI UI, sign in to `team-b` or `team-c-ha` controllers with admin access. 
+1. In the CloudBees CI UI, sign in to `team-b` or `team-c-ha` controllers with admin access.
 2. Navigate to the **admin > validations > kaniko** Pipeline.
 3. Using parameters, enter an existing DockerHub organization and an existing Amazon ECR repository to test that building and pushing to all repositories works as expected.
 
