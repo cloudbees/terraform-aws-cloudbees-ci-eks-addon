@@ -81,7 +81,7 @@ This blueprint divides scalable node groups for different types of workloads:
 | acm_certificate_arn | AWS Certificate Manager (ACM) certificate for Amazon Resource Names (ARN). |
 | aws_backup_efs_protected_resource | AWS description for the Amazon EFS drive that is used to back up protected resources. |
 | aws_logstreams_fluentbit | AWS CloudWatch log streams from Fluent Bit. |
-| aws_region | AWS Region. |
+| aws_region | AWS region. |
 | cbci_agent_linuxtempl_events | Retrieves a list of events related to Linux template agents. |
 | cbci_agent_sec_reg | Retrieves the container registry secret deployed in the agents namespace. |
 | cbci_agent_windowstempl_events | Retrieves a list of events related to Windows template agents. |
@@ -103,7 +103,7 @@ This blueprint divides scalable node groups for different types of workloads:
 | efs_access_points | Amazon EFS access points. |
 | efs_arn | Amazon EFS ARN. |
 | eks_cluster_arn | Amazon EKS cluster ARN. |
-| eks_cluster_name | Amazon EKS cluster Name. |
+| eks_cluster_name | Amazon EKS cluster name. |
 | global_password | Random string that is used as the global password. |
 | grafana_url | Grafana URL. |
 | kubeconfig_add | Adds kubeconfig to the local configuration to access the Kubernetes API. |
