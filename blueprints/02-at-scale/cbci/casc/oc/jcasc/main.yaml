@@ -55,9 +55,9 @@ masterprovisioning:
       kind: "StatefulSet"
       spec:
         template:
-            spec:
-              tolerations:
-              - key: "dedicated"
-                operator: "Equal"
-                value: "cb-apps"
-                effect: "NoSchedule"
+          spec:
+            tolerations:
+            - key: "dedicated"
+              operator: "Equal"
+              value: "cb-apps"
+              effect: "NoSchedule"

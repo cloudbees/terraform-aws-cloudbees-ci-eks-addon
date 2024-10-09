@@ -123,7 +123,7 @@ module "ebs_csi_driver_irsa" {
 module "eks_blueprints_addons" {
   source = "aws-ia/eks-blueprints-addons/aws"
   #vEKSBpAddonsTFMod#
-  version    = "1.15.1"
+  version    = "1.16.4"
   depends_on = [module.eks]
 
   cluster_name      = module.eks.cluster_name

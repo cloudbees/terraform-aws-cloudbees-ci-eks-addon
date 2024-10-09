@@ -208,8 +208,9 @@ set-kube-env () {
   for bp in "${BLUEPRINTS[@]}"
   do
     # shellcheck disable=SC2154
-    sed -i -e "/#vK8#/{n;s/\".*\"/\"$vK8\"/;}" \
-      -e "/#vEKSBpAddonsTFMod#/{n;s/\".*\"/\"$vEKSBpAddonsTFMod\"/;}" "$SCRIPTDIR/$bp/main.tf"
+    find "$SCRIPTDIR/$bp" -type f -name "*.tf" -print0 \
+      | xargs -0 sed -i -e "/#vK8#/{n;s/\".*\"/\"$vK8\"/;}" \
+                        -e "/#vEKSBpAddonsTFMod#/{n;s/\".*\"/\"$vEKSBpAddonsTFMod\"/;}" 
   done
 }
 

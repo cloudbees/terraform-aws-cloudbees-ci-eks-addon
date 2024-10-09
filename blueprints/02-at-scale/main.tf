@@ -64,7 +64,7 @@ module "eks" {
   cluster_name                   = local.cluster_name
   cluster_endpoint_public_access = true
   #vK8#
-  cluster_version = "1.29"
+  cluster_version = "1.28"
 
   vpc_id     = module.vpc.vpc_id
   subnet_ids = module.vpc.private_subnets
@@ -141,7 +141,7 @@ module "eks" {
       instance_types  = ["m7g.2xlarge"] #Graviton
       min_size        = 1
       max_size        = 6
-      desired_size    = 1
+      desired_size    = 2
       taints          = [local.mng["cbci_apps"]["taints"]]
       labels = {
         role    = local.mng["cbci_apps"]["labels"].role
@@ -153,6 +153,7 @@ module "eks" {
       platform                   = "bottlerocket"
       enable_bootstrap_user_data = true
       bootstrap_extra_args       = local.bottlerocket_bootstrap_extra_args
+      disk_size     = 100
     }
     # https://aws.amazon.com/blogs/compute/cost-optimization-and-resilience-eks-with-spot-instances/
     # https://www.eksworkshop.com/docs/fundamentals/managed-node-groups/spot/instance-diversification
