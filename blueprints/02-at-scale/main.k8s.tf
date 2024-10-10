@@ -361,9 +361,9 @@ resource "kubernetes_annotations" "gp2" {
   }
 }
 
-resource "kubernetes_storage_class_v1" "gp3" {
+resource "kubernetes_storage_class_v1" "gp3_aza" {
   metadata {
-    name = "gp3"
+    name = "gp3-aza"
 
     annotations = {
       "storageclass.kubernetes.io/is-default-class" = "true"
@@ -375,6 +375,13 @@ resource "kubernetes_storage_class_v1" "gp3" {
   allow_volume_expansion = true
   reclaim_policy         = "Delete"
   volume_binding_mode    = "WaitForFirstConsumer"
+  # Issue #195
+  allowed_topologies {
+    match_label_expressions {
+      key    = "topology.ebs.csi.aws.com/zone"
+      values = ["${var.aws_region}a"]
+    }
+  }
 
   parameters = {
     encrypted = "true"
