@@ -153,7 +153,7 @@ module "eks" {
       platform                   = "bottlerocket"
       enable_bootstrap_user_data = true
       bootstrap_extra_args       = local.bottlerocket_bootstrap_extra_args
-      disk_size     = 100
+      disk_size                  = 100
     }
     # https://aws.amazon.com/blogs/compute/cost-optimization-and-resilience-eks-with-spot-instances/
     # https://www.eksworkshop.com/docs/fundamentals/managed-node-groups/spot/instance-diversification
