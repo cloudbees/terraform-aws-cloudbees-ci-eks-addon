@@ -53,7 +53,7 @@ items:
               "cloudbees.prometheus": "true"
     properties:
       - configurationAsCode:
-          bundle: "main/none-ha"
+          bundle: "develop/none-ha"
   # Casc, HA
   - kind: managedController
     name: team-c-ha
@@ -62,6 +62,7 @@ items:
         memory: 6144
         cpus: 2.0
         disk: 5
+        storageClassName: "efs"
         replication:
           config:
             maxReplicas: 4
@@ -100,4 +101,4 @@ items:
               "cloudbees.prometheus": "true"
     properties:
       - configurationAsCode:
-          bundle: "main/ha"
+          bundle: "develop/ha"
