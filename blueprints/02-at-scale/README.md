@@ -46,7 +46,7 @@ This blueprint divides scalable node groups for different types of workloads:
   - CI services (role: `cb-apps`):
     - Services instance type: [AWS Graviton Processor](https://aws.amazon.com/ec2/graviton/) and [Bottlerocket OS](https://aws.amazon.com/bottlerocket/) AMI type.
     - It uses an [instance profile](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2_instance-profiles.html) for operating with AWS services permissions (for example, S3 buckets). However, the recommended options are explained in [Issue 56](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/issues/56).
-    - Regarding Storage classes, none HA/HS Controller use `gp3-aza` tight to AZ type A (to avoid Issue [#195](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/issues/195)) and HA/HS Controller `efs`.
+    - Regarding Storage classes, none HA/HS Controllers use `gp3-aza` (ebs type which is tightened to AZ A to avoid issue [#195](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/issues/195)) and HA/HS Controller `efs`.
   - CI agents (ephemeral):
     - Linux: [AWS Graviton Processor](https://aws.amazon.com/ec2/graviton/) and [Bottlerocket OS](https://aws.amazon.com/bottlerocket/) AMI type and includes on-demand (role: `build-linux`) and Spot (role: `build-linux-spot`) capacity types. The Spot agent node groups follow the principles described in [Building for Cost Optimization and Resilience for EKS with Spot Instances](https://aws.amazon.com/blogs/compute/cost-optimization-and-resilience-eks-with-spot-instances/).
     - Windows (role: `build-windows`): Windows 2019 AMI type.
