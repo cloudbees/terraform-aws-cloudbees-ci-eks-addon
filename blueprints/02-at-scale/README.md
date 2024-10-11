@@ -45,10 +45,10 @@ This blueprint divides scalable node groups for different types of workloads:
 - CloudBees CI node groups:
   - CI services (role: `cb-apps`):
     - Services instance type: [AWS Graviton Processor](https://aws.amazon.com/ec2/graviton/) and [Bottlerocket OS](https://aws.amazon.com/bottlerocket/) AMI type.
-    - It uses an [instance profile](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2_instance-profiles.html) for operating with AWS services permissions (for example, S3 buckets). However, the recommended options are explained in [Issue 56](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/issues/56).
     - Regarding storage classes, no HA/HS controllers use `gp3-aza` (an Amazon EBS type which is tightened to Availability Zone A to avoid issue [#195](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/issues/195)) or HA/HS controller `efs`.
   - CI agents (ephemeral):
     - Linux: [AWS Graviton Processor](https://aws.amazon.com/ec2/graviton/) and [Bottlerocket OS](https://aws.amazon.com/bottlerocket/) AMI type and includes on-demand (role: `build-linux`) and Spot (role: `build-linux-spot`) capacity types. The Spot agent node groups follow the principles described in [Building for Cost Optimization and Resilience for EKS with Spot Instances](https://aws.amazon.com/blogs/compute/cost-optimization-and-resilience-eks-with-spot-instances/).
+      - Amazon Elastic Container Registry (Amazon ECR) authentication is done via [instance profile](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2_instance-profiles.html) connected to `build-linux-spot` node pools.
     - Windows (role: `build-windows`): Windows 2019 AMI type.
 
 > [!IMPORTANT]
@@ -59,6 +59,11 @@ This blueprint divides scalable node groups for different types of workloads:
 ### Workloads
 
 ![K8sApps](img/at-scale.k8s.drawio.svg)
+
+CloudBees CI Services uses [Pod identity](https://aws.amazon.com/blogs/aws/amazon-eks-pod-identity-simplifies-iam-permissions-for-applications-on-amazon-eks-clusters/) adquire permissions to operate with an AWS s3 services for backup, restore and cache operations.
+
+> [!IMPORTANT]
+> Known issues: Operation Center pod requires to be recreated to get injected AWS credentials.
 
 ## Terraform documentation
 
@@ -310,7 +315,7 @@ This blueprint use a couple of container registries for different purposes:
 1. Using parameters, enter an existing DockerHub organization and an existing Amazon ECR repository to test that building and pushing to all repositories works as expected.
 
 > [!NOTE]
-> Besides Kaniko, there are [other alternative tools](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/using-kaniko#_alternatives).
+> Besides Kaniko, there are [other alternative tools](https://docs.cloudbees.com/docs/cloudbees-ci/latest/cloud-admin-guide/using-kaniko#_alternatives) for building images in K8s.
 
 #### Back up and restore
 
@@ -422,11 +427,15 @@ Fluent Bit acts as a router for container logs.
 - Short-term logs and log aggregation systems:
 
   - [Amazon CloudWatch Logs](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/WhatIsCloudWatchLogs.html) group: Stores log streams for all the Kubernetes services running in the cluster, including CloudBees CI applications and agents in `/aws/eks/<CLUSTER_NAME>/aws-fluentbit-logs`.
-    ```sh
-     eval $(terraform output --raw aws_logstreams_fluentbit) | jq '.[] '
-     ```
-    The following image shows an example of `team b` controller logs:
+
+   ```sh
+   eval $(terraform output --raw aws_logstreams_fluentbit) | jq '.[] '
+   ```
+
+   The following image shows an example of `team b` controller logs:
+
    ![CloudBees CI logs from CloudWatch](img/observability/cbci-logs-cloudwatch.png)
+  
   - CloudWatch log group: Stores control plane logs in `/aws/eks/CLUSTER_NAME>/cluster`.
 
   - [Loki](https://grafana.com/oss/loki/):  In Grafana, navigate to the **Explore** section, select **Loki** as the datasource, filter by `com_cloudbees_cje_tenants`, and then select a CloudBees CI application log.
