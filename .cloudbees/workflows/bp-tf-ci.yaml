@@ -70,7 +70,7 @@ jobs:
       # CI: deploy,validate,destroy
       # Troubleshooting: deploy,validate,onboarding
       # Nuke (Delete Dangling resource): wipeout
-      STAGES: "wipeout"
+      STAGES: "deploy,validate,destroy"
       ROOT: 01-getting-started
       TF_VAR_hosted_zone: bp01-ci.aws.ps.beescloud.com
     needs:
@@ -177,7 +177,7 @@ jobs:
       # CI: deploy,validate,destroy
       # Troubleshooting: deploy,validate,onboarding
       # Nuke (Delete Dangling resource): wipeout
-      STAGES: "wipeout"
+      STAGES: "deploy,validate,destroy"
       ROOT: 02-at-scale
       TF_VAR_hosted_zone: bp02-ci.aws.ps.beescloud.com
     needs:
