@@ -162,7 +162,7 @@ module "eks_blueprints_addons" {
         }
       )
     }
-    kube-proxy = {}
+    kube-proxy             = {}
     eks-pod-identity-agent = {}
   }
   #####################
@@ -442,8 +442,8 @@ resource "aws_iam_role" "s3" {
 }
 
 resource "aws_iam_role_policy" "s3_policy" {
-  name   = "${local.name}-iam_inline_policy"
-  role   = aws_iam_role.s3.id
+  name = "${local.name}-iam_inline_policy"
+  role = aws_iam_role.s3.id
   policy = jsonencode(
     {
       "Version" : "2012-10-17",
@@ -476,7 +476,7 @@ resource "aws_iam_role_policy" "s3_policy" {
 }
 
 resource "aws_eks_pod_identity_association" "oc_s3" {
-  depends_on = [ module.eks_blueprints_addon_cbci ]
+  depends_on      = [module.eks_blueprints_addon_cbci]
   cluster_name    = module.eks.cluster_name
   namespace       = module.eks_blueprints_addon_cbci.cbci_namespace
   service_account = "cjoc"
@@ -484,7 +484,7 @@ resource "aws_eks_pod_identity_association" "oc_s3" {
 }
 
 resource "aws_eks_pod_identity_association" "controllers_s3" {
-  depends_on = [ module.eks_blueprints_addon_cbci ]
+  depends_on      = [module.eks_blueprints_addon_cbci]
   cluster_name    = module.eks.cluster_name
   namespace       = module.eks_blueprints_addon_cbci.cbci_namespace
   service_account = "jenkins"

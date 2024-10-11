@@ -435,7 +435,7 @@ Fluent Bit acts as a router for container logs.
    The following image shows an example of `team b` controller logs:
 
    ![CloudBees CI logs from CloudWatch](img/observability/cbci-logs-cloudwatch.png)
-  
+
   - CloudWatch log group: Stores control plane logs in `/aws/eks/CLUSTER_NAME>/cluster`.
 
   - [Loki](https://grafana.com/oss/loki/):  In Grafana, navigate to the **Explore** section, select **Loki** as the datasource, filter by `com_cloudbees_cje_tenants`, and then select a CloudBees CI application log.
