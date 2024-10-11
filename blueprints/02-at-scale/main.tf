@@ -12,9 +12,6 @@ locals {
   efs_name                  = "${local.name}-efs"
   resource_group_name       = "${local.name}-rg"
   bucket_name               = "${local.name}-s3"
-  cbci_instance_profile_s3  = "${local.name}-instance_profile_s3"
-  cbci_iam_role_s3          = "${local.name}-iam_role_s3"
-  cbci_inline_policy_s3     = "${local.name}-iam_inline_policy_s3"
   cbci_instance_profile_ecr = "${local.name}-instance_profile_ecr"
   cbci_iam_role_ecr         = "${local.name}-iam_role_ecr"
   cbci_inline_policy_ecr    = "${local.name}-iam_inline_policy_ecr"
@@ -64,7 +61,7 @@ module "eks" {
   cluster_name                   = local.cluster_name
   cluster_endpoint_public_access = true
   #vK8#
-  cluster_version = "1.28"
+  cluster_version = "1.29"
 
   vpc_id     = module.vpc.vpc_id
   subnet_ids = module.vpc.private_subnets
@@ -130,7 +127,7 @@ module "eks" {
       platform        = "linux"
       min_size        = 1
       max_size        = 3
-      desired_size    = 1
+      desired_size    = 2
       labels = {
         role    = "shared"
         storage = "enabled"
@@ -147,8 +144,6 @@ module "eks" {
         role    = local.mng["cbci_apps"]["labels"].role
         storage = "enabled"
       }
-      create_iam_role            = false
-      iam_role_arn               = aws_iam_role.managed_ng_s3.arn
       ami_type                   = "BOTTLEROCKET_ARM_64"
       platform                   = "bottlerocket"
       enable_bootstrap_user_data = true
@@ -245,6 +240,7 @@ module "eks" {
 }
 
 # AWS Instance Permissions
+
 data "aws_iam_policy_document" "managed_ng_assume_role_policy" {
   statement {
     sid = "EKSWorkerAssumeRole"
@@ -257,67 +253,6 @@ data "aws_iam_policy_document" "managed_ng_assume_role_policy" {
       identifiers = ["ec2.amazonaws.com"]
     }
   }
-}
-
-resource "aws_iam_role" "managed_ng_s3" {
-  name                  = local.cbci_iam_role_s3
-  description           = "EKS Managed Node group IAM Role s3"
-  assume_role_policy    = data.aws_iam_policy_document.managed_ng_assume_role_policy.json
-  path                  = "/"
-  force_detach_policies = true
-  # Mandatory for EKS Managed Node Group
-  managed_policy_arns = [
-    "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy",
-    "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy",
-    "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly",
-    "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-  ]
-  # Additional Permissions for for EKS Managed Node Group per https://docs.aws.amazon.com/eks/latest/userguide/create-node-role.html
-  inline_policy {
-    name = local.cbci_inline_policy_s3
-    policy = jsonencode(
-      {
-        "Version" : "2012-10-17",
-        #https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-cache-step#_s3_configuration
-        "Statement" : [
-          {
-            "Sid" : "cbciS3BucketputGetDelete",
-            "Effect" : "Allow",
-            "Action" : [
-              "s3:PutObject",
-              "s3:GetObject",
-              "s3:DeleteObject"
-            ],
-            "Resource" : "${local.cbci_s3_location}/*"
-          },
-          {
-            "Sid" : "cbciS3BucketList",
-            "Effect" : "Allow",
-            "Action" : "s3:ListBucket",
-            "Resource" : module.cbci_s3_bucket.s3_bucket_arn
-            "Condition" : {
-              "StringLike" : {
-                "s3:prefix" : "${local.cbci_s3_prefix}/*"
-              }
-            }
-          }
-        ]
-      }
-    )
-  }
-  tags = var.tags
-}
-
-resource "aws_iam_instance_profile" "managed_ng_s3" {
-  name = local.cbci_instance_profile_s3
-  role = aws_iam_role.managed_ng_s3.name
-  path = "/"
-
-  lifecycle {
-    create_before_destroy = true
-  }
-
-  tags = var.tags
 }
 
 resource "aws_iam_role" "managed_ng_ecr" {
