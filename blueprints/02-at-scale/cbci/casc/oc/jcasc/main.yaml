@@ -1,6 +1,7 @@
 jenkins:
   systemMessage: "${message}"
-  numExecutors: 0
+  # Setting 1 executor for Backup OC
+  numExecutors: 1
 unclassified:
   cascItemsConfiguration:
       variableInterpolationEnabledForAdmin: true
@@ -32,7 +33,7 @@ unclassified:
             logRotator:
               numToKeepStr: "3"
 cloudBeesCasCServer:
-  defaultBundle: "main/none-ha"
+  defaultBundle: ${cascBranch}/none-ha
   visibility: true
 beekeeper:
   enabled: true

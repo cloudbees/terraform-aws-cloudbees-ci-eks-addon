@@ -72,12 +72,9 @@ items:
                   - jobConfigurationSubject: {
                       }
                   - systemConfigurationSubject:
-                      omitMasterKey: false
+                      omitMasterKey: true
                   format:
-                    zipFormat: {
-                      }
-                  retentionPolicy:
-                    noRetentionPolicy: {
+                    tarGzFormat: {
                       }
                   safeDelaySeconds: 0
                   store:
@@ -85,9 +82,41 @@ items:
                       bucketName: "${sec_s3bucketName}"
                       bucketFolder: "${s3bucketPreffix}/backup"
                       region: "${sec_awsRegion}"
+                  retentionPolicy:
+                    upToNRetentionPolicy:
+                      n: 5
               itemSource:
                 jenkinsRootItemSource: {
                   }
               filters:
               - isMasterOnlineFilter: {
                   }
+      - kind: backupAndRestore
+        name: backup-cjoc
+        triggers:
+          - cron:
+              spec: '@daily'
+        buildersList:
+        - backupBuilder:
+            subjects:
+            - buildRecordSubject: {
+                }
+            - jobConfigurationSubject: {
+                }
+            - systemConfigurationSubject:
+                omitMasterKey: true
+            format:
+              tarGzFormat: {
+                }
+            exclusive: false
+            store:
+              s3Store:
+                bucketName: "${sec_s3bucketName}"
+                bucketFolder: "${s3bucketPreffix}/backup"
+                region: "${sec_awsRegion}"
+            retentionPolicy:
+              upToNRetentionPolicy:
+                n: 5
+            safeDelaySeconds: 0
+        concurrentBuild: false
+
