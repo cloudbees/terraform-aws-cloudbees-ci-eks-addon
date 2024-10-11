@@ -1,4 +1,4 @@
 variables:
   - sharedLibRepo: "https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon.git"
-  - sharedLibBranch: pod-identity-2
+  - sharedLibBranch: develop
   - sharedLibPath: "blueprints/02-at-scale/cbci/shared-lib"

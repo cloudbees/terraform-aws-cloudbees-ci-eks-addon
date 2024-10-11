@@ -51,7 +51,7 @@ items:
               "cloudbees.prometheus": "true"
     properties:
       - configurationAsCode:
-          bundle: "pod-identity-2/none-ha"
+          bundle: "develop/none-ha"
   # Casc, HA
   - kind: managedController
     name: team-c-ha
@@ -99,4 +99,4 @@ items:
               "cloudbees.prometheus": "true"
     properties:
       - configurationAsCode:
-          bundle: "pod-identity-2/ha"
+          bundle: "develop/ha"
