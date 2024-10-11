@@ -31,7 +31,3 @@ backend:
   replicas: 0
 write:
   replicas: 0
-test:
-  enabled: false
-minio:
-  enabled: true

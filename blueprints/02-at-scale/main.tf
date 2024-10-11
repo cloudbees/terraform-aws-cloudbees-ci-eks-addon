@@ -12,9 +12,6 @@ locals {
   efs_name                  = "${local.name}-efs"
   resource_group_name       = "${local.name}-rg"
   bucket_name               = "${local.name}-s3"
-  cbci_instance_profile_s3  = "${local.name}-instance_profile_s3"
-  cbci_iam_role_s3          = "${local.name}-iam_role_s3"
-  cbci_inline_policy_s3     = "${local.name}-iam_inline_policy_s3"
   cbci_instance_profile_ecr = "${local.name}-instance_profile_ecr"
   cbci_iam_role_ecr         = "${local.name}-iam_role_ecr"
   cbci_inline_policy_ecr    = "${local.name}-iam_inline_policy_ecr"
@@ -130,7 +127,7 @@ module "eks" {
       platform        = "linux"
       min_size        = 1
       max_size        = 3
-      desired_size    = 1
+      desired_size    = 2
       labels = {
         role    = "shared"
         storage = "enabled"
