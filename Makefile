@@ -81,7 +81,7 @@ clean: guard-ROOT agentCheck
 
 .PHONY: test
 test: ## Runs a test for blueprint passed as parameters throughout their Terraform Lifecycle. Example: ROOT=02-at-scale make test
-test: deploy validate destroy clean
+test: clean deploy validate destroy
 	@$(call helpers,INFO "Test target for $(ROOT) passed succesfully.")
 
 .PHONY: test-all
