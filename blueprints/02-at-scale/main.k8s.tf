@@ -364,7 +364,7 @@ resource "kubernetes_annotations" "gp2" {
 
 resource "kubernetes_storage_class_v1" "gp3_aza" {
   metadata {
-    name = "gp3-aza"
+    name = "gp3"
 
     annotations = {
       "storageclass.kubernetes.io/is-default-class" = "true"
@@ -376,13 +376,13 @@ resource "kubernetes_storage_class_v1" "gp3_aza" {
   allow_volume_expansion = true
   reclaim_policy         = "Delete"
   volume_binding_mode    = "WaitForFirstConsumer"
-  # Issue #195
-  allowed_topologies {
-    match_label_expressions {
-      key    = "topology.ebs.csi.aws.com/zone"
-      values = ["${var.aws_region}a"]
-    }
-  }
+  # # Issue #195
+  # allowed_topologies {
+  #   match_label_expressions {
+  #     key    = "topology.ebs.csi.aws.com/zone"
+  #     values = ["${var.aws_region}a"]
+  #   }
+  # }
 
   parameters = {
     encrypted = "true"
@@ -437,7 +437,7 @@ data "aws_iam_policy_document" "assume_role" {
 }
 
 resource "aws_iam_role" "s3" {
-  name               = "eks-pod-identity-s3-role"
+  name               = local.cbci_iam_role_s3
   assume_role_policy = data.aws_iam_policy_document.assume_role.json
 }
 
