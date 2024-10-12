@@ -9,8 +9,8 @@ items:
       kubernetes:
         memory: 2048
         cpus: 1.0
-        disk: 20
-        storageClassName: "gp3-aza"
+        disk: 10
+        storageClassName: "gp3"
   # Casc, Non-HA
   - kind: managedController
     name: team-b
@@ -19,7 +19,7 @@ items:
         memory: 6144
         cpus: 2.0
         disk: 5
-        storageClassName: "gp3-aza"
+        storageClassName: "gp3"
         yaml: |-
           ---
           apiVersion: "apps/v1"
