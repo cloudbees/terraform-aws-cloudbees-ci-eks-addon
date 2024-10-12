@@ -50,7 +50,6 @@ security:
 masterprovisioning:
   kubernetes:
     nodeSelectors: "role=cb-apps"
-    storageClassName: "gp3-aza"
     yaml: |-
       ---
       apiVersion: "apps/v1"

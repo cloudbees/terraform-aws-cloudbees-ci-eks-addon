@@ -10,6 +10,7 @@ items:
         memory: 2048
         cpus: 1.0
         disk: 20
+        storageClassName: "gp3-aza"
   # Casc, Non-HA
   - kind: managedController
     name: team-b
@@ -18,6 +19,7 @@ items:
         memory: 6144
         cpus: 2.0
         disk: 5
+        storageClassName: "gp3-aza"
         yaml: |-
           ---
           apiVersion: "apps/v1"
