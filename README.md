@@ -1,8 +1,14 @@
 # CloudBees CI add-on for Amazon EKS blueprints
 
 <p align="center">
-  <a href="https://www.cloudbees.com/capabilities/continuous-integration"><img alt="CloudBees CI add-on for Amazon EKS blueprints" src="https://images.ctfassets.net/vtn4rfaw6n2j/7FKeUjwsXI1d2JPUIvSMZJ/be286872ace9ca3b6b66a64adbb3c16a/cb-tag-sm.svg"/></a>
-  <p align="center">Deploy CloudBees CI to Amazon Web Services (AWS) Elastic Kubernetes Service (EKS) clusters</p>
+  <a href="https://www.cloudbees.com/capabilities/continuous-integration">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://images.ctfassets.net/vtn4rfaw6n2j/ieyxgJANPjaYhdkOXM7Ky/c65ade5254cca895cc99bb561df2dd91/Symbol-White.svg?fm=webp&q=85" height="120px">
+  <source media="(prefers-color-scheme: light)" srcset="https://images.ctfassets.net/vtn4rfaw6n2j/6A6SnrhpUInrzTDmB3eHSU/e0f759f7f0cbb396af21b220c8259b89/Symbol-Black.svg?fm=webp&q=85" height="120px">
+  <img alt="CloudBees CI add-on for Amazon EKS blueprints" src="https://images.ctfassets.net/vtn4rfaw6n2j/6A6SnrhpUInrzTDmB3eHSU/e0f759f7f0cbb396af21b220c8259b89/Symbol-Black.svg?fm=webp&q=85" height="120px">
+</picture></a></p>
+
+<p align="center">Deploy CloudBees CI to Amazon Web Services (AWS) Elastic Kubernetes Service (EKS) clusters</p>
 
 ---
 
@@ -24,7 +30,7 @@ The CloudBees CI [AWS partner add-on](https://aws-ia.github.io/terraform-aws-eks
 
 ## Usage
 
-Implementation examples are included in the [blueprints](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/tree/main/blueprints) folder, however this is the simplest example of usage:
+Implementation examples are included in the [blueprints](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/tree/main/blueprints) folder, however, this is the simplest example of usage:
 
 ```terraform
 module "eks_blueprints_addon_cbci" {
@@ -81,6 +87,9 @@ The two main components of CloudBees CI - the operations center and managed cont
 This module runs with a [trial license for CloudBees CI](https://docs.cloudbees.com/docs/cloudbees-ci-migration/latest/trial-guide/).
 Once the trial has expired, refer to [CloudBees CI license expiration FAQ](https://docs.cloudbees.com/docs/general-kb/latest/faqs/jenkins-enterprise-license-expiration-faq) to determine your next steps.
 
+> [!NOTE]
+> This addon appends the string `[EKS_TF_ADDON]` to the Trial License last name for telemetry purposes.
+
 ## Compatibility
 
 The CloudBees CI add-on uses `helms release` for its resources definition, making it compatible with [AWS EKS Blueprint v4](https://github.com/aws-ia/terraform-aws-eks-blueprints/tree/v4.32.1) and [AWS EKS Blueprint v5](https://github.com/aws-ia/terraform-aws-eks-blueprints/tree/v5.0.0). For more information, refer to [Amazon EKS Blueprints for Terraform: v4 to v5 migration](https://aws-ia.github.io/terraform-aws-eks-blueprints/v4-to-v5/motivation/).
@@ -100,8 +109,9 @@ The CloudBees CI add-on uses `helms release` for its resources definition, makin
 | create_reg_secret | Create a Kubernetes dockerconfigjson secret for container registry authentication (cbci-sec-reg) for CI builds agents. | `bool` | `false` | no |
 | helm_config | CloudBees CI Helm chart configuration. | `any` | <pre>{<br>  "values": [<br>    ""<br>  ]<br>}</pre> | no |
 | prometheus_target | Creates a service monitor to discover the CloudBees CI Prometheus target dynamically. It is designed to be enabled with the AWS EKS Terraform Addon Kube Prometheus Stack. | `bool` | `false` | no |
+| prometheus_target_ns | Prometheus target namespace, designed to be enabled with the AWS EKS Terraform Addon Kube Prometheus Stack. It is required when prometheus_target is enabled. | `string` | `"observability"` | no |
 | reg_secret_auth | Registry server authentication details for cbci-sec-reg secret. It is required when create_reg_secret is enabled. | `map(string)` | <pre>{<br>  "email": "foo.bar@acme.com",<br>  "password": "changeme1234",<br>  "server": "my-registry.acme:5000",<br>  "username": "foo"<br>}</pre> | no |
-| reg_secret_ns | Agent namespace to allocate cbci-sec-reg secret. It is required when create_reg_secret is enabled. | `string` | `"cbci"` | no |
+| reg_secret_ns | Agent namespace to allocate the cbci-sec-reg secret. It is required when create_reg_secret is enabled. | `string` | `"cbci"` | no |
 
 ### Outputs
 
@@ -115,7 +125,7 @@ The CloudBees CI add-on uses `helms release` for its resources definition, makin
 | cbci_oc_pod | Operations center pod for the CloudBees CI add-on. |
 | cbci_oc_url | Operations center URL for the CloudBees CI add-on using a subdomain and certificates. |
 | cbci_sec_casc | Optional. Kubernetes secrets name for CloudBees CI Casc. |
-| cbci_sec_registry | Optional. Kubernetes secrets name for CloudBees CI agents to autheticate to registry. |
+| cbci_sec_registry | Optional. Kubernetes secrets name for CloudBees CI agents to authenticate the registry. |
 | merged_helm_config | (merged) Helm configuration for CloudBees CI. |
 <!-- END_TF_DOCS -->
 

@@ -13,7 +13,7 @@ variable "trial_license" {
 }
 
 variable "dh_reg_secret_auth" {
-  description = "Docker Hub Registry server authentication details for cbci-sec-reg secret."
+  description = "Docker Hub registry server authentication details for cbci-sec-reg secret."
   type        = map(string)
   default = {
     username = "foo"
@@ -38,7 +38,7 @@ variable "suffix" {
 
 #Check number of AZ: aws ec2 describe-availability-zones --region var.aws_region
 variable "aws_region" {
-  description = "AWS region to deploy resources to. It requires at minimun 3 AZs."
+  description = "AWS region to deploy resources to. It requires a minimum of three availability zones."
   type        = string
   default     = "us-west-2"
 }

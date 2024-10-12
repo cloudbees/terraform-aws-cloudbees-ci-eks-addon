@@ -1,0 +1,84 @@
+# Copyright (c) CloudBees, Inc.
+
+# https://artifacthub.io/packages/helm/opentelemetry-helm/opentelemetry-collector
+# https://github.com/open-telemetry/opentelemetry-helm-charts/blob/main/charts/opentelemetry-collector/values.yaml
+
+nodeSelector:
+  kubernetes.io/os: linux
+
+image:
+  repository: "otel/opentelemetry-collector-contrib"
+
+mode: "deployment"
+presets:
+  kubernetesAttributes:
+    enabled: true
+    extractAllPodLabels: true
+    extractAllPodAnnotations: true
+service:
+    type: ClusterIP
+ports:
+  metrics:
+    enabled: true
+  prometheus:
+    enabled: true
+    containerPort: 8889
+    servicePort: 8889
+    protocol: TCP
+config:
+  receivers:
+    otlp:
+      protocols:
+        grpc:
+          endpoint: '${env:MY_POD_IP}:4317'
+        http:
+          endpoint: '${env:MY_POD_IP}:4318'
+  exporters:
+    # Note: Not compatible with CPE
+    # otlphttp/loki:
+    #   endpoint: 'http://loki.observability.svc.cluster.local:3100/otlp'
+    otlphttp/tempo:
+      endpoint: http://tempo.observability.svc.cluster.local:4318
+    prometheus:
+      endpoint: '${env:MY_POD_IP}:8889'
+      resource_to_telemetry_conversion:
+        enabled: true
+    debug:
+      verbosity: detailed
+      sampling_initial: 5
+      sampling_thereafter: 200
+  extensions:
+    health_check: {}
+    pprof:
+      endpoint: :1888
+    zpages:
+      endpoint: :55679
+
+  service:
+    extensions: [pprof, zpages, health_check]
+    pipelines:
+      # Note: Not compatible with CPE
+      # logs:
+      #   receivers:
+      #     - otlp/jenkins
+      #   processors:
+      #     - batch
+      #   exporters:
+      #     - otlphttp/loki
+      #     - debug
+      traces:
+        receivers:
+          - otlp
+        processors:
+          - batch
+        exporters:
+          - otlphttp/tempo
+          - debug
+      metrics:
+        receivers:
+          - otlp
+        processors:
+          - batch
+        exporters:
+          - prometheus
+          - debug

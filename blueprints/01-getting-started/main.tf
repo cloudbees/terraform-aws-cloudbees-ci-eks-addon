@@ -31,8 +31,9 @@ locals {
 # CloudBees CI Add-on
 
 module "eks_blueprints_addon_cbci" {
-  source  = "cloudbees/cloudbees-ci-eks-addon/aws"
-  version = ">= 3.18306.0"
+  #source  = "cloudbees/cloudbees-ci-eks-addon/aws"
+  #version = ">= 3.18306.0"
+  source = "../../"
 
   depends_on = [module.eks_blueprints_addons]
 
@@ -65,7 +66,7 @@ module "ebs_csi_driver_irsa" {
 module "eks_blueprints_addons" {
   source = "aws-ia/eks-blueprints-addons/aws"
   #vEKSBpAddonsTFMod#
-  version = "1.15.1"
+  version = "1.17.0"
 
   cluster_name      = module.eks.cluster_name
   cluster_endpoint  = module.eks.cluster_endpoint
@@ -112,7 +113,7 @@ module "eks" {
   cluster_name                   = local.cluster_name
   cluster_endpoint_public_access = true
   #vK8#
-  cluster_version = "1.28"
+  cluster_version = "1.29"
 
   vpc_id     = module.vpc.vpc_id
   subnet_ids = module.vpc.private_subnets
@@ -163,8 +164,8 @@ module "eks" {
     }
   }
 
-  #https://docs.aws.amazon.com/eks/latest/userguide/choosing-instance-type.html
-  #https://docs.aws.amazon.com/eks/latest/APIReference/API_Nodegroup.html
+  # https://docs.aws.amazon.com/eks/latest/userguide/choosing-instance-type.html
+  # https://docs.aws.amazon.com/eks/latest/APIReference/API_Nodegroup.html
   eks_managed_node_groups = {
     mg_start = {
       node_group_name = "managed-start"
@@ -242,13 +243,13 @@ module "acm" {
   source  = "terraform-aws-modules/acm/aws"
   version = "5.0.0"
 
-  #Important: Application Services Hostname must be the same as the domain name or subject_alternative_names
+  # Important: Application Services Hostname must be the same as the domain name or subject_alternative_names
   domain_name = var.hosted_zone
   subject_alternative_names = [
     "*.${var.hosted_zone}" # For subdomains example.${var.domain_name}
   ]
 
-  #https://docs.aws.amazon.com/acm/latest/userguide/dns-validation.html
+  # https://docs.aws.amazon.com/acm/latest/userguide/dns-validation.html
   zone_id           = local.route53_zone_id
   validation_method = "DNS"
 
@@ -269,8 +270,8 @@ module "vpc" {
   enable_nat_gateway = true
   single_nat_gateway = true
 
-  #https://docs.aws.amazon.com/eks/latest/userguide/network_reqs.html
-  #https://docs.aws.amazon.com/eks/latest/userguide/network-load-balancing.html
+  # https://docs.aws.amazon.com/eks/latest/userguide/network_reqs.html
+  # https://docs.aws.amazon.com/eks/latest/userguide/network-load-balancing.html
   public_subnet_tags = {
     "kubernetes.io/role/elb" = 1
   }

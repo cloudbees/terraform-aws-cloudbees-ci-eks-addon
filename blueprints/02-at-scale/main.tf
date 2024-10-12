@@ -6,24 +6,16 @@ data "aws_availability_zones" "available" {}
 
 locals {
 
-  ############
-  # Infra
-  ############
-
   name                      = var.suffix == "" ? "cbci-bp02" : "cbci-bp02-${var.suffix}"
   vpc_name                  = "${local.name}-vpc"
   cluster_name              = "${local.name}-eks"
   efs_name                  = "${local.name}-efs"
   resource_group_name       = "${local.name}-rg"
   bucket_name               = "${local.name}-s3"
-  cbci_instance_profile_s3  = "${local.name}-instance_profile_s3"
-  cbci_iam_role_s3          = "${local.name}-iam_role_s3"
-  cbci_inline_policy_s3     = "${local.name}-iam_inline_policy_s3"
   cbci_instance_profile_ecr = "${local.name}-instance_profile_ecr"
   cbci_iam_role_ecr         = "${local.name}-iam_role_ecr"
   cbci_inline_policy_ecr    = "${local.name}-iam_inline_policy_ecr"
-  kubeconfig_file           = "kubeconfig_${local.name}.yaml"
-  kubeconfig_file_path      = abspath("k8s/${local.kubeconfig_file}")
+  cbci_iam_role_s3          = "${local.name}-iam_role_s3"
 
   vpc_cidr         = "10.0.0.0/16"
   azs              = slice(data.aws_availability_zones.available.names, 0, 3)
@@ -57,319 +49,11 @@ locals {
     "tf-repository" = "github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon"
   })
 
-  ############
-  # K8s Apps
-  ############
-
-  global_password      = random_string.global_pass_string.result
-  global_pass_jsonpath = "'{.data.sec_globalPassword}'"
-
-  bottlerocket_bootstrap_extra_args = <<-EOT
-              [settings.host-containers.admin]
-              enabled = false
-              [settings.host-containers.control]
-              enabled = true
-              [settings.kernel]
-              lockdown = "integrity"
-              [settings.kubernetes.node-labels]
-              "bottlerocket.aws/updater-interface-version" = "2.0.0"
-            EOT
-
-  #Velero Backups: Only for controllers using block storage (for example, Amazon EBS volumes in AWS)
-  velero_controller_backup          = "team-b"
-  velero_controller_backup_selector = "tenant=${local.velero_controller_backup}"
-  velero_schedule_name              = "schedule-${local.velero_controller_backup}"
-
-  hibernation_monitor_url = "https://hibernation-${module.eks_blueprints_addon_cbci.cbci_namespace}.${module.eks_blueprints_addon_cbci.cbci_domain_name}"
-  cbci_admin_user         = "admin_cbci_a"
-  cbci_agents_ns          = "cbci-agents"
-  #K8S agent template name from the CasC bundle
-  cbci_agent_linuxtempl   = "linux-mavenAndKaniko-"
-  cbci_agent_windowstempl = "windows-powershell"
-
-  vault_ns               = "vault"
-  vault_config_file_path = abspath("k8s/vault-config.sh")
-  vault_init_file_path   = abspath("k8s/vault-init.log")
-}
-
-resource "random_string" "global_pass_string" {
-  length  = 16
-  special = false
-  upper   = true
-  lower   = true
-}
-
-resource "time_static" "epoch" {
-  depends_on = [module.eks_blueprints_addons]
 }
 
 ################################################################################
-# EKS: Add-ons
+# EKS Cluster
 ################################################################################
-
-# CloudBees CI Add-on
-
-module "eks_blueprints_addon_cbci" {
-  source  = "cloudbees/cloudbees-ci-eks-addon/aws"
-  version = ">= 3.18306.0"
-
-  depends_on = [module.eks_blueprints_addons]
-
-  hosted_zone   = var.hosted_zone
-  cert_arn      = module.acm.acm_certificate_arn
-  trial_license = var.trial_license
-
-  helm_config = {
-    values = [templatefile("k8s/cbci-values.yml", {
-      cbciAppsNodeRole        = local.mng["cbci_apps"]["labels"].role
-      cbciAppsTolerationKey   = local.mng["cbci_apps"]["taints"].key
-      cbciAppsTolerationValue = local.mng["cbci_apps"]["taints"].value
-      cbciAgentsNamespace     = local.cbci_agents_ns
-    })]
-  }
-
-  create_casc_secrets = true
-  casc_secrets_file = templatefile("k8s/secrets-values.yml", {
-    global_password = local.global_password
-    s3bucketName    = local.bucket_name
-    awsRegion       = var.aws_region
-    adminMail       = var.trial_license["email"]
-  })
-
-  create_reg_secret = true
-  reg_secret_ns     = local.cbci_agents_ns
-  #Note: This blueprint tests DockerHub as container registry but different registries can be used.
-  reg_secret_auth = {
-    server   = "https://index.docker.io/v1/"
-    username = var.dh_reg_secret_auth["username"]
-    password = var.dh_reg_secret_auth["password"]
-    email    = var.dh_reg_secret_auth["email"]
-  }
-
-  prometheus_target = true
-
-}
-
-# EKS Blueprints Add-ons
-
-module "ebs_csi_driver_irsa" {
-  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "5.29.0"
-
-  role_name_prefix = "${module.eks.cluster_name}-ebs-csi-driv"
-
-  attach_ebs_csi_policy = true
-
-  oidc_providers = {
-    main = {
-      provider_arn               = module.eks.oidc_provider_arn
-      namespace_service_accounts = ["kube-system:ebs-csi-controller-sa"]
-    }
-  }
-
-  tags = var.tags
-}
-
-# It must be separate to correctly purge the kube_prometheus_stack
-resource "kubernetes_namespace" "kube_prometheus_stack" {
-
-  depends_on = [module.eks]
-  metadata {
-    name = "kube-prometheus-stack"
-  }
-
-}
-
-module "eks_blueprints_addons" {
-  source = "aws-ia/eks-blueprints-addons/aws"
-  #vEKSBpAddonsTFMod#
-  version = "1.15.1"
-
-  cluster_name      = module.eks.cluster_name
-  cluster_endpoint  = module.eks.cluster_endpoint
-  oidc_provider_arn = module.eks.oidc_provider_arn
-  cluster_version   = module.eks.cluster_version
-
-  eks_addons = {
-    aws-ebs-csi-driver = {
-      service_account_role_arn = module.ebs_csi_driver_irsa.iam_role_arn
-      configuration_values = jsonencode(
-        {
-          # ensure any PVC created also includes the custom tags
-          controller = {
-            extraVolumeTags = local.tags
-          }
-          # Deploy on the nodes that need Amazon EBS storage
-          node = {
-            nodeSelector = {
-              storage = "enabled"
-            }
-          }
-        }
-      )
-    }
-    coredns = {
-      timeouts = {
-        create = "25m"
-        delete = "10m"
-      }
-    }
-    vpc-cni = {
-      configuration_values = jsonencode(
-        {
-          enableWindowsIpam = "true"
-        }
-      )
-    }
-    kube-proxy = {}
-  }
-  #####################
-  #01-getting-started
-  #####################
-  enable_external_dns = true
-  external_dns = {
-    values = [templatefile("k8s/extdns-values.yml", {
-      zoneDNS = var.hosted_zone
-    })]
-  }
-  external_dns_route53_zone_arns      = [local.route53_zone_arn]
-  enable_aws_load_balancer_controller = true
-  aws_load_balancer_controller = {
-    values = [file("k8s/aws-alb-controller-values.yml")]
-  }
-  #####################
-  #02-at-scale
-  #####################
-  enable_aws_efs_csi_driver = true
-  aws_efs_csi_driver = {
-    values = [file("k8s/aws-efs-csi-driver-values.yml")]
-  }
-  enable_metrics_server = true
-  metrics_server = {
-    values = [file("k8s/metrics-server-values.yml")]
-  }
-  enable_cluster_autoscaler = true
-  cluster_autoscaler = {
-    values = [file("k8s/cluster-autoscaler-values.yml")]
-  }
-  enable_velero = true
-  velero = {
-    values             = [file("k8s/velero-values.yml")]
-    s3_backup_location = local.velero_s3_location
-    set = [{
-      name  = "initContainers"
-      value = <<-EOT
-      - name: velero-plugin-for-aws
-        image: velero/velero-plugin-for-aws:v1.7.1
-        imagePullPolicy: IfNotPresent
-        volumeMounts:
-          - mountPath: /target
-            name: plugins
-      #https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/restart-aborted-builds#_restarting_builds_after_a_restore
-      - name: inject-metadata-velero-plugin
-        image: ghcr.io/cloudbees-oss/inject-metadata-velero-plugin:main
-        imagePullPolicy: Always
-        volumeMounts:
-          - mountPath: /target
-            name: plugins
-      EOT
-    }]
-  }
-  enable_kube_prometheus_stack = true
-  kube_prometheus_stack = {
-    namespace        = kubernetes_namespace.kube_prometheus_stack.metadata[0].name
-    create_namespace = false
-    values = [templatefile("k8s/kube-prom-stack-values.yml", {
-      grafana_password = local.global_password
-    })]
-  }
-  enable_aws_for_fluentbit = true
-  aws_for_fluentbit_cw_log_group = {
-    create          = true
-    use_name_prefix = true # Set this to true to enable name prefix
-    name_prefix     = "eks-cluster-logs-"
-    retention       = local.cloudwatch_logs_expiration_days
-  }
-  aws_for_fluentbit = {
-    #Enable Container Insights just for troubleshooting
-    #https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/ContainerInsights.html
-    enable_containerinsights = false
-    values = [templatefile("k8s/aws-for-fluent-bit-values.yml", {
-      region             = var.aws_region
-      bucketName         = module.cbci_s3_bucket.s3_bucket_id
-      log_retention_days = local.cloudwatch_logs_expiration_days
-    })]
-    kubelet_monitoring = true
-    chart_version      = "0.1.28"
-    s3_bucket_arns = [
-      module.cbci_s3_bucket.s3_bucket_arn,
-      "${local.fluentbit_s3_location}/*"
-    ]
-  }
-  #Cert Manager - Requirement for Bottlerocket Update Operator
-  enable_cert_manager = true
-  cert_manager = {
-    wait = true
-  }
-  #Important: Update timing can be customized
-  #Bottlerocket Update Operator
-  enable_bottlerocket_update_operator = true
-  bottlerocket_update_operator = {
-    values = [file("k8s/br-update-operator-values.yml")]
-  }
-  #####################
-  #Additional Helm Releases
-  #####################
-  helm_releases = {
-    openldap-stack = {
-      chart            = "openldap-stack-ha"
-      chart_version    = "4.2.2"
-      namespace        = "auth"
-      create_namespace = true
-      repository       = "https://jp-gouin.github.io/helm-openldap/"
-      values = [templatefile("k8s/openldap-stack-values.yml", {
-        password           = local.global_password
-        admin_user_outputs = local.cbci_admin_user
-      })]
-    }
-    aws-node-termination-handler = {
-      name             = "aws-node-termination-handler"
-      namespace        = "kube-system"
-      create_namespace = false
-      chart            = "aws-node-termination-handler"
-      chart_version    = "0.21.0"
-      repository       = "https://aws.github.io/eks-charts"
-      values           = [file("k8s/aws-node-term-handler-values.yml")]
-    }
-    grafana-tempo = {
-      name             = "tempo"
-      namespace        = kubernetes_namespace.kube_prometheus_stack.metadata[0].name
-      create_namespace = false
-      chart            = "tempo"
-      chart_version    = "1.7.2"
-      repository       = "https://grafana.github.io/helm-charts"
-      values           = [file("k8s/grafana-tempo.yml")]
-    }
-    #Based on hashicorp/hashicorp-vault-eks-addon/aws
-    vault = {
-      name             = "vault"
-      namespace        = local.vault_ns
-      create_namespace = true
-      chart            = "vault"
-      chart_version    = "0.28.0"
-      repository       = "https://helm.releases.hashicorp.com"
-      values           = [file("k8s/vault-values.yml")]
-    }
-  }
-
-  tags = local.tags
-}
-
-################################################################################
-# EKS: Infra
-################################################################################
-
-# EKS Cluster
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
@@ -378,7 +62,7 @@ module "eks" {
   cluster_name                   = local.cluster_name
   cluster_endpoint_public_access = true
   #vK8#
-  cluster_version = "1.28"
+  cluster_version = "1.29"
 
   vpc_id     = module.vpc.vpc_id
   subnet_ids = module.vpc.private_subnets
@@ -429,54 +113,58 @@ module "eks" {
     }
   }
 
-  #https://docs.aws.amazon.com/eks/latest/userguide/choosing-instance-type.html
-  #https://docs.aws.amazon.com/eks/latest/APIReference/API_Nodegroup.html
+  # https://docs.aws.amazon.com/eks/latest/userguide/choosing-instance-type.html
+  # https://docs.aws.amazon.com/eks/latest/APIReference/API_Nodegroup.html
   eks_managed_node_group_defaults = {
     capacity_type = "ON_DEMAND"
     disk_size     = 50
   }
   eks_managed_node_groups = {
-    #Note: Openldap is not compatible with Bottlerocket or Graviton.
+    # Note: Openldap is not compatible with Bottlerocket or Graviton.
     shared_apps = {
-      node_group_name = "mg-shared"
+      node_group_name = "shared"
       instance_types  = ["m5d.xlarge"]
       ami_type        = "AL2023_x86_64_STANDARD"
       platform        = "linux"
       min_size        = 1
       max_size        = 3
-      desired_size    = 1
+      desired_size    = 2
       labels = {
         role    = "shared"
         storage = "enabled"
       }
     }
     cb_apps = {
-      node_group_name = "mg-cb-apps"
+      node_group_name = "cb-apps"
       instance_types  = ["m7g.2xlarge"] #Graviton
       min_size        = 1
       max_size        = 6
-      desired_size    = 1
+      desired_size    = 2
       taints          = [local.mng["cbci_apps"]["taints"]]
       labels = {
         role    = local.mng["cbci_apps"]["labels"].role
         storage = "enabled"
       }
-      create_iam_role            = false
-      iam_role_arn               = aws_iam_role.managed_ng_s3.arn
       ami_type                   = "BOTTLEROCKET_ARM_64"
       platform                   = "bottlerocket"
       enable_bootstrap_user_data = true
       bootstrap_extra_args       = local.bottlerocket_bootstrap_extra_args
+      disk_size                  = 100
     }
-    cb_agents_2x = {
-      node_group_name = "mg-agent-2x"
-      instance_types  = ["m7g.large"] #Graviton
-      min_size        = 1
-      max_size        = 3
-      desired_size    = 1
-      taints          = [{ key = "dedicated", value = "build-linux", effect = "NO_SCHEDULE" }]
+    # https://aws.amazon.com/blogs/compute/cost-optimization-and-resilience-eks-with-spot-instances/
+    # https://www.eksworkshop.com/docs/fundamentals/managed-node-groups/spot/instance-diversification
+    cb_agents_lin_2x = {
+      node_group_name = "agent-lin-2x"
+      # ec2-instance-selector --vcpus 2 --memory 8 --region us-east-1 --deny-list 't.*' --current-generation -a arm64 --gpus 0 --usage-class spot
+      instance_types = ["im4gn.large", "m6g.large", "m6gd.large", "m7g.large", "m7gd.large"] #Graviton
+      capacity_type  = "SPOT"
+      min_size       = 1
+      max_size       = 3
+      desired_size   = 1
+      taints         = [{ key = "dedicated", value = "build-linux-l", effect = "NO_SCHEDULE" }]
       labels = {
-        role = "build-linux"
+        role = "build-linux-l"
+        size = "2x"
       }
       create_iam_role            = false
       iam_role_arn               = aws_iam_role.managed_ng_ecr.arn
@@ -485,19 +173,18 @@ module "eks" {
       enable_bootstrap_user_data = true
       bootstrap_extra_args       = local.bottlerocket_bootstrap_extra_args
     }
-    #https://aws.amazon.com/blogs/compute/cost-optimization-and-resilience-eks-with-spot-instances/
-    #https://www.eksworkshop.com/docs/fundamentals/managed-node-groups/spot/instance-diversification
-    cb_agents_spot_4x = {
-      node_group_name = "mng-agent-spot-4x"
-      #ec2-instance-selector --vcpus 4 --memory 16 --region us-east-1 --deny-list 't.*' --current-generation -a arm64 --gpus 0 --usage-class spot
+    cb_agents_lin_4x = {
+      node_group_name = "agent-lin-4x"
+      # ec2-instance-selector --vcpus 4 --memory 16 --region us-east-1 --deny-list 't.*' --current-generation -a arm64 --gpus 0 --usage-class spot
       instance_types = ["im4gn.xlarge", "m6g.xlarge", "m6gd.xlarge", "m7g.xlarge", "m7gd.xlarge"] #Graviton
       capacity_type  = "SPOT"
       min_size       = 0
       max_size       = 3
       desired_size   = 0
-      taints         = [{ key = "dedicated", value = "build-linux-spot", effect = "NO_SCHEDULE" }]
+      taints         = [{ key = "dedicated", value = "build-linux-xl", effect = "NO_SCHEDULE" }]
       labels = {
-        role = "build-linux-spot"
+        role = "build-linux-xl"
+        size = "4x"
       }
       create_iam_role            = false
       iam_role_arn               = aws_iam_role.managed_ng_ecr.arn
@@ -506,17 +193,18 @@ module "eks" {
       enable_bootstrap_user_data = true
       bootstrap_extra_args       = local.bottlerocket_bootstrap_extra_args
     }
-    cb_agents_spot_8x = {
-      node_group_name = "mng-agent-spot-8x"
-      #ec2-instance-selector --vcpus 8 --memory 32 --region us-east-1 --deny-list 't.*' --current-generation -a arm64 --gpus 0 --usage-class spot
+    cb_agents_lin_8x = {
+      node_group_name = "agent-lin-8x"
+      # ec2-instance-selector --vcpus 8 --memory 32 --region us-east-1 --deny-list 't.*' --current-generation -a arm64 --gpus 0 --usage-class spot
       instance_types = ["im4gn.2xlarge", "m6g.2xlarge", "m6gd.2xlarge", "m7g.2xlarge", "m7gd.2xlarge"] #Graviton
       capacity_type  = "SPOT"
       min_size       = 0
       max_size       = 3
       desired_size   = 0
-      taints         = [{ key = "dedicated", value = "build-linux-spot", effect = "NO_SCHEDULE" }]
+      taints         = [{ key = "dedicated", value = "build-linux-xl", effect = "NO_SCHEDULE" }]
       labels = {
-        role = "build-linux-spot"
+        role = "build-linux-xl"
+        size = "8x"
       }
       create_iam_role            = false
       iam_role_arn               = aws_iam_role.managed_ng_ecr.arn
@@ -525,23 +213,26 @@ module "eks" {
       enable_bootstrap_user_data = true
       bootstrap_extra_args       = local.bottlerocket_bootstrap_extra_args
     }
-    mg_windows = {
+    cb_agents_win = {
+      node_group_name = "agent-win-4x"
       min_size        = 1
       max_size        = 3
       desired_size    = 1
       platform        = "windows"
       ami_type        = "WINDOWS_CORE_2019_x86_64"
       use_name_prefix = true
-      instance_types  = ["m5d.xlarge", "m5ad.xlarge"]
-      taints          = [{ key = "dedicated", value = "build-windows", effect = "NO_SCHEDULE" }]
+      # ec2-instance-selector --vcpus 4 --memory 16 --region us-east-1 --deny-list 't.*' --current-generation -a amd64 --gpus 0 --usage-class spot
+      instance_types = ["m5.xlarge", "m5a.xlarge", "m5d.xlarge", "m5dn.xlarge", "m5n.xlarge", "m5zn.xlarge", "m6a.xlarge", "m6i.xlarge", "m6id.xlarge", "m6idn.xlarge", "m6in.xlarge", "m7a.xlarge", "m7i.xlarge"]
+      capacity_type  = "SPOT"
+      taints         = [{ key = "dedicated", value = "build-windows", effect = "NO_SCHEDULE" }]
       labels = {
         role = "build-windows"
       }
     }
   }
 
-  #https://docs.aws.amazon.com/eks/latest/userguide/control-plane-logs.html
-  #https://aws.amazon.com/blogs/containers/understanding-and-cost-optimizing-amazon-eks-control-plane-logs/
+  # https://docs.aws.amazon.com/eks/latest/userguide/control-plane-logs.html
+  # https://aws.amazon.com/blogs/containers/understanding-and-cost-optimizing-amazon-eks-control-plane-logs/
   create_cloudwatch_log_group            = true
   cluster_enabled_log_types              = ["audit", "api", "authenticator", "controllerManager", "scheduler"]
   cloudwatch_log_group_retention_in_days = local.cloudwatch_logs_expiration_days
@@ -550,6 +241,7 @@ module "eks" {
 }
 
 # AWS Instance Permissions
+
 data "aws_iam_policy_document" "managed_ng_assume_role_policy" {
   statement {
     sid = "EKSWorkerAssumeRole"
@@ -562,67 +254,6 @@ data "aws_iam_policy_document" "managed_ng_assume_role_policy" {
       identifiers = ["ec2.amazonaws.com"]
     }
   }
-}
-
-resource "aws_iam_role" "managed_ng_s3" {
-  name                  = local.cbci_iam_role_s3
-  description           = "EKS Managed Node group IAM Role s3"
-  assume_role_policy    = data.aws_iam_policy_document.managed_ng_assume_role_policy.json
-  path                  = "/"
-  force_detach_policies = true
-  # Mandatory for EKS Managed Node Group
-  managed_policy_arns = [
-    "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy",
-    "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy",
-    "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly",
-    "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-  ]
-  # Additional Permissions for for EKS Managed Node Group per https://docs.aws.amazon.com/eks/latest/userguide/create-node-role.html
-  inline_policy {
-    name = local.cbci_inline_policy_s3
-    policy = jsonencode(
-      {
-        "Version" : "2012-10-17",
-        #https://docs.cloudbees.com/docs/cloudbees-ci/latest/pipelines/cloudbees-cache-step#_s3_configuration
-        "Statement" : [
-          {
-            "Sid" : "cbciS3BucketputGetDelete",
-            "Effect" : "Allow",
-            "Action" : [
-              "s3:PutObject",
-              "s3:GetObject",
-              "s3:DeleteObject"
-            ],
-            "Resource" : "${local.cbci_s3_location}/*"
-          },
-          {
-            "Sid" : "cbciS3BucketList",
-            "Effect" : "Allow",
-            "Action" : "s3:ListBucket",
-            "Resource" : module.cbci_s3_bucket.s3_bucket_arn
-            "Condition" : {
-              "StringLike" : {
-                "s3:prefix" : "${local.cbci_s3_prefix}/*"
-              }
-            }
-          }
-        ]
-      }
-    )
-  }
-  tags = var.tags
-}
-
-resource "aws_iam_instance_profile" "managed_ng_s3" {
-  name = local.cbci_instance_profile_s3
-  role = aws_iam_role.managed_ng_s3.name
-  path = "/"
-
-  lifecycle {
-    create_before_destroy = true
-  }
-
-  tags = var.tags
 }
 
 resource "aws_iam_role" "managed_ng_ecr" {
@@ -676,75 +307,6 @@ resource "aws_iam_instance_profile" "managed_ng_ecr" {
   }
 
   tags = var.tags
-}
-
-# Storage Classes
-
-resource "kubernetes_annotations" "gp2" {
-  api_version = "storage.k8s.io/v1"
-  kind        = "StorageClass"
-  # This is true because the resources was already created by the ebs-csi-driver addon
-  force = "true"
-
-  metadata {
-    name = "gp2"
-  }
-
-  annotations = {
-    "storageclass.kubernetes.io/is-default-class" = "false"
-  }
-}
-
-resource "kubernetes_storage_class_v1" "gp3" {
-  metadata {
-    name = "gp3"
-
-    annotations = {
-      "storageclass.kubernetes.io/is-default-class" = "true"
-    }
-  }
-
-  storage_provisioner    = "ebs.csi.aws.com"
-  allow_volume_expansion = true
-  reclaim_policy         = "Delete"
-  volume_binding_mode    = "WaitForFirstConsumer"
-
-  parameters = {
-    encrypted = "true"
-    fsType    = "ext4"
-    type      = "gp3"
-  }
-
-}
-
-resource "kubernetes_storage_class_v1" "efs" {
-
-  metadata {
-    name = "efs"
-  }
-
-  storage_provisioner = "efs.csi.aws.com"
-  reclaim_policy      = "Delete"
-  parameters = {
-    provisioningMode = "efs-ap" # Dynamic provisioning
-    fileSystemId     = module.efs.id
-    directoryPerms   = "700"
-  }
-
-  mount_options = [
-    "iam"
-  ]
-}
-
-# Kubeconfig
-resource "terraform_data" "create_kubeconfig" {
-  depends_on = [module.eks]
-
-  triggers_replace = var.ci ? [timestamp()] : []
-
-  provisioner "local-exec" {
-    command = "aws eks update-kubeconfig --name ${module.eks.cluster_name} --region ${var.aws_region} --kubeconfig ${local.kubeconfig_file_path}"
-  }
 }
 
 ################################################################################

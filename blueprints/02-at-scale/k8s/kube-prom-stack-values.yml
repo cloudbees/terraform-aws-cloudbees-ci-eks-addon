@@ -1,7 +1,10 @@
 # Copyright (c) CloudBees, Inc.
 
-#https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack
-#https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-prometheus-stack/Chart.yaml
+# https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack
+# https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-prometheus-stack/values.yaml
+# https://artifacthub.io/packages/helm/prometheus-community/prometheus
+# https://artifacthub.io/packages/helm/grafana/grafana
+# https://artifacthub.io/packages/helm/prometheus-community/alertmanager
 
 alertmanager:
   alertmanagerSpec:
@@ -9,12 +12,13 @@ alertmanager:
       kubernetes.io/os: linux
 prometheus:
   prometheusSpec:
-    # Not Used since OC uses ServiceMonitor
-    # additionalScrapeConfigs:
-    #   - job_name: "cjoc"
-    #     metrics_path: "/prometheus/"
-    #     static_configs:
-    #       - targets: ["cjoc.cbci.svc.cluster.local:80"]
+    additionalScrapeConfigs:
+      - job_name: "otel-collector"
+        static_configs:
+          #OTEL collector own metrics https://opentelemetry.io/docs/collector/internal-telemetry/
+          - targets: ["otel-collector-opentelemetry-collector:8888"]
+          #OTEL collector exporter prometheus metrics
+          - targets: ["otel-collector-opentelemetry-collector:8889"]
     serviceMonitorSelector:
       # Note: For all Service Monitors, use a common label
       matchLabels:
@@ -118,16 +122,45 @@ kube-state-metrics:
 grafana:
   nodeSelector:
     kubernetes.io/os: linux
+  ingress:
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: alb
+      alb.ingress.kubernetes.io/scheme: internet-facing
+      alb.ingress.kubernetes.io/target-type: ip
+      alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
+      alb.ingress.kubernetes.io/certificate-arn: ${cert_arn}
+      alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig": { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
+      external-dns.alpha.kubernetes.io/hostname: ${grafana_hostname}
+    hosts:
+      - ${grafana_hostname}
   adminPassword: ${grafana_password}
+  plugins:
+    - grafana-lokiexplore-app
   datasources:
     datasources.yaml:
       apiVersion: 1
       datasources:
+        - name: Loki
+          type: loki
+          access: proxy
+          url: http://loki-gateway
+          uid: lokiDatasource
+          derivedFields:
+          - datasourceUid: tempoDatasource
+            matcherRegex: trace_id=(\w+)
+            name: TraceID
+            url: '$${__value.raw}'
         - name: Tempo
           type: tempo
-          url: http://tempo.kube-prometheus-stack.svc.cluster.local:3100
+          url: http://tempo:3100
           access: proxy
-          isDefault: false
+          uid: tempoDatasource
+          jsonData:
+            tracesToLogsV2:
+              datasourceUid: lokiDatasource
+            tracesToMetrics:
+              datasourceUid: prometheus
   dashboardProviders:
     dashboardproviders.yaml:
       apiVersion: 1
@@ -150,19 +183,22 @@ grafana:
             path: /var/lib/grafana/dashboards/grafana-dashboards-cloudbees
   dashboards:
     grafana-dashboards-kubernetes:
-        k8s-views-global:
-          url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-global.json
-          token: ""
-        k8s-views-namespaces:
-          url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-namespaces.json
-          token: ""
-        k8s-views-nodes:
-          url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-nodes.json
-          token: ""
-        k8s-views-pods:
-          url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-pods.json
-          token: ""
+      k8s-views-global:
+        url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-global.json
+        token: ""
+      k8s-views-namespaces:
+        url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-namespaces.json
+        token: ""
+      k8s-views-nodes:
+        url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-nodes.json
+        token: ""
+      k8s-views-pods:
+        url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-pods.json
+        token: ""
     grafana-dashboards-cloudbees:
-      cb-controllers:
-        url: https://raw.githubusercontent.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/main/blueprints/02-at-scale/k8s/kube-prom-stack-grafana-db.json
+      prometheus-plugin:
+        url: https://raw.githubusercontent.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/develop/blueprints/02-at-scale/k8s/prometheus-plugin-db.json
+        token: ""
+      otel-plugin:
+        url: https://raw.githubusercontent.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/develop/blueprints/02-at-scale/k8s/opentelemetry-plugin-db.json
         token: ""

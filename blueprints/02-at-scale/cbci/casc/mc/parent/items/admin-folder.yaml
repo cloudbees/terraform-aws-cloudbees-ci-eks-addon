@@ -216,9 +216,13 @@ items:
           sandbox: true
           script: |
             pipeline {
+                options {
+                  retry(3)
+                  timeout(time: 1, unit: 'HOURS')
+                }
                 agent any
                 environment {
-                    U1=credentials('cbci-oc-secret-a')
+                    U1=credentials('cbci-oc_secret-a')
                     S1=credentials('cbci-oc_secret-b')
                 }
                 stages {
@@ -244,6 +248,10 @@ items:
             @Library('common') _
 
             pipeline {
+              options {
+                retry(3)
+                timeout(time: 1, unit: 'HOURS')
+              }
               agent {
                 label 'linux-mavenAndKaniko-XL'
               }

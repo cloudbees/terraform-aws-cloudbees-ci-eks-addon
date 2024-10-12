@@ -1,10 +1,26 @@
 # Copyright (c) CloudBees, Inc.
 
-#https://artifacthub.io/packages/helm/aws/aws-for-fluent-bit
-#https://github.com/aws/eks-charts/blob/master/stable/aws-for-fluent-bit/Chart.yaml
+# https://artifacthub.io/packages/helm/aws/aws-for-fluent-bit
+# https://github.com/aws/eks-charts/blob/master/stable/aws-for-fluent-bit/values.yaml
 
-nodeSelector:
-  kubernetes.io/os: linux
+tolerations:
+- effect: "NoSchedule"
+  key: "${cbciAppsTolerationKey}"
+  operator: "Equal"
+  value: "${cbciAppsTolerationValue}"
+- effect: "NoSchedule"
+  key: "dedicated"
+  operator: "Equal"
+  value: "build-linux-l"
+- effect: "NoSchedule"
+  key: "dedicated"
+  operator: "Equal"
+  value: "build-linux-xl"
+# Note: It is not compatible with Windows nodes by default.
+# - effect: "NoSchedule"
+#   key: "dedicated"
+#   operator: "Equal"
+#   value: "build-windows"
 
 cloudWatchLogs:
   enabled: true
@@ -20,3 +36,12 @@ s3:
   region: "${region}"
   bucket: "${bucketName}"
   s3KeyFormat: /fluentbit/$TAG/%Y-%m-%d/%H-%M-%S
+
+additionalOutputs: |
+  [OUTPUT]
+      name                   loki
+      host                   loki.observability.svc.cluster.local
+      port                   3100
+      match                  *
+      labels                 job=fluentbit
+      auto_kubernetes_labels on

@@ -1,7 +1,7 @@
 # Copyright (c) CloudBees, Inc.
 
-#https://artifacthub.io/packages/helm/cloudbees/cloudbees-core/
-#https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/installing-eks-using-helm
+# https://artifacthub.io/packages/helm/cloudbees/cloudbees-core/
+# https://docs.cloudbees.com/docs/cloudbees-ci/latest/eks-install-guide/installing-eks-using-helm
 
 OperationsCenter:
   NodeSelector:
@@ -16,7 +16,7 @@ OperationsCenter:
     Retriever:
       Enabled: true
       scmRepo: "https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon.git"
-      scmBranch: main
+      scmBranch: develop
       scmBundlePath: blueprints/02-at-scale/cbci/casc/oc
       scmPollingInterval: PT20M
 Persistence:

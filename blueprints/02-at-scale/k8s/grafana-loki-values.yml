@@ -1,0 +1,33 @@
+# Copyright (c) CloudBees, Inc.
+
+# https://artifacthub.io/packages/helm/grafana/loki
+# https://github.com/grafana/helm-charts/blob/main/charts/loki/README.md
+# https://github.com/grafana/loki/blob/main/production/helm/loki/values.yaml
+# https://grafana.com/docs/loki/next/setup/install/helm/
+
+deploymentMode: SingleBinary
+loki:
+  commonConfig:
+    replication_factor: 1
+  storage:
+    type: 'filesystem'
+  schemaConfig:
+    configs:
+    - from: "2024-01-01"
+      store: tsdb
+      index:
+        prefix: loki_index_
+        period: 24h
+      object_store: filesystem # we're storing on filesystem so there's no real persistence here.
+      schema: v13
+  auth_enabled: false
+singleBinary:
+  replicas: 1
+  nodeSelector:
+      kubernetes.io/os: linux
+read:
+  replicas: 0
+backend:
+  replicas: 0
+write:
+  replicas: 0

@@ -46,6 +46,6 @@ output "cbci_sec_casc" {
 }
 
 output "cbci_sec_registry" {
-  description = "Optional. Kubernetes secrets name for CloudBees CI agents to autheticate to registry."
+  description = "Optional. Kubernetes secrets name for CloudBees CI agents to authenticate the registry."
   value       = local.create_secret_reg ? kubernetes_secret.cbci_sec_reg[0].metadata[0].name : "No secrets created"
 }

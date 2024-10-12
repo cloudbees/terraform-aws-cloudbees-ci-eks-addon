@@ -6,7 +6,7 @@ BP_AGENT_USER       := bp-agent
 MKFILEDIR 			:= $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 CBCI_REPO		    ?= https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon.git
 CBCI_BRANCH			?= main
-NUKE_DRY_RUN		?= true
+DESTROY_WL_ONLY	?= false
 
 define helpers
 	source blueprints/helpers.sh && $(1)
@@ -57,13 +57,17 @@ endif
 	@$(call helpers,INFO "CloudBees CI Blueprint $(ROOT) Validation target finished succesfully.")
 
 .PHONY: destroy
-destroy: ## Destroy Terraform Blueprint passed as parameter. Example: ROOT=02-at-scale make destroy
-destroy: tfChecks agentCheck
+destroy: ## Destroy Terraform Blueprint passed as parameter. Example: DESTROY_WL_ONLY=false ROOT=02-at-scale make destroy
+destroy: tfChecks agentCheck guard-DESTROY_WL_ONLY
 ifeq ($(CI),false)
-	@$(call helpers,ask-confirmation "Destroy $(ROOT)")
+	@$(call helpers,ask-confirmation "Destroy $(ROOT) with Destroy Workloads Only=$(DESTROY_WL_ONLY)")
 endif
-	@$(call helpers,tf-destroy $(ROOT) $(CBCI_ONLY))
-	@$(call helpers,INFO "CloudBees CI Blueprint $(ROOT) Destroy target finished succesfully.")
+ifeq ($(DESTROY_WL_ONLY),false)
+	@$(call helpers,tf-destroy $(ROOT))
+else
+	@$(call helpers,tf-destroy-wl $(ROOT))
+endif
+	@$(call helpers,INFO "CloudBees CI Blueprint $(ROOT) Destroy target finished succesfully. Destroy Workloads Only=$(DESTROY_WL_ONLY)")
 
 .PHONY: clean
 clean: ## Clean Blueprint passed as parameter. Example: ROOT=02-at-scale make clean
@@ -77,7 +81,7 @@ clean: guard-ROOT agentCheck
 
 .PHONY: test
 test: ## Runs a test for blueprint passed as parameters throughout their Terraform Lifecycle. Example: ROOT=02-at-scale make test
-test: deploy validate destroy clean
+test: clean deploy validate destroy
 	@$(call helpers,INFO "Test target for $(ROOT) passed succesfully.")
 
 .PHONY: test-all
@@ -101,15 +105,6 @@ set-cbci-location: ## Update cbci folder location per parameter. Example: CBCI_R
 set-cbci-location: agentCheck guard-CBCI_REPO guard-CBCI_BRANCH
 	@$(call helpers,set-cbci-location $(CBCI_REPO) $(CBCI_BRANCH))
 	@$(call helpers,INFO "Setting new Casc location to $(CBCI_REPO) $(CBCI_BRANCH) finished succesfully.")
-
-.PHONY: run-aws-nuke
-run-aws-nuke: ## Run aws nuke by https://github.com/rebuy-de/aws-nuke. Example: NUKE_DRY_RUN=true make run-aws-nuke
-run-aws-nuke: guard-NUKE_DRY_RUN
-ifeq ($(NUKE_DRY_RUN),false)
-	@$(call helpers,ask-confirmation "Running AWS Nuke to destroy selected resources.")
-endif
-	@$(call helpers,run-aws-nuke $(NUKE_DRY_RUN))
-	@$(call helpers,INFO "AWS nuke finished successfully with DRY_RUN=$(NUKE_DRY_RUN).")
 
 ##########################
 # Global
