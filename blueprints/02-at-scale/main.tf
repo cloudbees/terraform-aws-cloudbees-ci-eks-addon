@@ -15,6 +15,7 @@ locals {
   cbci_instance_profile_ecr = "${local.name}-instance_profile_ecr"
   cbci_iam_role_ecr         = "${local.name}-iam_role_ecr"
   cbci_inline_policy_ecr    = "${local.name}-iam_inline_policy_ecr"
+  cbci_iam_role_s3          = "${local.name}-iam_role_s3"
 
   vpc_cidr         = "10.0.0.0/16"
   azs              = slice(data.aws_availability_zones.available.names, 0, 3)
