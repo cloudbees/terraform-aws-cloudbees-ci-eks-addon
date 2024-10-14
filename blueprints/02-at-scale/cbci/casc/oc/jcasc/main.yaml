@@ -32,6 +32,12 @@ unclassified:
           discarder:
             logRotator:
               numToKeepStr: "3"
+  bundleUpdateTiming:
+    automaticReload: true
+    automaticRestart: false
+    rejectWarnings: true
+    reloadAlwaysOnRestart: false
+    skipNewVersions: false
 cloudBeesCasCServer:
   defaultBundle: ${cascBranch}/none-ha
   visibility: true
