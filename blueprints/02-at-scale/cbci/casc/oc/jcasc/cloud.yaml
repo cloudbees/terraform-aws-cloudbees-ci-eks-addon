@@ -1,0 +1,37 @@
+jenkins:
+  clouds:
+  - kubernetes:
+      containerCap: 10
+      containerCapStr: "10"
+      name: "kubernetes-oc"
+      namespace: "cbci-agents"
+      templates:
+      - name: "linux-mavenAndKaniko-L"
+        label: "linux-mavenAndKaniko-L"
+        nodeUsageMode: "NORMAL"
+        yaml: |-
+          apiVersion: "v1"
+          kind: "Pod"
+          spec:
+            containers:
+            - args:
+              - "99d"
+              command:
+              - "sleep"
+              image: "maven:3.9.6-amazoncorretto-8"
+              name: "maven"
+              resources:
+                limits:
+                  memory: "1Gi"
+                requests:
+                  memory: "500Mi"
+                  cpu: "250m"
+            nodeSelector:
+              kubernetes.io/os: linux
+              role: "build-linux-l"
+              size: "2x"
+            tolerations:
+            - effect: "NoSchedule"
+              key: "dedicated"
+              operator: "Equal"
+              value: "build-linux-l"
