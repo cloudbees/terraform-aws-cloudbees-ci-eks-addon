@@ -6,8 +6,8 @@ jenkins:
       name: "kubernetes-oc"
       namespace: "cbci-agents"
       templates:
-      - name: "linux-mavenAndKaniko-L"
-        label: "linux-mavenAndKaniko-L"
+      - name: "test-L"
+        label: "test-L"
         nodeUsageMode: "NORMAL"
         yaml: |-
           apiVersion: "v1"
