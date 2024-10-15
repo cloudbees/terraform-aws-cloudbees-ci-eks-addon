@@ -4,10 +4,11 @@ jenkins:
       containerCap: 10
       containerCapStr: "10"
       name: "kubernetes-oc"
-      namespace: "cbci-agents"
+      # Note: It requires jenkins SA to have edit role on the namespace
+      # namespace: "cbci-agents"
       templates:
-      - name: "test-L"
-        label: "test-L"
+      - name: "busybox-L"
+        label: "busybox-L"
         nodeUsageMode: "NORMAL"
         yaml: |-
           apiVersion: "v1"
