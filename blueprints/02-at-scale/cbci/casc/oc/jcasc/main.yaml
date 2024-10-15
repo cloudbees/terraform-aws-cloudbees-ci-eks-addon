@@ -10,7 +10,7 @@ jenkins:
       # Note 1: Using cbci-agents namespace requires same permissions like jenkins SA
       # namespace: "cbci-agents"
       # Note 2: Similar to controller provisioning traffic can go internally. Then, websocket is not needed.
-      # jenkinsUrl: "http://cjoc.cbci.svc.cluster.local/"
+      # jenkinsUrl: "http://cjoc.${namespace}.svc.cluster.local/"
 unclassified:
   cascItemsConfiguration:
       variableInterpolationEnabledForAdmin: true
