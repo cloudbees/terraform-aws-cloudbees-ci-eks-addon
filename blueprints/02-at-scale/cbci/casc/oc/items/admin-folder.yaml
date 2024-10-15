@@ -93,6 +93,7 @@ items:
                   }
       - kind: backupAndRestore
         name: backup-cjoc
+        label: busybox-L
         triggers:
           - cron:
               spec: '@daily'
