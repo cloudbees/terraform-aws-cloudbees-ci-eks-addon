@@ -1,7 +1,16 @@
 jenkins:
   systemMessage: "${message}"
-  # Setting 1 executor for Backup OC
-  numExecutors: 1
+  numExecutors: 0
+  clouds:
+  - kubernetes:
+      containerCap: 10
+      containerCapStr: "10"
+      name: "kubernetes-oc"
+      webSocket: true
+      # Note 1: Using cbci-agents namespace requires same permissions like jenkins SA
+      # namespace: "cbci-agents"
+      # Note 2: Similar to controller provisioning traffic can go internally. Then, websocket is not needed.
+      # jenkinsUrl: "http://cjoc.cbci.svc.cluster.local/"
 unclassified:
   cascItemsConfiguration:
       variableInterpolationEnabledForAdmin: true
