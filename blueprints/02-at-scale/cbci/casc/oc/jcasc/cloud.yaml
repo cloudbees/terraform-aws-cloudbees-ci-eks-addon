@@ -18,8 +18,8 @@ jenkins:
               - "99d"
               command:
               - "sleep"
-              image: "maven:3.9.6-amazoncorretto-8"
-              name: "maven"
+              image: "busybox:1.37.0-musl"
+              name: "busybox"
               resources:
                 limits:
                   memory: "1Gi"
