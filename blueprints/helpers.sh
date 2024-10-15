@@ -234,5 +234,5 @@ set-cbci-location () {
 }
 
 build-casc-zip () {
-  cd "$SCRIPTDIR/02-at-scale/cbci/casc/oc" && zip "$SCRIPTDIR/02-at-scale/cbci/casc-zip/oc-bundle.zip" . -r
+  cd "$SCRIPTDIR/02-at-scale/cbci/casc/" && zip "$SCRIPTDIR/02-at-scale/cbci/casc-zip/oc-bundle.zip" "casc/oc" -r
 }
