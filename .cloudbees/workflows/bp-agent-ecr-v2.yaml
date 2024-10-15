@@ -1,0 +1,44 @@
+# Copyright (c) CloudBees, Inc.
+
+apiVersion: automation.cloudbees.io/v1alpha1
+kind: workflow
+name: agent
+
+on:
+  # Enable once Issue #83 is solved
+  # pull_request:
+  #   branches:
+  #     - 'main'
+  workflow_dispatch:
+
+env:
+  REGISTRY: public.ecr.aws/r1n1q0e5
+  RESPOSITORY: cloudbees-labs/tf-aws-cb-ci-eks-addon-agent
+  VERSION: rootless
+  AWS_REGION: us-west-2
+  #TODO: Replace by rootless image when it is supported
+  DOCKERFILE: .docker/agent/agent.rootless.Dockerfile
+
+jobs:
+  build_and_push_images:
+    steps:
+    - name: Checkout code
+      uses: cloudbees-io/checkout@v1
+
+    - name: Configure AWS Credentials
+      uses: cloudbees-io/configure-aws-credentials@v1
+      with:
+        aws-region: ${{ env.AWS_REGION }}
+        aws-access-key-id: ${{ secrets.AWS_TF_CBCI_EKS_AccessKeyID }}
+        aws-secret-access-key: ${{ secrets.AWS_TF_CBCI_EKS_SecretAccessKey }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: cloudbees-io/configure-ecr-credentials@v1
+
+    - name: Build, tag, and push docker image to Amazon ECR
+      uses: cloudbees-io/kaniko@v1
+      with:
+        dockerfile: ${{ env.DOCKERFILE }}
+        context: .
+        destination: ${{ env.REGISTRY }}/${{ env.RESPOSITORY }}:${{ env.VERSION }}
