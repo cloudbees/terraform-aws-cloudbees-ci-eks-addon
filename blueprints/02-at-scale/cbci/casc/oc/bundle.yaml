@@ -1,0 +1,13 @@
+apiVersion: "2"
+id: "modern.oc.simple"
+version: "1"
+jcasc:
+  - jcasc
+items:
+  - items
+plugins:
+  - plugins
+rbac:
+  - rbac
+variables:
+  - variables
