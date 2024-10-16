@@ -219,21 +219,30 @@ set-cbci-location () {
   local branch="$2"
   #Repo
   sed -i "s|scmRepo: .*|scmRepo: \"$repo\"|g" "$SCRIPTDIR/02-at-scale/k8s/cbci-values.yml"
-  sed -i "s|scmCascMmStore: .*|scmCascMmStore: \"$repo\"|g" "$SCRIPTDIR/02-at-scale/cbci/casc/oc/variables/variables.yaml"
-  sed -i "s|sharedLibRepo: .*|sharedLibRepo: \"$repo\"|g" "$SCRIPTDIR/02-at-scale/cbci/casc/mc/ha/variables/variables.yaml"
-  sed -i "s|sharedLibRepo: .*|sharedLibRepo: \"$repo\"|g" "$SCRIPTDIR/02-at-scale/cbci/casc/mc/none-ha/variables/variables.yaml"
+  sed -i "s|scmCascMmStore: .*|scmCascMmStore: \"$repo\"|g" "$SCRIPTDIR/02-at-scale/cbci/casc/oc/variables/variables.yml"
+  sed -i "s|sharedLibRepo: .*|sharedLibRepo: \"$repo\"|g" "$SCRIPTDIR/02-at-scale/cbci/casc/mc/mc-ha/variables/variables.yml"
+  sed -i "s|sharedLibRepo: .*|sharedLibRepo: \"$repo\"|g" "$SCRIPTDIR/02-at-scale/cbci/casc/mc/mc-none-ha/variables/variables.yml"
   #Branch
   sed -i "s|scmBranch: .*|scmBranch: $branch|g" "$SCRIPTDIR/02-at-scale/k8s/cbci-values.yml"
-  sed -i "s|cascBranch: .*|cascBranch: $branch|g" "$SCRIPTDIR/02-at-scale/cbci/casc/oc/variables/variables.yaml"
-  sed -i "s|sharedLibBranch: .*|sharedLibBranch: $branch|g" "$SCRIPTDIR/02-at-scale/cbci/casc/mc/ha/variables/variables.yaml"
-  sed -i "s|sharedLibBranch: .*|sharedLibBranch: $branch|g" "$SCRIPTDIR/02-at-scale/cbci/casc/mc/none-ha/variables/variables.yaml"
-  sed -i "s|bundle: \".*/none-ha\"|bundle: \"$branch/none-ha\"|g" "$SCRIPTDIR/02-at-scale/cbci/casc/oc/items/root.yaml"
-  sed -i "s|bundle: \".*/ha\"|bundle: \"$branch/ha\"|g" "$SCRIPTDIR/02-at-scale/cbci/casc/oc/items/root.yaml"
+  sed -i "s|cascBranch: .*|cascBranch: $branch|g" "$SCRIPTDIR/02-at-scale/cbci/casc/oc/variables/variables.yml"
+  sed -i "s|sharedLibBranch: .*|sharedLibBranch: $branch|g" "$SCRIPTDIR/02-at-scale/cbci/casc/mc/mc-ha/variables/variables.yml"
+  sed -i "s|sharedLibBranch: .*|sharedLibBranch: $branch|g" "$SCRIPTDIR/02-at-scale/cbci/casc/mc/mc-none-ha/variables/variables.yml"
+  sed -i "s|bundle: \".*/none-ha\"|bundle: \"$branch/none-ha\"|g" "$SCRIPTDIR/02-at-scale/cbci/casc/oc/items/root.yml"
+  sed -i "s|bundle: \".*/ha\"|bundle: \"$branch/ha\"|g" "$SCRIPTDIR/02-at-scale/cbci/casc/oc/items/root.yml"
   sed -i "s|https://raw.githubusercontent.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/.*/blueprints/02-at-scale/k8s/prometheus-plugin-db.json|https://raw.githubusercontent.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/$branch/blueprints/02-at-scale/k8s/prometheus-plugin-db.json|g" "$SCRIPTDIR/02-at-scale/k8s/kube-prom-stack-values.yml"
   sed -i "s|https://raw.githubusercontent.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/.*/blueprints/02-at-scale/k8s/opentelemetry-plugin-db.json|https://raw.githubusercontent.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/$branch/blueprints/02-at-scale/k8s/opentelemetry-plugin-db.json|g" "$SCRIPTDIR/02-at-scale/k8s/kube-prom-stack-values.yml"
 }
 
-build-casc-zip () {
-  cd "$SCRIPTDIR/02-at-scale/cbci/casc" && zip "$SCRIPTDIR/02-at-scale/cbci/casc-zip/oc-bundle.v4.zip" "feat/oc-1" -r
-  #cd "$SCRIPTDIR/02-at-scale/cbci/casc" && zip "$SCRIPTDIR/02-at-scale/cbci/casc-zip/oc-bundle.v2.zip" "casc/oc" -r
+zip-all-casc-bundles () {
+  branch=$(git rev-parse --abbrev-ref HEAD)
+  cbciDirInput="$SCRIPTDIR/02-at-scale/cbci"
+  cascDirOutput="$cbciDirInput/casc-zip"
+  cascPreValidatePath="casc-pre-validate/$branch"
+  cascDirTempValidate="$cbciDirInput/$cascPreValidatePath"
+  mkdir -p "$cascDirTempValidate"
+  cp -R "${cbciDirInput}/casc/oc" "$cascDirTempValidate"
+  cp -R "${cbciDirInput}/casc/mc/"* "$cascDirTempValidate"
+  rm "$cascDirOutput/pre-validate-casc.zip" || INFO "No previous zip found."
+  cd "$cbciDirInput/casc-pre-validate" && zip "$cascDirOutput/pre-validate-casc.zip" "$branch" -r
+  rm -rf "$cascDirTempValidate"
 }

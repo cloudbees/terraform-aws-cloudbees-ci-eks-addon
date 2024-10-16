@@ -1,0 +1,17 @@
+apiVersion: "2"
+id: "oc"
+version: "1"
+jcasc:
+  - jcasc.main.yml
+  - jcasc.security.yml
+  - jcasc.k8s-agents.yml
+  - jcasc.support.yml
+items:
+  - items.admin-folder.yml
+  - items.root.yml
+plugins:
+  - plugins.yml
+rbac:
+  - rbac.yml
+variables:
+  - variables.yml

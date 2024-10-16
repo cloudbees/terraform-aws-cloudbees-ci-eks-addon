@@ -1,0 +1,32 @@
+kube:
+  podTemplatesConfiguration:
+    templates:
+    - name: "busybox-L"
+      label: "busybox-L"
+      yaml: |-
+        apiVersion: "v1"
+        kind: "Pod"
+        spec:
+          containers:
+          - args:
+            - "99d"
+            command:
+            - "sleep"
+            image: "busybox:1.37.0-musl"
+            name: "busybox"
+            resources:
+              limits:
+                memory: "1Gi"
+              requests:
+                memory: "500Mi"
+                cpu: "250m"
+          nodeSelector:
+            kubernetes.io/os: linux
+            role: "build-linux-l"
+            size: "2x"
+          tolerations:
+          - effect: "NoSchedule"
+            key: "dedicated"
+            operator: "Equal"
+            value: "build-linux-l"
+      yamlMergeStrategy: "override"
