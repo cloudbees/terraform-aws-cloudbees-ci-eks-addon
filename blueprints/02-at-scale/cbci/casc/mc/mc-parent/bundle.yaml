@@ -1,0 +1,19 @@
+apiVersion: "2"
+id: "mc-parent"
+description: "Parent CasC bundle. It is tested for the CloudBees CI blueprint add-on: At scale."
+version: "1"
+jcasc:
+  - jcasc.main.yaml
+  - jcasc.support.yaml
+  - jcasc.k8s-agents.yaml
+  - jcasc.security.yaml
+items:
+  - items.admin-folder.yaml
+  - items.squad_x-folder.yaml
+  - items.squad_y-folder.yaml
+plugins:
+  - plugins.yaml
+rbac:
+  - rbac.yaml
+variables:
+  - variables.yaml
