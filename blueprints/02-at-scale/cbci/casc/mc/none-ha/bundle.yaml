@@ -6,6 +6,6 @@ parent: "parent"
 allowCapExceptions: true
 jcascMergeStrategy: "errorOnConflict"
 jcasc:
-  - jcasc
+  - jcasc.main.yaml
 variables:
-  - variables
+  - variables.yaml
