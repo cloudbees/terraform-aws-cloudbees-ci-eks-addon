@@ -11,6 +11,7 @@ ENV TF_VERSION=1.6.6 \
 RUN apk add --update --no-cache \
     bash \
     unzip \
+    zip \
     curl \
     git \
     make \

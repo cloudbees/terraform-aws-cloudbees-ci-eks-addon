@@ -1,7 +1,14 @@
 jenkins:
   systemMessage: "${message}"
-  # Setting 1 executor for Backup OC
-  numExecutors: 1
+  numExecutors: 0
+  clouds:
+  - kubernetes:
+      name: "kubernetes-oc"
+      webSocket: true
+      # Note 1: Using cbci-agents namespace requires same permissions like jenkins SA
+      # namespace: "cbci-agents"
+      # Note 2: Similar to controller provisioning traffic can go internally. Then, websocket is not needed.
+      # jenkinsUrl: "http://cjoc.${namespace}.svc.cluster.local/"
 unclassified:
   cascItemsConfiguration:
       variableInterpolationEnabledForAdmin: true
@@ -32,6 +39,12 @@ unclassified:
           discarder:
             logRotator:
               numToKeepStr: "3"
+  bundleUpdateTiming:
+    automaticReload: true
+    automaticRestart: false
+    rejectWarnings: true
+    reloadAlwaysOnRestart: false
+    skipNewVersions: false
 cloudBeesCasCServer:
   defaultBundle: ${cascBranch}/none-ha
   visibility: true

@@ -106,6 +106,12 @@ set-cbci-location: agentCheck guard-CBCI_REPO guard-CBCI_BRANCH
 	@$(call helpers,set-cbci-location $(CBCI_REPO) $(CBCI_BRANCH))
 	@$(call helpers,INFO "Setting new Casc location to $(CBCI_REPO) $(CBCI_BRANCH) finished succesfully.")
 
+.PHONY: zip-all-casc-bundles
+zip-all-casc-bundles: ## Creates a zip file containing all cbci casc bundles from 02 At scale. Example: make zip-all-casc-bundles
+zip-all-casc-bundles: agentCheck
+	@$(call helpers,zip-all-casc-bundles)
+	@$(call helpers,INFO "Zip casc bundles finished succesfully.")
+
 ##########################
 # Global
 ##########################

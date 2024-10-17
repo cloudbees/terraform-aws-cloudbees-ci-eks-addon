@@ -93,6 +93,7 @@ items:
                   }
       - kind: backupAndRestore
         name: backup-cjoc
+        label: busybox-L
         triggers:
           - cron:
               spec: '@daily'
@@ -119,3 +120,30 @@ items:
                 n: 5
             safeDelaySeconds: 0
         concurrentBuild: false
+      - kind: freeStyle
+        name: validate-all-casc-bundles
+        builders:
+        - shell:
+            command: |
+              casc_repo="https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon"
+              casc_zip_bundle_path="terraform-aws-cloudbees-ci-eks-addon/blueprints/02-at-scale/cbci/casc-zip/pre-validate-casc.zip"
+              username="admin_cbci_a"
+              target_branch="^${TARGET_BRANCH}"
+              api_token="^${API_TOKEN}"
+              git clone -b "$target_branch" "$casc_repo"
+              curl -s -H 'Accept: application/json' -H 'Content-Type: application/zip;charset=utf-8' --user "$username:$api_token" --data-binary @"$casc_zip_bundle_path" -XPOST "^${JENKINS_URL}casc-bundle/pre-validate-bundle"
+        concurrentBuild: false
+        disabled: false
+        label: busybox-L
+        parameters:
+        - string:
+            trim: true
+            name: API_TOKEN
+            description: API TOKEN for user admin_cbci_a
+        - string:
+            trim: true
+            name: TARGET_BRANCH
+            description: Branch to validate casc bundles before merging to production branch
+
+
+

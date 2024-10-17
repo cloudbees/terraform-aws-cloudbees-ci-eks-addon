@@ -55,3 +55,6 @@ tfplan*.txt
 *.bkp
 *.dtmp
 *.save
+
+#tmp folder to validate casc bundles
+blueprints/02-at-scale/cbci/casc-pre-validate

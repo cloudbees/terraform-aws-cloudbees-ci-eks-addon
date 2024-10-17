@@ -1,13 +1,17 @@
 apiVersion: "2"
-id: "modern.oc.simple"
+id: "oc"
 version: "1"
 jcasc:
-  - jcasc
+  - jcasc.main.yaml
+  - jcasc.security.yaml
+  - jcasc.k8s-agents.yaml
+  - jcasc.support.yaml
 items:
-  - items
+  - items.admin-folder.yaml
+  - items.root.yaml
 plugins:
-  - plugins
+  - plugins.yaml
 rbac:
-  - rbac
+  - rbac.yaml
 variables:
-  - variables
+  - variables.yaml
