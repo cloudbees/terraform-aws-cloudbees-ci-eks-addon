@@ -149,7 +149,7 @@ When preparing to deploy, you must complete the following steps:
 For more information, refer to [The Core Terraform Workflow](https://www.terraform.io/intro/core-workflow) documentation.
 
 > [!TIP]
-> The `deploy` phase can be orchestrated via the companion [Makefile](../../Makefile).
+> The `deploy` phase can be orchestrated via the companion [Makefile](../Makefile).
 
 ## Validate
 
@@ -456,4 +456,4 @@ To tear down and remove the resources created in the blueprint, refer to [Amazon
 
 > [!TIP]
 > - To avoid [#165](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/issues/165), run `kube-prometheus-destroy.sh` after destroying the EKS cluster.
-> - The `destroy` phase can be orchestrated via the companion [Makefile](../../Makefile).
+> - The `destroy` phase can be orchestrated via the companion [Makefile](../Makefile).

@@ -9,7 +9,7 @@ CBCI_BRANCH			?= main
 DESTROY_WL_ONLY	?= false
 
 define helpers
-	source blueprints/helpers.sh && $(1)
+	source helpers.sh && $(1)
 endef
 
 ##########################
@@ -19,8 +19,8 @@ endef
 .PHONY: tfChecks
 tfChecks: ## Run required terraform checks according to getting-started/README.md . Example: ROOT=02-at-scale make tfChecks
 tfChecks: guard-ROOT
-	@if [ ! -f blueprints/$(ROOT)/.auto.tfvars ]; then $(call helpers,ERROR "blueprints/$(ROOT)/.auto.tfvars file does not exist and it is required to store your own values"); fi
-	@if ([ ! -f blueprints/$(ROOT)/k8s/secrets-values.yml ] && [ $(ROOT) == "02-at-scale" ]); then $(call helpers,ERROR "blueprints/$(ROOT)/secrets-values.yml file does not exist and it is required to store your secrets"); fi
+	@if [ ! -f $(ROOT)/.auto.tfvars ]; then $(call helpers,ERROR "$(ROOT)/.auto.tfvars file does not exist and it is required to store your own values"); fi
+	@if ([ ! -f $(ROOT)/k8s/secrets-values.yml ] && [ $(ROOT) == "02-at-scale" ]); then $(call helpers,ERROR "$(ROOT)/secrets-values.yml file does not exist and it is required to store your secrets"); fi
 	$(eval USER_ID := $(shell aws sts get-caller-identity | grep UserId | cut -d"," -f 1 | xargs ))
 	@if [ "$(USER_ID)" == "" ]; then $(call helpers,ERROR "AWS Authention for CLI is not configured"); fi
 	@$(call helpers,INFO "Terraform Preflight Checks OK for $(USER_ID)")
@@ -36,10 +36,10 @@ bpAgent-dRun: ## Build (if not locally present) and Run the Blueprint Agent usin
 .PHONY: deploy
 deploy: ## Deploy Terraform Blueprint passed as parameter. Example: ROOT=02-at-scale make deploy
 deploy: tfChecks agentCheck
-	terraform -chdir=$(MKFILEDIR)/blueprints/$(ROOT) init
-	terraform -chdir=$(MKFILEDIR)/blueprints/$(ROOT) plan -no-color > $(MKFILEDIR)/blueprints/$(ROOT)/tfplan.txt
+	terraform -chdir=$(MKFILEDIR)/$(ROOT) init
+	terraform -chdir=$(MKFILEDIR)/$(ROOT) plan -no-color > $(MKFILEDIR)/$(ROOT)/tfplan.txt
 ifeq ($(CI),false)
-	@$(call helpers,ask-confirmation "Deploy $(ROOT). Check plan at blueprints/$(ROOT)/tfplan.txt")
+	@$(call helpers,ask-confirmation "Deploy $(ROOT). Check plan at $(ROOT)/tfplan.txt")
 endif
 	@$(call helpers,tf-apply $(ROOT))
 	@$(call helpers,INFO "CloudBees CI Blueprint $(ROOT) Deploy target finished succesfully.")
@@ -48,7 +48,7 @@ endif
 validate: ## Validate CloudBees CI Blueprint deployment passed as parameter. Example: ROOT=02-at-scale make validate
 validate: tfChecks agentCheck
 ifeq ($(CI),false)
-ifeq ($(wildcard $(MKFILEDIR)/blueprints/$(ROOT)/terraform.output),)
+ifeq ($(wildcard $(MKFILEDIR)/$(ROOT)/terraform.output),)
 	@$(call helpers,WARN "Blueprint $(ROOT) did not complete the Deployment target thus it is not Ready to be validated.")
 endif
 	@$(call helpers,ask-confirmation "Validate $(ROOT)")

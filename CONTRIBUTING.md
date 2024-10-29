@@ -48,13 +48,13 @@ To submit a pull request:
 1. Fork the repository.
 2. Create a feature branch based on the `develop` branch.
 3. Modify the source and focus on the specific change you are contributing. For example, if you reformat all the code, it is hard for reviewers to focus on your specific change.
-4. **Ensure that local tests pass**. Local tests can be orchestrated via the companion [Makefile](Makefile).
+4. **Ensure that local tests pass**. Local tests can be orchestrated via the companion [Makefile](blueprints/Makefile).
 5. Make commits to your fork using clear commit messages.
 6. Submit a pull request against the `develop` branch and answer any default questions in the pull request interface.
 7. Pay attention to any automated CI failures reported in the pull request, and stay involved in the conversation.
 
 > [!IMPORTANT]
-> If you make updates to embedded repository (for example, CasC bundles), you must push the changes to the public upstream (repository/branch) before running `terraform apply` locally. The endpoint and/or branch can be updated via `set-casc-location` from the companion [Makefile](Makefile).
+> If you make updates to embedded repository (for example, CasC bundles), you must push the changes to the public upstream (repository/branch) before running `terraform apply` locally. The endpoint and/or branch can be updated via `set-casc-location` from the companion [Makefile](blueprints/Makefile).
 
 ### Pre-commits: Linting, formatting and secrets scanning
 
@@ -68,7 +68,7 @@ Many of the files in the repository can be linted or formatted to maintain a sta
 Validate your pull request changes inside the blueprint agent described in the [Dockerfile](.docker/agent). It is the same agent used for the CI pipeline [bp-agent-ecr.yaml](.cloudbees/workflows/bp-agent-ecr.yaml).
 
 > [!NOTE]
-> The agent and dependencies can be automated using the [Makefile](Makefile) at the root of the project, under the target `bpAgent-dRun`. It is the same Makefile used in the CloudBees CI pipeline.
+> The agent and dependencies can be automated using the [Makefile](blueprints/Makefile) at the root of the project, under the target `bpAgent-dRun`. It is the same Makefile used in the CloudBees CI pipeline.
 
 The [bp-tf-ci.yaml](.cloudbees/workflows/bp-tf-ci.yaml) blueprints are orchestrated into the [CloudBees platform](https://www.cloudbees.com/products/saas-platform) inside the [CloudBees Professional Services (PS) sub-organization](https://cloudbees.io/orgs/cloudbees~professional-services/components/94c50dcf-125e-4767-b9c5-58d6d669a1f6/runs).
 
@@ -89,7 +89,7 @@ The [bp-tf-ci.yaml](.cloudbees/workflows/bp-tf-ci.yaml) blueprints are orchestra
 CloudBees CI Terraform EKS Addon versions try to be in sync with the [CloudBees CI releases](https://docs.cloudbees.com/docs/release-notes/latest/cloudbees-ci/).
 
 1. Ensure that `develop` branch follows its requisites from the [Design principles](#design-principles) section.
-2. Test locally the (`develop`) for all the blueprints. Use the `test-all` target in the companion [Makefile](Makefile).
+2. Test locally the (`develop`) for all the blueprints. Use the `test-all` target in the companion [Makefile](blueprints/Makefile).
 3. Once all local tests passed successfully, create a PR against the `main` branch. It **must pass** the Center of Excellence (CoE) team validation.
 4. Once the pull request is merged, update the `main` branch following its requisites from the [Design principles](#design-principles) section. The [Blueprint Terraform CI pipeline](#blueprint-terraform-ci-pipeline) must validate the changes.
 5. Create a [new release](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/releases). The release version semantics follow the Helm chart convention.

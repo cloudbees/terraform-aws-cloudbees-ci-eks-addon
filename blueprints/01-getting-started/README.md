@@ -68,7 +68,7 @@ When preparing to deploy, you must complete the following steps:
 For more information, refer to [The Core Terraform Workflow](https://www.terraform.io/intro/core-workflow) documentation.
 
 > [!TIP]
-> The `deploy` phase can be orchestrated via the companion [Makefile](../../Makefile).
+> The `deploy` phase can be orchestrated via the companion [Makefile](../Makefile).
 
 ## Validate
 
@@ -135,4 +135,4 @@ Once you can access the Kubernetes API from your terminal, complete the followin
 To tear down and remove the resources created in the blueprint, complete the steps for [Amazon EKS Blueprints for Terraform - Destroy](https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#destroy).
 
 > [!TIP]
-> The `destroy` phase can be orchestrated via the companion [Makefile](../../Makefile).
+> The `destroy` phase can be orchestrated via the companion [Makefile](../Makefile).
