@@ -144,6 +144,3 @@ items:
             trim: true
             name: TARGET_BRANCH
             description: Branch to validate casc bundles before merging to production branch
-
-
-
