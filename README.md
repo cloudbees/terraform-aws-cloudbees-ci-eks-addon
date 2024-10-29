@@ -58,7 +58,7 @@ By default, it uses a minimum required configuration described in the Helm chart
 The blueprint `deploy` and `destroy` phases use the same requirements provided in the [AWS EKS Blueprints for Terraform - Prerequisites](https://aws-ia.github.io/terraform-aws-eks-blueprints/getting-started/#prerequisites). However, the blueprint `validate` phase may require additional tooling, such as `jq` and `velero`.
 
 > [!NOTE]
-> There is a companion [Dockerfile](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/tree/main/.docker) to run the blueprints in a containerized development environment, ensuring all dependencies are met. It can be built locally using the [Makefile](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/blob/main/Makefile) target `make bpAgent-dRun`.
+> There is a companion [Dockerfile](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/tree/main/.docker) to run the blueprints in a containerized development environment, ensuring all dependencies are met. It can be built locally using the [Makefile](https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/blob/main/blueprints/Makefile) target `make bpAgent-dRun`.
 
 ### AWS authentication
 

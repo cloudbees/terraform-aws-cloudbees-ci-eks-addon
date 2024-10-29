@@ -36,6 +36,7 @@ bpAgent-dRun (){
 		fi
 	docker run --rm -it --name "$bpAgentUser" \
 		-v "$SCRIPTDIR/..":"/$bpAgentUser/cbci-eks-addon" -v "$HOME/.aws":"/$bpAgentUser/.aws" \
+    --workdir="/$bpAgentUser/cbci-eks-addon/blueprints" \
 		"$bpAgentLocalImage"
 }
 
