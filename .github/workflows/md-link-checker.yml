@@ -9,7 +9,8 @@ on:
 jobs:
   check-links:
     name: MD_Check_Links
-    runs-on: ubuntu-latest
+    runs-on:
+      group: large-runners
     steps:
       - uses: actions/checkout@v3
       - uses: gaurav-nelson/github-action-markdown-link-check@v1
