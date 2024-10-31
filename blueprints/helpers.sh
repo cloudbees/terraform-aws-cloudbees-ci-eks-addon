@@ -105,8 +105,8 @@ tf-destroy () {
   if [ "$root" == "${BLUEPRINTS[1]}" ]; then
     eks_cluster_name=$(tf-output "$root" eks_cluster_name)
     aws_region=$(tf-output "$root" aws_region)
-    bash "$SCRIPTDIR/$root/scripts/kube-prometheus-destroy.sh" "$eks_cluster_name" "$aws_region"
-    INFO "kube-prometheus-destroy.sh completed."
+    bash "$SCRIPTDIR/$root/k8s/kube-prom-destroy.sh" "$eks_cluster_name" "$aws_region"
+    INFO "kube-prom-destroy.sh completed."
   fi
   retry 3 "terraform -chdir=$SCRIPTDIR/$root destroy -auto-approve"
   INFO "Destroy the rest completed."
@@ -228,8 +228,6 @@ set-cbci-location () {
   sed -i "s|cascBranch: .*|cascBranch: $branch|g" "$SCRIPTDIR/02-at-scale/cbci/casc/oc/variables.yaml"
   sed -i "s|sharedLibBranch: .*|sharedLibBranch: $branch|g" "$SCRIPTDIR/02-at-scale/cbci/casc/mc/mc-ha/variables.yaml"
   sed -i "s|sharedLibBranch: .*|sharedLibBranch: $branch|g" "$SCRIPTDIR/02-at-scale/cbci/casc/mc/mc-none-ha/variables.yaml"
-  sed -i "s|bundle: \".*/none-ha\"|bundle: \"$branch/none-ha\"|g" "$SCRIPTDIR/02-at-scale/cbci/casc/oc/items.root.yaml"
-  sed -i "s|bundle: \".*/ha\"|bundle: \"$branch/ha\"|g" "$SCRIPTDIR/02-at-scale/cbci/casc/oc/items.root.yaml"
   sed -i "s|https://raw.githubusercontent.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/.*/blueprints/02-at-scale/k8s/prometheus-plugin-db.json|https://raw.githubusercontent.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/$branch/blueprints/02-at-scale/k8s/prometheus-plugin-db.json|g" "$SCRIPTDIR/02-at-scale/k8s/kube-prom-stack-values.yml"
   sed -i "s|https://raw.githubusercontent.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/.*/blueprints/02-at-scale/k8s/opentelemetry-plugin-db.json|https://raw.githubusercontent.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon/$branch/blueprints/02-at-scale/k8s/opentelemetry-plugin-db.json|g" "$SCRIPTDIR/02-at-scale/k8s/kube-prom-stack-values.yml"
 }
