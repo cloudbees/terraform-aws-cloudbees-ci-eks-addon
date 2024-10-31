@@ -46,7 +46,7 @@ unclassified:
     reloadAlwaysOnRestart: false
     skipNewVersions: false
 cloudBeesCasCServer:
-  defaultBundle: ${cascBranch}/none-ha
+  defaultBundle: "${cascBranch}/mc-none-ha"
   visibility: true
 beekeeper:
   enabled: true
