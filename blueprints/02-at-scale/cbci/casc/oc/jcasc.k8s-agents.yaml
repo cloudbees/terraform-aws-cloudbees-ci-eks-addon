@@ -30,5 +30,3 @@ kube:
             operator: "Equal"
             value: "build-linux-l"
       yamlMergeStrategy: "override"
-
-
