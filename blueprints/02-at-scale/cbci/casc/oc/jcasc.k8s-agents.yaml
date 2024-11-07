@@ -30,35 +30,5 @@ kube:
             operator: "Equal"
             value: "build-linux-l"
       yamlMergeStrategy: "override"
-    - label: "busybox-L-UI"
-      name: "busybox-L-UI"
-      containers:
-      - args: "99d"
-        command: "sleep"
-        image: "busybox:1.37.0-musl"
-        livenessProbe:
-          failureThreshold: 0
-          initialDelaySeconds: 0
-          periodSeconds: 0
-          successThreshold: 0
-          timeoutSeconds: 0
-        name: "busybox"
-        resourceLimitMemory: "1Gi"
-        resourceRequestCpu: "250m"
-        resourceRequestMemory: "500Mi"
-        workingDir: "/home/jenkins/agent"
-      yaml: |-
-        apiVersion: "v1"
-        kind: "Pod"
-        spec:
-          nodeSelector:
-            kubernetes.io/os: linux
-            role: "build-linux-l"
-            size: "2x"
-          tolerations:
-          - effect: "NoSchedule"
-            key: "dedicated"
-            operator: "Equal"
-            value: "build-linux-l"
-      yamlMergeStrategy: "override"
+
 
