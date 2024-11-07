@@ -1,8 +1,8 @@
 kube:
   podTemplatesConfiguration:
     templates:
-    - label: "busybox-L"
-      name: "busybox-L"
+    - name: "busybox-L"
+      label: "busybox-L"
       yaml: |-
         apiVersion: "v1"
         kind: "Pod"
