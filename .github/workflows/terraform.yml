@@ -22,7 +22,8 @@ concurrency:
 jobs:
   collectInputs:
     name: Collect workflow inputs
-    runs-on: ubuntu-latest
+    runs-on:
+      group: large-runners
     outputs:
       directories: ${{ steps.dirs.outputs.directories }}
     steps:
@@ -36,7 +37,8 @@ jobs:
   preCommitMinVersions:
     name: Min TF pre-commit
     needs: collectInputs
-    runs-on: ubuntu-latest
+    runs-on:
+      group: large-runners
     strategy:
       matrix:
         directory: ${{ fromJson(needs.collectInputs.outputs.directories) }}
@@ -82,7 +84,8 @@ jobs:
 
   preCommitMaxVersion:
     name: Max TF pre-commit
-    runs-on: ubuntu-latest
+    runs-on:
+      group: large-runners
     needs: collectInputs
     steps:
       - name: Remove default Terraform
