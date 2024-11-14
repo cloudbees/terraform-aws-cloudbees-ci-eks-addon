@@ -123,7 +123,7 @@ module "ebs_csi_driver_irsa" {
 module "eks_blueprints_addons" {
   source = "aws-ia/eks-blueprints-addons/aws"
   #vEKSBpAddonsTFMod#
-  version    = "1.17.0"
+  version    = "1.19.0"
   depends_on = [module.eks]
 
   cluster_name      = module.eks.cluster_name
@@ -260,7 +260,7 @@ module "eks_blueprints_addons" {
       cbciAppsTolerationValue = local.mng["cbci_apps"]["taints"].value
     })]
     kubelet_monitoring = true
-    chart_version      = "0.1.28"
+    chart_version      = "0.1.34"
     s3_bucket_arns = [
       module.cbci_s3_bucket.s3_bucket_arn,
       "${local.fluentbit_s3_location}/*"
@@ -283,7 +283,7 @@ module "eks_blueprints_addons" {
   helm_releases = {
     openldap-stack = {
       chart            = "openldap-stack-ha"
-      chart_version    = "4.2.2"
+      chart_version    = "4.3.1"
       namespace        = "auth"
       create_namespace = true
       repository       = "https://jp-gouin.github.io/helm-openldap/"
@@ -307,7 +307,7 @@ module "eks_blueprints_addons" {
       namespace        = local.vault_ns
       create_namespace = true
       chart            = "vault"
-      chart_version    = "0.28.0"
+      chart_version    = "0.28.1"
       repository       = "https://helm.releases.hashicorp.com"
       values           = [file("k8s/vault-values.yml")]
     }
@@ -316,7 +316,7 @@ module "eks_blueprints_addons" {
       namespace        = local.observability_ns
       create_namespace = true
       chart            = "opentelemetry-collector"
-      chart_version    = "0.105.1"
+      chart_version    = "0.108.0"
       repository       = "https://open-telemetry.github.io/opentelemetry-helm-charts"
       values           = [file("k8s/otel-collector-values.yml")]
     }
@@ -325,7 +325,7 @@ module "eks_blueprints_addons" {
       namespace        = local.observability_ns
       create_namespace = true
       chart            = "tempo"
-      chart_version    = "1.7.2"
+      chart_version    = "1.10.3"
       repository       = "https://grafana.github.io/helm-charts"
       values           = [file("k8s/grafana-tempo-values.yml")]
     }
@@ -334,7 +334,7 @@ module "eks_blueprints_addons" {
       namespace        = local.observability_ns
       create_namespace = true
       chart            = "loki"
-      chart_version    = "6.12.0"
+      chart_version    = "6.18.0"
       repository       = "https://grafana.github.io/helm-charts"
       values           = [file("k8s/grafana-loki-values.yml")]
     }
